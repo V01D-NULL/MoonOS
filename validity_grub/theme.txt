@@ -1,0 +1,4 @@
+title-text: "Title Text"
+title-color: "#FFFFFF"
+desktop-image-background: "desktop-grub.png"
+terminal-font: "Droid Sans Mono Regular 11"
