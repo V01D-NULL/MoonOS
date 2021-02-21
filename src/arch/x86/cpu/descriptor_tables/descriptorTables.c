@@ -67,6 +67,13 @@ void init_descriptor_tables ()
 {
 	init_gdt();
 	init_idt();
+
+	get_gdt_info();
+}
+
+//Return some info about the memory layout after calling init_gdt()
+void get_gdt_info() {
+	kprintf("%%%% GDT %%%%\nMEM_MIN: %x\nMEM_MAX: %x\nGDT_GRANULARITY => %b\nListing: GDT_ACCESS\n\tSUPERVISOR_CODE => %b\n\tSUPERVISOR_DATA => %b\n\tUSERMODE_CODE => %b\n\tUSERMODE_DATA => %b\n%%%% GDT %%%%\n", MEM_MIN, MEM_MAX, 0xCF, 0x9A, 0x92, 0xFA, 0xF2);
 }
 
 //
@@ -75,11 +82,11 @@ static void init_gdt ()
 	gdt_ptr.limit = ( sizeof( gdt_entry_t ) * 5 ) - 1;
 	gdt_ptr.base  = ( u32int ) &gdt_entries;
 
-	gdt_set_gate( 0, 0,          0,    0,    0 );  // Null segment
-	gdt_set_gate( 1, 0, 0xFFFFFFFF, 0x9A, 0xCF );  // Kernel mode code segment
-	gdt_set_gate( 2, 0, 0xFFFFFFFF, 0x92, 0xCF );  // Kernel mode data segment
-	gdt_set_gate( 3, 0, 0xFFFFFFFF, 0xFA, 0xCF );  // User mode code segment
-	gdt_set_gate( 4, 0, 0xFFFFFFFF, 0xF2, 0xCF );  // User mode data segment
+	gdt_set_gate( 0, MEM_MIN, MEM_MIN,    0,    0 );  // Null segment
+	gdt_set_gate( 1, MEM_MIN, MEM_MAX, 0x9A, 0xCF );  // Kernel mode code segment
+	gdt_set_gate( 2, MEM_MIN, MEM_MAX, 0x92, 0xCF );  // Kernel mode data segment
+	gdt_set_gate( 3, MEM_MIN, MEM_MAX, 0xFA, 0xCF );  // User mode code segment
+	gdt_set_gate( 4, MEM_MIN, MEM_MAX, 0xF2, 0xCF );  // User mode data segment
 
 	gdt_flush( ( u32int ) &gdt_ptr );
 }

@@ -71,4 +71,7 @@ void delay(int time);
 //
 char* to_dec(u32int n);
 
+//
+void to_bin(unsigned int n);
+
 #endif  // COMMON_H

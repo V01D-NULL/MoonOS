@@ -134,7 +134,7 @@ int kmain ( struct multiboot *mboot_ptr )
 
 	init_vfs(mboot_ptr);
 	
-	init_pci();
+	// init_pci();
 	
 	// list_fs();
 	// list_file("/ValidityOS.txt");

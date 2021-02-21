@@ -374,6 +374,14 @@ int debug(char* fmt, ...)
 						break;
 					}
 
+					case 'b':
+					{
+						int bin = va_arg(arg, int);
+						to_bin(bin);
+						i+=2;
+						break;
+					}
+
 					default:
 						va_end(arg);
 						break;
@@ -437,6 +445,14 @@ int kprintf(const char* fmt, ...)
 						int hex = va_arg(arg, int);
 						monitor_write_hex(hex);
 						i += 2;
+						break;
+					}
+
+					case 'b':
+					{
+						int bin = va_arg(arg, int);
+						to_bin(bin);
+						i+=2;
 						break;
 					}
 
@@ -524,6 +540,14 @@ int kprintf_x(const char* fmt, ...)
 						int hex = va_arg(arg, int);
 						monitor_write_hex(hex);
 						i += 2;
+						break;
+					}
+
+					case 'b':
+					{
+						int bin = va_arg(arg, int);
+						to_bin(bin);
+						i+=2;
 						break;
 					}
 

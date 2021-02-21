@@ -4,6 +4,7 @@
 
 #include "../../../../common.h"
 #include "../../../../hal/pic.h"
+#include "../../../../drivers/screen/monitor.h"
 
 /*
 	We use the attribute 'packed' to tell GCC not to change
@@ -29,6 +30,8 @@
 */
 
 // GDT --------------------------------------------------------------
+#define MEM_MAX 0xFFFFFFFF
+#define MEM_MIN 0
 
 // GDT entry
 struct gdt_entry_struct
