@@ -134,10 +134,20 @@ int kmain ( struct multiboot *mboot_ptr )
 	init(mboot_ptr);	
 
 	init_vfs(mboot_ptr);
-	
+
 	// init_pci();
-	
+
 	get_cpl();
+
+	int ss, esp, cs, _eip;
+	asm volatile("movl %%ss, %0" : "r="(ss));
+	asm volatile("movl %%cs, %0" : "r="(cs));
+	asm volatile("movl %%esp, %0" : "r="(esp));
+
+	__asm__ volatile ("call 1f \n\t"
+             "1: pop %0" : "=r"(_eip));
+
+	kprintf("EIP: %x\nSS: %x\nCS: %x\nESP: %x\n", _eip, ss, cs, esp);
 
 	// list_fs();
 	// list_file("/ValidityOS.txt");
