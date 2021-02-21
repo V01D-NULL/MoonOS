@@ -377,7 +377,7 @@ int debug(char* fmt, ...)
 					case 'b':
 					{
 						int bin = va_arg(arg, int);
-						to_bin(bin);
+						to_bin(bin, true);
 						i+=2;
 						break;
 					}
@@ -451,7 +451,7 @@ int kprintf(const char* fmt, ...)
 					case 'b':
 					{
 						int bin = va_arg(arg, int);
-						to_bin(bin);
+						to_bin(bin, false);
 						i+=2;
 						break;
 					}
@@ -546,7 +546,7 @@ int kprintf_x(const char* fmt, ...)
 					case 'b':
 					{
 						int bin = va_arg(arg, int);
-						to_bin(bin);
+						to_bin(bin, false);
 						i+=2;
 						break;
 					}

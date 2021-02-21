@@ -12,6 +12,7 @@
 // CPU/Architecture specific
 #include "arch/x86/cpu/descriptor_tables/descriptorTables.h"
 #include "arch/x86/cpu/interrupts/interrupts.h"
+#include "arch/x86/usermode/usermode.h"
 #include "arch/x86/cpuid.h"
 
 // HAL
@@ -136,6 +137,8 @@ int kmain ( struct multiboot *mboot_ptr )
 	
 	// init_pci();
 	
+	get_cpl();
+
 	// list_fs();
 	// list_file("/ValidityOS.txt");
 	// kernel_demo_end();

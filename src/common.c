@@ -182,7 +182,8 @@ void delay(int time) {
      }
 }
 
-void to_bin(unsigned int n)
+// The boolean is_caller_debug is used sothat a debug() function call with the %b symbol will redirect the output to the serial and not the screen
+void to_bin(unsigned int n, bool is_caller_debug)
 {
     int a[10], i, result[10];
     for(i=0;n>0;i++)    
@@ -192,7 +193,10 @@ void to_bin(unsigned int n)
     }    
     
     for(i=i-1;i>=0;i--)    
-    {    
-        kprintf("%d",a[i]);
+    {
+        if (!is_caller_debug)
+            kprintf("%d",a[i]);
+        else
+            debug("%d", a[i]);
 	}
 }
