@@ -13,6 +13,7 @@
 #include "arch/x86/cpu/descriptor_tables/descriptorTables.h"
 #include "arch/x86/cpu/interrupts/interrupts.h"
 #include "arch/x86/usermode/usermode.h"
+#include "arch/x86/bios32/bios32.h"
 #include "arch/x86/cpuid.h"
 
 // HAL
@@ -129,6 +130,7 @@ void init (struct multiboot *mboot_ptr)
 // void trigger_page_fault() { u32int *ptr = ( u32int* ) 0xA0000000; u32int trigger_page_fault = *ptr; }
 
 
+
 int kmain ( struct multiboot *mboot_ptr )
 {
 	init(mboot_ptr);	
@@ -148,6 +150,10 @@ int kmain ( struct multiboot *mboot_ptr )
              "1: pop %0" : "=r"(_eip));
 
 	kprintf("EIP: %x\nSS: %x\nCS: %x\nESP: %x\n", _eip, ss, cs, esp);
+
+	regs16_t r;
+	r.ax = 0x0013;
+	int32(0x10, &r);
 
 	// list_fs();
 	// list_file("/ValidityOS.txt");
