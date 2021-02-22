@@ -11,7 +11,8 @@
 OUTPUT_ARCH(i386)
 ENTRY( start )
 SECTIONS
-{	
+{
+	
 	.text 0x100000 :
 	{
 		code   = .;

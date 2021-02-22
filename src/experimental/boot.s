@@ -1,1 +1,0 @@
-%define MAGIC 0xE85250D6
