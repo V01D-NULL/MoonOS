@@ -13,6 +13,7 @@
 #include "arch/x86/cpu/descriptor_tables/descriptorTables.h"
 #include "arch/x86/cpu/interrupts/interrupts.h"
 #include "arch/x86/usermode/usermode.h"
+#include "arch/x86/bios32/bios_calls.h"
 #include "arch/x86/bios32/bios32.h"
 #include "arch/x86/cpuid.h"
 
@@ -42,6 +43,12 @@
 #include "sys/timer.h"
 #include "panic.h"
 #include "ascii_art.h"
+
+//Power / device managment related
+#include "power/shared/shared_reboot.h"
+
+// VM / emulator related
+#include "power/vm/vm_power.h"
 
 //For some reason everything inside of sys/timer.h has to be re-defined. Otherwise it will be an implicit declaration. IDK why, if you do- please tell me.
 //Also note that this only occurs inside of this main.c file. Every other file is fine.
@@ -137,7 +144,7 @@ int kmain ( struct multiboot *mboot_ptr )
 
 	init_vfs(mboot_ptr);
 
-	// init_pci();
+	init_pci();
 
 	get_cpl();
 
@@ -150,10 +157,6 @@ int kmain ( struct multiboot *mboot_ptr )
              "1: pop %0" : "=r"(_eip));
 
 	kprintf("EIP: %x\nSS: %x\nCS: %x\nESP: %x\n", _eip, ss, cs, esp);
-
-	regs16_t r;
-	r.ax = 0x0013;
-	int32(0x10, &r);
 
 	// list_fs();
 	// list_file("/ValidityOS.txt");

@@ -2,7 +2,7 @@
 Validity OS is a monolithic kernel targeting the x86 architecture (IA32 ~ 32 bits).
 
 # Features
-- Mulitboot2 compliant
+- Mulitboot compliant
 	- Uses GRUB2
 - GDT
 - Interrupts
@@ -11,15 +11,16 @@ Validity OS is a monolithic kernel targeting the x86 architecture (IA32 ~ 32 bit
 - Paging
 - Serial in & output
 - CMOS/RTC Timestamp
+- Simple VFS
+
 # Future features:
-- APIC
+- Multiboot2
+- ACPI
 - Many hardware drivers including but not limited to:
 	- Network cards
 	- ATA
 	- GPU's
 	- And much more
-- Simple VFS
-- UART driver
 - Simple userland mode
 - A small libc for the userland
 
