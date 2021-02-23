@@ -1,7 +1,7 @@
 #include "vfs.h"
-#include "pre_env/initrd.h"
+// #include "pre_env/initrd.h"
 
-extern u32int placement_address;
+// extern u32int placement_address;
 
 
 // The root of the file system
@@ -95,14 +95,14 @@ void init_vfs(struct multiboot *mboot_ptr)
 	u32int initrd_end      = *( ( u32int * ) ( mboot_ptr -> mods_addr + 4 ) );
 
 	// Don't trample our module with placement accesses
-	placement_address = initrd_end;
+	// placement_address = initrd_end;
 
 	// Initialise paging
-	init_paging();
+	// init_paging();
 
 	monitor_write("Loading initrd into memory\n", true, false);
 	// Initialise the initial ramdisk, and set it as the filesystem root
-	fs_root = init_initrd( initrd_location );
+	// fs_root = init_initrd( initrd_location );
 	
 	monitor_write("Setup VFS\n", false, true);
 	

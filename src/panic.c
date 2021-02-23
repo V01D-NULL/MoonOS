@@ -3,7 +3,7 @@
 #include "common.h"
 #include "drivers/io/serial.h"
 #include "drivers/screen/monitor.h"
-#include "mem/heap.h"
+
 
 //Specific to interrupts
 void dump_regs_interrupt(registers_t r)

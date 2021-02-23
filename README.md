@@ -6,15 +6,15 @@ Validity OS is a monolithic kernel targeting the x86 architecture (IA32 ~ 32 bit
 	- Uses GRUB2
 - GDT
 - Interrupts
-- A simple heap / memory allocator
 - CPU Identification
-- Paging
 - Serial in & output
 - CMOS/RTC Timestamp
 - Simple VFS
 
 # Future features:
-- Multiboot2
+- A simple heap / memory allocator
+- Paging
+- Multiboot2 (Due to my computer's problems this is on hold for an unkown timespan (that is until I can afford a new computer))
 - ACPI
 - Many hardware drivers including but not limited to:
 	- Network cards
@@ -24,6 +24,8 @@ Validity OS is a monolithic kernel targeting the x86 architecture (IA32 ~ 32 bit
 - Simple userland mode
 - A small libc for the userland
 
+# This is currently being working on:
+- A rewrite of the allocation and paging implementations (I kinda stole the code from a tutorial and wish to rewrite it in order to increase the level of independence for me, my learning experience and my kernel)
 
 # Installation
 ## Building:

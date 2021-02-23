@@ -31,8 +31,7 @@
 #include "drivers/mouse/mouse.h"
 
 //Mem
-#include "mem/heap.h"
-#include "mem/paging.h"
+#include "mem/pmm.h"
 
 //VFS
 #include "fs/vfs.h"
@@ -113,9 +112,9 @@ void init (struct multiboot *mboot_ptr)
 	//Get multiboot info
 	get_boot_info(mboot_ptr);
 
-	debug(".text: %x\n.data: %x\n.bss: %x\n", get_section_text(), get_section_data(), get_section_bss());
-	debug("***************************\n");
-	debug("Physical memory: %x\n", get_physical_memory_map(mboot_ptr));
+	// debug(".text: %x\n.data: %x\n.bss: %x\n", get_section_text(), get_section_data(), get_section_bss());
+	// debug("***************************\n");
+	// debug("Physical memory: %x\n", get_physical_memory_map(mboot_ptr));
 
 	//Check the CPU
 	checkCPU();
@@ -157,7 +156,7 @@ int kmain ( struct multiboot *mboot_ptr )
              "1: pop %0" : "=r"(_eip));
 
 	kprintf("EIP: %x\nSS: %x\nCS: %x\nESP: %x\n", _eip, ss, cs, esp);
-
+	print_end();
 	// list_fs();
 	// list_file("/ValidityOS.txt");
 	// kernel_demo_end();

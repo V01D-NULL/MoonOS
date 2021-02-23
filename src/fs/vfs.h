@@ -3,7 +3,7 @@
 
 #include "../common.h"
 #include "../multiboot.h"
-#include "../mem/paging.h"
+#include "../panic.h"
 
 #define VFS_FILE        0x01
 #define VFS_DIR         0x02
