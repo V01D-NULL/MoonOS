@@ -5,6 +5,6 @@
 #include "../../../drivers/screen/monitor.h"
 
 void get_cpl();
-
+extern void enter_usermode();
 
 #endif // USERMODE_H

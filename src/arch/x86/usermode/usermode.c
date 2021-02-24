@@ -1,10 +1,5 @@
 #include "usermode.h"
 
-void enter_usermode()
-{
-
-}
-
 // Prints the Current Privilege Level
 void get_cpl()
 {

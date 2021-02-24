@@ -17,7 +17,7 @@ bits 32                             ; All instructions should be 32-bit.
 global mboot                        ; Make 'mboot' accessible from C.
 extern code                         ; Start of the '.text' section.
 extern bss                          ; Start of the .bss section.
-extern end                          ; End of the last loadable section.
+extern kernel_end                          ; End of the last loadable section.
 
 mboot:
 
@@ -29,7 +29,7 @@ mboot:
 	dd  mboot                       ; Location of this descriptor
 	dd  code                        ; Start of kernel '.text' (code) section.
 	dd  bss                         ; End of kernel '.data' section.
-	dd  end                         ; End of kernel.
+	dd  kernel_end                         ; End of kernel.
 	dd  start                       ; Kernel entry point (initial EIP).
 
 global start                        ; Kernel entry point.

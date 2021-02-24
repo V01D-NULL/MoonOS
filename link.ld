@@ -12,6 +12,7 @@ OUTPUT_ARCH(i386)
 ENTRY( start )
 SECTIONS
 {	
+	kernel_start = .;
 	.text 0x100000 :
 	{
 		code   = .;
@@ -43,7 +44,6 @@ SECTIONS
 		. = ALIGN( 4096 );
 	}
 
-	end   = .;
-	_end  = .;
-	__end = .;
+	. = ALIGN(4096); /* page align */
+	kernel_end = .;
 }
