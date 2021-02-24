@@ -6,6 +6,7 @@
 #include "../../stdarg.h"
 #include "../../sys/timer.h"
 #include "../io/serial.h"
+#include "cursor.h"
 
 #define NCOLS   80
 #define NROWS   25

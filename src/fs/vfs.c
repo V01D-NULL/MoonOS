@@ -91,8 +91,8 @@ void init_vfs(struct multiboot *mboot_ptr)
 		return; //Otherwise machine will triple fault
 	}
 
-	u32int initrd_location = *( ( u32int * )   mboot_ptr -> mods_addr );
-	u32int initrd_end      = *( ( u32int * ) ( mboot_ptr -> mods_addr + 4 ) );
+	// u32int initrd_location = *( ( u32int * )   mboot_ptr -> mods_addr );
+	// u32int initrd_end      = *( ( u32int * ) ( mboot_ptr -> mods_addr + 4 ) );
 
 	// Don't trample our module with placement accesses
 	// placement_address = initrd_end;
@@ -100,11 +100,11 @@ void init_vfs(struct multiboot *mboot_ptr)
 	// Initialise paging
 	// init_paging();
 
-	monitor_write("Loading initrd into memory\n", true, false);
+	// monitor_write("Loading initrd into memory\n", true, false);
 	// Initialise the initial ramdisk, and set it as the filesystem root
 	// fs_root = init_initrd( initrd_location );
 	
-	monitor_write("Setup VFS\n", false, true);
+	// monitor_write("Setup VFS\n", false, true);
 	
 }
 

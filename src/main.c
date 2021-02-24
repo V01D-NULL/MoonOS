@@ -141,6 +141,8 @@ int kmain ( struct multiboot *mboot_ptr )
 {
 	init(mboot_ptr);	
 
+	pmm_init();
+
 	init_vfs(mboot_ptr);
 
 	init_pci();
@@ -156,7 +158,7 @@ int kmain ( struct multiboot *mboot_ptr )
              "1: pop %0" : "=r"(_eip));
 
 	kprintf("EIP: %x\nSS: %x\nCS: %x\nESP: %x\n", _eip, ss, cs, esp);
-	print_end();
+	
 	// list_fs();
 	// list_file("/ValidityOS.txt");
 	// kernel_demo_end();

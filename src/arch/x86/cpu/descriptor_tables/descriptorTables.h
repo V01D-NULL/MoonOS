@@ -141,5 +141,6 @@ extern void irq13 ();
 extern void irq14 ();
 extern void irq15 ();
 
+void get_gdt_info();
 
 #endif  // DESCRIPTOR_TABLES_H
