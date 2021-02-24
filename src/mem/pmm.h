@@ -12,12 +12,19 @@
 
 #define PMM_FREE 1
 #define PMM_USED 0
+#define PMM_4KB  0x10000
 
 //Set a bit to bit_val at index idx
 #define SET_FLAG(bit_val, idx) (bit_val << idx)
 
 void pmm_init();
-void pmm_alloc();
+u32int pmm_alloc();
 void pmm_free();
+
+
+//IGNORE
+u32int pmm_stack_alloc();
+void pmm_stack_free();
+extern void s_pmm();
 
 #endif // PMM_H

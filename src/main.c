@@ -158,8 +158,13 @@ int kmain ( struct multiboot *mboot_ptr )
              "1: pop %0" : "=r"(_eip));
 
 	kprintf("EIP: %x\nSS: %x\nCS: %x\nESP: %x\n", _eip, ss, cs, esp);
-	kprintf("Entering usermode...\n");
 	
+	pmm_stack_alloc(1024);
+	asm volatile("movl %%esp, %0" : "r="(esp));
+	debug("%x\n", esp);
+
+	s_pmm();
+	// kprintf("Entering usermode...\n");
 	// enter_usermode(); //tss not setup yet. pls ignore
 	
 	// list_fs();

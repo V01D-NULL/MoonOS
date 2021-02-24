@@ -39,7 +39,7 @@ void pmm_init(struct multiboot *ptr)
     debug("pmm_init: Marking kernel memory as reserved ( %x -> %x )\n", (u32int)&kernel_start, (u32int)&kernel_end);
 }
 
-//Need to set a bit or something. Read up somemore and look at other projects for help
+//Need to set a bit or something. Read some more wiki entries and look at other projects for help if needed
 void pmm_mark_as_used()
 {
 
@@ -48,4 +48,23 @@ void pmm_mark_as_used()
 void pmm_free(void *memory)
 {
     
+}
+
+/*
+    The stack allocation is merely for learning purposes. It's downside of not being able to work on page boundaries makes me turn it down as a main mm.
+*/
+u32int pmm_stack_alloc(u32int size)
+{
+    u32int esp;
+    asm volatile("movl %%esp, %0" : "r="(esp));
+    debug("pmm_stack_alloc: Stack address: %x\n", esp);
+    debug("pmm_stack_alloc: Reserving memory on the stack from %x => %x\n", esp, (esp+size));
+    asm volatile("push %0" :: "r"(esp+size));
+    
+    return  esp;
+}
+
+void pmm_stack_free()
+{
+
 }
