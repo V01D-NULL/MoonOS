@@ -359,7 +359,7 @@ int debug(char* fmt, ...)
 					case 'i':
 					case 'd':
 					{
-						int val = va_arg(arg, int);
+						u64int val = va_arg(arg, int);
 						serial_write_dec(val);
 						i += 2;
 						break;
@@ -368,7 +368,7 @@ int debug(char* fmt, ...)
 					case 'x':
 					case 'X':
 					{
-						int hex = va_arg(arg, int);
+						u64int hex = va_arg(arg, int);
 						serial_write_hex(hex);
 						i += 2;
 						break;

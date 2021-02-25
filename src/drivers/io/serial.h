@@ -23,8 +23,8 @@
 void serial_write(char chr);
 char serial_read();
 void serial_write_str(const char* str);
-void serial_write_dec(u32int n);
-void serial_write_hex(u32int n);
+void serial_write_dec(u64int n);
+void serial_write_hex(u64int n);
 void serial_set_color(const char* color_code);
 
 #endif

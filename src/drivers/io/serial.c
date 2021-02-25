@@ -28,7 +28,7 @@ void serial_write_str(const char* str)
     }
 }
 
-void serial_write_dec(u32int n)
+void serial_write_dec(u64int n)
 {
     switch (n) {
         case 0:
@@ -67,7 +67,7 @@ void serial_write_dec(u32int n)
     }
 }
 
-void serial_write_hex(u32int n)
+void serial_write_hex(u64int n)
 {
     signed int tmp;
 	int i;

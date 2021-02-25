@@ -5,6 +5,7 @@
     Page Frame Allocation and alike
 */
 #include "../common.h"
+#include "../panic.h"
 #include "../multiboot.h"
 #include "../drivers/screen/monitor.h"
 

@@ -31,29 +31,29 @@ void pmm_init(struct multiboot *ptr)
             u32int *addr_end = addr + mmap_start->length;
 
             while (addr < addr_end) {
-                pmm_free((void*)addr); //Set's a bit as free (1)
+                pmm_free(addr); //Set's a bit as free (1)
                 addr += PMM_4KB; //Page align
             }
         }
         mmap_start++;
     }
     debug("pmm_init: Marking kernel memory as reserved ( %x -> %x )\n", (u32int)&kernel_start, (u32int)&kernel_end);
-    u32int *kern_addr = (u32int*)&kernel_start;
+    u32int* kern_addr = (u32int*)&kernel_start;
     while (kern_addr < (u32int*)&kernel_end)
     {
         pmm_mark_as_used(kern_addr);
         kern_addr += PMM_4KB;
     }
-    debug("pmm_init: Max physical block size => %x\n", max_phys_blocks);
+    debug("pmm_init: Max physical block size => %d\n", 524288);
 }
 
 //Need to set a bit or something. Read some more wiki entries and look at other projects for help if needed
 static void pmm_mark_as_used(u32int bit)
 {
-    debug("pmm_mark_used: Marking %d as used\n", bit);
+    debug("pmm_mark_used: Marking the bit %d as used\npmm_mark_used: The sizeof the paramter in bytes is %d\n", bit, sizeof(bit));
     
     //Mark the "is memory block used" bit in the bitmap array (the memory container if you will) as used.
-    bitmap[SET_FLAG(PMM_FREE)] = SET_BIT(bit, 5, PMM_USED);
+    bitmap[SET_FLAG(PMM_USED)] = SET_BIT(bit, 5, PMM_USED);
 }
 
 void pmm_free(u32int memory)

@@ -73,7 +73,7 @@ void init_descriptor_tables ()
 
 //Return some info about the memory layout after calling init_gdt()
 void get_gdt_info() {
-	kprintf("%%%% GDT %%%%\nMEM_MIN: %x\nMEM_MAX: %x\nGDT_GRANULARITY => %b\nListing: GDT_ACCESS\n\tSUPERVISOR_CODE => %b\n\tSUPERVISOR_DATA => %b\n\tUSERMODE_CODE => %b\n\tUSERMODE_DATA => %b\n%%%% GDT %%%%\n", MEM_MIN, MEM_MAX, 0xCF, 0x9A, 0x92, 0xFA, 0xF2);
+	debug("%%%% GDT %%%%\nMEM_MIN: %x\nMEM_MAX: %x\nGDT_GRANULARITY => %b\nListing: GDT_ACCESS\n\tSUPERVISOR_CODE => %b\n\tSUPERVISOR_DATA => %b\n\tUSERMODE_CODE => %b\n\tUSERMODE_DATA => %b\n%%%% GDT %%%%\n", MEM_MIN, MEM_MAX, 0xCF, 0x9A, 0x92, 0xFA, 0xF2);
 }
 
 //
