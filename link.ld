@@ -12,8 +12,9 @@ OUTPUT_ARCH(i386)
 ENTRY( start )
 SECTIONS
 {	
+	. = 0x100000;
 	kernel_start = .;
-	.text 0x100000 :
+	.text :
 	{
 		code   = .;
 		_code  = .;

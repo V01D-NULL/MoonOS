@@ -20,11 +20,6 @@
 void pmm_init();
 u32int pmm_alloc();
 void pmm_free();
-
-
-//IGNORE
-u32int pmm_stack_alloc();
-void pmm_stack_free();
-extern void s_pmm();
+static void pmm_mark_as_used();
 
 #endif // PMM_H
