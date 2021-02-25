@@ -5,6 +5,7 @@ extern volatile const u32int kernel_start;
 extern volatile const u32int kernel_end;
 
 static u32int bitmap[BITMAP_SZ];
+static u32int max_phys_blocks = BITMAP_SZ * 32;
 
 /*
     1. Mark the whole memory area as used/reserved (1)
@@ -40,17 +41,17 @@ void pmm_init(struct multiboot *ptr)
     u32int *kern_addr = (u32int*)&kernel_start;
     while (kern_addr < (u32int*)&kernel_end)
     {
-        pmm_mark_as_used((void*)kern_addr);
+        pmm_mark_as_used(kern_addr);
         kern_addr += PMM_4KB;
     }
+    debug("pmm_init: Max physical block size => %x\n", max_phys_blocks);
 }
 
 //Need to set a bit or something. Read some more wiki entries and look at other projects for help if needed
-static void pmm_mark_as_used(u32int addr)
+static void pmm_mark_as_used(u32int *bit)
 {
-    kprintf("%b\n", addr);
-    addr |= 5 << PMM_USED;
-    kprintf("%b\n", addr);
+    debug("pmm_mark_used: Marking %d as used\n", bit);
+    // bitmap[]
 }
 
 void pmm_free(void *memory)
