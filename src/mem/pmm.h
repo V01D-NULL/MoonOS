@@ -13,9 +13,10 @@
 #define PMM_FREE 1
 #define PMM_USED 0
 #define PMM_4KB  0x10000 //Also known as blocksize
+#define FREE_OR_USED_BIT 5 //Bit 5 will determine whether the memoryblock is free or not (0 or 1)
 
-//Set a bit to bit_val at index idx
-#define SET_FLAG(bit_val, idx) (bit_val << idx)
+//This will mainly be used in the bitmap array. It defines the value (free or used) at the given index
+#define SET_FLAG(bit_val) (bit_val << FREE_OR_USED_BIT)
 
 void pmm_init();
 u32int pmm_alloc();

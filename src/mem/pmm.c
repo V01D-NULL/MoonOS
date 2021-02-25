@@ -48,10 +48,12 @@ void pmm_init(struct multiboot *ptr)
 }
 
 //Need to set a bit or something. Read some more wiki entries and look at other projects for help if needed
-static void pmm_mark_as_used(u32int *bit)
+static void pmm_mark_as_used(u32int bit)
 {
     debug("pmm_mark_used: Marking %d as used\n", bit);
-    // bitmap[]
+    
+    //Mark the "is memory block used" bit in the bitmap array (the memory container if you will) as used.
+    bitmap[SET_FLAG(PMM_FREE)] = SET_BIT(bit, 5, PMM_USED);
 }
 
 void pmm_free(void *memory)

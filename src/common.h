@@ -5,7 +5,8 @@
 
 //Checks if the bit is set. Returns 1 if true, 0 if false.
 // Input is the variable containing the value to be checked, bit_index = Nth bit to check.
-#define CHECK_BIT(variable, bit_index) (((variable)>>(bit_index)) & 1) //First bit shift to the given bit index (N). Then simply OR it with 1 to check if it is set.
+#define CHECK_BIT(variable, bit_index)      (((variable)>>(bit_index)) & 1) //First bit shift to the given bit index (N). Then simply OR it with 1 to check if it is set.
+#define SET_BIT(variable, bit_index, value) internal_set_bit(variable, bit_index, value)
 
 //
 #define NBITS 32
@@ -23,6 +24,13 @@ typedef          short s16int;
 typedef unsigned char  u8int;
 typedef          char  s8int;
 typedef          int   bool;
+
+//Sets a bit at a given index and returns it.
+//This is just a wrapper function for the SET_BIT macro
+static inline u32int internal_set_bit(u32int variable, u32int bit_index, u32int value)
+{
+    return (((variable)>>bit_index) | value);
+}
 
 //io.s
 extern void outb(u16int port,  u8int val);
