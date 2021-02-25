@@ -27,7 +27,7 @@ void pmm_init(struct multiboot *ptr)
         if (mmap_start->type == PMM_FREE)
         {
             //Here we have the start and end address of the memory map provided by GRUB
-            u32int *addr = (u32int*)mmap_start->base;
+            u32int *addr = mmap_start->base;
             u32int *addr_end = addr + mmap_start->length;
 
             while (addr < addr_end) {
@@ -56,7 +56,7 @@ static void pmm_mark_as_used(u32int bit)
     bitmap[SET_FLAG(PMM_FREE)] = SET_BIT(bit, 5, PMM_USED);
 }
 
-void pmm_free(void *memory)
+void pmm_free(u32int memory)
 {
     
 }

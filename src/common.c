@@ -24,6 +24,25 @@ void memset ( u8int *dest, u8int val, u32int len )  // byte-addressable
 	}
 }
 
+
+// Returns 1 if src is less than dst
+// Returns -1 if src is greater than dst
+// Returns 0 if the length of src and dst are equal
+u32int memcmp(const void *src, void *dst, int n)
+{
+    const u8int *src_a = src;
+    u8int *dst_a = dst;
+    
+    for (int i = 0; i < n; i++)
+    {
+        if (src_a[i] < dst_a[i])
+            return 1;
+        else if (src_a[i] > dst_a[i])
+            return -1;
+    }
+    return 0;
+}
+
 // Compare two strings.
 /* Should return,
      -1 if ( len(str1) > len(str2) ) or ( len(str2) > len(str1) )  // sort of. Shouldn't be used for len comp as will report mismatch first
