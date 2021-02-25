@@ -46,9 +46,11 @@ void pmm_init(struct multiboot *ptr)
 }
 
 //Need to set a bit or something. Read some more wiki entries and look at other projects for help if needed
-static void pmm_mark_as_used()
+static void pmm_mark_as_used(u32int addr)
 {
-
+    kprintf("%b\n", addr);
+    addr |= 5 << PMM_USED;
+    kprintf("%b\n", addr);
 }
 
 void pmm_free(void *memory)
