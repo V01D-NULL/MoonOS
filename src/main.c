@@ -162,6 +162,11 @@ int kmain ( struct multiboot *mboot_ptr )
 	
 	total_ram(mboot_ptr);
 
+	if (CHECK_BIT(mboot_ptr->flags, 12))
+	{
+		kprintf("apm table stuff is guud to go\n");
+	}
+
 	// kprintf("Entering usermode...\n");
 	// enter_usermode(); //tss not setup yet. pls ignore
 	

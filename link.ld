@@ -16,6 +16,11 @@ SECTIONS
 	kernel_start = .;
 	.text :
 	{
+		/* Multiboot (just places the multiboot structure in the first 8kb of the elf file */
+		. = ALIGN(8);
+		KEEP(*(.multiboot))
+
+		/* Kernel code */
 		code   = .;
 		_code  = .;
 		__code = .;

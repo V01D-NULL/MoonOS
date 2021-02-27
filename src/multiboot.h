@@ -3,6 +3,9 @@
 #ifndef MULTIBOOT_H
 #define MULTIBOOT_H
 
+//
+//https://www.gnu.org/software/grub/manual/multiboot/multiboot.html#Boot-information-format
+//
 
 #include "common.h"
 
@@ -49,7 +52,7 @@ struct multiboot
     u32int vbe_interface_seg;
     u32int vbe_interface_off;
     u32int vbe_interface_len;
-}__attribute__((packed));
+}__attribute__((section(".multiboot")));
 
 typedef struct multiboot_header multiboot_header_t;
 
@@ -58,6 +61,6 @@ struct multiboot_mmap {
     unsigned long long  base;
     unsigned long long  length;
     u32int              type;
-}__attribute__((packed));
+}__attribute__((section(".multiboot")));
 
 #endif  // MULTIBOOT_H

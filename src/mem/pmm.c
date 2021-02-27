@@ -114,7 +114,6 @@ u64int total_ram(struct multiboot *ptr)
         }
         mmap_start++;
     }
-    kprintf("%d %x\n", total_memory, total_memory);
     total_memory = total_memory / 4096 * 1024;
     kprintf("Ram memory total: %x\n", total_memory);
     return total_memory;

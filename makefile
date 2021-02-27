@@ -81,8 +81,8 @@ QEMU = qemu-system-i386
 
 # Flags
 # -serial mon:stdio is used so that ^C won't make qemu exit
-QEMUOPTS = -kernel $(ELF) -serial mon:stdio -d cpu_reset -soundhw pcspk -initrd $(INITRD) # -full-screen
-QEMUOPTS_GRUB = -cdrom $(ISO) -serial mon:stdio -d cpu_reset -soundhw pcspk -m 4kb
+QEMUOPTS = -kernel $(ELF) -serial mon:stdio -d cpu_reset -soundhw pcspk -initrd $(INITRD) -m 4G -vga std # -full-screen
+QEMUOPTS_GRUB = -cdrom $(ISO) -serial mon:stdio -d cpu_reset -soundhw pcspk -m 4G
 
 # Try to generate a unique GDB port
 GDBPORT = $(shell expr `id -u` % 5000 + 25000)

@@ -43,7 +43,7 @@ Validity OS is a monolithic kernel targeting the x86 architecture (IA32 ~ 32 bit
 	- If any of the compilation steps gives you an error, then you most likely don't have any object files the makefile tries to remove. If this is the case, execute make _all and try to compile again or type make run from there on since make _all compiles everything, but doesn't run the kernel.
 
 # Resources:
--  This kernel is mainly built upon JamesM's kernel development tutorials, however many hours of googling and other resources have brought me to this point.
+- This kernel started by me learning from james JamesM's kernel development tutorials, however I changed almost all of his code because of the bad and partially outdated implementations he presented. Thanks go out to websites like lowlevel.eu or the osdev wiki but also some cool and really helpful os developers on github and discord.
 
 * https://rwth-os.github.io/eduOS/
 * https://github.com/kAworu/JamesM
