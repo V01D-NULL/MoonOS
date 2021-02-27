@@ -54,12 +54,14 @@ static void pmm_mark_as_used(void *page)
 {
     // u32int in_case_of_kernel_panic = 0;
 
-    // debug("pmm_mark_as_used: page => %x\n", (u32int*)page);
-    // debug("pmm_mark_as_used: idx => %x\n", PMM_IDX(page));
-    u32int idx = (u32int)page/4096;
+    debug("pmm_mark_as_used: page => %x\n", (u32int*)page);
+    debug("pmm_mark_as_used: idx => %x\n", PMM_IDX(page));
+    u32int idx = PMM_IDX(page);
 
     //Mark the "is memory block used" bit in the bitmap array (the memory container if you will) as used.
     bitmap[idx/32] &= ~(1 << (idx % 32));
+    
+    //Super slow.
     // if (in_case_of_kernel_panic != PMM_USED)
     // {
     //     int __idx__ = bitmap[PMM_IDX(page)/32];
@@ -70,8 +72,12 @@ static void pmm_mark_as_used(void *page)
 
 void pmm_free(void *page)
 {
-    // debug("pmm_free: page => %x\n", (u32int*)page);
-    // debug("pmm_free: idx => %x\n", PMM_IDX(page));
-    u32int idx = (u32int)page/4096;
+    //Please ONLY use for debugging. This is really slow for larger address spaces
+    #ifdef DEBUG
+    debug("pmm_free: page => %x\n", (u32int*)page);
+    debug("pmm_free: idx => %x\n", PMM_IDX(page));
+    #endif
+
+    u32int idx = PMM_IDX(page);
     bitmap[idx/32] |= (1 << (idx % 32));
 }
