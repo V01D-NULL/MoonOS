@@ -21,9 +21,10 @@ static inline u32int internal_pmm_idx(void *page)
     return (u32int) page / 4096;
 }
 
-void pmm_init();
-u32int pmm_alloc();
+void pmm_init(struct multiboot *ptr);
 void pmm_free(void *page);
+u32int pmm_alloc();
 static void pmm_mark_as_used(void *page);
+u64int total_ram(struct multiboot *ptr);
 
 #endif // PMM_H

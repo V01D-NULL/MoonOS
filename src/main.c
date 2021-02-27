@@ -119,6 +119,9 @@ void init (struct multiboot *mboot_ptr)
 	//Check the CPU
 	checkCPU();
 	
+	// pmm must be initialised before the GDT
+	pmm_init(mboot_ptr);
+
 	// Initialize ISRs and segments
 	init_descriptor_tables();
 
@@ -141,8 +144,6 @@ int kmain ( struct multiboot *mboot_ptr )
 {
 	init(mboot_ptr);	
 
-	pmm_init(mboot_ptr);
-
 	init_vfs(mboot_ptr);
 
 	init_pci();
@@ -159,7 +160,7 @@ int kmain ( struct multiboot *mboot_ptr )
 
 	kprintf("EIP: %x\nSS: %x\nCS: %x\nESP: %x\n", _eip, ss, cs, esp);
 	
-	
+	total_ram(mboot_ptr);
 
 	// kprintf("Entering usermode...\n");
 	// enter_usermode(); //tss not setup yet. pls ignore

@@ -18,7 +18,7 @@ ELF    	 = kernel.elf
 INITRD 	 = initrd.img
 
 # 32 bit flags
-CFLAGS  = -nostdlib -nostdinc -fno-builtin -fno-stack-protector -m32 -Wall -g
+CFLAGS  = -nostdlib -nostdinc -fno-builtin -fno-stack-protector -m32 -Wall -g 
 ASFLAGS = -f elf32 -F dwarf -g
 LDFLAGS = -T link.ld -m elf_i386
 
@@ -82,7 +82,7 @@ QEMU = qemu-system-i386
 # Flags
 # -serial mon:stdio is used so that ^C won't make qemu exit
 QEMUOPTS = -kernel $(ELF) -serial mon:stdio -d cpu_reset -soundhw pcspk -initrd $(INITRD) # -full-screen
-QEMUOPTS_GRUB = -cdrom $(ISO) -serial mon:stdio -d cpu_reset -soundhw pcspk -m 4G
+QEMUOPTS_GRUB = -cdrom $(ISO) -serial mon:stdio -d cpu_reset -soundhw pcspk -m 4kb
 
 # Try to generate a unique GDB port
 GDBPORT = $(shell expr `id -u` % 5000 + 25000)

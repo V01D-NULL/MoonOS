@@ -31,13 +31,13 @@ struct multiboot
     u32int boot_device;
     u32int cmdline;
     u32int mods_count;
-    u32int mods_addr;
+    void   *mods_addr;
     u32int num;
     u32int size;
     u32int addr;
     u32int shndx;
     u32int mmap_length;
-    u32int mmap_addr;
+    void   *mmap_addr;
     u32int drives_length;
     u32int drives_addr;
     u32int config_table;
@@ -49,8 +49,7 @@ struct multiboot
     u32int vbe_interface_seg;
     u32int vbe_interface_off;
     u32int vbe_interface_len;
-}
-__attribute__( ( packed ) );
+}__attribute__((packed));
 
 typedef struct multiboot_header multiboot_header_t;
 
@@ -59,6 +58,6 @@ struct multiboot_mmap {
     unsigned long long  base;
     unsigned long long  length;
     u32int              type;
-} __attribute__((packed));
+}__attribute__((packed));
 
 #endif  // MULTIBOOT_H
