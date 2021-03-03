@@ -8,7 +8,7 @@
     . data (initialised static data) and bss (uninitialised static data) should be next and each page-aligned
     . rodata (read only initialized data) bundled with data
 */
-OUTPUT_ARCH(i386)
+/*OUTPUT_ARCH(elf64-x86-64)*/
 ENTRY( start )
 SECTIONS
 {

@@ -13,7 +13,9 @@ header_end:
 
 global start
 section .text
-[bits 32]
+extern kmain
+
+[bits 64]
 start:
-    mov dword[0xb8000], 0x026b024f
+    call kmain
     hlt
