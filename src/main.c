@@ -167,6 +167,9 @@ int kmain ( struct multiboot *mboot_ptr )
 		kprintf("apm table stuff is guud to go\n");
 	}
 
+    kprintf("Testing pmm_alloc...\n");
+    pmm_alloc();
+    kprintf("ok\n");
 	// kprintf("Entering usermode...\n");
 	// enter_usermode(); //tss not setup yet. pls ignore
 	

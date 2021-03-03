@@ -15,6 +15,12 @@
 #define PMM_USED 0
 #define PMM_4KB  0x1000 //Also known as blocksize
 #define PMM_IDX(page) internal_pmm_idx(page)
+#define GET_ALLOCATED_MEMORY(i, j) internal_get_allocated_memory(i, j)
+
+static inline void *internal_get_allocated_memory(int i, int j)
+{
+  return (void*)((i * 32 + j) * 4096);
+}
 
 static inline u32int internal_pmm_idx(void *page)
 {  
@@ -23,7 +29,7 @@ static inline u32int internal_pmm_idx(void *page)
 
 void pmm_init(struct multiboot *ptr);
 void pmm_free(void *page);
-u32int pmm_alloc();
+void *pmm_alloc();
 static void pmm_mark_as_used(void *page);
 u64int total_ram(struct multiboot *ptr);
 

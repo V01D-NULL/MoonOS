@@ -32,7 +32,6 @@ struct multiboot
     u32int mem_lower;
     u32int mem_upper;
     u32int boot_device;
-    u32int cmdline;
     u32int mods_count;
     void   *mods_addr;
     u32int num;
@@ -61,6 +60,14 @@ struct multiboot_mmap {
     unsigned long long  base;
     unsigned long long  length;
     u32int              type;
+}__attribute__((section(".multiboot")));
+
+struct multiboot_mods
+{
+    u32int    mod_start;
+    u32int    mod_end;
+    char      *cmdline;
+    u32int    reserved;
 }__attribute__((section(".multiboot")));
 
 #endif  // MULTIBOOT_H

@@ -4,7 +4,7 @@
 extern const void kernel_start;
 extern const void kernel_end;
 
-static u32int bitmap[BITMAP_SZ] = {0};
+static u32int bitmap[BITMAP_SZ];
 static u32int in_case_of_kernel_panic = 0;
 static u64int total_memory = 0;
 
@@ -44,16 +44,53 @@ void pmm_init(struct multiboot *ptr)
 
     /* Step 3. Mark the kernel memory as used/reserved since GRUB won't mark this memory range as used */
     debug("pmm_init: Marking kernel memory as reserved ( %x -> %x )\n", (u32int)&kernel_start, (u32int)&kernel_end);
-    u32int *kern_addr = (u32int*)&kernel_start;
-    while (kern_addr < (u32int*)&kernel_end)
+    u32int *addr = (u32int*)&kernel_start;
+    while (addr < (u32int*)&kernel_end)
     {
-        pmm_mark_as_used((void*)&kern_addr);
-        kern_addr += PMM_4KB;
+        pmm_mark_as_used((void*)&addr);
+        addr += PMM_4KB;
     }
 
     /* Step 3.1. Now just mark the modules as used/reserved aswell. */
 
+    struct multiboot_mods* modules = ptr->mods_addr;
+
+    pmm_mark_as_used(ptr);
+    pmm_mark_as_used(modules);
+
+    int i;
+    for (i = 0; i < ptr->mods_count; i++) {
+        *addr = modules[i].mod_start;
+        while (*addr < modules[i].mod_end) {
+            pmm_mark_as_used(&addr);
+            addr += 0x1000;
+        }
+    }
+
     monitor_write("Initialised physical memory manager\n", false, true);
+}
+
+//Find the first free block and initialize it
+void *pmm_alloc(void)
+{
+    //For some reason this doesn't work.
+    int i, j;
+
+    for (i = 0; i < BITMAP_SZ; i++)
+    {
+        if (bitmap[i] != PMM_USED) //This condition is never true, looking at gdb it shows the entire bitmap array is marked with 0, no memory is every marked as free!
+        {
+            for (j = 0; j < 32; j++)
+            {
+                if (bitmap[i] & (PMM_FREE << j))
+                {
+                    bitmap[i] &= (PMM_FREE << j);
+                    return (void*)((i * 32 + j) * 4096);   
+                }
+            }
+        }
+    }
+  PANIC("Out of physical memory!");
 }
 
 //A relatively safe implementation of the mark_as_used bitmap function.
@@ -118,3 +155,4 @@ u64int total_ram(struct multiboot *ptr)
     kprintf("Ram memory total: %x\n", total_memory);
     return total_memory;
 }
+
