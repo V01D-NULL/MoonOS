@@ -87,7 +87,7 @@ void kmain(struct stivale2_struct *stivale2_struct) {
     init_idt();
 
     // ISR's 0-31 work as they should. The issue lies within the custom IRQ's, they don't seem to get called and cause a GPF if called manually like so:
-    asm volatile("int $33");
+    asm volatile("int $37");
     
     for (;;) {
         asm ("hlt");

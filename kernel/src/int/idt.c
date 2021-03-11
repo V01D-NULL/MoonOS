@@ -64,12 +64,13 @@ void handler(struct regs* regs)
     kprintf("a");
 }
 
+//37
 isr_handler_t isr_handlers[256] = {
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // 32
-    NULL, handler, NULL, NULL, NULL, NULL, NULL, NULL, 
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // 64
