@@ -1,20 +1,18 @@
 # VALIDITY OS
-Validity OS is a monolithic kernel targeting the x86 architecture (IA32 ~ 32 bits).
+Validity OS is a monolithic kernel targeting the x86_64 architecture.
 
 # Features
-- Mulitboot compliant
-	- Uses GRUB2
+- Stivale2 boot protocol
+- Limine bootloader
 - GDT
-- Interrupts
+- Interrupts (kinda, custom IRQ's don't get called and cause a GPF if called using the int instruction)
 - CPU Identification
 - Serial in & output
-- CMOS/RTC Timestamp
-- Simple VFS
 
 # Future features:
 - A simple heap / memory allocator
 - Paging
-- Multiboot2 (Due to my computer's problems this is on hold for an unkown timespan (that is until I can afford a new computer))
+- APIC
 - ACPI
 - Many hardware drivers including but not limited to:
 	- Network cards
@@ -36,11 +34,8 @@ Validity OS is a monolithic kernel targeting the x86 architecture (IA32 ~ 32 bit
 	- Build kernel
 		- git clone < REPO >
 		- cd < REPO_DIR >
-		- make qemu
-	- Debug kernel:
-		- make qemu-gdb
-
-	- If any of the compilation steps gives you an error, then you most likely don't have any object files the makefile tries to remove. If this is the case, execute make _all and try to compile again or type make run from there on since make _all compiles everything, but doesn't run the kernel.
+		- make all
+		- make run
 
 # Resources:
 - This kernel started by me learning from james JamesM's kernel development tutorials, however I changed almost all of his code because of the bad and partially outdated implementations he presented. Thanks go out to websites like lowlevel.eu or the osdev wiki but also some cool and really helpful os developers on github and discord.
