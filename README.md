@@ -5,7 +5,7 @@ Validity OS is a monolithic kernel targeting the x86_64 architecture.
 - Stivale2 boot protocol
 - Limine bootloader
 - GDT
-- Interrupts (kinda, custom IRQ's don't get called and cause a GPF if called using the int instruction) (Credits to https://github.com/ethan4984/rock/ for gdt and idt)
+- Interrupts (Credits to https://github.com/ethan4984/rock/ for the gdt code)
 - CPU Identification
 - Serial in & output
 

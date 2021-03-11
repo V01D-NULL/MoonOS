@@ -86,8 +86,10 @@ void kmain(struct stivale2_struct *stivale2_struct) {
 
     init_idt();
 
-    // ISR's 0-31 work as they should. The issue lies within the custom IRQ's, they don't seem to get called and cause a GPF if called manually like so:
-    asm volatile("int $37");
+    //Test CPU exception (invalid opcode)
+    kprintf("Triggering CPU exception.... %d\n", 0/0);
+
+    // asm volatile("int $2"); //NMI
     
     for (;;) {
         asm ("hlt");
