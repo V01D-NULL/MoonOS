@@ -2,7 +2,7 @@
 
 global _load_bin
 
-%define KRNL_CS 0x08
+%define KRNL_CS 0x8
 %define KRNL_DS 0x10
 
 %macro pusha64 0

@@ -160,6 +160,8 @@ void install_isr(int idx, isr_handler_t handler)
     isr_handlers[idx] = handler;
 }
 
+extern void load_idt(uint64_t idtr);
+
 void init_idt()
 {
     monitor_write("Initialising interrupts\n", true, false);
@@ -426,8 +428,10 @@ void init_idt()
         .limit  = 256 * sizeof(struct idt_desc) - 1, 
         .offset = (uint64_t)idt
     };
-    asm volatile("lidtq %0" :"=m"(_idtr));
-    asm volatile("sti");
+    
+    load_idt((uint64_t)&_idtr);
+    // asm volatile("lidtq %0" :"=m"(_idtr));
+    // asm volatile("sti");
     
     monitor_write("Initialised interrupts\n", false, true);
 }
