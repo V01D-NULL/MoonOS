@@ -44,6 +44,10 @@ void isr_handler(regs_t regs)
     /* CPU exceptions */
     if (regs.isr_number < 32)
     {
+        if (regs.isr_number == 13) {
+            debug("GPF(0): eflags.NT=%d\n", regs.rflags >> 14);
+            debug("GPF(0): cpl@ss=%d\n", regs.ss & 3);
+        }
         set_color(VGA_BLACK, VGA_LIGHT_RED);
         serial_set_color(BASH_RED);
         kprintf("[INTR] %s (err_code %d)\n", exception_messages[regs.isr_number], regs.error_code);
@@ -78,7 +82,10 @@ void isr_handler(regs_t regs)
                                                                 );
         
         set_color(VGA_BLACK, VGA_WHITE);
-
+        
+        asm("nop");
+        asm("nop");
+        asm("nop");
         asm("hlt");
     }
     

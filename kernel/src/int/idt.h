@@ -40,7 +40,7 @@ struct idt_desc {
     uint16_t offset_mid;  // offset bits 16..31
     uint32_t offset_high; // offset bits 32..63
     uint32_t zero;        // reserved
-};
+}__attribute__((packed));
 
 struct idtr {
     uint16_t limit;

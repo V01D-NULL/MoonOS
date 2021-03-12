@@ -10,6 +10,8 @@
 #include "drivers/screen/monitor.h"
 #include "drivers/io/serial.h"
 
+#include "hal/apic.h"
+
 // We need to tell the stivale bootloader where we want our stack to be.
 // We are going to allocate our stack as an uninitialised array in .bss.
 static uint8_t stack[4096];
@@ -82,7 +84,9 @@ void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id) {
 
 static void dummy_handler(regs_t r)
 {
-    kprintf("Hello from the user defined ISR\n");
+    // r.rdi = 0;
+    // r.rsi = 0;
+    // kprintf("Hello from the user defined ISR\n");
 }
 
 // The following will be our kernel's entry point.
@@ -92,8 +96,11 @@ void kmain(struct stivale2_struct *stivale2_struct) {
 
     init_idt();
 
-    // outb(0x21, 0xE0);
-    // outb(0xA1, 0xE8);
+    if (is_apic_available() == 1)
+        debug("APIC is not available\n");
+    else
+        debug("APIC is available\n");
+
 
     //Works
     install_isr(80, &dummy_handler);

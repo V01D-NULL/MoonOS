@@ -8,12 +8,13 @@
 _asm_isr_handler_stub:
     cli
     pusha64
+    ;mov rsi, rsp
     mov rdi, rsp
     call isr_handler   ; C interrupt handler routine
     popa64
-    add rsp, 24 ;_cleanup_stack 24  ; Clean up pushed error codes, etc, etc from stack
+    add rsp, 16 ;_cleanup_stack 24  ; Clean up pushed error codes, etc, etc from stack
     sti
-    iret              ; Pop other flags and return to normal execution state
+    iretq              ; Pop other flags and return to normal execution state
 
 _asm_irq_handler_stub:
     pusha64
