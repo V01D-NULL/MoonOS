@@ -6,13 +6,14 @@
 ;[extern irq_handler]
 
 _asm_isr_handler_stub:
+    cld
     pusha64
     mov rdi, rsp
     call isr_handler   ; C interrupt handler routine
     popa64
-    _cleanup_stack 16  ; Clean up pushed error codes, etc, etc from stack
+    add rsp, 24 ;_cleanup_stack 24  ; Clean up pushed error codes, etc, etc from stack
     sti
-    iretq              ; Pop other flags and return to normal execution state
+    iret              ; Pop other flags and return to normal execution state
 
 _asm_irq_handler_stub:
     pusha64
@@ -104,3 +105,6 @@ irq 12, 44
 irq 13, 45
 irq 14, 46
 irq 15, 47
+
+; Custom ISR's (user defined)
+isr 80

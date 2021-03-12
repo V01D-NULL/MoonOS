@@ -86,8 +86,10 @@ void kmain(struct stivale2_struct *stivale2_struct) {
 
     init_idt();
 
+    asm volatile("int $80");
+
     //Test CPU exception (invalid opcode)
-    kprintf("Triggering CPU exception.... %d\n", 0/0);
+    // kprintf("Triggering CPU exception.... %d\n", 0/0);
 
     // asm volatile("int $2"); //NMI
     

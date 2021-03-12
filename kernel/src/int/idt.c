@@ -91,6 +91,11 @@ void isr_handler(struct regs *regs)
 
         asm("hlt");
     }
+    if (regs->isr_number == 80)
+    {
+        kprintf("this is custom interrupt 0x80\n");
+        //Causes a GPF?
+    }
     /* Todo: Handle isr's 48-255 ie. user defined isr's (note: isr's 32-47 are marked as IRQ's and handled separately */
 }
 
@@ -150,6 +155,7 @@ void init_idt()
     idt_set_entry(0x8, 0, 0x8E, (uint64_t)irq14, 46);
     idt_set_entry(0x8, 0, 0x8E, (uint64_t)irq15, 47);
 
+    idt_set_entry(0x08, 0, 0x8E, (uint64_t)isr80, 80);
     /*
     idt_set_entry(0x8, 0, 0x8E, (uint64_t)isr48, 48);
     ...

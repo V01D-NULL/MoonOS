@@ -6,7 +6,7 @@ BUILD_UTIL_DIR = build-util
 all: quick_recompile  $(KERNEL_HDD)
 
 run: $(KERNEL_HDD)
-	qemu-system-x86_64 -m 2G -serial mon:stdio -hda $(KERNEL_HDD)
+	qemu-system-x86_64 -m 2G -serial mon:stdio -hda $(KERNEL_HDD) -d cpu_reset
 
 kernel/Validity.elf:
 	$(MAKE) -C kernel
