@@ -8,11 +8,10 @@
 _asm_isr_handler_stub:
     cli
     pusha64
-    ;mov rsi, rsp
     mov rdi, rsp
     call isr_handler   ; C interrupt handler routine
     popa64
-    add rsp, 16 ;_cleanup_stack 24  ; Clean up pushed error codes, etc, etc from stack
+    _cleanup_stack 16  ; Clean up pushed error codes, etc, etc from stack
     sti
     iretq              ; Pop other flags and return to normal execution state
 
@@ -55,6 +54,11 @@ global load_idt
 load_idt:
     lidt [rdi]
     sti
+    ret
+
+global test_int80
+test_int80:
+    int 80
     ret
 
 isr 0

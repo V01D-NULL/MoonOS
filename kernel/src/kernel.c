@@ -84,9 +84,7 @@ void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id) {
 
 static void dummy_handler(regs_t r)
 {
-    // r.rdi = 0;
-    // r.rsi = 0;
-    // kprintf("Hello from the user defined ISR\n");
+    kprintf("Hello from the user defined ISR\n");
 }
 
 // The following will be our kernel's entry point.
@@ -105,7 +103,7 @@ void kmain(struct stivale2_struct *stivale2_struct) {
     //Works
     install_isr(80, &dummy_handler);
     
-    //Works, function is called, isr handled but a GPF is issued after executing the function tied to the isr
+    //Works, function is called, isr handled but a GPF is issued after the iretq instruction in isr.s ~ _asm_isr_handler_stub
     asm volatile("int $80");
 
     //Test CPU exception (invalid opcode)
