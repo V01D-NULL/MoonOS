@@ -82,7 +82,7 @@ void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id) {
 
 static void dummy_handler(regs_t r)
 {
-    kprintf("Keyboard int.\n");
+    kprintf("Hello from the user defined ISR\n");
 }
 
 // The following will be our kernel's entry point.
@@ -91,6 +91,9 @@ void kmain(struct stivale2_struct *stivale2_struct) {
     init_gdt();    
 
     init_idt();
+
+    // outb(0x21, 0xE0);
+    // outb(0xA1, 0xE8);
 
     //Works
     install_isr(80, &dummy_handler);

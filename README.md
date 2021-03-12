@@ -1,6 +1,11 @@
 # VALIDITY OS
 Validity OS is a monolithic kernel targeting the x86_64 architecture.
 
+# Where did everything go?
+As you might have noticed there are alot less files in this repo than there were before. This is because I have decided to switch from GRUB to limine, and from protected to long mode, so most of the protected mode code had to go.
+- Why switch?
+	- **Seemingly endless address space** (Do I really need to say more after that? :D ), XSDT, APIC (besides, protected mode is super obsolete. (Technically this OS is obsolete aswell since it isn't UEFI but eh. (Jokes on you I can see my private Validty-UEFI repo that I will work on eventually which will be an exact clone of this kernel but for UEFI systems) It's still good practice and doesn't differ from UEFI that much (I think)))
+
 # Features
 - Stivale2 boot protocol
 - Limine bootloader
@@ -23,7 +28,7 @@ Validity OS is a monolithic kernel targeting the x86_64 architecture.
 - A small libc for the userland
 
 # This is currently being working on:
-- A rewrite of the allocation and paging implementations (I kinda stole the code from a tutorial and wish to rewrite it in order to increase the level of independence for me, my learning experience and my kernel)
+- A rewrite of the ISR and IRQ routines/handlers.
 
 # Installation
 ## Building:
@@ -38,11 +43,10 @@ Validity OS is a monolithic kernel targeting the x86_64 architecture.
 		- make run
 
 # Resources:
-- This kernel started by me learning from james JamesM's kernel development tutorials, however I changed almost all of his code because of the bad and partially outdated implementations he presented. Thanks go out to websites like lowlevel.eu or the osdev wiki but also some cool and really helpful os developers on github and discord.
+- This kernel started by me learning from james JamesM's kernel development tutorials, however I changed all of his code because of the bad and partially outdated implementations he presented. Thanks go out to websites like lowlevel.eu or the osdev wiki but also some cool and really helpful os developers on github and discord.
 
 * https://rwth-os.github.io/eduOS/
 * https://github.com/kAworu/JamesM
-* https://github.com/cirosantilli/jamesmolloy-kernel-development-tutorials
-* https://github.com/berkus/jamesm-tutorials/
 * https://github.com/Usemox/Usemox/
 * https://www.cs.cmu.edu/~ralf/files.html
+* https://ethv.net/workshops/osdev/notes/notes-3.html
