@@ -5,6 +5,7 @@
 
 #include "int/gdt.h"
 #include "int/idt.h"
+#include "int/interrupts.h"
 
 #include "drivers/screen/monitor.h"
 #include "drivers/io/serial.h"
@@ -79,6 +80,11 @@ void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id) {
     }
 }
 
+static void dummy_handler(regs_t r)
+{
+    kprintf("Keyboard int.\n");
+}
+
 // The following will be our kernel's entry point.
 void kmain(struct stivale2_struct *stivale2_struct) {
     
@@ -86,12 +92,14 @@ void kmain(struct stivale2_struct *stivale2_struct) {
 
     init_idt();
 
+    //Works
+    install_isr(80, &dummy_handler);
+    
+    //Works, function is called, isr handled but a GPF is issued after executing the function tied to the isr
     asm volatile("int $80");
 
     //Test CPU exception (invalid opcode)
     // kprintf("Triggering CPU exception.... %d\n", 0/0);
-
-    // asm volatile("int $2"); //NMI
     
     for (;;) {
         asm ("hlt");

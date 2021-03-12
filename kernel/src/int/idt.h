@@ -6,7 +6,7 @@
 #include "../common.h"
 #include "../drivers/screen/monitor.h"
 
-struct regs {
+typedef struct regs {
     uint64_t r15;
     uint64_t r14;
     uint64_t r13;
@@ -29,8 +29,8 @@ struct regs {
     uint64_t rflags; 
     uint64_t rsp;
     uint64_t ss;
-} __attribute__((packed));
-typedef struct regs regs_t;
+} regs_t;
+// typedef struct regs regs_t;
 
 struct idt_desc {
     uint16_t offset_low;  // offset bits 0..15
@@ -47,13 +47,8 @@ struct idtr {
     uint64_t offset;
 }__attribute__((packed));
 
-typedef void (*isr_handler_t)(struct regs regs);
-
 void idt_set_entry(uint16_t selector, uint8_t ist, uint8_t type_attr, uint64_t offset, uint8_t idx);
 void init_idt();
-void isr_handler(struct regs *regs);
-void irq_handler(struct regs *regs);
-void set_irq(uint64_t base, isr_handler_t handler);
 
 extern void isr0();
 extern void isr1();

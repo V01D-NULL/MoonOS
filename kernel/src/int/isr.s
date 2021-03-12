@@ -6,7 +6,7 @@
 ;[extern irq_handler]
 
 _asm_isr_handler_stub:
-    cld
+    cli
     pusha64
     mov rdi, rsp
     call isr_handler   ; C interrupt handler routine
@@ -26,7 +26,7 @@ _asm_irq_handler_stub:
 %macro isr 1
 global isr%1
 isr%1:
-    cli
+    ;cli
     push 0  ; Dummy error code
     push %1 ; Push interrupt number
     jmp _asm_isr_handler_stub
@@ -35,7 +35,7 @@ isr%1:
 %macro isr_err 1
 global isr_err%1
 isr_err%1:
-    cli
+    ;cli
     ; Error code pushed by CPU
     push %1 ; Push interrupt number
     jmp _asm_isr_handler_stub
