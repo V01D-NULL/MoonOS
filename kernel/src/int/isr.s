@@ -15,6 +15,7 @@ _asm_isr_handler_stub:
     sti
     iretq              ; Pop other flags and return to normal execution state
 
+; IGNORE (for now)
 _asm_irq_handler_stub:
     pusha64
 ;    mov rdi, rsp
@@ -26,7 +27,6 @@ _asm_irq_handler_stub:
 %macro isr 1
 global isr%1
 isr%1:
-    ;cli
     push 0  ; Dummy error code
     push %1 ; Push interrupt number
     jmp _asm_isr_handler_stub
@@ -35,12 +35,12 @@ isr%1:
 %macro isr_err 1
 global isr_err%1
 isr_err%1:
-    ;cli
     ; Error code pushed by CPU
     push %1 ; Push interrupt number
     jmp _asm_isr_handler_stub
 %endmacro
 
+; IGNORE (for now)
 %macro irq 2
 global irq%1
 irq%1:
@@ -56,10 +56,6 @@ load_idt:
     sti
     ret
 
-global test_int80
-test_int80:
-    int 80
-    ret
 
 isr 0
 isr 1
