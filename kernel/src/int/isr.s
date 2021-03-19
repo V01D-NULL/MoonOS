@@ -6,19 +6,16 @@
 ;[extern irq_handler]
 
 _asm_isr_handler_stub:
-    cli
+    cld
     pusha64
-    mov rdi, rsp
     call isr_handler   ; C interrupt handler routine
     popa64
     _cleanup_stack 16  ; Clean up pushed error codes, etc, etc from stack
-    sti
-    iretq              ; Pop other flags and return to normal execution state
+    iretq              ;(GPF happens here. pls help. I really need help with this) Pop other flags and return to normal execution State
 
 ; IGNORE (for now)
 _asm_irq_handler_stub:
     pusha64
-;    mov rdi, rsp
     ;call irq_handler
     popa64
     _cleanup_stack 16
