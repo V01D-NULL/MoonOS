@@ -6,11 +6,11 @@ static struct idt_desc idt[256];
 
 void idt_set_entry(uint16_t selector, uint8_t ist, uint8_t type_attr, uint64_t offset /*offset2 + offset3*/, uint8_t idx)
 {
-    idt[idx].offset_low  = offset & 0xFFFFFFFF;
+    idt[idx].offset_low  = offset & 0xFFFF;
     idt[idx].selector    = selector;
     idt[idx].ist         = ist;
     idt[idx].type_attr   = type_attr;
-    idt[idx].offset_mid  = (offset >> 16) & 0xFFFFFFFF;
+    idt[idx].offset_mid  = (offset >> 16) & 0xFFFF;
     idt[idx].offset_high = (offset >> 32) & 0xFFFFFFFF;
     idt[idx].zero        = 0;
 }
@@ -80,11 +80,11 @@ void init_idt()
 
     // Load IDT
     struct idtr _idtr = { 
-        .limit  = 256 * sizeof(struct idt_desc) - 1, 
-        .offset = (uint64_t)idt
+        .limit  = 256 * sizeof(struct idt_desc) - 1,
+	.offset = (uint64_t)idt
     };
-    
+
     load_idt((uint64_t)&_idtr);
-    
+
     monitor_write("Initialised interrupts\n", false, true);
 }

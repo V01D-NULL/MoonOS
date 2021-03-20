@@ -94,18 +94,10 @@ void kmain(struct stivale2_struct *stivale2_struct) {
 
     init_idt();
 
-    if (is_apic_available() == 1)
-        debug("APIC is not available\n");
-    else
-        debug("APIC is available\n");
+    // install_isr(80, &dummy_handler);
 
-
-    //Works
-    install_isr(80, &dummy_handler);
+    // asm volatile("int $80");
     
-    //Works, function is called, isr handled but a GPF is issued after the iretq instruction in isr.s ~ _asm_isr_handler_stub
-    asm volatile("int $80");
-
     //Test CPU exception (invalid opcode)
     // kprintf("Triggering CPU exception.... %d\n", 0/0);
     

@@ -10,10 +10,9 @@ _asm_isr_handler_stub:
     pusha64
     call isr_handler   ; C interrupt handler routine
     popa64
-    _cleanup_stack 16  ; Clean up pushed error codes, etc, etc from stack
-    iretq              ;(GPF happens here. pls help. I really need help with this) Pop other flags and return to normal execution State
+    _cleanup_stack 16  ; Clean up pushed error code and interrutp number from stack
+    iretq              ; Pop other flags and return to normal execution State
 
-; IGNORE (for now)
 _asm_irq_handler_stub:
     pusha64
     ;call irq_handler
@@ -37,7 +36,6 @@ isr_err%1:
     jmp _asm_isr_handler_stub
 %endmacro
 
-; IGNORE (for now)
 %macro irq 2
 global irq%1
 irq%1:
@@ -50,8 +48,20 @@ irq%1:
 global load_idt
 load_idt:
     lidt [rdi]
-    sti
-    ret
+
+    ; Reload cs and ds
+    push 0x08
+    push .reload
+    retfq
+    .reload:
+       mov ax, 0x10
+       mov ds, ax
+       mov fs, ax
+       mov gs, ax
+       mov ss, ax
+       mov es, ax
+       sti
+       ret
 
 
 isr 0
