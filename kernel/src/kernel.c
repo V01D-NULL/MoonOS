@@ -81,26 +81,16 @@ void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id) {
         current_tag = (void *)current_tag->next;
     }
 }
-
-static void dummy_handler(regs_t r)
-{
-    kprintf("Hello from the user defined ISR\n");
-}
-
+#include "asm/x86/x86.h"
 // The following will be our kernel's entry point.
 void kmain(struct stivale2_struct *stivale2_struct) {
+    x86_cpu_info();
+    x86_cpu_check_apic();
     
     init_gdt();    
 
     init_idt();
 
-    // install_isr(80, &dummy_handler);
-
-    // asm volatile("int $80");
-    
-    //Test CPU exception (invalid opcode)
-    // kprintf("Triggering CPU exception.... %d\n", 0/0);
-    
     for (;;) {
         asm ("hlt");
     }

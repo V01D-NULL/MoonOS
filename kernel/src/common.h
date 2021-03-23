@@ -10,6 +10,10 @@
 #define CHECK_BIT(variable, bit_index)      (((variable)>>(bit_index)) & 1) //First bit shift to the given bit index (N). Then simply OR it with 1 to check if it is set.
 #define SET_BIT(variable, bit_index, value) internal_set_bit(variable, bit_index, value)
 
+//Get the lower or upper 32 bits of a 64 bit data type
+#define LOWER_32(variable) (variable & 0xffffffff)
+#define UPPER_32(variable) (variable >> 32)
+
 //
 #define NBITS 32
 
