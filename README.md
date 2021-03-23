@@ -9,13 +9,14 @@ As you might have noticed there are alot less files in this repo than there were
 # Features
 - Stivale2 boot protocol
 - Limine bootloader
-- GDT
-- Interrupts (Credits to https://github.com/ethan4984/rock/ for the gdt code)
+- GDT (Credits to https://github.com/ethan4984/rock/ for the gdt code (The only change I made was to add a null descriptor to the GDT))
+- Interrupts
 - CPU Identification
-- Serial in & output
+- Serial output
 
 # Future features:
-- A simple heap / memory allocator
+- A simple heap
+- A memory allocator which acts as a wrapper for vmm and pmm (haven't decided on the type yet (slab, buddy, bitmap, linked list, etc))
 - Paging
 - APIC
 - ACPI
@@ -45,8 +46,7 @@ As you might have noticed there are alot less files in this repo than there were
 # Resources:
 - This kernel started by me learning from james JamesM's kernel development tutorials, however I changed all of his code because of the bad and partially outdated implementations he presented. Thanks go out to websites like lowlevel.eu or the osdev wiki but also some cool and really helpful os developers on github and discord.
 
-* https://rwth-os.github.io/eduOS/
-* https://github.com/kAworu/JamesM
-* https://github.com/Usemox/Usemox/
 * https://www.cs.cmu.edu/~ralf/files.html
 * https://ethv.net/workshops/osdev/notes/notes-3.html
+* https://osdev.wiki  (barebones but up-to-date osdev wiki)
+* https://wiki.osdev.org
