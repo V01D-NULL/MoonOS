@@ -21,6 +21,6 @@ char* strcat(char* a, char* b);
 
 uint64_t strlen ( const char *s );
 
-char *reverse(char *src);
+char *strrev(char *src);
 
 #endif // LIB_KERNEL_STRING_H

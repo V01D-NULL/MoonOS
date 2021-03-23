@@ -361,9 +361,8 @@ int debug(char* fmt, ...)
 					case 'd':
 					{
 						uint64_t val = va_arg(arg, int);
-						char *result = itoa(val);
-						serial_write_str(result);
-						// serial_write_dec(val);
+						char result[256];
+						serial_write_str(itoa(val, result));
 						i += 2;
 						break;
 					}
@@ -372,8 +371,7 @@ int debug(char* fmt, ...)
 					case 'X':
 					{
 						uint64_t hex = va_arg(arg, int);
-						char *result = itoh(hex);
-						serial_write_str(result);
+						serial_write_str(itoh(hex));
 						i += 2;
 						break;
 					}
@@ -381,7 +379,7 @@ int debug(char* fmt, ...)
 					case 'b':
 					{
 						int bin = va_arg(arg, int);
-						itob(bin);
+						serial_write_str(itob(bin));
 						i+=2;
 						break;
 					}
@@ -436,16 +434,9 @@ int kprintf(const char* fmt, ...)
 					case 'd':
 					{
 						int val = va_arg(arg, int);
-						monitor_write_dec(val);
+						char result[256];
+						monitor_write(itoa(val, result), false, false);
 						i += 2;
-						break;
-					}
-					
-					case 'l':
-					{
-						long int val = va_arg(arg, int);
-						monitor_write_dec(val);
-						i+=2;
 						break;
 					}
 
@@ -453,7 +444,7 @@ int kprintf(const char* fmt, ...)
 					case 'X':
 					{
 						uint64_t hex = va_arg(arg, int);
-						monitor_write_hex(hex);
+						monitor_write(itoh(hex), false, false);
 						i += 2;
 						break;
 					}
@@ -461,8 +452,7 @@ int kprintf(const char* fmt, ...)
 					case 'b':
 					{
 						int bin = va_arg(arg, int);
-						char *result = itob(bin);
-						monitor_write(result, false, false);
+						monitor_write(itob(bin), false, false);
 						i+=2;
 						break;
 					}
@@ -538,7 +528,8 @@ int kprintf_x(const char* fmt, ...)
 					case 'd':
 					{
 						uint64_t val = va_arg(arg, int);
-						monitor_write_dec(val);
+						char result[256];
+						monitor_write(itoa(val, result), false, false);
 						i += 2;
 						break;
 					}
@@ -547,7 +538,7 @@ int kprintf_x(const char* fmt, ...)
 					case 'X':
 					{
 						uint64_t hex = va_arg(arg, int);
-						monitor_write_hex(hex);
+						monitor_write(itoh(hex), false, false);
 						i += 2;
 						break;
 					}
@@ -555,7 +546,7 @@ int kprintf_x(const char* fmt, ...)
 					case 'b':
 					{
 						int bin = va_arg(arg, int);
-						to_bin(bin, false);
+						monitor_write(itob(bin), false, false);
 						i+=2;
 						break;
 					}

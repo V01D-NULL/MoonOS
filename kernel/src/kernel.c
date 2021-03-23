@@ -14,6 +14,8 @@
 
 #include "asm/x86/x86.h"
 
+#include "libk/kstdlib.h"
+#include "libk/kstring.h"
 
 //Specifies the stack required by stivale2. Stored in .bss
 static uint8_t stack[4096];
@@ -31,6 +33,11 @@ void kmain(struct stivale2_struct *stivale2_struct) {
     init_gdt();
 
     init_idt();
+
+    debug("%s - %c - %d - %x - %b", "heyo", 'a', 10, 10, 10);
+
+    char *bin = itob(27); //11011
+    // debug("bin: %s\n", bin);
 
     //TODO:
     //NOTE: common.c/common.h may only define types, custom bit manipulation macros and inX/outX functions

@@ -116,19 +116,21 @@ uint64_t strlen ( const char *s )
 	return len;	
 }
 
-char *reverse(char *src)
+char *strrev(char *src)
 {
-    int len = strlen(src);
-    volatile char *out; //NO TOUCHY! The compiler will optimize this string for some reason. If the volatile keyword is removed an empty debug or kprintf statement must be inserted before returning `out`. 
-    int src_string_index = -1;
-    int  last_char = len - 1;
+	static char temp;
+	int src_string_index = 0;
+	int last_char = strlen(src) - 1;
 
-    do {
-        ++src_string_index;
-        out[src_string_index] = src[last_char];
-        last_char--; //Get the last index and move on backwards from there (by "get" I just mean the value of last_char which happens to be the index of the current char)
-    } while(src_string_index < len);
-    
-    out[src_string_index] = 0; // NULL terminate the string
-    return (char*)out;
+	for (; src_string_index < last_char; src_string_index++)
+	{
+		temp = src[src_string_index]; 			  // Save current character
+		src[src_string_index] = src[last_char];   // Swap out the current char with the last char
+		src[last_char] = temp;	 				  // Swap out last character with the current character
+		last_char--;
+	}
+
+	src[strlen(src)-1+1] = 0;
+
+    return src;
 }
