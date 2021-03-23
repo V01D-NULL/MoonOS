@@ -25,7 +25,6 @@
 #define null (void*)0
 typedef int bool;
 
-//io.s
 inline void outb(uint16_t port, uint8_t val)
 {
     asm volatile ( "outb %0, %1" : : "a"(val), "Nd"(port) );
@@ -68,7 +67,7 @@ inline uint32_t inl(uint16_t port)
     return ret;
 }
 
-static inline void delay(int time) {
+inline void delay(int time) {
      volatile int i, j = 0;
      for (i=0; i<time; i++)
      {
