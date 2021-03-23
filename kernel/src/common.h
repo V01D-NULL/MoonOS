@@ -68,13 +68,15 @@ inline uint32_t inl(uint16_t port)
     return ret;
 }
 
-//
-void delay(int time);
-
-//
-// char* to_dec(uint64_t n);
-
-// //
-// void to_bin(unsigned int n, bool is_caller_debug);
+static inline void delay(int time) {
+     volatile int i, j = 0;
+     for (i=0; i<time; i++)
+     {
+         for (j=0; j < 250000; j++)
+         {
+            asm volatile("nop");
+         }
+     }
+}
 
 #endif  // COMMON_H

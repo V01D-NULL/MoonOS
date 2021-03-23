@@ -2,17 +2,7 @@
 #include "drivers/io/serial.h"
 #include "drivers/screen/monitor.h"
 
-void delay(int time) {
-     volatile int i, j;
-     for (i=0; i<time; i++)
-     {
-         for (j=0; j < 250000; j++)
-         {
-            __asm__ __volatile__("nop");
-         }
-     }
-}
-
+//Obsolete. Will be removed soon
 // The boolean is_caller_debug is used sothat a debug() function call with the %b symbol will redirect the output to the serial and not the screen
 void to_bin(unsigned int n, bool is_caller_debug)
 {
