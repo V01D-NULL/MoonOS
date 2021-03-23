@@ -26,13 +26,19 @@ struct stivale2_header stivale_hdr = {
 };
 
 void kmain(struct stivale2_struct *stivale2_struct) {
-    // x86_cpu_info();
     ASM_x86_cpuid_vendor_string();
 
-    init_gdt();    
+    init_gdt();
 
     init_idt();
 
+    //TODO:
+    //NOTE: common.c/common.h may only define types, custom bit manipulation macros and inX/outX functions
+    // 1.  Add itob() function
+    // 2.  Rewrite debug and kprintf to use the itob() function
+    // 2.1 Remove to_dec, to_bin & decToHex. They are error prone and bloat the kernel. They will all be replaced by itob
+    // 3.  Cleanup common.h/common.c | Create lib/string.h etc
+    
     for (;;) {
         asm ("hlt");
     }

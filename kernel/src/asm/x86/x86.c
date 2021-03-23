@@ -8,10 +8,10 @@
 void x86_cpuid_vendor_string(const char *a, const char *b, const char *c)
 {
     //a, b and c are ebx, edx and ecx after executing cpuid. I am too lazy to fix the variables names so they will stay a, b, and c for now
-    char* half = strcat(&a, &b);
-    const char* cpu_vendor = strcat(half, &c);
+    char* half = strcat((char*)&a, (char*)&b);
+    const char* cpu_vendor = strcat(half, (char*)&c);
     kprintf("%s\n", cpu_vendor);
-    
+
     debug("===========================================\nVendor string: %s\n===========================================\n", cpu_vendor);
 }
 

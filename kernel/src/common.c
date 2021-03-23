@@ -1,6 +1,6 @@
 #include "common.h"
+#include "drivers/io/serial.h"
 #include "drivers/screen/monitor.h"
-#include <bits/stdint-uintn.h>
 
 // Copy len bytes from src to dest
 void memcpy ( uint8_t *dest, const uint8_t *src, uint32_t len )
@@ -78,13 +78,16 @@ int strcmp ( char *str1, char *str2 )
 }
 
 // Copy the NULL-terminated string src into dest, and return dest
-char* strcpy ( char dest[100], const char src[100] )
+char* strcpy (char *dest, const char *src)
 {
-	for (int i = 0; src[i] != '\0'; i++)
-	{
-		dest[i] = src[i];
-	}
-
+    int n = -1;
+    int len = strlen(src);
+    do {
+        ++n;
+        memcpy((uint8_t*)dest, (uint8_t*)src, n);
+    } while (n < len);
+	
+    dest[n] = 0; //Null terminate the stri
 	return dest;
 }
 
@@ -115,7 +118,7 @@ uint64_t strlen ( const char *s )
 	return len;	
 }
 
-
+//MARKED AS REPLACABLE (once itob is implemented)
 uint64_t decToHex(int n)
 {
     // char array to store hexadecimal number 
@@ -153,7 +156,7 @@ uint64_t decToHex(int n)
         result[j] = hexaDeciNum[j];
 	
 	//Reverse string. Actually this just puts it back into the correct order.
-    char* reversed_string = str_reverse(result);
+    char* reversed_string = reverse(result);
 	
 	//Convert the string to a decimal datatype
 	uint64_t final = atoi(reversed_string);
@@ -162,21 +165,21 @@ uint64_t decToHex(int n)
     return final;
 }
 
-char* str_reverse(char str[])
+char *reverse(char *src)
 {
-    char temp;
-    int i, j = 0;
-    i = 0;
-    j = strlen(str) - 1; // counting the length
-    while (i < j) // for reversing string
-    {        
-        temp = str[i];
-        str[i] = str[j];
-        str[j] = temp;
-        i++;
-        j--;
-    }
-    return str;
+    int len = strlen(src);
+    volatile char *out; //NO TOUCHY! The compiler will optimize this string for some reason. If the volatile keyword is removed an empty debug or kprintf statement must be inserted before returning `out`. 
+    int src_string_index = -1;
+    int  last_char = len - 1;
+
+    do {
+        ++src_string_index;
+        out[src_string_index] = src[last_char];
+        last_char--; //Get the last index and move on backwards from there (by "get" I just mean the value of last_char which happens to be the index of the current char)
+    } while(src_string_index < len);
+    
+    out[src_string_index] = 0; // NULL terminate the string
+    return (char*)out;
 }
 
 uint64_t atoi(const char* string)
@@ -189,6 +192,10 @@ uint64_t atoi(const char* string)
 	}
 
 	return result;
+}
+
+char *itob(uint64_t n, uint64_t base) {
+
 }
 
 void delay(int time) {

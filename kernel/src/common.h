@@ -13,6 +13,7 @@
 //Get the lower or upper 32 bits of a 64 bit data type
 #define LOWER_32(variable) (variable & 0xffffffff)
 #define UPPER_32(variable) (variable >> 32)
+#define DATATYPE_SZ(variable) ( sizeof(variable) * 8 )
 
 //
 #define NBITS 32
@@ -85,7 +86,7 @@ uint64_t memcmp(const void *src, void *dst, int n);
 int strcmp ( char *str1, char *str2 );
 
 // Copy the NULL-terminated string src into dest, and return dest
-char* strcpy ( char dest[100], const char src[100] );
+char* strcpy (char *dest, const char *src);
 
 // Concatenate the NULL-terminated string src onto the end of dest, and return dest
 char* strcat(char* a, char* b);
@@ -93,14 +94,16 @@ char* strcat(char* a, char* b);
 // Get the string length
 uint64_t strlen ( const char *s );
 
+// Reverse a string
+char *reverse(char *src);
+
 //Convert a decimal string to hexadecimal
 uint64_t decToHex(int n);
 
-// Reverse a string
-char* str_reverse(char str[]);
-
 //Ascii to int
 uint64_t atoi(const char* string);
+
+char *itob(uint64_t num, uint64_t base);
 
 //
 void delay(int time);

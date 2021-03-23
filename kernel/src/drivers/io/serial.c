@@ -30,41 +30,46 @@ void serial_write_str(const char* str)
 
 void serial_write_dec(uint64_t n)
 {
-    switch (n) {
-        case 0:
-            serial_write('0');
-            break;
-        case 1:
-            serial_write('1');
-            break;
-        case 2:
-            serial_write('2');
-            break;
-        case 3:
-            serial_write('3');
-            break;
-        case 4:
-            serial_write('4');
-            break;
-        case 5:
-            serial_write('5');
-            break;
-        case 6:
-            serial_write('6');
-            break;
-        case 7:
-            serial_write('7');
-            break;
-        case 8:
-            serial_write('8');
-            break;
-        case 9:
-            serial_write('9');
-            break;
-        
-        default:
-            break;
-    }
+    char  c [64];
+	char c2 [64];
+	int64_t i;
+	int64_t j;
+
+	if (n == 0)
+	{
+		serial_write('0');
+		return;
+	}
+
+	int64_t acc = n;
+	// signed int acc = n;
+
+	i = 0;
+	while (acc > 0)
+	{
+		c[i] = acc % 10 + '0';  //
+
+		acc /= 10;
+
+		i += 1;
+	}
+	c[i] = 0;  // ?
+
+	//
+	c2[ i ] = 0;  // ?
+	i -= 1;
+
+	// Reverse order so that MSD stored at index 0 ?
+	j = 0;
+	while ( i >= 0 )
+	{
+		c2[i] = c[j];
+
+		i -= 1;
+		j += 1;
+	}
+
+	serial_write_str(c2);
 }
 
 void serial_write_hex(uint64_t n)

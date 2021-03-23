@@ -283,10 +283,10 @@ void monitor_write_hex ( uint64_t n )
 //
 void monitor_write_dec ( uint64_t n )
 {
-	char  c [ 32 ];
-	char c2 [ 32 ];
-	int i;
-	int j;
+	char  c [ 64 ];
+	char c2 [ 64 ];
+	int64_t i;
+	int64_t j;
 
 	if ( n == 0 )
 	{
@@ -294,7 +294,8 @@ void monitor_write_dec ( uint64_t n )
 		return;
 	}
 
-	signed int acc = n;
+	int64_t acc = n;
+	// signed int acc = n;
 
 	i = 0;
 	while ( acc > 0 )
@@ -361,7 +362,9 @@ int debug(char* fmt, ...)
 					case 'd':
 					{
 						uint64_t val = va_arg(arg, int);
-						serial_write_dec(val);
+						char *result = itob(val, 10);
+						serial_write_str(result);
+						// serial_write_dec(val);
 						i += 2;
 						break;
 					}
@@ -370,7 +373,8 @@ int debug(char* fmt, ...)
 					case 'X':
 					{
 						uint64_t hex = va_arg(arg, int);
-						serial_write_hex(hex);
+						char *result = itob(hex, 16);
+						serial_write_str(result);
 						i += 2;
 						break;
 					}
@@ -432,9 +436,17 @@ int kprintf(const char* fmt, ...)
 					case 'i':
 					case 'd':
 					{
-						uint64_t val = va_arg(arg, int);
+						int val = va_arg(arg, int);
 						monitor_write_dec(val);
 						i += 2;
+						break;
+					}
+					
+					case 'l':
+					{
+						long int val = va_arg(arg, int);
+						monitor_write_dec(val);
+						i+=2;
 						break;
 					}
 

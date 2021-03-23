@@ -29,7 +29,8 @@ As you might have noticed there are alot less files in this repo than there were
 - A small libc for the userland
 
 # This is currently being working on:
-- A rewrite of the ISR and IRQ routines/handlers.
+- Improving the debug and kprintf functions
+- Adding rock solid atoi, itoa, itob
 
 # Installation
 ## Building:
