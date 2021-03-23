@@ -1,5 +1,4 @@
 #include "monitor.h"
-#include <stdint.h>
 
 /*
 	Something about booting by GRUB in text mode. Thus framebuffer controls characters (not pixels).
@@ -362,7 +361,7 @@ int debug(char* fmt, ...)
 					case 'd':
 					{
 						uint64_t val = va_arg(arg, int);
-						char *result = itob(val, 10);
+						char *result = itoa(val);
 						serial_write_str(result);
 						// serial_write_dec(val);
 						i += 2;
@@ -373,7 +372,7 @@ int debug(char* fmt, ...)
 					case 'X':
 					{
 						uint64_t hex = va_arg(arg, int);
-						char *result = itob(hex, 16);
+						char *result = itoh(hex);
 						serial_write_str(result);
 						i += 2;
 						break;
@@ -382,7 +381,7 @@ int debug(char* fmt, ...)
 					case 'b':
 					{
 						int bin = va_arg(arg, int);
-						to_bin(bin, true);
+						itob(bin);
 						i+=2;
 						break;
 					}
@@ -462,7 +461,8 @@ int kprintf(const char* fmt, ...)
 					case 'b':
 					{
 						int bin = va_arg(arg, int);
-						to_bin(bin, false);
+						char *result = itob(bin);
+						monitor_write(result, false, false);
 						i+=2;
 						break;
 					}

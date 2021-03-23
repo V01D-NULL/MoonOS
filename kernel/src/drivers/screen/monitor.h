@@ -1,6 +1,9 @@
 #ifndef MONITOR_H
 #define MONITOR_H
 
+#include "../../libk/kstring.h"
+#include "../../libk/kstdlib.h"
+
 #include "../../stdarg.h"
 #include "../io/serial.h"
 #include "cursor.h"

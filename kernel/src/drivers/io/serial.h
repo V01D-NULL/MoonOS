@@ -1,6 +1,7 @@
 #ifndef SERIAL_H
 #define SERIAL_H
 
+#include "../../libk/kstdlib.h"
 #include "../../common.h"
 #include "../screen/monitor.h"
 #include <stdint.h>
