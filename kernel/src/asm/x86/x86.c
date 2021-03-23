@@ -1,14 +1,24 @@
 #include "x86.h"
 
-void x86_cpu_info()
+// void x86_cpu_info()
+// {
+//     ASM_x86_cpuid_vendor_string();
+// }
+
+void x86_cpuid_vendor_string(const char *a, const char *b, const char *c)
 {
-    const char *cpu_vendor = ASM_x86_cpuid_vendor_string();
-    kprintf("===========================================\nVendor string: %s\n===========================================\n", cpu_vendor);
+    //a, b and c are ebx, edx and ecx after executing cpuid. I am too lazy to fix the variables names so they will stay a, b, and c for now
+    char* half = strcat(&a, &b);
+    const char* cpu_vendor = strcat(half, &c);
+    kprintf("%s\n", cpu_vendor);
+    
+    debug("===========================================\nVendor string: %s\n===========================================\n", cpu_vendor);
 }
+
 
 void x86_cpu_check_apic()
 {
-    uint64_t rdx = ASM_x86_cpuid_check_apic();
+    uint64_t rdx = ASM_x86_cpuid_check_bi_local_apic();
     
-    kprintf("apic_support_edx: %b\n", LOWER_32(rdx));
+    debug("apic_support_rdx: %x\n", rdx);
 }
