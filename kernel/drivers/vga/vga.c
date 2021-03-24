@@ -1,20 +1,16 @@
 #include "vga.h"
+#include <stdint.h>
 
 
 void vga_init(int fg, int bg) {
-	vga.col = 80;
-	vga.row = 25;
+	vga.row = 80;
+	vga.col = 25;
 	vga.cursor_x = 0;
 	vga.cursor_y = 0;
 	vga.vram = (uint16_t*)0xB8000;
 	vga.attr = ((bg << 4) | (fg & 0x0F)) << 8;
 	vga.text_scroll_speed = 4;
-	vga_hist.cell_color_bg = bg;
-	vga_hist.cell_color_fg = fg;
 }
-
-uint8_t get_x () { return vga.cursor_x;}
-uint8_t get_y () { return vga.cursor_y;}
 
 // #define vga.row_HISTORY vga.row * 5
 
@@ -38,18 +34,18 @@ void set_scroll_speed(uint32_t speed) {
 void vga_scroll()
 {
 	int i;
-	int lastRow = vga.row - 1;
+	int lastRow = 24;
 
 	uint16_t spaceChar = vga.attr | 0x20;  // space character
 
 	// Move the current text chunk that makes up the screen back in the buffer by a line
-	for ( i = 0; i < lastRow * vga.col; i += 1 )
+	for (i = 0; i < lastRow * vga.col; i++)
 	{
 		vga.vram[ i ] = vga.vram[ i + vga.col ];
 	}
 
 	// The last line should now be blank. Do this by writing 80 spaces to it
-	for ( i = lastRow * vga.col; i < vga.row * vga.col; i += 1 )
+	for (i = lastRow * vga.col; i < vga.row * vga.col; i++)
 	{
 		vga.vram[ i ] = spaceChar;
 	}
@@ -61,15 +57,15 @@ void vga_scroll()
 // Write a single character out to the screen
 void vga_putc(char c)
 {
-	uint16_t *location;
+	uint16_t *location = 0;
 
 	// Handle a backspace
-	if ( c == 0x08 && vga.cursor_x )
+	if (c == 0x08 && vga.cursor_x != 0)
 	{
 		vga.cursor_x -= 1; //Reset cursor position
 
 		//Put an empty character inplace of the character there was before it.
-		location = vga.vram + ( vga.cursor_y * vga.col + vga.cursor_x );
+		location = vga.vram + ( vga.cursor_y * vga.row + vga.cursor_x );
 		*location = vga.attr | ' ';
 	}
 
@@ -85,7 +81,7 @@ void vga_putc(char c)
 		vga.cursor_x = 0;
 	}
 
-	// Handle newline by moving cursor back to left and incrementing the row
+	// Handle newline
 	else if ( c == '\n' )
 	{
 		vga.cursor_x = 0;
@@ -95,22 +91,21 @@ void vga_putc(char c)
 	// Handle any other printable character
 	else if ( c >= ' ' && c < 127 )
 	{
-		location = vga.vram + ( vga.cursor_y * vga.col + vga.cursor_x );
+		location = vga.vram + ( vga.cursor_y * vga.row + vga.cursor_x );
 
 		*location = vga.attr | c;
 
 		vga.cursor_x++;
 	}
 
-	// Check if we need to inser a new line because we've reached the end of the screen
-	if ( vga.cursor_x >= vga.col )
+	if ( vga.cursor_x >= vga.row )
 	{
 		vga.cursor_x = 0;
 		vga.cursor_y++;
 	}
 
 	// Scroll the screen if needed
-	if ( vga.cursor_y >= vga.row )
+	if ( vga.cursor_y >= vga.col )
 	{
 		vga_scroll();
 	}
@@ -127,7 +122,7 @@ void vga_clear()
 	uint16_t spaceChar = vga.attr | 0x20;  // space character
 
 	// Fill buffer with spaces
-	for ( i = 0; i < vga.row * vga.col; i += 1 )
+	for (i = 0; i < vga.row * vga.col; i++)
 	{
 		vga.vram[ i ] = spaceChar;
 	}
@@ -136,6 +131,7 @@ void vga_clear()
 	vga.cursor_x = 0;
 	vga.cursor_y = 0;
 	vga_move_cursor();
+	vga.vram = (uint16_t*)0xB8000; //Reset vram framebuffer
 }
 
 void op_ok()

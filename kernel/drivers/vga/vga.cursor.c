@@ -4,7 +4,7 @@
 // Updates the hardware cursor
 void vga_move_cursor()
 {
-	uint16_t cursorLocation = vga.cursor_y * vga.col + vga.cursor_x;
+	uint16_t cursorLocation = vga.cursor_y * vga.row + vga.cursor_x;
 
 	// For some reason VGA accepts 16-bit location as two bytes
 	outb(0x3D4, 14);                   // Tell VGA we are setting the high cursor byte
