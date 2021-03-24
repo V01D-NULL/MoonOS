@@ -17,7 +17,7 @@ uint8_t get_x ();
 uint8_t get_y ();
 
 // Scrolls the text on the screen up by one line
-void monitor_scrollUp ();
+//void monitor_scrollUp ();
 
 // Scrolls the text on the screen down by one line
 void monitor_scrollDown ();
@@ -33,12 +33,6 @@ void monitor_write (char *c, bool is_task, bool operation_ok);
 
 // Write a newline character
 void monitor_writeln ();
-
-//
-void monitor_write_hex ( uint64_t n );
-
-//
-void monitor_write_dec ( uint64_t n );
 
 //
 int debug(char* fmt, ...);

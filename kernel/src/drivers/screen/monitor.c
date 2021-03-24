@@ -235,95 +235,6 @@ void monitor_writeln ()
 	monitor_put( '\n' );
 }
 
-//
-void monitor_write_hex ( uint64_t n )
-{
-	signed int tmp;
-	int i;
-
-	monitor_write("0x", false, false);
-
-	char noZeroes = 1;
-
-	for ( i = 28; i > 0; i -= 4 )
-	{
-		tmp = ( n >> i ) & 0xF;
-
-		if ( tmp == 0 && noZeroes != 0 )
-		{
-			continue;
-		}
-
-		if ( tmp >= 0xA )
-		{
-			noZeroes = 0;
-			monitor_put( tmp - 0xA + 'a' );  // a..f
-		}
-		else
-		{
-			noZeroes = 0;
-			monitor_put( tmp + '0' );  // 0..9
-		}
-	}
-
-	// last nibble
-	tmp = n & 0xF;
-
-	if ( tmp >= 0xA )
-	{
-		monitor_put( tmp - 0xA + 'a' );  // a..f
-	}
-	else
-	{
-		monitor_put( tmp + '0' );  // 0..9
-	}
-}
-
-//
-void monitor_write_dec ( uint64_t n )
-{
-	char  c [ 64 ];
-	char c2 [ 64 ];
-	int64_t i;
-	int64_t j;
-
-	if ( n == 0 )
-	{
-		monitor_put( '0' );
-		return;
-	}
-
-	int64_t acc = n;
-	// signed int acc = n;
-
-	i = 0;
-	while ( acc > 0 )
-	{
-		c[ i ] = acc % 10 + '0';  //
-
-		acc /= 10;
-
-		i += 1;
-	}
-	c[ i ] = 0;  // ?
-
-	//
-	c2[ i ] = 0;  // ?
-	i -= 1;
-
-	// Reverse order so that MSD stored at index 0 ?
-	j = 0;
-	while ( i >= 0 )
-	{
-		c2[ i ] = c[ j ];
-
-		i -= 1;
-		j += 1;
-	}
-
-	monitor_write(c2, false, false);
-}
-
 int debug(char* fmt, ...)
 {
 	if (!fmt)
@@ -360,9 +271,9 @@ int debug(char* fmt, ...)
 					case 'i':
 					case 'd':
 					{
-						uint64_t val = va_arg(arg, int);
+						int val = va_arg(arg, int);
 						char result[256];
-						serial_write_str(itoa(val, result));
+						serial_write_str(itoa(val, result, BASE_10));
 						i += 2;
 						break;
 					}
@@ -371,7 +282,8 @@ int debug(char* fmt, ...)
 					case 'X':
 					{
 						uint64_t hex = va_arg(arg, int);
-						serial_write_str(itoh(hex));
+						const char result[256];
+						serial_write_str(itoa(hex, result, BASE_16));
 						i += 2;
 						break;
 					}
@@ -379,7 +291,8 @@ int debug(char* fmt, ...)
 					case 'b':
 					{
 						int bin = va_arg(arg, int);
-						serial_write_str(itob(bin));
+						const char result[256];
+						serial_write_str(itoa(bin, result, BASE_2));
 						i+=2;
 						break;
 					}
@@ -435,7 +348,7 @@ int kprintf(const char* fmt, ...)
 					{
 						int val = va_arg(arg, int);
 						char result[256];
-						monitor_write(itoa(val, result), false, false);
+						monitor_write(itoa(val, result, BASE_10), false, false);
 						i += 2;
 						break;
 					}
@@ -444,7 +357,8 @@ int kprintf(const char* fmt, ...)
 					case 'X':
 					{
 						uint64_t hex = va_arg(arg, int);
-						monitor_write(itoh(hex), false, false);
+						char result[256];
+						monitor_write(itoa(hex, result, BASE_16), false, false);
 						i += 2;
 						break;
 					}
@@ -452,7 +366,8 @@ int kprintf(const char* fmt, ...)
 					case 'b':
 					{
 						int bin = va_arg(arg, int);
-						monitor_write(itob(bin), false, false);
+						char result[256];
+						monitor_write(itoa(bin, result, BASE_2), false, false);
 						i+=2;
 						break;
 					}
@@ -480,13 +395,13 @@ void write_x(const char* str)
 
 void write_x_dec(uint64_t n)
 {
-	monitor_write_dec(n);
+	//monitor_write_dec(n);
 	cursorX = 0;
 }
 
 void write_x_hex(uint64_t n)
 {
-	monitor_write_hex(n);
+	//monitor_write_hex(n);
 	cursorX = 0;
 }
 
@@ -529,7 +444,7 @@ int kprintf_x(const char* fmt, ...)
 					{
 						uint64_t val = va_arg(arg, int);
 						char result[256];
-						monitor_write(itoa(val, result), false, false);
+						monitor_write(itoa(val, result, BASE_10), false, false);
 						i += 2;
 						break;
 					}

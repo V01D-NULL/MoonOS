@@ -12,10 +12,7 @@ char *itob(uint64_t n);
 //Int to hex
 char *itoh(uint64_t n);
 
-char *itoa(uint64_t n, char *str);
-
-//Int To X (where X depends on the value of `base`, 2, 8, 10, 16 - b, o, d/i, h)
-// Note that itoX is specific to the Validity kernel, the function is not posix or unix compliant
-char *itoX(uint64_t num, uint64_t base);
+//Int to ascii - The base must be specified
+char *itoa(int n, char *str, int base);
 
 #endif // LIB_KERNEL_STDLIB_H

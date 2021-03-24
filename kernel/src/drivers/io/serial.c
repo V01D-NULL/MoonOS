@@ -31,7 +31,7 @@ void serial_write_str(const char* str)
 void serial_write_dec(uint64_t n)
 {
     char result[256];
-    const char *serial_decimal = itoa(n, result);
+    const char *serial_decimal = itoa(n, result, BASE_10);
 	serial_write_str(serial_decimal);
 }
 

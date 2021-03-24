@@ -14,38 +14,40 @@ uint64_t atoi(const char* string)
 	return result;
 }
 
-
-
+//itob and itoh will be left empty for now. All they do is do what itoa does but without specifying the base since the function knows it already
 char *itob(uint64_t n) {
-    int sign;
-    char result[10];
-    if ((sign=n)<0)
-        n = -n;
 
-    do {
-        int i = n % BASE_2;
-        
-    }while((n /= 2) > 0);
-
-    return "itob() IS NOT YET READY\n";
+    return "itob() -> not yet implemented. Please use itoa() instead\n";
 }
 
 char *itoh(uint64_t n) {
-    return "itoh() IS NOT YET READY\n";
+    return "itoh() -> not yet implemented. Please use itoa() instead\n";
 }
 
-char *itoa(uint64_t n, char *str) {
-    static int i = 0;
+char *itoa(int n, char *str, int base) {
+    int i = 0;
+    bool is_signed = false;
+
     if (n == 0) {
         str[i] = '0';
-        str[++i] = '\0';
+        str[i++] = '\0';
+        return str;
     }
+
+    is_signed = true ? (base == BASE_10 && n < 0) : false;
+    if (is_signed) n = -n;
 
     while (n != 0)
     {
-        str[i++] = '0' + n;
+        int remainder = n % base;
+        str[i++] = (remainder > 9) ? (remainder-10) + 'a' : remainder + '0';
+        n /= base;
     }
+    
+    if (is_signed)
+        str[i++] = '-';
 
-    return str;
-    // return "itoa() IS NOT YET READY\n";
+    str[i] = '\0'; //NULL terminate string
+    
+    return strrev(str);
 }
