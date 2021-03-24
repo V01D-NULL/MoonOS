@@ -1,7 +1,9 @@
 #ifndef SERIAL_H
 #define SERIAL_H
 
-#include "../../libk/kstdlib.h"
+
+#include <libk/kprintf.h>
+#include <libk/kstring.h>
 #include "../../common.h"
 #include "../vga/vga.h"
 #include <stdint.h>

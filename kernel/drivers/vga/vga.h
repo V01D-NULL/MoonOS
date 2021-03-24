@@ -1,9 +1,9 @@
 #ifndef LEGACY_VGA_H
 #define LEGACY_VGA_H
 
-#include "../../libk/kstring.h"
-#include "../../libk/kstdlib.h"
-#include "../../libk/kprintf.h"
+#include <libk/kstring.h>
+#include <libk/kprintf.h>
+
 #include "../io/serial.h"
 #include <stdarg.h>
 #include "vga.cursor.h"

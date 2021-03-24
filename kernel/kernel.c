@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stddef.h>
+#include <stdlib.h>
 
 #include "stivale2.h"
 #include "boot/bootloader_stivale2.h"
@@ -15,8 +16,9 @@
 
 #include "asm/x86/x86.h"
 
-#include "libk/kstdlib.h"
+//Defined in libs/libk/
 #include "libk/kstring.h"
+#include "libk/kprintf.h"
 
 #include "common.h"
 
@@ -32,10 +34,9 @@ void kmain(struct stivale2_struct *stivale2_struct) {
     init_idt();
 
     set_color(VGA_RED, VGA_BLACK);
-    kprintf_p(false, true, "Color changing example\n");
+    kprintf_p(false, true, "Color changing example \n");
 
     debug("testing testing %d\n", 1234);
-
 
 
     // bootloader_stivale2_init_smp(stivale2_struct);

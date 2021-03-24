@@ -1,0 +1,11 @@
+file kernel/Validity.elf
+
+target remote :1234
+
+set print pretty on
+
+set disassembly-flavor intel
+
+b kmain
+
+continue

@@ -1,11 +1,6 @@
 # VALIDITY OS
 Validity OS is a monolithic kernel targeting the x86_64 architecture.
 
-# Where did everything go?
-As you might have noticed there are alot less files in this repo than there were before. This is because I have decided to switch from GRUB to limine, and from protected to long mode, so most of the protected mode code had to go.
-- Why switch?
-	- **Seemingly endless address space** (Do I really need to say more after that? :D ), XSDT, APIC (besides, protected mode is super obsolete. (Technically this OS is obsolete aswell since it isn't UEFI but eh. (Jokes on you I can see my private Validty-UEFI repo that I will work on eventually which will be an exact clone of this kernel but for UEFI systems) It's still good practice and doesn't differ from UEFI that much (I think)))
-
 # Features
 - Stivale2 boot protocol
 - Limine bootloader
@@ -13,6 +8,8 @@ As you might have noticed there are alot less files in this repo than there were
 - Interrupts
 - CPU Identification
 - Serial output
+- Rock solid kprintf(vga) & debug(serial) functions
+- Barebones kernel library (strlen, memcmp, memcpy, vsnprintf, etc)
 
 # Future features:
 - A simple heap
@@ -20,6 +17,8 @@ As you might have noticed there are alot less files in this repo than there were
 - Paging
 - APIC
 - ACPI
+- VESA (This includes font loading and rendering)
+- TTY  (Using VESA, NOT vga)
 - Many hardware drivers including but not limited to:
 	- Network cards
 	- ATA
@@ -29,24 +28,45 @@ As you might have noticed there are alot less files in this repo than there were
 - A small libc for the userland
 
 # This is currently being working on:
-- Creating a libs/ folder in the projects root directory where .a files will be generated for use by the Validity kernel (files will be those in the kernel/libk/ folder and more will be added as time goes on)
 - pmm
 
+# Directory walkthrough:
+- libs/   	  --  Here you will find kernel libs and ports. (Planning on putting things like bash and Doom in this lib/ folder)
+- kernel/ 	  --  Kernel source code, this is most likely all you really care about
+- build-util/ --  3rd party tools needed to build the Validity kernel + makefile flags
+- debug-util/ --  Files needed for debugging Validity.
+- boot/		  --  Everything limine needs to boot 
+
 # Installation
-## Building:
-- ### For devs (assuming you are using a debian based linux distro)
-	- Install needed tools:
-		- sudo apt update
-		- sudo apt install build-essential nasm qemu-system-x86
-	- Build kernel
-		- git clone < REPO >
-		- cd < REPO_DIR >
-		- make all
-		- make run
+## Building: (assuming you are using a debian based linux distro)
+- Install needed tools:
+	- sudo apt update
+	- sudo apt install build-essential nasm qemu-system-x86
+- Build kernel
+	- git clone < REPO >
+	- cd < REPO_DIR >
+	- make all
+	- make run
 
-# Resources:
-- This kernel started by me learning from james JamesM's kernel development tutorials, however I changed all of his code because of the bad and partially outdated implementations he presented. Thanks go out to websites like lowlevel.eu or the osdev wiki but also some cool and really helpful os developers on github and discord.
 
+# My journey: (Inspiration for newcomers)
+I have always wanted to make an OS, so one day I decided to build one.
+Turns out it is alot of work and back then it totally overwhelmed me to the point where I took long breaks (for months) because information was so scarce, and what little informate there is is outdated.
+
+I have written about 4 "kernels" during my OS development learning experience, and each time I started over because I was far too overwhelmed- none have gotting past a GDT :/   (heck, some where just bootloaders that called a kernel entry and looped)
+
+If you are a beginner looking to understand what this code is doing and how you can write your own kernel with up-to-date information, please do join the OSDEV discord server (linked in the osdev wiki at the bottom) and don't give up when it gets hard at first.
+
+I have started developing kernels about 8 months ago (with multiple month-long of breaks inbetween), and I still have many things to learn, however my `try harder` mindset proved useful in helping me get through the struggles and write a kernel for which I did not have to steal or copy code from tutorials or other projects out of a lack of knowledge.
+
+I hope this inspired you to use this mindset when things seem too difficult to manage.
+
+Best of luck ~ V01D aka Tim.
+
+# Special thanks
+- Thanks go out to websites like lowlevel.eu or the osdev wiki but also some cool and really helpful os developers on github and discord.
+
+# Finishing touch (resources I use)
 * https://www.cs.cmu.edu/~ralf/files.html
 * https://ethv.net/workshops/osdev/notes/notes-3.html
 * https://osdev.wiki  (barebones but up-to-date osdev wiki)
