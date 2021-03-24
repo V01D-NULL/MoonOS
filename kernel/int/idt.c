@@ -19,7 +19,7 @@ extern void load_idt(uint64_t idtr);
 
 void init_idt()
 {
-    monitor_write("Initialising interrupts\n", true, false);
+    vga_puts("Initialising interrupts\n", true, false);
     
     // idt_set_entry(uint16_t selector /*kernel CS (0x08)*/, uint8_t ist /*0*/, uint8_t type_attr /*0x8E*/, uint64_t offset /*asm func*/, uint8_t idx /*isr index*/)
     idt_set_entry(0x08, 0, 0x8E, (uint64_t)isr0, 0);
@@ -86,5 +86,5 @@ void init_idt()
 
     load_idt((uint64_t)&_idtr);
 
-    monitor_write("Initialised interrupts\n", false, true);
+    vga_puts("Initialised interrupts\n", false, true);
 }

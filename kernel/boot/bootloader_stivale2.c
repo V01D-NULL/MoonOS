@@ -1,4 +1,5 @@
 #include "bootloader_stivale2.h"
+#include "../drivers/vga/vga.h"
 #include "../stivale2.h"
 #include <stdint.h>
 

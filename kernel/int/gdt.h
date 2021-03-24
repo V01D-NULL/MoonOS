@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include "../common.h"
-#include "../drivers/screen/monitor.h"
+#include "../drivers/vga/vga.h"
 
 struct memory_segment {
     uint16_t limit;

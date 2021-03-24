@@ -1,6 +1,6 @@
 [bits 64]
 
-%include "src/asm/defs.inc"
+%include "asm/defs.inc"
 
 [extern isr_handler]
 ;[extern irq_handler]

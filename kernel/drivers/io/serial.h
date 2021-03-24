@@ -3,7 +3,7 @@
 
 #include "../../libk/kstdlib.h"
 #include "../../common.h"
-#include "../screen/monitor.h"
+#include "../vga/vga.h"
 #include <stdint.h>
 
 /*

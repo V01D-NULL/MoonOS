@@ -5,7 +5,7 @@
     x86.h - Takes all the assembly functions and provides them in a single header file for ease-of-access
 */
 
-#include "../../drivers/screen/monitor.h"
+#include "../../drivers/vga/vga.h"
 #include "../../common.h"
 
 //Assembly labels (must be prefixed with ASM_<ARCHITECTURE>):

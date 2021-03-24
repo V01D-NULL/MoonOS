@@ -1,5 +1,4 @@
 TARGET := Validity.elf
-SRCDIR  = src/
 
 CC = @cc
 AS = @nasm
@@ -12,8 +11,6 @@ CFLAGS := 				 \
 	-mno-80387           \
 	-mno-mmx             \
 	-mno-3dnow           \
-	-mno-sse             \
-	-mno-sse2            \
 	-mcmodel=kernel      \
 	-mno-red-zone
 
@@ -39,11 +36,11 @@ $(TARGET): $(OBJ)
 	@printf "[LD] Linking object files\n";
 	$(LD) $(LDINTERNALFLAGS) $(OBJ) -o $@
 
-$(SRCDIR)%.o: $(SRCDIR)%.c
+%.o: %.c
 	@printf "[CC] [ $< ]\n";
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(SRCDIR)%.o: $(SRCDIR)%.s
+%.o: %.s
 	@printf "[AS] [ $< ]\n";
 	$(AS) $(ASMFLAGS) $< -o $@
 

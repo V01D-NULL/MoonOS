@@ -1,7 +1,7 @@
 ; Loads the 64 bit gdt
 [bits 64]
 
-%include "src/asm/defs.inc"
+%include "asm/defs.inc"
 
 global _load_gdt
 

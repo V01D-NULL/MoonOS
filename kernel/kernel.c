@@ -8,7 +8,7 @@
 #include "int/idt.h"
 #include "int/interrupts.h"
 
-#include "drivers/screen/monitor.h"
+#include "drivers/vga/vga.h"
 #include "drivers/io/serial.h"
 
 #include "hal/apic.h"
@@ -23,11 +23,20 @@
 void kmain(struct stivale2_struct *stivale2_struct) {
     ASM_x86_cpuid_vendor_string();
 
+    set_color(VGA_BLACK, VGA_WHITE);
+
     init_gdt();
 
     init_idt();
 
-    bootloader_stivale2_init_smp(stivale2_struct);
+    set_color(VGA_RED, VGA_BLACK);
+    kprintf_p(false, true, "Color changing example\n");
+
+    debug("testing testing %d\n", 1234);
+
+
+
+    // bootloader_stivale2_init_smp(stivale2_struct);
 
     // debug("%d\n", stivale2_struct->tags);
 

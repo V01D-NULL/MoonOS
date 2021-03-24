@@ -29,6 +29,7 @@ As you might have noticed there are alot less files in this repo than there were
 - A small libc for the userland
 
 # This is currently being working on:
+- Creating a libs/ folder in the projects root directory where .a files will be generated for use by the Validity kernel (files will be those in the kernel/libk/ folder and more will be added as time goes on)
 - pmm
 
 # Installation
