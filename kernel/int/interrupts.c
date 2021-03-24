@@ -51,9 +51,9 @@ void isr_handler(regs_t regs)
         serial_set_color(BASH_WHITE);
         debug("Register dump:\n"                      \
                 "rax 0x%x, rbx 0x%x, rcx 0x%x, rdx 0x%x\n"    \
-                "rbp %d, rsp %d, rdi %d, rsi %d\n"    \
-                "rip %d, cs  0x%x, ss  0x%x, rflags 0x%x\n" \
-                "r8  %d, r9  0x%x, r10 0x%x, r11  0x%x\n"   \
+                "rbp 0x%x, rsp 0x%x, rdi 0x%x, rsi 0x%x\n"    \
+                "rip 0x%x, cs  0x%x, ss  0x%x, rflags 0x%x\n" \
+                "r8  0x%x, r9  0x%x, r10 0x%x, r11  0x%x\n"   \
                 "r12 0x%x, r13 0x%x, r14 0x%x, r15  0x%x\n",
                                                                 regs.rax,
                                                                 regs.rbx,
