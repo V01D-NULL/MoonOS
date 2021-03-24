@@ -22,18 +22,19 @@
 
 #include "common.h"
 
-void kmain(struct stivale2_struct *stivale2_struct) {
+void kmain(boot_info_t *bootvars) {
     vga_init(VGA_WHITE, VGA_BLACK);
 
-    ASM_x86_cpuid_vendor_string();
+//    ASM_x86_cpuid_vendor_string(); //Calling this function will clear out every variable in bootvars. Find out why.
 
     init_gdt();
     init_idt();
 
-    //This doesn't work as expected. See boot/bootloader_stivale2.c/h for more
-//    bootloader_stivale2_init_mmap(stivale2_struct);
+    debug("%d\n", bootvars->cpu.processor_count);
 
     for (;;) {
         asm ("hlt");
     }
 }
+
+

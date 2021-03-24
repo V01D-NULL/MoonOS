@@ -1,33 +1,29 @@
 #include "bootloader_stivale2.h"
 #include "../drivers/vga/vga.h"
 #include "../stivale2.h"
+#include "../kernel.h"
 #include <stdint.h>
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id);
 
 static uint8_t stack[4096];
 
-struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
-    // All tags need to begin with an identifier and a pointer to the next tag.
+struct stivale2_header_tag_smp smp = {
     .tag = {
-        // Identification constant defined in stivale2.h and the specification.
-        .identifier = STIVALE2_HEADER_TAG_FRAMEBUFFER_ID,
-        // If next is 0, then this marks the end of the linked list of tags.
+        .identifier = STIVALE2_HEADER_TAG_SMP_ID,
         .next = 0
     },
-    // We set all the framebuffer specifics to 0 as we want the bootloader
-    // to pick the best it can.
-    .framebuffer_width  = 0,
-    .framebuffer_height = 0,
-    .framebuffer_bpp    = 0
 };
 
-// How do I do this?
-// struct stivale2_header_tag_smp smp = {
+// struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
+//     // All tags need to begin with an identifier and a pointer to the next tag.
 //     .tag = {
-//         .identifier = STIVALE2_HEADER_TAG_SMP_ID,
-//         .next = 0
+//         .identifier = STIVALE2_HEADER_TAG_FRAMEBUFFER_ID,
+//         .next = (uintptr_t)&smp
 //     },
+//     .framebuffer_width  = 0,
+//     .framebuffer_height = 0,
+//     .framebuffer_bpp    = 0
 // };
 
 __attribute__((section(".stivale2hdr"), used))
@@ -44,7 +40,7 @@ struct stivale2_header stivale_hdr = {
     .flags = 0,
     // This header structure is the root of the linked list of header tags and
     // points to the first one (and in our case, only).
-    .tags = 0
+    .tags = (uintptr_t)&smp
 };
 
 //Stolen from the limine barebones tutorial (I don't feel like re-inventing the wheel rn)
@@ -67,16 +63,24 @@ void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id) {
 }
 
 
-void bootloader_stivale2_init_mmap(struct stivale2_struct *stivale2_struct)
-{
-    struct stivale2_struct_tag_memmap *memory_map = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_MEMMAP_ID);
-    debug("mmap_base: %x", memory_map->memmap->type); //Invalid Opcode??
-}
+void kinit(struct stivale2_struct *bootloader_info) {
+    boot_info_t bootvars; //Hardware information from the bootloader
 
-void bootloader_stivale2_init_smp(struct stivale2_struct *stivale2_struct)
-{
-    struct stivale2_smp_info *s;
-    s = stivale2_get_tag(stivale2_struct, STIVALE2_STRUCT_TAG_SMP_ID);
- 
-    debug("%d\n", s->processor_id);
+    //Vesa support will come later on (probably after memory management)
+    struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
+    struct stivale2_struct_tag_smp *smp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_SMP_ID);
+
+    if (fb != NULL) {
+
+    }
+
+    if (smp != NULL)
+    {
+        bootvars.cpu.processor_count = smp->cpu_count;
+        bootvars.cpu.bootstrap_processor_lapic_id = smp->bsp_lapic_id;
+        bootvars.cpu.acpi_processor_uid = smp->smp_info->processor_id;
+        bootvars.cpu.lapic_id = smp->smp_info->lapic_id;
+    }
+
+    kmain(&bootvars);
 }
