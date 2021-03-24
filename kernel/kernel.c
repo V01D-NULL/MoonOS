@@ -21,6 +21,8 @@
 #include "common.h"
 
 void kmain(struct stivale2_struct *stivale2_struct) {
+    vga_init(VGA_WHITE, VGA_BLACK);
+
     ASM_x86_cpuid_vendor_string();
 
     set_color(VGA_BLACK, VGA_WHITE);
