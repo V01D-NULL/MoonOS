@@ -262,7 +262,7 @@ int debug(char* fmt, ...)
 
 					case 's':
 					{
-						char* string = va_arg(arg, char*);
+						const char* string = va_arg(arg, char*);
 						serial_write_str(string);
 						i+=2;
 						break;
@@ -281,8 +281,8 @@ int debug(char* fmt, ...)
 					case 'x':
 					case 'X':
 					{
-						uint64_t hex = va_arg(arg, int);
-						const char result[256];
+						int hex = va_arg(arg, int);
+						char result[256];
 						serial_write_str(itoa(hex, result, BASE_16));
 						i += 2;
 						break;
@@ -291,7 +291,7 @@ int debug(char* fmt, ...)
 					case 'b':
 					{
 						int bin = va_arg(arg, int);
-						const char result[256];
+						char result[256];
 						serial_write_str(itoa(bin, result, BASE_2));
 						i+=2;
 						break;
@@ -461,7 +461,7 @@ int kprintf_x(const char* fmt, ...)
 					case 'b':
 					{
 						int bin = va_arg(arg, int);
-						monitor_write(itob(bin), false, false);
+						//monitor_write(itob(bin), false, false);
 						i+=2;
 						break;
 					}

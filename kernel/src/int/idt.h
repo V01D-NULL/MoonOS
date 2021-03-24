@@ -7,28 +7,28 @@
 #include "../drivers/screen/monitor.h"
 
 typedef struct regs {
-    uint64_t r15;
-    uint64_t r14;
-    uint64_t r13;
-    uint64_t r12;
-    uint64_t r11;
-    uint64_t r10;
-    uint64_t r9;
-    uint64_t r8;
-    uint64_t rsi;
-    uint64_t rdi;
-    uint64_t rbp;
-    uint64_t rdx;
-    uint64_t rcx;
-    uint64_t rbx;
-    uint64_t rax;
-    uint64_t isr_number;
-    uint64_t error_code;
-    uint64_t rip;
-    uint64_t cs; 
-    uint64_t rflags; 
-    uint64_t rsp;
-    uint64_t ss;
+    long long int r15;
+    long long int r14;
+    long long int r13;
+    long long int r12;
+    long long int r11;
+    long long int r10;
+    long long int r9;
+    long long int r8;
+    long long int rsi;
+    long long int rdi;
+    long long int rbp;
+    long long int rdx;
+    long long int rcx;
+    long long int rbx;
+    long long int rax;
+    long long int isr_number;
+    long long int error_code;
+    long long int rip;
+    long long int cs; 
+    long long int rflags; 
+    long long int rsp;
+    long long int ss;
 } regs_t;
 // typedef struct regs regs_t;
 

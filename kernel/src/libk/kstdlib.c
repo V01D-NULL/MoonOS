@@ -20,6 +20,7 @@ char *itob(uint64_t n) {
     return "itob() -> not yet implemented. Please use itoa() instead\n";
 }
 
+
 char *itoh(uint64_t n) {
     return "itoh() -> not yet implemented. Please use itoa() instead\n";
 }
@@ -29,13 +30,17 @@ char *itoa(int n, char *str, int base) {
     bool is_signed = false;
 
     if (n == 0) {
-        str[i] = '0';
-        str[i++] = '\0';
+        str[i++] = '0';
+        str[i] = '\0';
         return str;
     }
 
-    is_signed = true ? (base == BASE_10 && n < 0) : false;
-    if (is_signed) n = -n;
+    if (n < 0 && base == BASE_10) {
+        is_signed = true;
+        n = -n;
+    }
+    //is_signed = true ? (base == BASE_10 && n < 0) : false;
+    //if (is_signed) n = -n;
 
     while (n != 0)
     {

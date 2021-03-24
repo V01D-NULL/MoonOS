@@ -20,5 +20,5 @@ void x86_cpu_check_apic()
 {
     uint64_t rdx = ASM_x86_cpuid_check_bi_local_apic();
     
-    debug("apic_support_rdx: %x\n", rdx);
+    debug("apic_support_rdx: %b\n", rdx);
 }

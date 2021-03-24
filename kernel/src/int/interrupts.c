@@ -6,7 +6,7 @@
 isr_t isr_handler_array[256];
 
 //Straight up copy and paste the text from the intel programming manual :D
-volatile static const char* exception_messages[31] = {
+static const char* exception_messages[31] = {
    "Type: (#DE) Division Exception",
    "Type: (#DB) Debug Exception",
    "Type: (NONE) NMI interrupt (Non Maskable Interrupt)",
@@ -50,11 +50,11 @@ void isr_handler(regs_t regs)
         debug("INT#%d - %s (err_code %d)\n", regs.isr_number, exception_messages[regs.isr_number], regs.error_code);
         serial_set_color(BASH_WHITE);
         debug("Register dump:\n"                      \
-                "rax %x, rbx %x, rcx %x, rdx %x\n"    \
-                "rbp %x, rsp %x, rdi %x, rsi %x\n"    \
-                "rip %x, cs  %x, ss  %x, rflags %x\n" \
-                "r8  %x, r9  %x, r10 %x, r11  %x\n"   \
-                "r12 %x, r13 %x, r14 %x, r15  %x\n",
+                "rax 0x%x, rbx 0x%x, rcx 0x%x, rdx 0x%x\n"    \
+                "rbp %d, rsp %d, rdi %d, rsi %d\n"    \
+                "rip %d, cs  0x%x, ss  0x%x, rflags 0x%x\n" \
+                "r8  %d, r9  0x%x, r10 0x%x, r11  0x%x\n"   \
+                "r12 0x%x, r13 0x%x, r14 0x%x, r15  0x%x\n",
                                                                 regs.rax,
                                                                 regs.rbx,
                                                                 regs.rcx,

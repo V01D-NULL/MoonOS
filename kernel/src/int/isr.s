@@ -8,9 +8,10 @@
 _asm_isr_handler_stub:
     cld
     pusha64
+    
     call isr_handler   ; C interrupt handler routine
     popa64
-    _cleanup_stack 16  ; Clean up pushed error code and interrutp number from stack
+    _cleanup_stack 16  ; Clean up pushed error code and interrupt number from stack
     iretq              ; Pop other flags and return to normal execution State
 
 _asm_irq_handler_stub:
