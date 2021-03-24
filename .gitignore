@@ -1,3 +1,4 @@
+*.a
 *.o
 *.elf
 ValidityOS.hdd

@@ -12,7 +12,7 @@ include build-util/flags.mk
 
 all: klibs quick_recompile $(KERNEL_HDD)
 
-run: $(KERNEL_HDD)
+run: klibs quick_recompile $(KERNEL_HDD)
 	$(EMU) $(EMU_OPTS)
 
 $(KERNEL_ELF):
