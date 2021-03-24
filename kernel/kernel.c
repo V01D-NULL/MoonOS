@@ -31,7 +31,7 @@ void kmain(struct stivale2_struct *stivale2_struct) {
     init_idt();
 
     //This doesn't work as expected. See boot/bootloader_stivale2.c/h for more
-    bootloader_stivale2_init_mmap(stivale2_struct);
+//    bootloader_stivale2_init_mmap(stivale2_struct);
 
     for (;;) {
         asm ("hlt");
