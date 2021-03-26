@@ -10,7 +10,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJ)
 	@printf "[kernel @ LD] Linking object files\n";
-	$(LD) $(LDINTERNALFLAGS) $(OBJ) $(KLIBS)/libk.a -o $@
+	$(LD) $(LDINTERNALFLAGS) $(OBJ) $(KLIBS)/libk.a $(KLIBS)/liballoc.a -o $@
 
 %.o: %.c
 	@printf "[kernel @ CC] [ $< ]\n";

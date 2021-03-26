@@ -82,4 +82,9 @@ inline void delay(int time) {
      }
 }
 
+inline uint64_t align(int size, int align)
+{
+    return (size + align - 1) & ~(align - 1);
+}
+
 #endif  // COMMON_H

@@ -32,7 +32,7 @@ int linear_mm_init(void *start, uint64_t size)
 }
 
 //TODO: Align bytes by `byte_align_ammount' for optimization purposes
-uint8_t *linear_alloc(uint64_t size/*, int byte_align_ammount*/) {
+uint8_t *linear_alloc(uint64_t size, int byte_align_ammount) {
     
     serial_set_color(BASH_GREEN);
 
@@ -48,7 +48,7 @@ uint8_t *linear_alloc(uint64_t size/*, int byte_align_ammount*/) {
     assert((void*)(size + mem_manager.first_free_addr) <= mem_manager.end);
 
     //Do we have enough RAM to allocate the memory?
-    assert((size_t)(mem_manager.first_free_addr += size) <= ram_manager_get_free()); //Update the first free address
+    assert((align((size_t)(mem_manager.first_free_addr += size), byte_align_ammount)) <= ram_manager_get_free()); //Update the first free address
     mem_manager.allocation_ptr = mem_manager.first_free_addr;
 
     debug("linear_alloc: Allocated %ld bytes, current buffer address: 0x%x (AllocationPool: 0x%x - 0x%x)\n", size, mem_manager.allocation_ptr, mem_manager.start, mem_manager.end);
