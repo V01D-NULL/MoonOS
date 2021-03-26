@@ -5,31 +5,7 @@
 #include <stddef.h>
 #include "../common.h"
 #include "../drivers/vga/vga.h"
-
-typedef struct regs {
-    int64_t r15;
-    int64_t r14;
-    int64_t r13;
-    int64_t r12;
-    int64_t r11;
-    int64_t r10;
-    int64_t r9;
-    int64_t r8;
-    int64_t rsi;
-    int64_t rdi;
-    int64_t rbp;
-    int64_t rdx;
-    int64_t rcx;
-    int64_t rbx;
-    int64_t rax;
-    int64_t isr_number;
-    int64_t error_code;
-    int64_t rip;
-    int64_t cs; 
-    int64_t rflags; 
-    int64_t rsp;
-    int64_t ss;
-} regs_t;
+#include "../AMD/cpu.h"
 
 struct idt_desc {
     uint16_t offset_low;  // offset bits 0..15

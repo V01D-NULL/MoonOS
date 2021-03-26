@@ -5,6 +5,7 @@
     x86.h - Takes all the assembly functions and provides them in a single header file for ease-of-access
 */
 
+#include <libk/kstring.h>
 #include "../../drivers/vga/vga.h"
 #include "../../common.h"
 

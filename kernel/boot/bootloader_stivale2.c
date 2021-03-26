@@ -112,7 +112,19 @@ void kinit(struct stivale2_struct *bootloader_info) {
         }
     }
 
-    debug("Total RAM: %ld kb\nFree  RAM: %ld kb\nUsed  RAM: %ld kb\n", bootvars.mmap.total_ram, bootvars.mmap.free_ram, bootvars.mmap.used_ram);
+    //It's ugly code but pretty output :)
+    debug("Total RAM: ");
+    serial_set_color(BASH_CYAN);
+    debug("%ld kb\n", bootvars.mmap.total_ram);
+    serial_set_color(BASH_WHITE);
+    debug("Free  RAM: ");
+    serial_set_color(BASH_CYAN);
+    debug("%ld kb\n", bootvars.mmap.free_ram);
+    serial_set_color(BASH_WHITE);
+    debug("Used  RAM: ");
+    serial_set_color(BASH_CYAN);
+    debug("%ld kb\n", bootvars.mmap.used_ram);
+    serial_set_color(BASH_WHITE);
     
     kmain(&bootvars);
 }
