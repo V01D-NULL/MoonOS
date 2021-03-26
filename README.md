@@ -29,8 +29,7 @@ Validity OS is a monolithic kernel targeting the x86_64 architecture.
 - A small libc for the userland
 
 # This is currently being working on:
-- paging
-- pmm (NOTE: I will be trying all sorts of memory allocation algorithms over time, the first one you see is not going to be the final product (I will not be working on a new memory management algorithm all the time.))
+- pmm (bitmap based ~ might switch to slab allocation once the kernel has robust memory management)
 
 # Directory walkthrough:
 - libs/   	  --  Here you will find kernel libs and ports. (Planning on putting things like bash and Doom in this lib/ folder)
