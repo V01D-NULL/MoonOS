@@ -9,8 +9,7 @@ void vga_init(int fg, int bg) {
 	vga.cursor_y = 0;
 	vga.vram = (uint16_t*)0xB8000;
 	set_color(bg, fg);
-//	vga.attr = ((bg << 4) | (fg & 0x0F)) << 8;
-	vga.text_scroll_speed = 4;
+	vga.text_scroll_speed = 10;
 }
 
 // #define vga.row_HISTORY vga.row * 5

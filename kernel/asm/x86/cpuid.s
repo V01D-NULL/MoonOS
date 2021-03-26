@@ -4,6 +4,7 @@ global ASM_x86_cpuid_check_bi_local_apic
 extern x86_cpuid_vendor_string
 
 ASM_x86_cpuid_vendor_string:
+    push rbx ; The sysv ABI expects rbx to not be clobbered which is the case with cpuid
     xor rax, rax
     cpuid
 
@@ -12,12 +13,6 @@ ASM_x86_cpuid_vendor_string:
     mov rdx, rcx
 
     call x86_cpuid_vendor_string
-
+    pop rbx
     ret
 
-; Bit 9 of edx checks if there is a built-in local apic
-ASM_x86_cpuid_check_bi_local_apic:
-    mov eax, 0x01
-    cpuid
-    mov rax, rdx
-    ret

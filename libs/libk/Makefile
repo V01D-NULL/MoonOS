@@ -11,7 +11,8 @@ OBJ		 := $(OBJ_C) $(OBJ_ASM)
 .PHONY: all clean
 
 CFLAGS := $(CFLAGS) \
-			-I ../../kernel/
+			-I ../../kernel/ \
+			-I ../
 
 all: $(TARGET)
 

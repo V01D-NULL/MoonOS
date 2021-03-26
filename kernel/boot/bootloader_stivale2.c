@@ -66,9 +66,12 @@ void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id) {
 void kinit(struct stivale2_struct *bootloader_info) {
     boot_info_t bootvars; //Hardware information from the bootloader
 
+    serial_set_color(BASH_WHITE);
+
     //Vesa support will come later on (probably after memory management)
     struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
     struct stivale2_struct_tag_smp *smp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_SMP_ID);
+    struct stivale2_struct_tag_memmap *mmap = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
 
     if (fb != NULL) {
 
@@ -80,6 +83,15 @@ void kinit(struct stivale2_struct *bootloader_info) {
         bootvars.cpu.bootstrap_processor_lapic_id = smp->bsp_lapic_id;
         bootvars.cpu.acpi_processor_uid = smp->smp_info->processor_id;
         bootvars.cpu.lapic_id = smp->smp_info->lapic_id;
+    }
+
+    if (mmap != NULL)
+    {
+        bootvars.mmap.entries = mmap->entries;
+        bootvars.mmap.base = mmap->memmap->base;
+        bootvars.mmap.length = mmap->memmap->length;
+        bootvars.mmap.type = mmap->memmap->type;
+        //Todo: Caluclate total memory from this memory map and save it in bootvars.mmap.ram
     }
 
     kmain(&bootvars);

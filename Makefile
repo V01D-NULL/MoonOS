@@ -10,13 +10,13 @@ include build-util/flags.mk
 
 .PHONY: clean all run
 
-all: klibs quick_recompile $(KERNEL_HDD)
+all: quick_recompile $(KERNEL_HDD)
 
-run: klibs quick_recompile $(KERNEL_HDD)
+run: quick_recompile $(KERNEL_HDD)
 	$(EMU) $(EMU_OPTS)
 
 $(KERNEL_ELF):
-	$(MAKE) --no-print-directory -C kernel
+	@$(MAKE) --no-print-directory -C kernel
 
 $(KERNEL_HDD): $(KERNEL_ELF)
 	@dd if=/dev/zero bs=1M count=0 seek=64 of=$(KERNEL_HDD)
@@ -28,12 +28,12 @@ $(KERNEL_HDD): $(KERNEL_ELF)
 	@./$(BUILD_UTIL_DIR)/limine-install 	$(KERNEL_HDD)
 
 klibs:
-	$(MAKE) --no-print-directory -C libs all
+	@$(MAKE) --no-print-directory -C libs all
 
 clean:
 	@rm -f $(KERNEL_HDD)
-	$(MAKE) --no-print-directory -C kernel clean
-	$(MAKE) --no-print-directory -C libs   clean
+	@$(MAKE) --no-print-directory -C kernel clean
+	@$(MAKE) --no-print-directory -C libs   clean
 
 debugger_session: $(KERNEL_HDD)
 	$(DEBUG_TERMINAL) $(DEBUG_TERMINAL_OPTS) ./debug-util/debug.sh &
@@ -44,4 +44,6 @@ debugger_session: $(KERNEL_HDD)
 quick_recompile:
 	@rm -f $(KERNEL_HDD) kernel/Validity.elf
 	@printf "\n";
-	$(MAKE) --no-print-directory -C kernel
+	@$(MAKE) --no-print-directory -C libs
+	@printf "\n";
+	@$(MAKE) --no-print-directory -C kernel
