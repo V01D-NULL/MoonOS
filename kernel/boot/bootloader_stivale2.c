@@ -113,7 +113,7 @@ void kinit(struct stivale2_struct *bootloader_info) {
     }
 
     debug("Total RAM: %ld kb\nFree  RAM: %ld kb\nUsed  RAM: %ld kb\n", bootvars.mmap.total_ram, bootvars.mmap.free_ram, bootvars.mmap.used_ram);
-
+    
     kmain(&bootvars);
 }
 

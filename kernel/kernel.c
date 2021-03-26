@@ -23,6 +23,9 @@
 
 #include "common.h"
 
+//TODO:
+//  Create a mm/ram.h/c file where Validity will keep track of RAM usage (the struct will be updated with each memory allocation and deallocation)
+//
 void kmain(boot_info_t *bootvars) {
     
     ASM_x86_cpuid_vendor_string();
