@@ -26,6 +26,7 @@
 #include "common.h"
 
 #include "mm/ram.h"
+#include "mm/pmm.h"
 #include "mm/linear_alloc.h"
 
 void kmain(boot_info_t *bootvars) {
@@ -42,7 +43,8 @@ void kmain(boot_info_t *bootvars) {
     }
     linear_mm_release_buffer();
     
-    
+    init_pmm();
+
 
     for (;;) {
         asm ("hlt");
