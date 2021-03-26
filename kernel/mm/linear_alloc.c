@@ -58,8 +58,19 @@ uint8_t *linear_alloc(uint64_t size/*, int byte_align_ammount*/) {
     //Update RAM statistics
     uint64_t old_ram = ram_manager_get_used();
     ram_manager_add(size);
-    debug("RAM statistics: (old) %d kb\t(new) %d kb\n", old_ram, ram_manager_get_used());
     
+    debug(
+        "RAM statistics (used/total):\n"
+        "(old) %lld mb/%lld GB ~ %lld/%lld kb\n"
+        "(new) %lld mb/%lld GB ~ %lld/%lld kb\n",
+            /* old RAM stat */
+            old_ram / 1024, ram_manager_get_total() / 1024 / 1024,
+            old_ram, ram_manager_get_total(),
+
+            /* new RAM stat */
+            ram_manager_get_used() / 1024, ram_manager_get_total() / 1024 / 1024,
+            ram_manager_get_used(), ram_manager_get_total()
+    );
     
     return mem_manager.allocation_ptr;
 }

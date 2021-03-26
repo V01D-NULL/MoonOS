@@ -4,20 +4,24 @@
 #include <stdint.h>
 #include "../boot/bootloader_stivale2.h"
 
-//size_t go brr
+/*
+    Store and update RAM usage
+    All random access memory statistics (whether it be used, total, or free) will be returned in kb.
+*/
+
 typedef struct ram {
-    size_t used;
-    size_t total;
-    size_t free;
+    uint64_t used;
+    uint64_t total;
+    uint64_t free;
 } ram_usage_t;
 
 //Store inital RAM information from the bootloader
-void ram_manager_init(boot_info_t ram_info);
+void ram_manager_init(boot_info_t *ram_info);
 
 //Get the free, total, or used ram in kb
-size_t ram_manager_get_free();
-size_t ram_manager_get_total();
-size_t ram_manager_get_used();
+uint64_t ram_manager_get_free();
+uint64_t ram_manager_get_total();
+uint64_t ram_manager_get_used();
 
 //Marks *ammount* number of kb as free and returns the used ram
 size_t ram_manager_free(uint64_t ammount);

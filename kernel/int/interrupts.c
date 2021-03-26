@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-isr_t isr_handler_array[255];
+isr_t isr_handler_array[255] = {0};
 
 //TODO: Update exception messages to comply with the AMD manual
 static const char* exception_messages[31] = {
@@ -87,6 +87,10 @@ void isr_handler(regs_t regs)
 
     if (isr_handler_array[regs.isr_number] != 0) {
         isr_handler_array[regs.isr_number]((regs_t*)&regs);
+    }
+    //Ignore CPU excpetions and IRQ's, because the first will never be unhandled, and the second option will be utterly useless spam to the serial device
+    else if (regs.isr_number > 47) {
+        debug("Unhandled interrupt %x (%ld)\n", regs.isr_number, regs.isr_number);
     }
 }
 

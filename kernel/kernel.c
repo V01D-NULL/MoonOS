@@ -41,14 +41,14 @@ static void timer(regs_t *r) {
 }
 
 void kmain(boot_info_t *bootvars) {
-    ram_manager_init(*bootvars);
-    
+    ram_manager_init(bootvars);
+
     init_gdt();
     init_idt();
     
     //Tie IRQ's to functions example
-    install_isr(IRQ0, timer);
-    install_isr(IRQ1, abc);
+    // install_isr(IRQ0, timer);
+    // install_isr(IRQ1, abc);
 
     ASM_x86_cpuid_vendor_string();
 
