@@ -32,26 +32,13 @@ void set_scroll_speed(uint32_t speed) {
 
 // Scrolls the text on the screen up by one line
 void vga_scroll()
-{
-	int i;
-	int lastRow = 24;
+{    
+    int i = 0;
+    for(i = 0; i < (vga.row*vga.col-80); i++)
+    	vga.vram[i] = vga.vram[i+80];
+    for(i = 0; i < vga.row; i++)
+        vga.vram[(vga.row - 1) * vga.row + i] = (uint16_t) ' ' | ((uint16_t) VGA_BLACK << 8);
 
-	uint16_t spaceChar = vga.attr | 0x20;  // space character
-
-	// Move the current text chunk that makes up the screen back in the buffer by a line
-	for (i = 0; i < lastRow * vga.col; i++)
-	{
-		vga.vram[ i ] = vga.vram[ i + vga.col ];
-	}
-
-	// The last line should now be blank. Do this by writing 80 spaces to it
-	for (i = lastRow * vga.col; i < vga.row * vga.col; i++)
-	{
-		vga.vram[ i ] = spaceChar;
-	}
-
-	// The cursor should now be on the last line
-	vga.cursor_y = lastRow;
 }
 
 // Write a single character out to the screen
@@ -202,14 +189,15 @@ int debug(char* fmt, ...)
 	return 0; //All went well
 }
 
+char buff2[512] = {0};
 int kprintf(const char* fmt, ...)
 {
 	va_list arg;
 	va_start(arg, fmt);
-	vsnprintf((char*)&buff, (size_t) -1, fmt, arg);
+	vsnprintf((char*)&buff2, (size_t) -1, fmt, arg);
 	va_end(arg);
 
-	vga_puts((char*)&buff, false, false);
+	vga_puts((char*)&buff2, false, false);
 
 	return 0; //All went well
 }

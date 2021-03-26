@@ -33,7 +33,7 @@
 #define IRQ14 46
 #define IRQ15 47
 
-typedef void (*isr_t)(regs_t);
+typedef void (*isr_t)(regs_t*);
 
 void install_isr(uint8_t base, isr_t handler);
 void uninstall_isr(uint8_t base);

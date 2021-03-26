@@ -28,8 +28,16 @@
 #include "mm/ram.h"
 #include "mm/linear_alloc.h"
 
-void abc(regs_t r) {
-    kprintf("A");
+//Extremely useless keyboard test driver
+static void abc(regs_t *r) {
+    char a = inb(0x60);
+    debug("%x\n", a);
+    
+}
+
+//And here is the extremely useless PIT test driver
+static void timer(regs_t *r) {
+    kprintf("tick\n");
 }
 
 void kmain(boot_info_t *bootvars) {
@@ -38,6 +46,10 @@ void kmain(boot_info_t *bootvars) {
     init_gdt();
     init_idt();
     
+    //Tie IRQ's to functions example
+    install_isr(IRQ0, timer);
+    install_isr(IRQ1, abc);
+
     ASM_x86_cpuid_vendor_string();
 
     //Safely create a memory buffer of 10 bytes and allocate 4 bytes

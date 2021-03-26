@@ -60,22 +60,22 @@ extern void isr30();
 extern void isr31();
 
 //HW interrupts
-extern void irq0();
-extern void irq1();
-extern void irq2();
-extern void irq3();
-extern void irq4();
-extern void irq5();
-extern void irq6();
-extern void irq7();
-extern void irq8();
-extern void irq9();
-extern void irq10();
-extern void irq11();
-extern void irq12();
-extern void irq13();
-extern void irq14();
-extern void irq15();
+extern void isr32();
+extern void isr33();
+extern void isr34();
+extern void isr35();
+extern void isr36();
+extern void isr37();
+extern void isr38();
+extern void isr39();
+extern void isr40();
+extern void isr41();
+extern void isr42(); 
+extern void isr43(); 
+extern void isr44(); 
+extern void isr45(); 
+extern void isr46(); 
+extern void isr47();
 
 //User defined interrupts
 extern void isr48();

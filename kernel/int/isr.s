@@ -1,9 +1,6 @@
-[bits 64]
-
 %include "asm/defs.inc"
 
 extern isr_handler
-extern irq_handler
 
 _asm_isr_handler_stub:
     cld
@@ -13,15 +10,6 @@ _asm_isr_handler_stub:
     popa64
     _cleanup_stack 16  ; Clean up pushed error code and interrupt number from stack
     iretq              ; Pop other flags and return to normal execution State
-
-_asm_irq_handler_stub:
-    cld
-    pusha64
-
-    call irq_handler
-    popa64
-    _cleanup_stack 16
-    iretq
 
 %macro isr 1
 global isr%1
@@ -37,14 +25,6 @@ isr_err%1:
     ; Error code pushed by CPU
     push %1 ; Push interrupt number
     jmp _asm_isr_handler_stub
-%endmacro
-
-%macro irq 2
-global irq%1
-irq%1:
-    push 0  ; Dummy error code
-    push %2 ; Interrupt number
-    jmp _asm_irq_handler_stub
 %endmacro
 
 global load_idt
@@ -65,7 +45,7 @@ load_idt:
        sti
        ret
 
-
+; CPU exceptions
 isr 0
 isr 1
 isr 2
@@ -99,22 +79,23 @@ isr 29
 isr 30
 isr 31
 
-irq 0, 32
-irq 1, 33
-irq 2, 34
-irq 3, 35
-irq 4, 36
-irq 5, 37
-irq 6, 38
-irq 7, 39
-irq 8, 40
-irq 9, 41
-irq 10, 42
-irq 11, 43
-irq 12, 44
-irq 13, 45
-irq 14, 46
-irq 15, 47
+; IRQ's
+isr 32
+isr 33
+isr 34
+isr 35
+isr 36
+isr 37
+isr 38
+isr 39
+isr 40
+isr 41
+isr 42
+isr 43
+isr 44
+isr 45
+isr 46
+isr 47
 
 ; Custom ISR's (user defined)
 isr 48

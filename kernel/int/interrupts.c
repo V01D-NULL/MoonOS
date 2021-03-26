@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-isr_t isr_handler_array[256];
+isr_t isr_handler_array[255];
 
 //TODO: Update exception messages to comply with the AMD manual
 static const char* exception_messages[31] = {
@@ -39,23 +39,6 @@ static const char* exception_messages[31] = {
    "Type: (NONE) Reserved"
 };
 
-void irq_handler(regs_t regs) {
-    if (regs.isr_number >= 40 /*irq8+*/)
-    {
-        //master and slave eoi
-        outb(0xA0, 0x20);
-        outb(0x20, 0x20);
-    }
-    else {
-        //master eoi
-        outb(0x20, 0x20);
-    }
-    if (isr_handler_array[regs.isr_number != 0]) {
-        isr_t handler = isr_handler_array[regs.isr_number];
-        handler(regs);
-    }
-}
-
 void isr_handler(regs_t regs)
 {
     /* CPU exceptions */
@@ -63,8 +46,8 @@ void isr_handler(regs_t regs)
     {
         set_color(VGA_BLACK, VGA_LIGHT_RED);
         serial_set_color(BASH_RED);
-        kprintf("[INTR] %s (err_code %d)\n", exception_messages[regs.isr_number], regs.error_code);
-        debug("INT#%d - %s (err_code %d)\n", regs.isr_number, exception_messages[regs.isr_number], regs.error_code);
+        kprintf("[INTR] %s (err_code %ld)\n", exception_messages[regs.isr_number], regs.error_code);
+        debug("INT#%d - %s (err_code %ld)\n", regs.isr_number, exception_messages[regs.isr_number], regs.error_code);
         serial_set_color(BASH_WHITE);
         debug("Register dump:\n"                      \
                 "rax 0x%x, rbx 0x%x, rcx 0x%x, rdx 0x%x\n"    \
@@ -98,18 +81,13 @@ void isr_handler(regs_t regs)
         
         asm("hlt");
     }
-    
-    if (isr_handler_array[regs.isr_number] != 0)
-    {
-        isr_t handler = isr_handler_array[regs.isr_number];
-        handler(regs);
-    }
+    //Signal EOI
+    outb(0xA0, 0x20);
+    outb(0x20, 0x20);
 
-    else {
-        kprintf("Unhandled interrupt: 0x%x (%d)\n", regs.isr_number);
+    if (isr_handler_array[regs.isr_number] != 0) {
+        isr_handler_array[regs.isr_number]((regs_t*)&regs);
     }
-    
-    /* Todo: Handle isr's 48-255 ie. user defined isr's (note: isr's 32-47 are marked as IRQ's and handled separately */
 }
 
 void install_isr(uint8_t base, isr_t handler)
