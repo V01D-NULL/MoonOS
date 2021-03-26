@@ -3,6 +3,19 @@
 
 #include "idt.h"
 
+/*
+    Example of registering a custom interrupt:
+
+        void abc(regs_t r) {
+            //do stuff
+        }
+
+        void some_func() {
+            install_isr(255, &abc);
+            asm("int $255");
+        }
+*/
+
 #define IRQ0  32
 #define IRQ1  33
 #define IRQ2  34

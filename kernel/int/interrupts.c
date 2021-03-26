@@ -5,7 +5,7 @@
 
 isr_t isr_handler_array[256];
 
-//Straight up copy and paste the text from the intel programming manual :D
+//TODO: Update exception messages to comply with the AMD manual
 static const char* exception_messages[31] = {
    "Type: (#DE) Division Exception",
    "Type: (#DB) Debug Exception",
@@ -38,6 +38,23 @@ static const char* exception_messages[31] = {
    "Type: (NONE) Reserved",
    "Type: (NONE) Reserved"
 };
+
+void irq_handler(regs_t regs) {
+    if (regs.isr_number >= 40 /*irq8+*/)
+    {
+        //master and slave eoi
+        outb(0xA0, 0x20);
+        outb(0x20, 0x20);
+    }
+    else {
+        //master eoi
+        outb(0x20, 0x20);
+    }
+    if (isr_handler_array[regs.isr_number != 0]) {
+        isr_t handler = isr_handler_array[regs.isr_number];
+        handler(regs);
+    }
+}
 
 void isr_handler(regs_t regs)
 {
@@ -89,13 +106,9 @@ void isr_handler(regs_t regs)
     }
 
     else {
-        kprintf("Unhandled interrupt: 0x%d\n", regs.isr_number);
+        kprintf("Unhandled interrupt: 0x%x (%d)\n", regs.isr_number);
     }
-    // if (regs->isr_number == 80)
-    // {
-    //     kprintf("this is custom interrupt 0x80\n");
-    //     //Causes a GPF?
-    // }
+    
     /* Todo: Handle isr's 48-255 ie. user defined isr's (note: isr's 32-47 are marked as IRQ's and handled separately */
 }
 
@@ -104,7 +117,7 @@ void install_isr(uint8_t base, isr_t handler)
     if (isr_handler_array[base] == 0)
         isr_handler_array[base] = handler;
     else
-        kprintf("This interrupt has already been registered!\n");
+        kprintf("The interrupt ( %d ) has already been registered!\n", base);
 }
 
 void uninstall_isr(uint8_t base)

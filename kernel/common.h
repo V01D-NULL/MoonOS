@@ -67,6 +67,10 @@ inline uint32_t inl(uint16_t port)
     return ret;
 }
 
+inline void io_wait() {
+    inb(0x80);
+}
+
 inline void delay(int time) {
      volatile int i, j = 0;
      for (i=0; i<time; i++)

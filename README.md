@@ -10,6 +10,7 @@ Validity OS is a monolithic kernel targeting the x86_64 architecture.
 - Serial output
 - Rock solid kprintf(vga) & debug(serial) functions
 - Barebones kernel library (strlen, memcmp, memcpy, vsnprintf, etc)
+- Linear memory allocation (Physical)
 
 # Future features:
 - A simple heap
@@ -28,7 +29,8 @@ Validity OS is a monolithic kernel targeting the x86_64 architecture.
 - A small libc for the userland
 
 # This is currently being working on:
-- pmm (NOTE: I will be trying all sorts of memory allocation algorithms, the first one you see is not going to be the final product)
+- paging
+- pmm (NOTE: I will be trying all sorts of memory allocation algorithms over time, the first one you see is not going to be the final product (I will not be working on a new memory management algorithm all the time.))
 
 # Directory walkthrough:
 - libs/   	  --  Here you will find kernel libs and ports. (Planning on putting things like bash and Doom in this lib/ folder)

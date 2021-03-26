@@ -28,9 +28,10 @@
 #include "mm/ram.h"
 #include "mm/linear_alloc.h"
 
-//TODO:
-//  Create a mm/ram.h/c file where Validity will keep track of RAM usage (the struct will be updated with each memory allocation and deallocation)
-//
+void abc(regs_t r) {
+    kprintf("A");
+}
+
 void kmain(boot_info_t *bootvars) {
     ram_manager_init(*bootvars);
     
