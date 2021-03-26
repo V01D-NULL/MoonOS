@@ -62,11 +62,15 @@ void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id) {
     }
 }
 
+void banner();
 
 void kinit(struct stivale2_struct *bootloader_info) {
     boot_info_t bootvars; //Hardware information from the bootloader
 
     serial_set_color(BASH_WHITE);
+    vga_init(VGA_LIGHT_GREY, VGA_BLACK);
+    
+    banner();
 
     //Vesa support will come later on (probably after memory management)
     struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
@@ -91,8 +95,48 @@ void kinit(struct stivale2_struct *bootloader_info) {
         bootvars.mmap.base = mmap->memmap->base;
         bootvars.mmap.length = mmap->memmap->length;
         bootvars.mmap.type = mmap->memmap->type;
-        //Todo: Caluclate total memory from this memory map and save it in bootvars.mmap.ram
+        
+        for (int i = 0; i < mmap->entries; i++)
+        {
+            struct stivale2_mmap_entry *internal_mmap = &mmap->memmap[i];
+            
+            bootvars.mmap.total_ram += internal_mmap->length;
+
+            if (internal_mmap->type == STIVALE2_MMAP_USABLE) //|| internal_mmap->type == STIVALE2_MMAP_ACPI_RECLAIMABLE || internal_mmap->type == STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE)
+            {
+                bootvars.mmap.free_ram += internal_mmap->length;
+            }
+            else {
+                bootvars.mmap.used_ram += internal_mmap->length;
+            }
+        }
     }
 
+    debug("Total RAM: %ld kb\nFree  RAM: %ld kb\nUsed  RAM: %ld kb\n", bootvars.mmap.total_ram, bootvars.mmap.free_ram, bootvars.mmap.used_ram);
+
     kmain(&bootvars);
+}
+
+
+const char* p1 = " _  _   __   __    __  ____  __  ____  _  _     __   ____\n";
+const char* p2 = "/ )( \\ / _\\ (  )  (  )(    \\(  )(_  _)( \\/ )   /  \\ / ___)\n";
+const char* p3 = "\\ \\/ //    \\/ (_/\\ )(  ) D ( )(   )(   )  /   (  O )\\___ \\ \n";
+const char* p4 = " \\__/ \\_/\\_/\\____/(__)(____/(__) (__) (__/     \\__/ (____/\n";
+
+void banner() {
+    int bg = vga_hist.cell_color_bg;
+    int fg = vga_hist.cell_color_fg;
+
+    debug("%s%s%s%s", p1, p2, p3, p4);
+
+    set_color(VGA_BLACK, VGA_DARK_GREY);
+    kprintf("%s", p1);
+    set_color(VGA_BLACK, VGA_LIGHT_GREY);
+    kprintf("%s", p2);
+    set_color(VGA_BLACK, VGA_WHITE);
+    kprintf("%s", p3);
+    set_color(VGA_BLACK, VGA_LIGHT_BLUE);
+    kprintf("%s", p4);
+    set_color(bg, fg);
+    delay(200);
 }

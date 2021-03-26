@@ -4,8 +4,8 @@ AR = @ar
 LD = @ld
 
 EMU = qemu-system-x86_64
-EMU_OPTS = -m 2G -serial mon:stdio -hda $(KERNEL_HDD) -d cpu_reset
-EMU_DEBUG_OPTS = -S -s -m 2G -serial mon:stdio -hda $(KERNEL_HDD) -d cpu_reset --no-reboot
+EMU_OPTS = -m 4G -serial mon:stdio -hda $(KERNEL_HDD) -d cpu_reset
+EMU_DEBUG_OPTS = $(EMU_OPTS) -S -s --no-reboot
 
 LIB_DIR  = ../libs/
 

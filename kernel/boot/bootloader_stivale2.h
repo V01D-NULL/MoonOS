@@ -17,6 +17,9 @@ typedef struct boot_mmap {
     uint64_t base;
     uint64_t length;
     uint32_t type;
+    uint64_t free_ram;
+    uint64_t total_ram;
+    uint64_t used_ram;
 } boot_mmap_t;
 
 typedef struct boot_vesa {
