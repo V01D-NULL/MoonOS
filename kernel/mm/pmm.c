@@ -1,9 +1,27 @@
 #include "pmm.h"
+#include <stdint.h>
 
-struct bitmap bitmap;
+static uint8_t  *bitmap; //Bitmap buffer / bitmap arena
 
-void init_pmm()
+void init_pmm(struct stivale2_struct_tag_memmap *mmap)
 {
+
     debug("Bitmap size: %lld\n", BITMAP_SIZE);
-    bitmap.bitmap = BITMAP_SIZE;
+    pmm_bitmap.size = BITMAP_SIZE;
+
+    //Setup bitmap arena
+    for (int i = 0; i < mmap->entries; i++)
+    {
+        struct stivale2_mmap_entry internal_mmap = mmap->memmap[i];
+        
+        if (internal_mmap.type == STIVALE2_MMAP_USABLE)
+        {
+            // bitmap[i] = PMM_FREE; //1 - triplefaults
+        }
+        else {
+            bitmap[i] = PMM_USED; //0
+        }
+    }
+    
 }
+

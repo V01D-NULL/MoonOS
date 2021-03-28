@@ -2,6 +2,7 @@
 #include "../drivers/vga/vga.h"
 #include "../stivale2.h"
 #include "../kernel.h"
+#include "../mm/pmm.h"
 #include <stdint.h>
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id);
@@ -67,7 +68,7 @@ void kinit(struct stivale2_struct *bootloader_info) {
     struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
     struct stivale2_struct_tag_smp *smp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_SMP_ID);
     struct stivale2_struct_tag_memmap *mmap = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
-
+    
     if (fb != NULL) {
         // bootvars.vesa.fb_addr = fb->framebuffer_addr;
         // bootvars.vesa.fb_width = fb->framebuffer_width;
@@ -94,7 +95,8 @@ void kinit(struct stivale2_struct *bootloader_info) {
         for (int i = 0; i < mmap->entries; i++)
         {
             struct stivale2_mmap_entry *internal_mmap = &mmap->memmap[i];
-            
+            // debug("%d\n", internal_mmap->type);
+
             bootvars.mmap.total_ram += internal_mmap->length;
 
             if (internal_mmap->type == STIVALE2_MMAP_USABLE) //|| internal_mmap->type == STIVALE2_MMAP_ACPI_RECLAIMABLE || internal_mmap->type == STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE)
@@ -121,6 +123,8 @@ void kinit(struct stivale2_struct *bootloader_info) {
     debug("%ld kb\n", bootvars.mmap.used_ram);
     serial_set_color(BASH_WHITE);
     
+    ram_manager_init(&bootvars);
+    init_pmm(mmap);
     
 
     kmain(&bootvars);

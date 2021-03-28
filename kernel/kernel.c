@@ -30,8 +30,6 @@
 #include "mm/linear_alloc.h"
 
 void kmain(boot_info_t *bootvars) {
-    ram_manager_init(bootvars);
-
     init_gdt();
     init_idt();
     
@@ -43,9 +41,6 @@ void kmain(boot_info_t *bootvars) {
     }
     linear_mm_release_buffer();
     
-    init_pmm();
-
-
     for (;;) {
         asm ("hlt");
     }
