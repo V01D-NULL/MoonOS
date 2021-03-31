@@ -3,7 +3,7 @@ ARCH = x86_64-elf
 CC = @$(ARCH)-gcc
 AS = @nasm
 AR = @$(ARCH)-ar
-LD = @ld
+LD = @$(ARCH)-ld
 
 EMU = qemu-system-x86_64
 EMU_OPTS = -m 4G -serial mon:stdio -hda $(KERNEL_HDD) -d cpu_reset
