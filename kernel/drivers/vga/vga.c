@@ -1,6 +1,9 @@
 #include "vga.h"
 #include <stdint.h>
 
+//Init structs
+vga_hdr_t vga;
+vga_history_t vga_hist;
 
 void vga_init(int fg, int bg) {
 	vga.row = 80;

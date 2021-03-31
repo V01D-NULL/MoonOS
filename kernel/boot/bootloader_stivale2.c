@@ -136,6 +136,8 @@ const char* p2 = "/ )( \\ / _\\ (  )  (  )(    \\(  )(_  _)( \\/ )   /  \\ / ___
 const char* p3 = "\\ \\/ //    \\/ (_/\\ )(  ) D ( )(   )(   )  /   (  O )\\___ \\ \n";
 const char* p4 = " \\__/ \\_/\\_/\\____/(__)(____/(__) (__) (__/     \\__/ (____/\n";
 
+extern vga_history_t vga_hist;
+
 void banner() {
     int bg = vga_hist.cell_color_bg;
     int fg = vga_hist.cell_color_fg;

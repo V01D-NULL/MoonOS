@@ -2,6 +2,7 @@
 #include <stdint.h>
 
 static uint8_t  *bitmap; //Bitmap buffer / bitmap arena
+pmm_bitmap_t pmm_bitmap;
 
 void init_pmm(struct stivale2_struct_tag_memmap *mmap)
 {

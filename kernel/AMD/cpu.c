@@ -1,5 +1,7 @@
 #include "cpu.h"
 
+cpu_hw_t cpu_hardware;
+
 void cpu_info_init(boot_info_t cpu_info)
 {
     

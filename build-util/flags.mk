@@ -30,11 +30,15 @@ CFLAGS := 				 \
 	-mno-mmx             \
 	-mno-3dnow           \
 	-mcmodel=kernel      \
+	-fno-pie			 \
+	-fno-pic			 \
+	-no-pie				 \
+	-lgcc				 \
 	-mno-red-zone
 
 ASMFLAGS = -felf64 -g -F dwarf
 LDINTERNALFLAGS := \
 	-Tlinker.ld    \
 	-static        \
-	-nostdlib      \
-	-no-pie
+	-nostdlib      
+	# -no-pie

@@ -17,8 +17,6 @@ typedef struct cpu_hw {
     char     *vendor_string;
 } cpu_hw_t;
 
-cpu_hw_t cpu_hardware;
-
 typedef struct regs {
     int64_t r15;
     int64_t r14;

@@ -5,6 +5,7 @@
 // {
 //     ASM_x86_cpuid_vendor_string();
 // }
+extern cpu_hw_t cpu_hardware;
 
 void x86_cpuid_vendor_string(const char *rax, const char *rbx, const char *rcx)
 {

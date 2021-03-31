@@ -17,8 +17,8 @@ static inline uint64_t calc_bitmap_size()
 
 void init_pmm(struct stivale2_struct_tag_memmap *mmap);
 
-struct pmm_bmp {
+typedef struct pmm_bmp {
     uint64_t size;
-}pmm_bitmap;
+} pmm_bitmap_t;
 
 #endif // BITMAP_PMM_H
