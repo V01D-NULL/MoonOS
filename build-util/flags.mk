@@ -1,6 +1,8 @@
-CC = @cc
+ARCH = x86_64-elf
+
+CC = @$(ARCH)-gcc
 AS = @nasm
-AR = @ar
+AR = @$(ARCH)-ar
 LD = @ld
 
 EMU = qemu-system-x86_64
@@ -28,11 +30,12 @@ CFLAGS := 				 \
 	-mno-mmx             \
 	-mno-3dnow           \
 	-mcmodel=kernel      \
+	-no-pie			 \
 	-mno-red-zone
 
 ASMFLAGS = -felf64 -g -F dwarf
 LDINTERNALFLAGS := \
 	-Tlinker.ld    \
 	-static        \
-	-nostdlib      \
-	-no-pie		   
+	-nostdlib      
+	# -no-pie		   

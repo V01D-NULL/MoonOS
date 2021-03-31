@@ -1,6 +1,5 @@
 #include <stdint.h>
 #include <stddef.h>
-#include <stdlib.h>
 
 #include "stivale2.h"
 #include "boot/bootloader_stivale2.h"

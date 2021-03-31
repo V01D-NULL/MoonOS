@@ -1,4 +1,3 @@
-/* Tell the linker that we want the symbol _start to be our entry point */
 ENTRY(kinit)
 
 SECTIONS
