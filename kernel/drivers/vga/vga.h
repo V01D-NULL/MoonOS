@@ -25,7 +25,6 @@ typedef struct vga_history {
     int cell_color_bg;
 } vga_history_t;
 
-
 //
 void vga_init(int fg, int bg);
 

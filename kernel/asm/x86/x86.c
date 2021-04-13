@@ -1,5 +1,5 @@
 #include "x86.h"
-#include "../../AMD/cpu.h"
+#include "../../amd64/cpu.h"
 
 // void x86_cpu_info()
 // {

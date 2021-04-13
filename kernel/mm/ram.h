@@ -22,6 +22,7 @@ void ram_manager_init(boot_info_t *ram_info);
 uint64_t ram_manager_get_free();
 uint64_t ram_manager_get_total();
 uint64_t ram_manager_get_used();
+uint64_t ram_manager_get_total_in_bytes();
 
 //Marks *ammount* number of kb as free and returns the used ram
 size_t ram_manager_free(uint64_t ammount);

@@ -7,7 +7,7 @@
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id);
 
-static uint8_t stack[4096];
+static uint8_t stack[345859];
 
 struct stivale2_header_tag_smp smp_hdr_tag = {
     .tag = {
@@ -124,7 +124,7 @@ void kinit(struct stivale2_struct *bootloader_info) {
     serial_set_color(BASH_WHITE);
     
     ram_manager_init(&bootvars);
-    init_pmm(mmap);
+    init_pmm(mmap, mmap->entries);
     
 
     kmain(&bootvars);

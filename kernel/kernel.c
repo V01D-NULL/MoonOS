@@ -4,7 +4,7 @@
 #include "stivale2.h"
 #include "boot/bootloader_stivale2.h"
 
-#include "AMD/cpu.h"
+#include "amd64/cpu.h"
 
 #include "int/gdt.h"
 #include "int/idt.h"
@@ -28,6 +28,11 @@
 #include "mm/pmm.h"
 #include "mm/linear_alloc.h"
 
+/*
+	TODO:
+		- Add a ctypes.h/c file to libk for functions like isdigit and co.
+*/
+
 void kmain(boot_info_t *bootvars) {
     init_gdt();
     init_idt();
@@ -39,7 +44,7 @@ void kmain(boot_info_t *bootvars) {
         linear_alloc(4, 0);
     }
     linear_mm_release_buffer();
-    
+
     for (;;) {
         asm ("hlt");
     }

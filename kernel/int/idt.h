@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include "../common.h"
 #include "../drivers/vga/vga.h"
-#include "../AMD/cpu.h"
+#include "../amd64/cpu.h"
 
 struct idt_desc {
     uint16_t offset_low;  // offset bits 0..15

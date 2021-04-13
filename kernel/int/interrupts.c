@@ -39,6 +39,7 @@ static const char* exception_messages[31] = {
    "Type: (NONE) Reserved"
 };
 
+
 void isr_handler(regs_t regs)
 {
     /* CPU exceptions */
