@@ -1,3 +1,14 @@
+/**
+ * @file bootloader_stivale2.c
+ * @author Tim (V01D)
+ * @brief Hanldes information from the bootloader
+ * @version 0.1
+ * @date 2021-04-15
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #include "bootloader_stivale2.h"
 #include "../drivers/vga/vga.h"
 #include "../stivale2.h"
@@ -35,7 +46,7 @@ struct stivale2_header stivale_hdr = {
     .tags = (uintptr_t)&smp_hdr_tag//&framebuffer_hdr_tag
 };
 
-//Stolen from the limine barebones tutorial (I don't feel like re-inventing the wheel rn)
+//Stolen from the limine barebones tutorial
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id) {
     struct stivale2_tag *current_tag = (void *)stivale2_struct->tags;
     for (;;) {
@@ -56,6 +67,11 @@ void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id) {
 
 void banner();
 
+/**
+ * @brief Kernel entry point
+ * 
+ * @param[in] bootloader_info Various information from the limine bootloader
+ */
 void kinit(struct stivale2_struct *bootloader_info) {
     boot_info_t bootvars; //Hardware information from the bootloader
 
@@ -95,7 +111,6 @@ void kinit(struct stivale2_struct *bootloader_info) {
         for (int i = 0; i < mmap->entries; i++)
         {
             struct stivale2_mmap_entry *internal_mmap = &mmap->memmap[i];
-            // debug("%d\n", internal_mmap->type);
 
             bootvars.mmap.total_ram += internal_mmap->length;
 
@@ -124,7 +139,7 @@ void kinit(struct stivale2_struct *bootloader_info) {
     serial_set_color(BASH_WHITE);
     
     ram_manager_init(&bootvars);
-    init_pmm(mmap, mmap->entries);
+    // init_pmm(mmap, mmap->entries);
     
 
     kmain(&bootvars);

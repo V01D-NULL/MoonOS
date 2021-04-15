@@ -1,3 +1,14 @@
+/**
+ * @file idt.h
+ * @author Tim (V01D)
+ * @brief Interrupt Descriptor Table
+ * @version 0.1
+ * @date 2021-04-16
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #ifndef IDT_H
 #define IDT_H
 
@@ -7,6 +18,10 @@
 #include "../drivers/vga/vga.h"
 #include "../amd64/cpu.h"
 
+/**
+ * @brief Defines an IDT entry
+ * 
+ */
 struct idt_desc {
     uint16_t offset_low;  // offset bits 0..15
     uint16_t selector;    // a code segment selector in GDT or LDT
@@ -17,12 +32,30 @@ struct idt_desc {
     uint32_t zero;        // reserved
 }__attribute__((packed));
 
+/**
+ * @brief The values used to load the IDT into memory using 'lidt'
+ * 
+ */
 struct idtr {
     uint16_t limit;
     uint64_t offset;
 }__attribute__((packed));
 
+/**
+ * @brief Set an IDT entry
+ * 
+ * @param selector  Code segment
+ * @param ist       Interrupt stack table offset
+ * @param type_attr Types and attributes
+ * @param offset    Low, mid, and high offset
+ * @param idx       IDT entry index
+ */
 void idt_set_entry(uint16_t selector, uint8_t ist, uint8_t type_attr, uint64_t offset, uint8_t idx);
+
+/**
+ * @brief Setup and load IDT
+ * 
+ */
 void init_idt();
 
 //CPU exceptions

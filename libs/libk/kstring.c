@@ -1,25 +1,23 @@
 #include "kstring.h"
 
 // Copy len bytes from src to dest
-void memcpy ( uint8_t *dest, const uint8_t *src, uint64_t len )
+void memcpy (uint8_t *dest, const uint8_t *src, uint64_t len)
 {
-	for ( ; len != 0; len -= 1 )
+	for (; len != 0; len--)
 	{
 		*dest = *src;
 
-		dest += 1;
-		src  += 1;
+		dest++;
+		src++;
 	}
 }
 
-// Write len copies of val into dest
-void memset ( uint8_t *dest, uint8_t val, uint64_t len )  // byte-addressable
+void memset (uint8_t *dest, uint8_t val, uint64_t len)
 {
-	for ( ; len != 0; len -= 1 )
+	for (; len != 0; len--)
 	{
 		*dest = val;
-
-		dest += 1;
+		dest++;
 	}
 }
 
@@ -44,32 +42,32 @@ uint64_t memcmp(const void *src, void *dst, uint64_t n)
 
 // Compare two strings.
 /* Should return,
-     -1 if ( len(str1) > len(str2) ) or ( len(str2) > len(str1) )  // sort of. Shouldn't be used for len comp as will report mismatch first
+     -1 if ( len(str1) > len(str2) ) or ( len(str2) > len(str1) )
       0 if str1 == str2
       1 otherwise
 */
-int strcmp ( char *str1, char *str2 )
+int strcmp (char *str1, char *str2)
 {
 	int i = 0;
 	int failed = 0;
 
-	while ( str1[ i ] != '\0' && str2[ i ] != '\0' )  // haven't reached null-terminal of either string
+	while (str1[i] != '\0' && str2[i] != '\0')
 	{
-		if ( str1[ i ] != str2[ i ] )
+		if (str1[i] != str2[i])
 		{
 			failed = 1;
-
+		
 			break;
 		}
 
-		i += 1;
+		i++;
 	}
 
 	// did loop exit due to unequal lengths?
-	if ( ( str1[ i ] == '\0' && str2[ i ] != '\0' ) ||  // len( str2 ) > len( str1 )
-	     ( str1[ i ] != '\0' && str2[ i ] == '\0' ) )   // len( str1 ) > len( str2 )
+	if ((str1[i] == '\0' && str2[i] != '\0') ||  // len( str2 ) > len( str1 )
+	    (str1[i] != '\0' && str2[i] == '\0' ))   // len( str1 ) > len( str2 )
 	{
-		failed = - 1;
+		failed = -1;
 	}
 
 	return failed;
@@ -104,11 +102,11 @@ char* strcat(char* a, char* b)
 
 
 // Get the string length
-uint64_t strlen ( const char *s )
+uint64_t strlen (const char *s)
 {
 	uint64_t len = 0;
 
-	while ( *s++ != '\0' )
+	while (*s++ != '\0')
 	{
 		len++;
 	}

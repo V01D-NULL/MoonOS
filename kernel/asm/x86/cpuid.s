@@ -1,5 +1,4 @@
 global ASM_x86_cpuid_vendor_string
-global ASM_x86_cpuid_check_bi_local_apic
 
 extern x86_cpuid_vendor_string
 

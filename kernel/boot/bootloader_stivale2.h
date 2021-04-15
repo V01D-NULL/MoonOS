@@ -1,3 +1,14 @@
+/**
+ * @file bootloader_stivale2.h
+ * @author Tim (V01D)
+ * @brief Hanldes information from the bootloader
+ * @version 0.1
+ * @date 2021-04-15
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #ifndef BOOTLOADER_STIVALE2_INIT_H
 #define BOOTLOADER_STIVALE2_INIT_H
 
@@ -5,6 +16,10 @@
 #include <stddef.h>
 #include "../stivale2.h"
 
+/**
+ * @brief CPU information provided by the bootloader
+ * 
+ */
 typedef struct boot_cpu {
     uint64_t  processor_count;
     uint32_t  acpi_processor_uid;
@@ -12,6 +27,10 @@ typedef struct boot_cpu {
     uint32_t  bootstrap_processor_lapic_id;
 } boot_cpu_t;
 
+/**
+ * @brief Memorymap information provided by the bootloader
+ * 
+ */
 typedef struct boot_mmap {
     uint64_t entries;
     uint64_t base;
@@ -22,6 +41,10 @@ typedef struct boot_mmap {
     uint64_t used_ram;
 } boot_mmap_t;
 
+/**
+ * @brief VESA information provided by the bootloader
+ * 
+ */
 typedef struct boot_vesa {
     uint64_t fb_addr;
     uint16_t fb_width;
@@ -30,6 +53,10 @@ typedef struct boot_vesa {
     uint16_t fb_bpp;
 } boot_vesa_t;
 
+/**
+ * @brief A single structure that combines all bootloader-provided information structs
+ * 
+ */
 typedef struct boot_info {
     boot_cpu_t  cpu;
     boot_vesa_t vesa;

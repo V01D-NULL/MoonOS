@@ -1,17 +1,21 @@
+/**
+ * @file serial.h
+ * @author Tim (V01D)
+ * @brief Reading and writing to the serial port
+ * @version 0.1
+ * @date 2021-04-16
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
 #ifndef SERIAL_H
 #define SERIAL_H
-
 
 #include <libk/kprintf.h>
 #include <libk/kstring.h>
 #include "../../common.h"
 #include "../vga/vga.h"
 #include <stdint.h>
-
-/*
-  COM ports 1&3 = IRQ#4
-  COM ports 2&4 = IRQ#3
-*/
 
 #define COM1 0x3F8
 #define COM2 0x2F8

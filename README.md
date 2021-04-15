@@ -1,6 +1,8 @@
 # VALIDITY OS
 Validity OS is a monolithic kernel targeting the x86_64 architecture.
 
+I will attempt to make it POSIX compliant
+
 # Features
 - Stivale2 boot protocol
 - Limine bootloader
@@ -11,6 +13,7 @@ Validity OS is a monolithic kernel targeting the x86_64 architecture.
 - Rock solid kprintf(vga) & debug(serial) functions
 - Barebones kernel library (strlen, memcmp, memcpy, vsnprintf, etc)
 - Linear memory allocation (Physical)
+- Bitmap library which can handle multiple bitmaps
 
 # Future features:
 - A simple heap
@@ -29,7 +32,9 @@ Validity OS is a monolithic kernel targeting the x86_64 architecture.
 - A small libc for the userland
 
 # This is currently being working on:
-- pmm (bitmap based ~ might switch to slab allocation once the kernel has robust memory management)
+- HTML Doxygen kernel and library documentation
+- Setting up a webpage for the doxygen docs (hosted by github)
+- pmm (bitmap based ~ might switch to slab allocation in the future)
 
 # Directory walkthrough:
 - libs/   	  --  Here you will find kernel libs and ports. (Planning on putting things like bash and Doom in this lib/ folder)

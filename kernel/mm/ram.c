@@ -30,6 +30,10 @@ uint64_t ram_manager_get_free() {
     return ram.free;
 }
 
+uint64_t ram_manager_get_total_in_bytes() {
+    return ram.total * 1024;
+}
+
 uint64_t ram_manager_get_total() {
     return ram.total;
 }

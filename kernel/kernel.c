@@ -1,3 +1,15 @@
+/**
+ * @mainpage
+ * @file kernel.c
+ * @author Tim (V01D)
+ * @brief This is where all the magic happens :)
+ * @version 0.1
+ * @date 2021-04-15
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #include <stdint.h>
 #include <stddef.h>
 
@@ -21,6 +33,7 @@
 #include "libk/kstring.h"
 #include "libk/kprintf.h"
 #include "libk/kassert.h"
+#include "liballoc/bitmap.h"
 
 #include "common.h"
 
@@ -30,13 +43,13 @@
 
 /*
 	TODO:
-		- Add a ctypes.h/c file to libk for functions like isdigit and co.
+		- Add a ctype.h/c file to libk for functions like isdigit and co.
 */
 
 void kmain(boot_info_t *bootvars) {
     init_gdt();
     init_idt();
-    
+
     ASM_x86_cpuid_vendor_string();
 
     //Safely create a memory buffer of 10 bytes and allocate 4 bytes
@@ -44,6 +57,21 @@ void kmain(boot_info_t *bootvars) {
         linear_alloc(4, 0);
     }
     linear_mm_release_buffer();
+
+    //Bitmap example usage (this is not a mm, just a bitmap)
+    uint64_t *bitmap_arena;
+    liballoc_bitmap_t bitmap_object = bitmap_init(bitmap_arena, 20);
+    
+    bitmap_log_all_bits(bitmap_object);
+
+    //Clear all bits
+    bitmap_purge(bitmap_object);
+
+    //Set the 10th bit in the bitmap
+    bitmap_object.set(bitmap_object.pool, 20/2);
+
+    //Get all bits
+    bitmap_log_all_bits(bitmap_object);
 
     for (;;) {
         asm ("hlt");

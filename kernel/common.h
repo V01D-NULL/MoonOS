@@ -1,4 +1,13 @@
-// Defines typedefs and some global functions
+/**
+ * @file common.h
+ * @author Tim (V01D)
+ * @brief Common functions, typedefs, etc
+ * @version 0.1
+ * @date 2021-04-15
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
 
 #ifndef COMMON_H
 #define COMMON_H

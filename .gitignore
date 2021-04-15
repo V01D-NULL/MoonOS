@@ -1,4 +1,13 @@
+# Kernel related
 *.a
 *.o
 *.elf
 ValidityOS.hdd
+
+# VSCode extension
+.VSCodeCounter
+
+#Doxygen
+html
+latex
+Doxyfile

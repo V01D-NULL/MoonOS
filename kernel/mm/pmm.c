@@ -2,8 +2,13 @@
 #include <stdint.h>
 
 pmm_bitmap_t pmm_bitmap;
-uint8_t *bitmap; //Bitmap buffer / bitmap arena
 uint64_t highest_page;
+
+/**
+ * @brief The bitmap of the physical memory manager
+ * 
+ */
+uint8_t *bitmap = NULL; //Bitmap buffer / bitmap arena
 
 #define DIV_ROUND(x, y) ((x + (y - 1)) / y)
 
@@ -12,9 +17,10 @@ void init_pmm(struct stivale2_struct_tag_memmap *mmap, int entries)
     //take the first memmap entry, and if it's big enough set its start as the physical address of the bitmap.
     //increment the address of that entry by the size used
 
-    debug("Bitmap size: %lld\n", BITMAP_SIZE);
-    pmm_bitmap.size = BITMAP_SIZE;
-    
+    /*
+        TODO:
+            - Integrate liballoc's bitmap into the pmm
+    */
 
     //Calculate the size of the bitmap 
     for (int i = 0; i < mmap->entries; i++)
@@ -34,7 +40,8 @@ void init_pmm(struct stivale2_struct_tag_memmap *mmap, int entries)
 
     uint64_t memory_size = DIV_ROUND(highest_page, PAGE_SIZE * BLOCK_SZ);
 	uint64_t bitmap_size = memory_size / 8;
-    
+    pmm_bitmap.size = bitmap_size;
+
     debug("Bitmap top  address: 0x%x\n", pmm_bitmap.top);
     debug("bitmap size: 0x%x, %ld\n", bitmap_size, bitmap_size);
 
@@ -47,27 +54,19 @@ void init_pmm(struct stivale2_struct_tag_memmap *mmap, int entries)
             continue;
 
         //We found a large enough block of memory to host the bitmap!
-        if (local_mmap->length >= bitmap_size)
+        if (local_mmap->length > bitmap_size)
         {
-            debug("Found a big enough block of  memory to host the bitmap (size: %ld)\n", local_mmap);
-            debug("bitmap: %p\n", bitmap);
-            for (int j = 0; j < bitmap_size; j++)
+            debug("Found a big enough block of  memory to host the bitmap (size: %ld), bitmap_size: %ld\n", local_mmap->length, bitmap_size);
+            debug("%p\n", bitmap);
+            for (int i = 0; i < 100; i++)
             {
-                bitmap[j] = PMM_USED; //does weird stuff to the video display (erases alot of stuff)
+                bitmap[i] = 1;
+                debug("bitmap: %p | i: %d\n", bitmap, i);
             }
-            debug("\nbitmap: %p\n", bitmap);
+            // memset((uint8_t*)bitmap, 0xF, bitmap_size);
+            debug("bitmap: %p\n", bitmap);
+            
             break;
         }
-        
     }
-}
-
-void pmm_set(uint8_t bit)
-{
-    bitmap[bit / BLOCK_SZ] |= (1 << (bit % BLOCK_SZ));
-}
-
-void pmm_unset(uint8_t bit)
-{
-    bitmap[bit / BLOCK_SZ] &= ~(1 << (bit % BLOCK_SZ));
 }
