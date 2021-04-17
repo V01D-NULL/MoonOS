@@ -13,6 +13,7 @@
 #define LIB_KERNEL_STRING_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 /*
     TODO: Add strncmp
@@ -25,7 +26,7 @@
  * @param src  A pointer to the destination bytes
  * @param len  The amount of bytes to copy
  */
-void memcpy ( uint8_t *dest, const uint8_t *src, uint64_t len );
+void memcpy(uint8_t *dest, const uint8_t *src, uint64_t len);
 
 /**
  * @brief Set *n* bytes equal to val
@@ -34,7 +35,7 @@ void memcpy ( uint8_t *dest, const uint8_t *src, uint64_t len );
  * @param val  The value to set the bytes to
  * @param len  The amount of bytes to modify
  */
-void memset ( uint8_t *dest, uint8_t val, uint64_t len );
+void memset(uint8_t *dest, uint8_t val, uint64_t len);
 
 /**
  * @brief Compare two bytes
@@ -53,7 +54,7 @@ uint64_t memcmp(const void *src, void *dst, uint64_t n);
  * @param str2 Second string
  * @return int -1 if strings are not equal in length, 0 if string are the same, 1 if strings are not equal to eachother
  */
-int strcmp ( char *str1, char *str2 );
+int strcmp(char *str1, char *str2);
 
 /**
  * @brief Copy the NULL-terminated string 'src' into 'dest'
@@ -62,7 +63,7 @@ int strcmp ( char *str1, char *str2 );
  * @param src 
  * @return char* The copied string 'dest'
  */
-char* strcpy (char *dest, const char *src);
+char* strcpy(char *dest, const char *src);
 
 /**
  * @brief Concatenate two NULL-terminated strings
@@ -79,7 +80,7 @@ char* strcat(char* a, char* b);
  * @param s String to count
  * @return uint64_t Length of the string
  */
-uint64_t strlen (const char *s);
+uint64_t strlen(const char *s);
 
 /**
  * @brief Reverse a string

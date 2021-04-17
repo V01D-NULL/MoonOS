@@ -4,5 +4,11 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.associations": {
+			"ranges": "c",
+			"string_view": "c",
+			"random": "c"
+		}
+	}
 }

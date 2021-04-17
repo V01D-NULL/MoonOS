@@ -80,6 +80,9 @@ void kinit(struct stivale2_struct *bootloader_info) {
     
     banner();
 
+    init_gdt();
+    init_idt();
+
     //Vesa support will come later on (probably after memory management)
     struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
     struct stivale2_struct_tag_smp *smp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_SMP_ID);
@@ -139,8 +142,9 @@ void kinit(struct stivale2_struct *bootloader_info) {
     serial_set_color(BASH_WHITE);
     
     ram_manager_init(&bootvars);
-    // init_pmm(mmap, mmap->entries);
     
+    //Init the bitmap-based pmm
+    init_pmm(mmap->memmap, mmap->entries);
 
     kmain(&bootvars);
 }

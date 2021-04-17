@@ -1,20 +1,19 @@
 /**
  * @file bitmap.c
- * @author Tim (V01D)
+ * @author your name (you@domain.com)
  * @brief 
  * @version 0.1
- * @date 2021-04-15
+ * @date 2021-04-16
  * 
  * @copyright Copyright (c) 2021
  * 
  */
-
 #include "bitmap.h"
 #include "drivers/vga/vga.h"
 
 static bitmap_size_type get(bitmap_size_type byte, uint8_t bit);
-void bitmap_set(bitmap_size_type *bitmap, uint8_t bit);
-void bitmap_unset(bitmap_size_type *bitmap, uint8_t bit);
+void bitmap_set(bitmap_size_type *bitmap, bitmap_size_type bit);
+void bitmap_unset(bitmap_size_type *bitmap, bitmap_size_type bit);
 bitmap_size_type bitmap_get(bitmap_size_type *bitmap, uint8_t bit);
 bitmap_size_type bitmap_allocate();
 
@@ -88,10 +87,10 @@ bitmap_size_type bitmap_allocate()
 * @param[in] bitmap A pointer to the bitmap arena
 * @param[in] bit    The bit offset which should be modified
 */
-void bitmap_set(bitmap_size_type *bitmap, uint8_t bit)
+void bitmap_set(bitmap_size_type *bitmap, bitmap_size_type bit)
 {
     bitmap[bit / BITMAP_BLOCK_SIZE] |= (1 << (bit % BITMAP_BLOCK_SIZE));
-    debug("bitmap::liballoc::set(): Set bit: %d\n", bit);
+    // debug("bitmap::liballoc::set(): Set bit: %d\n", bit);
 }
 
 /**
@@ -99,10 +98,10 @@ void bitmap_set(bitmap_size_type *bitmap, uint8_t bit)
 * @param[in] bitmap A pointer to the bitmap arena
 * @param[in] bit    The bit offset which should be modified
 */
-void bitmap_unset(bitmap_size_type *bitmap, uint8_t bit)
+void bitmap_unset(bitmap_size_type *bitmap, bitmap_size_type bit)
 {
     bitmap[bit / BITMAP_BLOCK_SIZE] &= ~(1 << (bit % BITMAP_BLOCK_SIZE));
-    debug("bitmap::liballoc::clear(): Cleared bit: %d\n", bit);
+    // debug("bitmap::liballoc::clear(): Cleared bit: %d\n", bit);
 }
 
 /**

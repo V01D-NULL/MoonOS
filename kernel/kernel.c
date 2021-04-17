@@ -47,31 +47,8 @@
 */
 
 void kmain(boot_info_t *bootvars) {
-    init_gdt();
-    init_idt();
 
     ASM_x86_cpuid_vendor_string();
-
-    //Safely create a memory buffer of 10 bytes and allocate 4 bytes
-    if (linear_mm_init((void*)0, sizeof(char) * 10) == 0) {
-        linear_alloc(4, 0);
-    }
-    linear_mm_release_buffer();
-
-    //Bitmap example usage (this is not a mm, just a bitmap)
-    uint64_t *bitmap_arena;
-    liballoc_bitmap_t bitmap_object = bitmap_init(bitmap_arena, 20);
-    
-    bitmap_log_all_bits(bitmap_object);
-
-    //Clear all bits
-    bitmap_purge(bitmap_object);
-
-    //Set the 10th bit in the bitmap
-    bitmap_object.set(bitmap_object.pool, 20/2);
-
-    //Get all bits
-    bitmap_log_all_bits(bitmap_object);
 
     for (;;) {
         asm ("hlt");
