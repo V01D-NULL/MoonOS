@@ -10,7 +10,6 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
     //Step 1. Calculate the size of the bitmap 
     for (int i = 0; i < entries; i++)
     {
-        debug("S1: mmap[%d].type = %d\n", i, mmap[i].type);
         if (mmap[i].type != STIVALE2_MMAP_USABLE)
             continue;
 
@@ -24,8 +23,9 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
     
     //Get the size of the bitmap in bytes.
     //highest_page / PAGE_SIZE = amount of pages in total, and higest_page / PAGE_SIZE / 8 will get the amount of bytes the bitmap will occupy since 1 byte = 8 bits
-    size_t bitmap_size_bytes = ALIGN_UP(highest_page / PAGE_SIZE / 8);
-    
+    size_t bitmap_size_bytes = ALIGN_UP(highest_page / PAGE_SIZE / PAGE_SIZE);
+    debug("no. of pages in total: %d\n", ALIGN_UP(highest_page / PAGE_SIZE));
+
     //Create a bitmap
     liballoc_bitmap_t bitmap_manager = bitmap_init(bitmap, bitmap_size_bytes);
 
@@ -35,7 +35,6 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
     //Step 2. Find a big enough block to host the bitmap
     for (int i = 0; i < entries; i++)
     {
-        debug("S2: mmap[%d].type = %d\n", i, mmap[i].type);
         if (mmap[i].type != STIVALE2_MMAP_USABLE)
             continue;
 
@@ -43,37 +42,39 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
         if (mmap[i].length >= bitmap_size_bytes)
         {
             debug("Found a big enough block of  memory to host the bitmap (size: %ld), bitmap_size_bytes: %ld\n", mmap[i].length, bitmap_size_bytes);
-            debug("bitmap: %p\n", bitmap); //0000000000000000
+            // bitmap = (uint8_t*) mmap[i].base;
+            debug("Start of the bitmap: %llx, %d\n", mmap[i].base, mmap[i].base);
+            for (int i = 0; i < bitmap_size_bytes; i++)
+                bitmap_manager.clear(bitmap, i);
             
-            //BUG:
-            //This sets all the bits to 1, but it also overwrites the mmap structure with 0xff, why?!
-            memset((uint8_t*) bitmap, 0xff, bitmap_size_bytes);
-            
-            debug("bitmap: %p\n", bitmap); //0000000000000000
-
             //Resize page
             mmap[i].base += bitmap_size_bytes;
             mmap[i].length -= bitmap_size_bytes;
             
-            // bitmap_log_all_bits(bitmap_manager); //Prints the bitmap (this shows that all bits are indeed set to 1)
-            // debug("Shrunk mmap entry: %ld\nShrunk mmap base: %ld", mmap[i].base, mmap[i].length);
+            debug("Shrunk mmap entry: %ld\nShrunk mmap base: %ld", mmap[i].base, mmap[i].length);
             break;
         }
     }
 
     //Step 3. 
-    //This doesn't work because the memset above overwrites the values of the mmap struct, so the mmap.type will equal -1 for all checks, thus skipping this step entirely
-    // for (int i = 0; i < entries; i++)
-    // {
-    //     debug("S3: mmap[%d].type = %d\n", i, mmap[i].type);
+    for (int i = 0; i < entries; i++)
+    {
+        if (mmap[i].type != STIVALE2_MMAP_USABLE)
+        {
+            //Mark pages as reserved
+            size_t page_count = mmap[i].length / PAGE_SIZE; //The amount of pages to mark as reserved
+            size_t addr = mmap[i].base;
+            
+            for (int j = 0; j < page_count; j++)
+            {
+                bitmap_manager.set(bitmap_manager.pool, (addr + (j * PAGE_SIZE)));
+            }
 
-    //     if (mmap[i].type != STIVALE2_MMAP_USABLE) && mmap[i].type != STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE && mmap[i].type != STIVALE2_MMAP_KERNEL_AND_MODULES)
-    //         continue;
-
-    //     for (uintptr_t j = 0; j < mmap[i].length; j += PAGE_SIZE)
-    //     {
-    //         bitmap_manager.clear(bitmap, ALIGN_DOWN(mmap[i].base + j) / PAGE_SIZE);
-    //     }
-    // }
-    // bitmap_log_all_bits(bitmap_manager);
+            continue;
+        }
+    }
+    
+    debug("\n");
+    debug("%d\n", entries);
+    bitmap_log_all_bits(bitmap_manager);
 }
