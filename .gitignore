@@ -13,5 +13,5 @@ latex
 Doxyfile
 
 #Other
-log.txt
-test
+./log.txt
+./test
