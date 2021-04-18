@@ -1,8 +1,8 @@
 /**
  * @file bitmap.c
- * @author your name (you@domain.com)
+ * @author Tim (V01D)
  * @brief 
- * @version 0.1
+ * @version 0.2
  * @date 2021-04-16
  * 
  * @copyright Copyright (c) 2021
@@ -11,10 +11,10 @@
 #include "bitmap.h"
 #include "drivers/vga/vga.h"
 
-static bitmap_size_type get(bitmap_size_type byte, uint8_t bit);
+static bitmap_size_type get(bitmap_size_type byte, bitmap_size_type bit);
 void bitmap_set(bitmap_size_type *bitmap, bitmap_size_type bit);
 void bitmap_unset(bitmap_size_type *bitmap, bitmap_size_type bit);
-bitmap_size_type bitmap_get(bitmap_size_type *bitmap, uint8_t bit);
+bitmap_size_type bitmap_get(bitmap_size_type *bitmap, bitmap_size_type bit);
 bitmap_size_type bitmap_allocate();
 
 /**
@@ -109,7 +109,7 @@ void bitmap_unset(bitmap_size_type *bitmap, bitmap_size_type bit)
 * @param[in] bitmap A pointer to the bitmap arena
 * @param[in] bit    The bit offset which should be modified
 */
-bitmap_size_type bitmap_get(bitmap_size_type *bitmap, uint8_t bit)
+bitmap_size_type bitmap_get(bitmap_size_type *bitmap, bitmap_size_type bit)
 {
     return get(bitmap[bit / BITMAP_BLOCK_SIZE], bit % BITMAP_BLOCK_SIZE);
 }
@@ -117,7 +117,7 @@ bitmap_size_type bitmap_get(bitmap_size_type *bitmap, uint8_t bit)
 /**
 * @brief Internal function (not intended for use by anything except the bitmap.c source file)
 */
-static bitmap_size_type get(bitmap_size_type byte, uint8_t bit)
+static bitmap_size_type get(bitmap_size_type byte, bitmap_size_type bit)
 {
     return (byte >> bit) & 1;
 }
