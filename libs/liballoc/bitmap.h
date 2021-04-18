@@ -19,7 +19,7 @@
 typedef uint64_t bitmap_size_type;
 
 //BITMAP_BLOCK_SIZE = bitmap_size_type in bits
-#define BITMAP_BLOCK_SIZE       8//(sizeof(bitmap_size_type) * 8)
+#define BITMAP_BLOCK_SIZE       (sizeof(bitmap_size_type) * 8)
 
 /* main functions */
 typedef struct liballoc_bmp {
