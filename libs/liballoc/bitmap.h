@@ -16,7 +16,7 @@
 #include <stdint.h>
 
 /* bitmap size can be changed globally by changing this typedef */
-typedef uint8_t bitmap_size_type;
+typedef uint64_t bitmap_size_type;
 
 //BITMAP_BLOCK_SIZE = bitmap_size_type in bits
 #define BITMAP_BLOCK_SIZE       8//(sizeof(bitmap_size_type) * 8)

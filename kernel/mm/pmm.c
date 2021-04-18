@@ -1,9 +1,13 @@
 #include "pmm.h"
+#include "paging/pfa.h"
 #include <stdint.h>
 
 pmm_bitmap_t pmm_bitmap;
 size_t highest_page;
-bitmap_size_type *bitmap; //Bitmap buffer / bitmap arena
+static uint64_t *bitmap; //Bitmap buffer / bitmap arena
+liballoc_bitmap_t bitmap_manager;
+
+extern const size_t __offset__;
 
 void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
 {
@@ -21,14 +25,17 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
         }
     }
     
-    //Get the size of the bitmap in bytes.
-    //highest_page / PAGE_SIZE = amount of pages in total, and higest_page / PAGE_SIZE / 8 will get the amount of bytes the bitmap will occupy since 1 byte = 8 bits
-    size_t bitmap_size_bytes = ALIGN_UP(highest_page / PAGE_SIZE / PAGE_SIZE);
+    //Used for sanity check
+    bitmap = (uint8_t*) 0x0;
+
+    //Set the size of the bitmap (for some reason there are 256 bits, then in repeats)
+    // size_t bitmap_size_bytes = 256;
+    size_t memory_size = highest_page + (PAGE_SIZE - 1) / PAGE_SIZE;
+	size_t bitmap_size_bytes = memory_size / 8;
+    pmm_bitmap.size = bitmap_size_bytes;
+
     debug("no. of pages in total: %d\n", ALIGN_UP(highest_page / PAGE_SIZE));
-
-    //Create a bitmap
-    liballoc_bitmap_t bitmap_manager = bitmap_init(bitmap, bitmap_size_bytes);
-
+    
     debug("Bitmap top  address: 0x%x\n", pmm_bitmap.top);
     debug("bitmap size: 0x%x, %ld\n", bitmap_size_bytes, bitmap_size_bytes);
 
@@ -42,39 +49,67 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
         if (mmap[i].length >= bitmap_size_bytes)
         {
             debug("Found a big enough block of  memory to host the bitmap (size: %ld), bitmap_size_bytes: %ld\n", mmap[i].length, bitmap_size_bytes);
-            // bitmap = (uint8_t*) mmap[i].base;
-            debug("Start of the bitmap: %llx, %d\n", mmap[i].base, mmap[i].base);
-            for (int i = 0; i < bitmap_size_bytes; i++)
-                bitmap_manager.clear(bitmap, i);
             
+            //Set the base of the bitmap ((size_t)&__offset__ makes sure that the bitmap is within the higher half of the kernel and not at mmap[i].base which would likely be in unmapped memory)
+            bitmap = (uint64_t*) (mmap[i].base + (size_t)&__offset__);
+
+            //Create a bitmap
+            bitmap_manager = bitmap_init(bitmap, bitmap_size_bytes);
+
+            debug("Bitmap base: %p\n", bitmap);
+            debug("Start of the bitmap: %llx, %d\n", mmap[i].base, mmap[i].base);
+
+            memset(bitmap_manager.pool, 0xff, bitmap_size_bytes);
+
             //Resize page
             mmap[i].base += bitmap_size_bytes;
             mmap[i].length -= bitmap_size_bytes;
-            
-            debug("Shrunk mmap entry: %ld\nShrunk mmap base: %ld", mmap[i].base, mmap[i].length);
+
+            //Mark the the bitmap in the resized page as reserved.
+            // pfa_mark_page_as_used(bitmap_manager.pool, (void*)(mmap[i].base +  mmap[i].length));
+
+            debug("Shrunk mmap entry: %ld\nShrunk mmap base: %ld\n", mmap[i].base, mmap[i].length);
             break;
         }
     }
 
-    //Step 3. 
+    //Sanity check, if this fails then there isn't enough memory to store the bitmap
+    if (bitmap == (uint8_t*)0x0) {
+        kprintf("Son of a bit!\nYour computer doesn't have enough memory to store the bitmap!\n");
+        for (;;)
+            asm ("hlt");
+    }
+
+    //Step 3.
     for (int i = 0; i < entries; i++)
     {
         if (mmap[i].type != STIVALE2_MMAP_USABLE)
         {
-            //Mark pages as reserved
-            size_t page_count = mmap[i].length / PAGE_SIZE; //The amount of pages to mark as reserved
-            size_t addr = mmap[i].base;
-            
-            for (int j = 0; j < page_count; j++)
-            {
-                bitmap_manager.set(bitmap_manager.pool, (addr + (j * PAGE_SIZE)));
-            }
-
-            continue;
         }
     }
+    debug("mmap: 0x%llx\nhighest page: 0x%llx\n", (uint64_t) bitmap, highest_page);
     
     debug("\n");
     debug("%d\n", entries);
+    
+    for (int i = 0; i < 10; i++)
+        bitmap_manager.clear(bitmap_manager.pool, i);
+    // pmm_set(1);
+
+    // for (int i = 0; i < bitmap_size_bytes; i++)
+    //     debug("%d", bitmap[i]);
     bitmap_log_all_bits(bitmap_manager);
+
+    //Step 4.
+    //TODO: Mark kernel (end - start) as reserved
+}
+
+void pmm_set(uint8_t bit)
+{
+    bitmap[bit / BITMAP_BLOCK_SIZE] |= (1 << (bit % BITMAP_BLOCK_SIZE));
+}
+
+void pmm_clear(uint8_t bit)
+{
+    bitmap[bit / BITMAP_BLOCK_SIZE] &= ~(1 << (bit % BITMAP_BLOCK_SIZE));
 }

@@ -4,6 +4,8 @@ SECTIONS
 {
     /* We wanna be placed in the higher half, 2MiB above 0 in physical memory. */
     . = 0xffffffff80200000;
+    __offset__ = .;
+
     kernel_start = .;
     
     /* We place the .stivalehdr section containing the header in its own section, */
