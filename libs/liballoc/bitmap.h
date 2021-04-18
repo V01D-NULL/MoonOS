@@ -2,7 +2,7 @@
  * @file bitmap.h
  * @author Tim (V01D)
  * @brief 
- * @version 0.1
+ * @version 0.2
  * @date 2021-04-15
  * 
  * @copyright Copyright (c) 2021
