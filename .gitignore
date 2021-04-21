@@ -6,8 +6,8 @@ ValidityOS.hdd
 ValidityOS.iso
 
 # Limine related
-boot/limine-cd.bin
-boot/limine.sys
+*.bin
+*.sys
 
 # VSCode extension
 .VSCodeCounter
