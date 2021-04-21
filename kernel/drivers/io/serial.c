@@ -36,3 +36,16 @@ void serial_set_color(const char* color_code)
 
     serial_write_str(color_code);
 }
+
+char serial_buff[512];
+int debug(char* fmt, ...)
+{
+	va_list arg;
+	va_start(arg, fmt);
+	vsnprintf((char*)&serial_buff, (size_t) -1, fmt, arg);
+	va_end(arg);
+	
+	serial_write_str((char*)&serial_buff);
+	
+	return 0; //All went well
+}

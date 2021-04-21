@@ -9,7 +9,7 @@
  * 
  */
 #include "bitmap.h"
-#include "drivers/vga/vga.h"
+#include "drivers/io/serial.h"
 
 static bitmap_size_type get(bitmap_size_type byte, bitmap_size_type bit);
 void bitmap_set(bitmap_size_type *bitmap, bitmap_size_type bit);
@@ -66,20 +66,8 @@ liballoc_bitmap_t bitmap_init(bitmap_size_type *pool, uint64_t size)
     bmp.pool  = pool;
     bmp.clear = bitmap_unset;
     bmp.set   = bitmap_set;
-    bmp.alloc = bitmap_allocate;
     bmp.get   = bitmap_get;
     return bmp;
-}
-
-/**
-* @brief Mark the first free block of memory in the bitmap arena as used (1)
-* @param[in] bitmap A pointer to the bitmap arena
-* @param[in] bit    The bit offset which should be modified
-*/
-bitmap_size_type bitmap_allocate()
-{
-    //TODO: Allocate the first free block and return a pointer to the allocated memory
-    return 0;
 }
 
 /**
@@ -90,7 +78,6 @@ bitmap_size_type bitmap_allocate()
 void bitmap_set(bitmap_size_type *bitmap, bitmap_size_type bit)
 {
     bitmap[bit / BITMAP_BLOCK_SIZE] |= (1 << (bit % BITMAP_BLOCK_SIZE));
-    // debug("bitmap::liballoc::set(): Set bit: %d\n", bit);
 }
 
 /**
@@ -101,7 +88,6 @@ void bitmap_set(bitmap_size_type *bitmap, bitmap_size_type bit)
 void bitmap_unset(bitmap_size_type *bitmap, bitmap_size_type bit)
 {
     bitmap[bit / BITMAP_BLOCK_SIZE] &= ~(1 << (bit % BITMAP_BLOCK_SIZE));
-    // debug("bitmap::liballoc::clear(): Cleared bit: %d\n", bit);
 }
 
 /**

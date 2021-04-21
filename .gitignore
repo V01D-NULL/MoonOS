@@ -3,6 +3,11 @@
 *.o
 *.elf
 ValidityOS.hdd
+ValidityOS.iso
+
+# Limine related
+boot/limine-cd.bin
+boot/limine.sys
 
 # VSCode extension
 .VSCodeCounter
@@ -15,3 +20,4 @@ Doxyfile
 #Other
 ./log.txt
 ./test
+iso

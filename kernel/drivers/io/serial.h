@@ -14,7 +14,6 @@
 #include <libk/kprintf.h>
 #include <libk/kstring.h>
 #include "../../common.h"
-#include "../vga/vga.h"
 #include <stdint.h>
 
 #define COM1 0x3F8
@@ -33,5 +32,8 @@ void serial_write(char chr);
 char serial_read();
 void serial_write_str(const char* str);
 void serial_set_color(const char* color_code);
+
+/// Output a formatted string to the serial port
+int debug(char* fmt, ...);
 
 #endif

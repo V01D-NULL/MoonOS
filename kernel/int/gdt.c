@@ -6,8 +6,6 @@ static struct gdt_table gdt;
 
 void init_gdt()
 {
-    vga_puts("Initialising GDT\n", true, false);
-    
     //Null descriptor
     gdt.gdt_table_memory_segments[0].limit     = 0;
     gdt.gdt_table_memory_segments[0].base_low  = 0;
@@ -51,6 +49,4 @@ void init_gdt()
     gdt.gdtr.limit = sizeof(struct memory_segment) * 5 - 1;
 
     _load_gdt((uint64_t)&gdt.gdtr);
-    
-    vga_puts("Initialised GDT\n", false, true);
 }

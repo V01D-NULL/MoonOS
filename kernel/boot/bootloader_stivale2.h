@@ -39,6 +39,7 @@ typedef struct boot_mmap {
     uint64_t free_ram;
     uint64_t total_ram;
     uint64_t used_ram;
+    struct stivale2_mmap_entry *memmap;
 } boot_mmap_t;
 
 /**

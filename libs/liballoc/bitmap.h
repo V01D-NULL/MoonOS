@@ -30,7 +30,6 @@ typedef struct liballoc_bmp {
     void              (*set)   (bitmap_size_type*, bitmap_size_type);
     bitmap_size_type  (*get)   (bitmap_size_type*, bitmap_size_type);
     void              (*clear) (bitmap_size_type*, bitmap_size_type);
-    bitmap_size_type  (*alloc) ();
 } liballoc_bitmap_t;
 
 /* init */

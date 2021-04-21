@@ -48,6 +48,16 @@ void memset(uint8_t *dest, uint8_t val, uint64_t len);
 uint64_t memcmp(const void *src, void *dst, uint64_t n);
 
 /**
+ * @brief Move the bytes in dst to src
+ * 
+ * @param src  Source bytes
+ * @param dst  Destination bytes
+ * @param n    Amount of bytes to copy
+ * @return void* 
+ */
+void *memmove(void *dst, const void *src, size_t n);
+
+/**
  * @brief Compare two NULL-terminated strings
  * 
  * @param str1 First string

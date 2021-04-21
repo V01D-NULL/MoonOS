@@ -7,15 +7,15 @@ global _load_gdt
 
 _load_gdt:
     lgdt [rdi]
-    push KRNL_CS
+    push 0x08
     push .flush
-    
+    retfq
+
     .flush:
-        mov ax, KRNL_DS
+        mov ax, 0x10
         mov ds, ax
-        mov es, ax
+        mov fs, ax
         mov gs, ax
         mov ss, ax
-        mov fs, ax 
-        mov gs, ax
+        mov es, ax
         ret

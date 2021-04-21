@@ -21,11 +21,10 @@ void memset(uint8_t *dest, uint8_t val, uint64_t len)
 	}
 }
 
-
 // Returns 1 if src is less than dst
 // Returns -1 if src is greater than dst
 // Returns 0 if the length of src and dst are equal
-uint64_t memcmp(const void *src, void *dst, uint64_t n)
+uint64_t memcmp(const void *src, void *dst, size_t n)
 {
     const uint8_t *src_a = src;
     uint8_t *dst_a = dst;
@@ -38,6 +37,18 @@ uint64_t memcmp(const void *src, void *dst, uint64_t n)
             return -1;
     }
     return 0;
+}
+
+void *memmove(void *dst, const void *src, size_t n)
+{
+	uint8_t *dst_ptr = dst;
+	uint8_t *src_ptr = src;
+
+	for (int i = 0; i < n; i++)
+	{
+		*dst_ptr++ = *src_ptr++;
+	}
+	return (void*) dst_ptr;
 }
 
 // Compare two strings.

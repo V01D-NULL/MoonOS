@@ -19,11 +19,10 @@
 */
 
 #include <libk/kstring.h>
-#include "../../drivers/vga/vga.h"
 #include "../../common.h"
 
 /// (x86_64) Return CPU vendor string
-extern const char *ASM_x86_cpuid_vendor_string      ();
+extern const char *ASM_x86_cpuid_vendor_string();
 
 /// (x86_64) Read from the RIP register
 extern int         ASM_x86_regs_read_rip();
@@ -32,4 +31,5 @@ extern int         ASM_x86_regs_read_rip();
 /// (C) Print vendor string
 void x86_cpuid_vendor_string(const char *a, const char *b, const char *c);
 
+void x86_cpu_info();
 #endif // ASM_ARCH_X86_H

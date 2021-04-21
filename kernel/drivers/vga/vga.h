@@ -58,9 +58,6 @@ void vga_clear();
 /// Output a null-terminated ASCII string to the monitor
 void vga_puts(char *c, bool is_task, bool operation_ok);
 
-/// Output a formatted string to the serial port
-int debug(char* fmt, ...);
-
 /// Print a formatted string to the screen
 int kprintf(const char* fmt, ...);
 

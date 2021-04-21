@@ -39,6 +39,7 @@ void vga_scroll()
     int i = 0;
     for(i = 0; i < (vga.row*vga.col-80); i++)
     	vga.vram[i] = vga.vram[i+80];
+		
     for(i = 0; i < vga.row; i++)
         vga.vram[(vga.row - 1) * vga.row + i] = (uint16_t) ' ' | ((uint16_t) VGA_BLACK << 8);
 
@@ -179,28 +180,16 @@ void vga_puts(char *c, bool is_task, bool operation_ok)
 	}
 }
 
-char buff[512] = {0};
-int debug(char* fmt, ...)
-{
-	va_list arg;
-	va_start(arg, fmt);
-	vsnprintf((char*)&buff, (size_t) -1, fmt, arg);
-	va_end(arg);
-	
-	serial_write_str((char*)&buff);
-	
-	return 0; //All went well
-}
+char vga_buff[512];
 
-char buff2[512] = {0};
 int kprintf(const char* fmt, ...)
 {
 	va_list arg;
 	va_start(arg, fmt);
-	vsnprintf((char*)&buff2, (size_t) -1, fmt, arg);
+	vsnprintf((char*)&vga_buff, (size_t) -1, fmt, arg);
 	va_end(arg);
 
-	vga_puts((char*)&buff2, false, false);
+	vga_puts((char*)&vga_buff, false, false);
 
 	return 0; //All went well
 }
@@ -210,10 +199,10 @@ int kprintf_p(bool is_task, bool operation_ok, const char* fmt,  ...)
 {
 	va_list arg;
 	va_start(arg, fmt);
-	vsnprintf((char*)&buff, (size_t) -1, fmt, arg);
+	vsnprintf((char*)&vga_buff, (size_t) -1, fmt, arg);
 	va_end(arg);
 
-	vga_puts((char*)&buff, is_task, operation_ok);
+	vga_puts((char*)&vga_buff, is_task, operation_ok);
 
 	return 0; //All went well
 }

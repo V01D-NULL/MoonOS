@@ -10,10 +10,12 @@ I will attempt to make it POSIX compliant
 - Interrupts
 - CPU Identification
 - Serial output
-- Rock solid kprintf(vga) & debug(serial) functions
+- Rock solid kprintf(vga), printk (vesa) & debug(serial) functions
 - Barebones kernel library (strlen, memcmp, memcpy, vsnprintf, etc)
 - Linear memory allocation (Physical)
-- Bitmap library which can handle multiple bitmaps
+- Bitmap library which can handle multiple instances of bitmaps
+- Vesa with font loading using ssfn2
+- Bitmap based pmm
 
 # Future features:
 - A simple heap
@@ -21,7 +23,6 @@ I will attempt to make it POSIX compliant
 - Paging
 - APIC
 - ACPI
-- VESA (This includes font loading and rendering)
 - TTY  (Using VESA, NOT vga)
 - Many hardware drivers including but not limited to:
 	- Network cards
@@ -32,9 +33,9 @@ I will attempt to make it POSIX compliant
 - A small libc for the userland
 
 # This is currently being working on:
+- Optmizing the bitmap pmm with a linked list for faster allocation and dealloction of memory + it's better for non-contiguous memory
 - HTML Doxygen kernel and library documentation
 - Setting up a webpage for the doxygen docs (hosted by github)
-- pmm (bitmap based ~ might switch to slab allocation in the future)
 
 # Directory walkthrough:
 - libs/   	  --  Here you will find kernel libs and ports. (Planning on putting things like bash and Doom in this lib/ folder)
@@ -54,6 +55,9 @@ I will attempt to make it POSIX compliant
 	- make all
 	- make run
 
+## Building an ISO
+- First build and move limine-cd.bin and limine.sys into boot/
+- Run make && make _iso, that's it!
 
 # My journey: (Inspiration for newcomers)
 I have always wanted to make an OS, so one day I decided to build one.

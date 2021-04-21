@@ -1,5 +1,7 @@
 #include "interrupts.h"
 #include "idt.h"
+#include "../drivers/gfx/gfx.h"
+#include "../drivers/io/serial.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -45,9 +47,8 @@ void isr_handler(regs_t regs)
     /* CPU exceptions */
     if (regs.isr_number < 32)
     {
-        set_color(VGA_BLACK, VGA_LIGHT_RED);
         serial_set_color(BASH_RED);
-        kprintf("[INTR] %s (err_code %ld)\n", exception_messages[regs.isr_number], regs.error_code);
+        printk("INTR",  "%s (err_code %ld)\n", exception_messages[regs.isr_number], regs.error_code);
         debug("INT#%d - %s (err_code %ld)\n", regs.isr_number, exception_messages[regs.isr_number], regs.error_code);
         serial_set_color(BASH_WHITE);
         debug("Register dump:\n"                      \
@@ -76,10 +77,7 @@ void isr_handler(regs_t regs)
                                                                 regs.r13,
                                                                 regs.r14,
                                                                 regs.r15
-                                                                );
-        
-        set_color(VGA_BLACK, VGA_WHITE);
-        
+                                                                );        
         asm("hlt");
     }
     //Signal EOI
@@ -100,7 +98,7 @@ void install_isr(uint8_t base, isr_t handler)
     if (isr_handler_array[base] == 0)
         isr_handler_array[base] = handler;
     else
-        kprintf("The interrupt ( %d ) has already been registered!\n", base);
+        printk("[INTR]", "The interrupt ( %d ) has already been registered!\n", base);
 }
 
 void uninstall_isr(uint8_t base)

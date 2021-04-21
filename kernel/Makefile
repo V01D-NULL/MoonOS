@@ -1,6 +1,6 @@
 include ../build-util/flags.mk
 
-TARGET := Validity.elf
+TARGET := kernel.elf
 
 .PHONY: all clean
 
@@ -10,7 +10,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJ)
 	@printf "[kernel @ LD] Linking object files\n";
-	$(LD) $(LDINTERNALFLAGS) $(OBJ) $(KLIBS)/libk.a $(KLIBS)/liballoc.a -o $@
+	$(LD) $(LDINTERNALFLAGS) ./drivers/gfx/__font__.o $(OBJ) $(KLIBS)/libk.a $(KLIBS)/liballoc.a -o $@
 
 %.o: %.c
 	@printf "[kernel @ CC] [ $< ]\n";

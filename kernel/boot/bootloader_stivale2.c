@@ -9,9 +9,12 @@
  * 
  */
 
+#include "../drivers/io/serial.h"
 #include "bootloader_stivale2.h"
-#include "../drivers/vga/vga.h"
+#include "../drivers/gfx/gfx.h"
 #include "../stivale2.h"
+#include "../int/idt.h"
+#include "../int/gdt.h"
 #include "../kernel.h"
 #include "../mm/pmm.h"
 #include <stdint.h>
@@ -43,7 +46,7 @@ struct stivale2_header stivale_hdr = {
     .entry_point = 0,
     .stack = (uintptr_t)stack + sizeof(stack),
     .flags = 0,
-    .tags = (uintptr_t)&smp_hdr_tag//&framebuffer_hdr_tag
+    .tags = (uintptr_t)&framebuffer_hdr_tag
 };
 
 //Stolen from the limine barebones tutorial
@@ -76,24 +79,20 @@ void kinit(struct stivale2_struct *bootloader_info) {
     boot_info_t bootvars; //Hardware information from the bootloader
 
     serial_set_color(BASH_WHITE);
-    vga_init(VGA_LIGHT_GREY, VGA_BLACK);
     
-    banner();
-
     init_gdt();
     init_idt();
-    
-    //Vesa support will come later on (probably after memory management)
+
     struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
     struct stivale2_struct_tag_smp *smp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_SMP_ID);
     struct stivale2_struct_tag_memmap *mmap = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
     
     if (fb != NULL) {
-        // bootvars.vesa.fb_addr = fb->framebuffer_addr;
-        // bootvars.vesa.fb_width = fb->framebuffer_width;
-        // bootvars.vesa.fb_height = fb->framebuffer_height;
-        // bootvars.vesa.fb_bpp = fb->framebuffer_bpp;
-        // bootvars.vesa.fb_pitch = fb->framebuffer_pitch;
+        bootvars.vesa.fb_addr = fb->framebuffer_addr;
+        bootvars.vesa.fb_width = fb->framebuffer_width;
+        bootvars.vesa.fb_height = fb->framebuffer_height;
+        bootvars.vesa.fb_bpp = fb->framebuffer_bpp;
+        bootvars.vesa.fb_pitch = fb->framebuffer_pitch;
     }
 
     if (smp != NULL)
@@ -113,8 +112,9 @@ void kinit(struct stivale2_struct *bootloader_info) {
         
         for (int i = 0; i < mmap->entries; i++)
         {
+            bootvars.mmap.memmap[i] = mmap->memmap[i];
             struct stivale2_mmap_entry *internal_mmap = &mmap->memmap[i];
-
+            
             bootvars.mmap.total_ram += internal_mmap->length;
 
             if (internal_mmap->type == STIVALE2_MMAP_USABLE) //|| internal_mmap->type == STIVALE2_MMAP_ACPI_RECLAIMABLE || internal_mmap->type == STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE)
@@ -142,35 +142,6 @@ void kinit(struct stivale2_struct *bootloader_info) {
     serial_set_color(BASH_WHITE);
     
     ram_manager_init(&bootvars);
-    
-    //Init the bitmap-based pmm
-    init_pmm(mmap->memmap, mmap->entries);
 
     kmain(&bootvars);
-}
-
-
-const char* p1 = " _  _   __   __    __  ____  __  ____  _  _     __   ____\n";
-const char* p2 = "/ )( \\ / _\\ (  )  (  )(    \\(  )(_  _)( \\/ )   /  \\ / ___)\n";
-const char* p3 = "\\ \\/ //    \\/ (_/\\ )(  ) D ( )(   )(   )  /   (  O )\\___ \\ \n";
-const char* p4 = " \\__/ \\_/\\_/\\____/(__)(____/(__) (__) (__/     \\__/ (____/\n";
-
-extern vga_history_t vga_hist;
-
-void banner() {
-    int bg = vga_hist.cell_color_bg;
-    int fg = vga_hist.cell_color_fg;
-
-    debug("%s%s%s%s", p1, p2, p3, p4);
-
-    set_color(VGA_BLACK, VGA_DARK_GREY);
-    kprintf("%s", p1);
-    set_color(VGA_BLACK, VGA_LIGHT_GREY);
-    kprintf("%s", p2);
-    set_color(VGA_BLACK, VGA_WHITE);
-    kprintf("%s", p3);
-    set_color(VGA_BLACK, VGA_LIGHT_BLUE);
-    kprintf("%s", p4);
-    set_color(bg, fg);
-    delay(200);
 }

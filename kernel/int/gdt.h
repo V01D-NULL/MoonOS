@@ -13,7 +13,6 @@
 
 #include <stdint.h>
 #include "../common.h"
-#include "../drivers/vga/vga.h"
 
 /**
  * @brief Defines a memory segment

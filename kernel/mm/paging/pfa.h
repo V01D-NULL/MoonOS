@@ -13,9 +13,9 @@
 void *request_page(void *address);
 
 //Mark a single page as free
-int pfa_mark_page_as_free(uint8_t *bitmap, void *address);
+int pfa_mark_page_as_free(void *address);
 
 //Mark a single page as used
-int pfa_mark_page_as_used(uint8_t *bitmap, void *address);
+int pfa_mark_page_as_used(void *address);
 
 #endif // PMM_PAGING_PFA_H

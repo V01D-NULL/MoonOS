@@ -1,15 +1,13 @@
 ARCH = x86_64-elf
 
 CC = @$(ARCH)-gcc
-AS = @nasm
 AR = @$(ARCH)-ar
 LD = @$(ARCH)-ld
+AS = @nasm
 
 EMU = qemu-system-x86_64
-EMU_OPTS = -m 2G -serial mon:stdio -hda $(KERNEL_HDD) -D log.txt -d int -no-reboot -no-shutdown # -monitor stdio
+EMU_OPTS = -m 2G -serial mon:stdio -hda $(KERNEL_HDD) -D log.txt -d int -no-reboot -no-shutdown # -monitor stdio 
 EMU_DEBUG_OPTS = $(EMU_OPTS) -S -s --no-reboot
-
-LIB_DIR  = ../libs/
 
 CFILES	 := $(shell find ./ -type f -name '*.c')
 ASMFILES := $(shell find ./ -type f -name '*.s')
@@ -17,7 +15,17 @@ OBJ_C    := $(CFILES:.c=.o)
 OBJ_ASM  := $(ASMFILES:.s=.o)
 OBJ		 := $(OBJ_C) $(OBJ_ASM)
 
+# ISO Creation
+
+LIMINE_CD_BIN = iso/  # Path/to/limine-cd.bin
+# ISO_ROOT_DIR  = iso/
+ISO_NAME	  = ValidityOS.iso 
+
+# XORRISO  = @xorriso
+# ISO_OPTS = 
+
 KLIBS 	 := ../libs
+FONT 	 := font/console.sfn
 
 # Kernel compiler / linker flags
 CFLAGS := 				 \
