@@ -3,6 +3,9 @@ Validity OS is a monolithic kernel targeting the x86_64 architecture.
 
 I will attempt to make it POSIX compliant
 
+# Screenshots:
+<img src="screenshot/1.png">
+
 # Features
 - Stivale2 boot protocol
 - Limine bootloader

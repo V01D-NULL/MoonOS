@@ -3,42 +3,40 @@
 #include <stdint.h>
 #include "../drivers/gfx/gfx.h"
 
-pmm_bitmap_t pmm_bitmap;
+
 size_t highest_page;
-static bitmap_size_type *bitmap; //Bitmap buffer / bitmap arena
-liballoc_bitmap_t bitmap_manager;
+pmm_t pmm;
 
 extern const size_t __offset__;
-extern const size_t kernel_start[];
-extern const size_t kernel_end[];
 
 void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
 {
+    size_t top = 0;
     //Step 1. Calculate the size of the bitmap 
     for (int i = 0; i < entries; i++)
     {
         if (mmap[i].type != STIVALE2_MMAP_USABLE)
             continue;
 
-        pmm_bitmap.top = mmap[i].base + mmap[i].length;
+        top = mmap[i].base + mmap[i].length;
 
-        if (pmm_bitmap.top > highest_page)
+        if (top > highest_page)
         {
-            highest_page = pmm_bitmap.top;
+            highest_page = top;
         }
     }
     
     //Used for sanity check
-    bitmap = (bitmap_size_type*) 0x0;
+    pmm.bitmap = (bitmap_size_type*) 0x0;
 
     //Set the size of the bitmap
     //highest_page / PAGE_SIZE = amount of pages in total, and higest_page / PAGE_SIZE / 8 will get the amount of bytes the bitmap will occupy since 1 byte = 8 bits
     size_t bitmap_size_bytes = ALIGN_UP(highest_page / PAGE_SIZE / 8);
-    pmm_bitmap.size = bitmap_size_bytes;
+    pmm.size = bitmap_size_bytes;
 
     debug("no. of pages in total: %d\n", ALIGN_UP(highest_page / PAGE_SIZE));
     
-    debug("Bitmap top  address: 0x%x\n", pmm_bitmap.top);
+    debug("Bitmap top  address: 0x%x\n", top);
     debug("bitmap size: 0x%x, %ld\n", bitmap_size_bytes, bitmap_size_bytes);
 
     //Step 2. Find a big enough block to host the bitmap
@@ -53,16 +51,16 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
             debug("Found a big enough block of  memory to host the bitmap (size: %ld), bitmap_size_bytes: %ld\n", mmap[i].length, bitmap_size_bytes);
             
             //Set the base of the bitmap ((size_t)&__offset__ makes sure that the bitmap is within the higher half of the kernel and not at mmap[i].base which would likely be in unmapped memory)
-            bitmap = (bitmap_size_type*) (mmap[i].base + (size_t)&__offset__);
+            pmm.bitmap = (bitmap_size_type*) (mmap[i].base + (size_t)&__offset__);
 
             //Create a bitmap
-            bitmap_manager = bitmap_init(bitmap, bitmap_size_bytes);
+            pmm.bitmap_manager = bitmap_init(pmm.bitmap, bitmap_size_bytes);
 
-            debug("Bitmap base: %p\n", bitmap);
+            debug("Bitmap base: %p\n", pmm.bitmap);
             debug("Start of the bitmap: %llx, %d\n", mmap[i].base, mmap[i].base);
 
             // Set each entry to free
-            memset((uint8_t*) bitmap_manager.pool, 0x0, bitmap_size_bytes);
+            memset((uint8_t*) pmm.bitmap_manager.pool, 0x0, bitmap_size_bytes);
 
             //Resize page
             mmap[i].base += bitmap_size_bytes;
@@ -81,7 +79,7 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
     }
 
     //Sanity check, if this fails then there isn't enough memory to store the bitmap
-    if (bitmap == (bitmap_size_type*)0x0) {
+    if (pmm.bitmap == (bitmap_size_type*)0x0) {
         printk("pmm","Son of a bit!\nYour computer doesn't have enough memory to store the bitmap!\n");
         for (;;)
             asm ("hlt");
@@ -98,7 +96,7 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
             }
         }
     }
-    debug("mmap: 0x%llx\nhighest page: 0x%llx\n", (uint64_t) bitmap, highest_page);
+    debug("mmap: 0x%llx\nhighest page: 0x%llx\n", (uint64_t) pmm.bitmap, highest_page);
     
     debug("\n");
     debug("%d\n", entries);
@@ -116,12 +114,14 @@ int32_t pmm_alloc()
     int32_t offset = PMM_INVALID;
 
     offset = find_first_free_block();
-    bitmap_manager.set(bitmap_manager.pool, offset);
+    pmm.bitmap_manager.set(pmm.bitmap_manager.pool, offset);
     printk("pmm", "Reserving bitmap bit: %d\n", offset);   
 
     //Coffee is yuck, and so is c0ffee. Sympathy +1 (in my book) for pmm_alloc which thinks the same :-)
     if (offset == PMM_INVALID)
         return 1;
+
+    ram_manager_add(PAGE_SIZE);
 
     return offset;
 }
@@ -136,12 +136,13 @@ int32_t pmm_alloc()
 int32_t pmm_free(uint8_t bit_index)
 {
     //Is the page/bit already free?
-    if (bitmap_manager.get(bitmap_manager.pool, bit_index) == PMM_FREE)
+    if (pmm.bitmap_manager.get(pmm.bitmap_manager.pool, bit_index) == PMM_FREE)
     {
         return 1;
     }
-    bitmap_manager.clear(bitmap_manager.pool, bit_index);
+    pmm.bitmap_manager.clear(pmm.bitmap_manager.pool, bit_index);
     printk("pmm", "Free'd bitmap bit %d\n", bit_index);
+    ram_manager_free(PAGE_SIZE);
     return 0;
 }
 
@@ -154,12 +155,12 @@ int32_t find_first_free_block()
 {
     uint32_t bit_offset = 0;
 
-    for (int i = 0; i < bitmap_manager.size; i++)
+    for (int i = 0; i < pmm.bitmap_manager.size; i++)
     {
-        bit_offset = bitmap_manager.get(bitmap_manager.pool, i);
+        bit_offset = pmm.bitmap_manager.get(pmm.bitmap_manager.pool, i);
         
         //Bit is marked as used
-        if (bitmap_manager.get(bitmap_manager.pool, bit_offset) == PMM_FREE)
+        if (pmm.bitmap_manager.get(pmm.bitmap_manager.pool, bit_offset) == PMM_FREE)
         {
             return bit_offset;
         }

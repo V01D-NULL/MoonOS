@@ -54,7 +54,7 @@ bool test_wait()
 }
 
 void banner();
-extern liballoc_bitmap_t bitmap_manager;
+extern pmm_t pmm;
 
 void kmain(boot_info_t *bootvars) {
     /* Init the VESA printing routines, font loading, etc */
@@ -80,9 +80,9 @@ void kmain(boot_info_t *bootvars) {
     
     //PMM Demo
     int32_t offset = pmm_alloc();
-    bitmap_log_all_bits(bitmap_manager);
+    bitmap_log_all_bits(pmm.bitmap_manager);
     pmm_free(offset);
-    bitmap_log_all_bits(bitmap_manager);
+    bitmap_log_all_bits(pmm.bitmap_manager);
 
     for (;;) {
         asm ("hlt");

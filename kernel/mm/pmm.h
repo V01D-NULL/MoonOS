@@ -19,10 +19,13 @@ int32_t pmm_alloc();
 int32_t pmm_free(uint8_t bit_index);
 int32_t find_first_free_block();
 
-typedef struct pmm_bmp {
-    uint64_t size;
-    uint64_t base;
-    uint64_t top;
-} pmm_bitmap_t;
+typedef struct pmm
+{
+    size_t phys_start;
+    liballoc_bitmap_t bitmap_manager;
+    bitmap_size_type *bitmap; //Bitmap buffer / bitmap arena
+    size_t size;
+    size_t *next;
+} pmm_t;
 
 #endif // BITMAP_PMM_H
