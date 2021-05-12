@@ -16,6 +16,7 @@
 #include <stddef.h>
 #include "../common.h"
 #include "../amd64/cpu.h"
+#include "../amd64/validity.h"
 
 /**
  * @brief Defines an IDT entry
@@ -29,7 +30,7 @@ struct idt_desc {
     uint16_t offset_mid;  // offset bits 16..31
     uint32_t offset_high; // offset bits 32..63
     uint32_t zero;        // reserved
-}__attribute__((packed));
+} __pack_bytes;
 
 /**
  * @brief The values used to load the IDT into memory using 'lidt'
@@ -38,7 +39,7 @@ struct idt_desc {
 struct idtr {
     uint16_t limit;
     uint64_t offset;
-}__attribute__((packed));
+} __pack_bytes;
 
 /**
  * @brief Set an IDT entry
@@ -58,55 +59,55 @@ void idt_set_entry(uint16_t selector, uint8_t ist, uint8_t type_attr, uint64_t o
 void init_idt();
 
 //CPU exceptions
-extern void isr0();
-extern void isr1();
-extern void isr2();
-extern void isr3();
-extern void isr4();
-extern void isr5();
-extern void isr6();
-extern void isr7();
-extern void isr_err8();
-extern void isr9();
-extern void isr_err10();
-extern void isr_err11();
-extern void isr_err12();
-extern void isr_err13();
-extern void isr_err14();
-extern void isr15();
-extern void isr16();
-extern void isr17();
-extern void isr18();
-extern void isr19();
-extern void isr20();
-extern void isr21();
-extern void isr22();
-extern void isr23();
-extern void isr24();
-extern void isr25();
-extern void isr26();
-extern void isr27();
-extern void isr28();
-extern void isr29();
-extern void isr30();
-extern void isr31();
+__export void isr0();
+__export void isr1();
+__export void isr2();
+__export void isr3();
+__export void isr4();
+__export void isr5();
+__export void isr6();
+__export void isr7();
+__export void isr_err8();
+__export void isr9();
+__export void isr_err10();
+__export void isr_err11();
+__export void isr_err12();
+__export void isr_err13();
+__export void isr_err14();
+__export void isr15();
+__export void isr16();
+__export void isr17();
+__export void isr18();
+__export void isr19();
+__export void isr20();
+__export void isr21();
+__export void isr22();
+__export void isr23();
+__export void isr24();
+__export void isr25();
+__export void isr26();
+__export void isr27();
+__export void isr28();
+__export void isr29();
+__export void isr30();
+__export void isr31();
 
 //HW interrupts
-extern void isr32();
-extern void isr33();
-extern void isr34();
-extern void isr35();
-extern void isr36();
-extern void isr37();
-extern void isr38();
-extern void isr39();
-extern void isr40();
-extern void isr41();
-extern void isr42(); 
-extern void isr43(); 
-extern void isr44(); 
-extern void isr45(); 
-extern void isr46(); 
-extern void isr47();
+__export void isr32();
+__export void isr33();
+__export void isr34();
+__export void isr35();
+__export void isr36();
+__export void isr37();
+__export void isr38();
+__export void isr39();
+__export void isr40();
+__export void isr41();
+__export void isr42(); 
+__export void isr43(); 
+__export void isr44(); 
+__export void isr45(); 
+__export void isr46(); 
+__export void isr47();
 
 #endif // IDT_H

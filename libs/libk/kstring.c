@@ -42,7 +42,7 @@ uint64_t memcmp(const void *src, void *dst, size_t n)
 void *memmove(void *dst, const void *src, size_t n)
 {
 	uint8_t *dst_ptr = dst;
-	uint8_t *src_ptr = src;
+	const uint8_t *src_ptr = src;
 
 	for (int i = 0; i < n; i++)
 	{

@@ -1,6 +1,6 @@
 #include "gdt.h"
 
-extern void _load_gdt(uint64_t gdt_desc);
+__export void _load_gdt(uint64_t gdt_desc);
 
 static struct gdt_table gdt;
 

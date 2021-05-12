@@ -1,13 +1,14 @@
 #include "gfx.h"
 #include "../../common.h"
+#include "../../amd64/validity.h"
 
 #define SSFN_CONSOLEBITMAP_TRUECOLOR        /* use the special renderer for 32 bit truecolor packed pixels */
 #define SSFN_NOIMPLEMENTATION               /* don't include the normal renderer implementation */
 #include <3rdParty/ssfn.h>
 
-extern uint8_t _binary_font_console_sfn_start;
-extern uint8_t _binary_font_console_sfn_size;
-extern uint8_t _binary_font_console_sfn_end;
+__export uint8_t _binary_font_console_sfn_start;
+__export uint8_t _binary_font_console_sfn_size;
+__export uint8_t _binary_font_console_sfn_end;
 
 gfx_header_t gfx_h;
 uint32_t *framebuffer_address;

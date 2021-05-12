@@ -20,12 +20,13 @@
 
 #include <libk/kstring.h>
 #include "../../common.h"
+#include "../../amd64/validity.h"
 
 /// (x86_64) Return CPU vendor string
-extern const char *ASM_x86_cpuid_vendor_string();
+__export const char *ASM_x86_cpuid_vendor_string();
 
 /// (x86_64) Read from the RIP register
-extern int         ASM_x86_regs_read_rip();
+__export int         ASM_x86_regs_read_rip();
 
 //C functions:
 /// (C) Print vendor string

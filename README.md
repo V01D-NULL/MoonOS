@@ -7,6 +7,7 @@ I will attempt to make it POSIX compliant
 <img src="screenshot/1.png">
 
 # Features
+- HTML Doxygen kernel and library documentation (not hosted anywhere yet)
 - Stivale2 boot protocol
 - Limine bootloader
 - GDT (Credits to https://github.com/ethan4984/rock/ for the gdt code (The only change I made was to add a null descriptor to the GDT))
@@ -22,23 +23,22 @@ I will attempt to make it POSIX compliant
 
 # Future features:
 - A simple heap
-- A memory allocator which acts as a wrapper for vmm and pmm (haven't decided on the type yet (slab, buddy, bitmap, linked list, etc))
 - Paging
 - APIC
 - ACPI
-- TTY  (Using VESA, NOT vga)
+- Userland support
+- Multitasking
+- SMP
 - Many hardware drivers including but not limited to:
 	- Network cards
 	- ATA
 	- GPU's
 	- And much more
-- Simple userland mode
-- A small libc for the userland
+- A libc for the userland
+- Setting up a webpage for the doxygen docs (hosted by github)
 
 # This is currently being working on:
-- Optmizing the bitmap pmm with a linked list for faster allocation and dealloction of memory + it's better for non-contiguous memory
-- HTML Doxygen kernel and library documentation
-- Setting up a webpage for the doxygen docs (hosted by github)
+- vmm
 
 # Directory walkthrough:
 - libs/   	  --  Here you will find kernel libs and ports. (Planning on putting things like bash and Doom in this lib/ folder)
@@ -46,12 +46,14 @@ I will attempt to make it POSIX compliant
 - build-util/ --  3rd party tools needed to build the Validity kernel + makefile flags
 - debug-util/ --  Files needed for debugging Validity.
 - boot/		  --  Everything limine needs to boot 
+- font/		  --  Contains the sfn font file which will be used by the kernel once VESA is enabled
 
 # Installation
-## Building: (assuming you are using a debian based linux distro)
+## Building: (assuming you are using a debian based distro)
 - Install needed tools:
 	- sudo apt update
 	- sudo apt install build-essential nasm qemu-system-x86
+	- IMPORTANT: You will need to have an x86_64 cross-compiler setup to build Validity. (Alternatively you can comment out the ARCH variable in flags.mk however this isn't recommended as compiling without a cross-compiler may cause unexpected behaviour)
 - Build kernel
 	- git clone < REPO >
 	- cd < REPO_DIR >

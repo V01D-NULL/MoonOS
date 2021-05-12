@@ -1,9 +1,10 @@
 #include "x86.h"
 #include "../../amd64/cpu.h"
+#include "../../amd64/validity.h"
 #include "../../drivers/gfx/gfx.h"
 #include "../../drivers/io/serial.h"
 
-extern cpu_hw_t cpu_hardware;
+__export cpu_hw_t cpu_hardware;
 
 void x86_cpu_info()
 {

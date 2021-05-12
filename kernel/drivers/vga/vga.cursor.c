@@ -1,7 +1,8 @@
 #include "vga.cursor.h"
 #include "vga.h"
+#include "../../amd64/validity.h"
 
-extern vga_hdr_t vga;
+__export vga_hdr_t vga;
 
 // Updates the hardware cursor
 void vga_move_cursor()

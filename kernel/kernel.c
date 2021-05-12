@@ -17,6 +17,7 @@
 #include "boot/bootloader_stivale2.h"
 
 #include "amd64/cpu.h"
+#include "amd64/validity.h"
 
 #include "int/gdt.h"
 #include "int/idt.h"
@@ -42,6 +43,7 @@
 #include "mm/paging/pfa.h"
 #include "mm/linear_alloc.h"
 
+
 /*
 	TODO:
 		- Add a ctype.h/c file to libk for functions like isdigit and co.
@@ -54,7 +56,8 @@ bool test_wait()
 }
 
 void banner();
-extern pmm_t pmm;
+
+__export pmm_t pmm;
 
 void kmain(boot_info_t *bootvars) {
     /* Init the VESA printing routines, font loading, etc */
@@ -75,14 +78,21 @@ void kmain(boot_info_t *bootvars) {
 
     init_pmm(bootvars->mmap.memmap, bootvars->mmap.entries);
 
-    //TODO: 
-    //Create a function that converts the bit offset in the bitmap to a physical address / address of the page
-    
     //PMM Demo
-    int32_t offset = pmm_alloc();
-    bitmap_log_all_bits(pmm.bitmap_manager);
-    pmm_free(offset);
-    bitmap_log_all_bits(pmm.bitmap_manager);
+    int a = pmm_alloc();
+    int a2 = pmm_alloc();
+    int a3 = pmm_alloc();
+    int a4 = pmm_alloc();
+    int a5 = pmm_alloc();
+    
+    pmm_free(a);
+    pmm_free(a2);
+    pmm_free(a3);
+    pmm_free(a4);
+    pmm_free(a5);
+    pmm_free(6); //Attempting to free memory which is already free
+    
+    
 
     for (;;) {
         asm ("hlt");

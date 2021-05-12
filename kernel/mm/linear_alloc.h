@@ -17,6 +17,7 @@
 #include <libk/kstdlib.h>
 #include "../drivers/io/serial.h"
 #include "../boot/bootloader_stivale2.h"
+#include "../amd64/validity.h"
 
 /*
     Q&D linear memory allocator | Will be replaced by a more advanced memory managment algorithm eventually
@@ -32,7 +33,7 @@ typedef struct linear_tracker {
     uint8_t *first_free_addr;
     void *end;
     uint8_t *allocation_ptr;
-}__attribute__((packed)) linear_tracker_t;
+} __pack_bytes linear_tracker_t;
 
 //
 /**

@@ -8,10 +8,10 @@
  * @copyright Copyright (c) 2021
  * 
  */
-
 #include "../drivers/io/serial.h"
 #include "bootloader_stivale2.h"
 #include "../drivers/gfx/gfx.h"
+#include "../amd64/validity.h"
 #include "../stivale2.h"
 #include "../int/idt.h"
 #include "../int/gdt.h"
@@ -41,7 +41,7 @@ struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
     .framebuffer_bpp    = 0
 };
 
-__attribute__((section(".stivale2hdr"), used))
+__SECTION(".stivale2hdr")
 struct stivale2_header stivale_hdr = {
     .entry_point = 0,
     .stack = (uintptr_t)stack + sizeof(stack),
@@ -67,8 +67,6 @@ void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id) {
         current_tag = (void *)current_tag->next;
     }
 }
-
-void banner();
 
 /**
  * @brief Kernel entry point

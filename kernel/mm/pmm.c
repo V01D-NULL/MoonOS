@@ -3,11 +3,8 @@
 #include <stdint.h>
 #include "../drivers/gfx/gfx.h"
 
-
 size_t highest_page;
 pmm_t pmm;
-
-extern const size_t __offset__;
 
 void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
 {
@@ -50,8 +47,8 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
         {
             debug("Found a big enough block of  memory to host the bitmap (size: %ld), bitmap_size_bytes: %ld\n", mmap[i].length, bitmap_size_bytes);
             
-            //Set the base of the bitmap ((size_t)&__offset__ makes sure that the bitmap is within the higher half of the kernel and not at mmap[i].base which would likely be in unmapped memory)
-            pmm.bitmap = (bitmap_size_type*) (mmap[i].base + (size_t)&__offset__);
+            //Set the base of the bitmap ((size_t)BASE makes sure that the bitmap is within the higher half of the kernel and not at mmap[i].base which would likely be in unmapped memory)
+            pmm.bitmap = (bitmap_size_type*) (mmap[i].base + (size_t)MM_BASE);
 
             //Create a bitmap
             pmm.bitmap_manager = bitmap_init(pmm.bitmap, bitmap_size_bytes);
@@ -67,7 +64,7 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
             mmap[i].length -= bitmap_size_bytes;
 
             //Mark the the bitmap in the resized page as reserved. Moments like those show emphasize how badly I need a kernel panic implementation
-            if (pfa_mark_page_as_used((void*)(mmap[i].base +  mmap[i].length))) {
+            if (pfa_mark_page_as_used((void*)(mmap[i].base +  mmap[i].length), true)) {
                 debug("Page already reserved!\nBitmap cannot be stored.\n");
                 for (;;)
                     asm ("hlt");
@@ -92,7 +89,7 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
         {
             for (int j = 0; j < mmap[i].length; i += PAGE_SIZE)
             {
-                pfa_mark_page_as_used((void*) ((mmap[i].base + mmap[i].length) / PAGE_SIZE));
+                pfa_mark_page_as_used((void*) ((mmap[i].base + mmap[i].length) / PAGE_SIZE), true);
             }
         }
     }
@@ -111,45 +108,42 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
  */
 int32_t pmm_alloc()
 {
-    int32_t offset = PMM_INVALID;
-
-    offset = find_first_free_block();
-    pmm.bitmap_manager.set(pmm.bitmap_manager.pool, offset);
-    printk("pmm", "Reserving bitmap bit: %d\n", offset);   
+    size_t offset = find_first_free_block();
 
     //Coffee is yuck, and so is c0ffee. Sympathy +1 (in my book) for pmm_alloc which thinks the same :-)
     if (offset == PMM_INVALID)
         return 1;
 
-    ram_manager_add(PAGE_SIZE);
+    pfa_mark_page_as_used((void*)offset, false);
+    printk("pmm", "Reserving bitmap bit: %d\n", offset);
 
     return offset;
 }
 
-//TODO: Add a pmm_alloc_pages which allocates n pages (4k in size)
+//TODO: Add a pmm_alloc_pages which allocates n pages (4k in size). This will be a wrapper function for pfa_request_pages()
 /**
  * @brief Free a bit in the bitmap / free a page
  * 
  * @param bit_index 
- * @return int32_t Returns 1 on error and 0 on success
+ * @return int32_t Returns PMM_INVALID on error and 0 on success
  */
-int32_t pmm_free(uint8_t bit_index)
+int32_t pmm_free(uint64_t bit_index)
 {
     //Is the page/bit already free?
-    if (pmm.bitmap_manager.get(pmm.bitmap_manager.pool, bit_index) == PMM_FREE)
+    if (pfa_mark_page_as_free((void*)bit_index, false) == 1)
     {
-        return 1;
+        debug("pmm_free: Invalid free on bit %d | Reason: Bit is already free\n");
+        return PMM_INVALID;
     }
-    pmm.bitmap_manager.clear(pmm.bitmap_manager.pool, bit_index);
+    
     printk("pmm", "Free'd bitmap bit %d\n", bit_index);
-    ram_manager_free(PAGE_SIZE);
     return 0;
 }
 
 /**
  * @brief Find the first free bit in the bitmap and return it's index
  * 
- * @return uint32_t Returns 1 on error and the index of the bit in the bitmap on success
+ * @return uint32_t Returns PMM_INVALID on error and the index of the bit in the bitmap on success
  */
 int32_t find_first_free_block()
 {
@@ -157,13 +151,13 @@ int32_t find_first_free_block()
 
     for (int i = 0; i < pmm.bitmap_manager.size; i++)
     {
-        bit_offset = pmm.bitmap_manager.get(pmm.bitmap_manager.pool, i);
-        
+        bit_offset = pmm.bitmap_manager.get(pmm.bitmap_manager.pool, i) + i; //The .get() method will check if a bit at index 'i' is 1 or 0, so we add i to store the bit's index in the bitmap inside of offset, otherwise offset could only be 1 or 0 which isn't what I was aiming for
+
         //Bit is marked as used
         if (pmm.bitmap_manager.get(pmm.bitmap_manager.pool, bit_offset) == PMM_FREE)
         {
             return bit_offset;
         }
     }
-    return 1;
+    return PMM_INVALID;
 }

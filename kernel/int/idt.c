@@ -1,6 +1,7 @@
 #include "idt.h"
 #include <stddef.h>
 #include <stdint.h>
+#include "../amd64/validity.h"
 
 static struct idt_desc idt[256];
 
@@ -15,7 +16,7 @@ void idt_set_entry(uint16_t selector, uint8_t ist, uint8_t type_attr, uint64_t o
     idt[idx].zero        = 0;
 }
 
-extern void load_idt(uint64_t idtr);
+__export void load_idt(uint64_t idtr);
 
 void init_idt()
 {    
