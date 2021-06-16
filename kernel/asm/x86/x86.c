@@ -6,12 +6,6 @@
 
 __export cpu_hw_t cpu_hardware;
 
-void x86_cpu_info()
-{
-    ASM_x86_cpuid_vendor_string();
-    printk("cpuid", "CPU Count: %d\n", cpu_hardware.cpu_count);
-}
-
 void x86_cpuid_vendor_string(const char *rax, const char *rbx, const char *rcx)
 {
     char *first_half = strcat((char*)&rax, (char*)&rbx);

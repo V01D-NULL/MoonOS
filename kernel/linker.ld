@@ -13,6 +13,7 @@ SECTIONS
         KEEP(*(.stivale2hdr))
     }
 
+
     /* Then let's place all the other traditional executable sections afterwards. */
     .text : {
         *(.text*)

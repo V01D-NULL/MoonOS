@@ -18,6 +18,7 @@
 
 #include "amd64/cpu.h"
 #include "amd64/validity.h"
+#include "amd64/bytes.h"
 
 #include "int/gdt.h"
 #include "int/idt.h"
@@ -40,24 +41,11 @@
 
 #include "mm/ram.h"
 #include "mm/pmm.h"
+#include "mm/vmm.h"
 #include "mm/paging/pfa.h"
 #include "mm/linear_alloc.h"
 
-
-/*
-	TODO:
-		- Add a ctype.h/c file to libk for functions like isdigit and co.
-*/
-
-bool test_wait()
-{
-    delay(500);
-    return true;
-}
-
 void banner();
-
-__export pmm_t pmm;
 
 void kmain(boot_info_t *bootvars) {
     /* Init the VESA printing routines, font loading, etc */
@@ -65,34 +53,14 @@ void kmain(boot_info_t *bootvars) {
 
     /* Init the CPU hardware struct */
     cpu_info_init(*bootvars);
-
     banner();
+    cpu_info();
 
-    printk("main", "Test log message\n");
-    printk("ERR", "Test error\n");
-    printk("OK", "Test succession\n");
+    pmm_init(bootvars->mmap.memmap, bootvars->mmap.entries);
+    vmm_init();
 
-    printk_wait(test_wait, "Testing the wait function\n");
-    
-    x86_cpu_info();
-
-    init_pmm(bootvars->mmap.memmap, bootvars->mmap.entries);
-
-    //PMM Demo
-    int a = pmm_alloc();
-    int a2 = pmm_alloc();
-    int a3 = pmm_alloc();
-    int a4 = pmm_alloc();
-    int a5 = pmm_alloc();
-    
-    pmm_free(a);
-    pmm_free(a2);
-    pmm_free(a3);
-    pmm_free(a4);
-    pmm_free(a5);
-    pmm_free(6); //Attempting to free memory which is already free
-    
-    
+    page_info_t p = vmm_vaddr_to_page_info_struct(0x803FE7F5CE);
+    printk("vmm", "offset: 0x%x / lv1: %d / lv2: %d / lv3: %d / lv4: %d\n", p.page_offset, p.lv1, p.lv2, p.lv3, p.lv4);
 
     for (;;) {
         asm ("hlt");

@@ -17,8 +17,22 @@
 */
 
 #include <stdint.h>
-#include "../boot/bootloader_stivale2.h"
 #include "../asm/x86/x86.h"
+#include "../boot/bootloader_stivale2.h"
+
+struct cpuid_regs_t
+{
+    int eax;
+    int ebx;
+    int ecx;
+    int edx;
+    int function;
+};
+
+
+void cpuid(struct cpuid_regs_t *cpuid_regs);
+
+void cpu_info();
 
 /**
  * @brief CPU information

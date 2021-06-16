@@ -21,7 +21,7 @@
 
 //Get the lower or upper 32 bits of a 64 bit data type
 #define LOWER_32(variable) (variable & 0xffffffff)
-#define UPPER_32(variable) (variable >> 32)
+#define UPPER_32(variable) (variable << 32)
 #define DATATYPE_SZ(variable) ( sizeof(variable) * 8 )
 
 #define BASE_2  2

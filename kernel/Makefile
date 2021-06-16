@@ -4,7 +4,6 @@ TARGET := kernel.elf
 
 .PHONY: all clean
 
-
 all: $(TARGET)
 	@printf "\n\[^*^]/ Kernel compiled & linked successfully \[^*^]/ \n\n";
 

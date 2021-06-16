@@ -6,7 +6,7 @@
 size_t highest_page;
 pmm_t pmm;
 
-void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
+void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
 {
     size_t top = 0;
     //Step 1. Calculate the size of the bitmap 
@@ -33,7 +33,7 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
 
     debug("no. of pages in total: %d\n", ALIGN_UP(highest_page / PAGE_SIZE));
     
-    debug("Bitmap top  address: 0x%x\n", top);
+    debug("Bitmap top  address: 0x%lx\n", top);
     debug("bitmap size: 0x%x, %ld\n", bitmap_size_bytes, bitmap_size_bytes);
 
     //Step 2. Find a big enough block to host the bitmap
@@ -47,8 +47,8 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
         {
             debug("Found a big enough block of  memory to host the bitmap (size: %ld), bitmap_size_bytes: %ld\n", mmap[i].length, bitmap_size_bytes);
             
-            //Set the base of the bitmap ((size_t)BASE makes sure that the bitmap is within the higher half of the kernel and not at mmap[i].base which would likely be in unmapped memory)
-            pmm.bitmap = (bitmap_size_type*) (mmap[i].base + (size_t)MM_BASE);
+            //Set the base of the bitmap (MM_BASE makes sure that the bitmap is within the higher half of the kernel and not at mmap[i].base which would likely be in unmapped memory)
+            pmm.bitmap = (bitmap_size_type*) (mmap[i].base + MM_BASE);
 
             //Create a bitmap
             pmm.bitmap_manager = bitmap_init(pmm.bitmap, bitmap_size_bytes);
@@ -62,13 +62,7 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
             //Resize page
             mmap[i].base += bitmap_size_bytes;
             mmap[i].length -= bitmap_size_bytes;
-
-            //Mark the the bitmap in the resized page as reserved. Moments like those show emphasize how badly I need a kernel panic implementation
-            if (pfa_mark_page_as_used((void*)(mmap[i].base +  mmap[i].length), true)) {
-                debug("Page already reserved!\nBitmap cannot be stored.\n");
-                for (;;)
-                    asm ("hlt");
-            }
+            pfa_mark_page_as_used((void*)(mmap[i].base +  mmap[i].length), true);
 
             debug("Shrunk mmap entry: %ld\nShrunk mmap base: %ld\n", mmap[i].base, mmap[i].length);
             break;
@@ -77,7 +71,7 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
 
     //Sanity check, if this fails then there isn't enough memory to store the bitmap
     if (pmm.bitmap == (bitmap_size_type*)0x0) {
-        printk("pmm","Son of a bit!\nYour computer doesn't have enough memory to store the bitmap!\n");
+        printk("ERR","Couldn't store bitmap\n");
         for (;;)
             asm ("hlt");
     }
@@ -85,16 +79,18 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
     //Step 3.
     for (int i = 0; i < entries; i++)
     {
-        if (mmap[i].type != STIVALE2_MMAP_USABLE)
+        if (mmap[i].type != STIVALE2_MMAP_USABLE || mmap[i].type != STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE)
         {
-            for (int j = 0; j < mmap[i].length; i += PAGE_SIZE)
+            if (mmap[i].type == STIVALE2_MMAP_KERNEL_AND_MODULES)
             {
                 pfa_mark_page_as_used((void*) ((mmap[i].base + mmap[i].length) / PAGE_SIZE), true);
+                debug("Reserved kernel and kernel modules\n");
             }
+            pfa_mark_page_as_used((void*) ((mmap[i].base + mmap[i].length) / PAGE_SIZE), true);
         }
     }
-    debug("mmap: 0x%llx\nhighest page: 0x%llx\n", (uint64_t) pmm.bitmap, highest_page);
-    
+    debug("Bitmap resides at: 0x%llx\nhighest page: 0x%llx\n", (uint64_t) pmm.bitmap, PMM_ABS_ADDRESS(highest_page));
+
     debug("\n");
     debug("%d\n", entries);
 
@@ -104,39 +100,55 @@ void init_pmm(struct stivale2_mmap_entry *mmap, int entries)
 /**
  * @brief Alloc n number of pages & return a pointer to the allocated memory
  * 
- * @return int32_t Returns 1 on error and the bits index in the bitmap on success. This return value will be used to free the page/clear the bit in the bitmap later on
+ * @return void* Returns NULL on error and a pointer to the allocated memory on success.
  */
-int32_t pmm_alloc()
+void *pmm_alloc()
 {
     size_t offset = find_first_free_block();
 
     //Coffee is yuck, and so is c0ffee. Sympathy +1 (in my book) for pmm_alloc which thinks the same :-)
     if (offset == PMM_INVALID)
-        return 1;
+        return NULL;
 
     pfa_mark_page_as_used((void*)offset, false);
-    printk("pmm", "Reserving bitmap bit: %d\n", offset);
 
-    return offset;
+    return ((void*) BIT_TO_ADDRESS(offset));
 }
 
 //TODO: Add a pmm_alloc_pages which allocates n pages (4k in size). This will be a wrapper function for pfa_request_pages()
+/**
+ * @brief Alloc `n' pages (only use for things that are not meant to be de-allocated)
+ * 
+ * @param n Number of pages to allocate
+ */
+void pmm_alloc_pages(uint64_t n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        pmm_alloc();
+    }
+}
+
 /**
  * @brief Free a bit in the bitmap / free a page
  * 
  * @param bit_index 
  * @return int32_t Returns PMM_INVALID on error and 0 on success
  */
-int32_t pmm_free(uint64_t bit_index)
+int32_t pmm_free(void *page)
 {
-    //Is the page/bit already free?
-    if (pfa_mark_page_as_free((void*)bit_index, false) == 1)
+    uint64_t int_page = (uint64_t)page;
+    if (int_page > MM_BASE)
     {
-        debug("pmm_free: Invalid free on bit %d | Reason: Bit is already free\n");
-        return PMM_INVALID;
+        int_page -= MM_BASE;
+        
+        //Is the page/bit already free?
+        if (pfa_mark_page_as_free((void*) ADDRESS_TO_BIT(int_page),false) == 1)
+        {
+            debug("pmm_free: Invalid free on bit %d | Reason: Bit is already free\n", ADDRESS_TO_BIT(int_page));
+            return PMM_INVALID;
+        }
     }
-    
-    printk("pmm", "Free'd bitmap bit %d\n", bit_index);
     return 0;
 }
 
