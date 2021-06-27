@@ -1,5 +1,6 @@
 #include "vmm.h"
 #include "../amd64/validity.h"
+#include "../drivers/gfx/gfx.h"
 
 size_t *page_directory;
 
@@ -21,7 +22,8 @@ page_info_t vmm_vaddr_to_page_info_struct(uint64_t virt_addr)
     page_info_t pg_info;
     const int bitmask = 0x1FF;
     
-    pg_info.page_offset = virt_addr;
+    debug("virt_addr = 0x%lx\n", virt_addr);
+    pg_info.page_offset = virt_addr & 0xfff;
     virt_addr >>= 12;
     
     pg_info.lv1 = virt_addr & bitmask;
@@ -47,4 +49,5 @@ void vmm_init()
     debug("Reserving memory for the pagetable\n");
     page_directory = pmm_alloc(); //There is no need to free this
     debug("Pagetable resides at 0x%x\n", page_directory);
+    printk("vmm", "Initialised vmm\n");
 }

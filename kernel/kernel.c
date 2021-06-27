@@ -60,7 +60,7 @@ void kmain(boot_info_t *bootvars) {
     vmm_init();
 
     page_info_t p = vmm_vaddr_to_page_info_struct(0x803FE7F5CE);
-    printk("vmm", "offset: 0x%x / lv1: %d / lv2: %d / lv3: %d / lv4: %d\n", p.page_offset, p.lv1, p.lv2, p.lv3, p.lv4);
+    printk("vmm", "offset: 0x%lx / lv1: %d / lv2: %d / lv3: %d / lv4: %d\n", p.page_offset, p.lv1, p.lv2, p.lv3, p.lv4);
 
     for (;;) {
         asm ("hlt");

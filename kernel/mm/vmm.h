@@ -1,6 +1,7 @@
 #ifndef VMM_H
 #define VMM_H
 
+#include "../amd64/validity.h"
 #include "../drivers/io/serial.h"
 #include "paging/pfa.h"
 #include "paging/CR.h"
@@ -8,12 +9,12 @@
 
 #define PAGE_TABLE_LIMIT 1024
 
-struct page_directory
+__page_align struct page_directory
 {
     uintptr_t page_tables[512];
 };
 
-/* A 4 level paging struct which holds info about the levels and page_offset */
+/* A 4 level paging struct which holds info about the levels and page offset */
 typedef struct
 {
     uintptr_t page_offset;
