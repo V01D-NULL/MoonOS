@@ -89,10 +89,7 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
             pfa_mark_page_as_used((void*) ((mmap[i].base + mmap[i].length) / PAGE_SIZE), true);
         }
     }
-    debug("Bitmap resides at: 0x%llx\nhighest page: 0x%llx\n", (uint64_t) pmm.bitmap, PMM_ABS_ADDRESS(highest_page));
-
-    debug("\n");
-    debug("%d\n", entries);
+    debug("Bitmap resides at: 0x%llx\nhighest page: 0x%llx\n", (uint64_t) pmm.bitmap, highest_page);
 
     printk("pmm", "Initialised pmm\n");
 }

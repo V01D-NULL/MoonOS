@@ -15,7 +15,7 @@
 #define ALIGN_DOWN(__number) ((__number) & ~(PAGE_SIZE - 1))
 #define PMM_ABS_ADDRESS(address) ((0xffffffffUL << 32) | address)
 
-__export size_t __offset__[];
+IMPORT_LDDEF(__offset__);
 #define MM_BASE (uintptr_t)__offset__
 
 void pmm_init(struct stivale2_mmap_entry *mmap, int entries);

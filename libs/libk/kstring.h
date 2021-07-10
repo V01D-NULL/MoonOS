@@ -35,7 +35,7 @@ void memcpy(uint8_t *dest, const uint8_t *src, uint64_t len);
  * @param val  The value to set the bytes to
  * @param len  The amount of bytes to modify
  */
-void memset(uint8_t *dest, uint8_t val, uint64_t len);
+void memset(void *dest, uint8_t val, uint64_t len);
 
 /**
  * @brief Compare two bytes

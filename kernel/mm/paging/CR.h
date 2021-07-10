@@ -12,6 +12,6 @@ enum CR_NUMBER
     CR4
 };
 
-uint32_t cr_read(enum CR_NUMBER cr);
+uint64_t cr_read(enum CR_NUMBER cr);
 
 #endif // CONTROL_REGISTER_X

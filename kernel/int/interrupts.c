@@ -2,12 +2,12 @@
 #include "idt.h"
 #include "../drivers/gfx/gfx.h"
 #include "../drivers/io/serial.h"
+#include "../mm/paging/CR.h"
 #include <stddef.h>
 #include <stdint.h>
 
 isr_t isr_handler_array[255] = {0};
 
-//TODO: Update exception messages to comply with the AMD manual
 static const char* exception_messages[31] = {
    "Type: (#DE) Division Exception",
    "Type: (#DB) Debug Exception",
@@ -49,14 +49,20 @@ void isr_handler(regs_t regs)
     {
         serial_set_color(BASH_RED);
         printk("INTR",  "%s (err_code %ld)\n", exception_messages[regs.isr_number], regs.error_code);
+        
+        if (regs.isr_number == 14)
+        {
+            printk("INTR ~ #PF", "Faulting address: 0x%lx\n", cr_read(CR2));
+        }
+
         debug("INT#%d - %s (err_code %ld)\n", regs.isr_number, exception_messages[regs.isr_number], regs.error_code);
         serial_set_color(BASH_WHITE);
-        debug("Register dump:\n"                      \
-                "rax 0x%x, rbx 0x%x, rcx 0x%x, rdx 0x%x\n"    \
-                "rbp 0x%x, rsp 0x%x, rdi 0x%x, rsi 0x%x\n"    \
-                "rip 0x%x, cs  0x%x, ss  0x%x, rflags 0x%x\n" \
-                "r8  0x%x, r9  0x%x, r10 0x%x, r11  0x%x\n"   \
-                "r12 0x%x, r13 0x%x, r14 0x%x, r15  0x%x\n",
+        debug("Register dump:\n"                      
+                "rax 0x%x, rbx 0x%x, rcx 0x%x, rdx    0x%x\n"    
+                "rbp 0x%x, rsp 0x%x, rdi 0x%x, rsi    0x%x\n"    
+                "rip 0x%x, cs  0x%x, ss  0x%x, rflags 0x%x\n" 
+                "r8  0x%x, r9  0x%x, r10 0x%x, r11    0x%x\n"   
+                "r12 0x%x, r13 0x%x, r14 0x%x, r15    0x%x\n",
                                                                 regs.rax,
                                                                 regs.rbx,
                                                                 regs.rcx,
@@ -78,7 +84,8 @@ void isr_handler(regs_t regs)
                                                                 regs.r14,
                                                                 regs.r15
                                                                 );        
-        asm("hlt");
+        for (;;)
+            asm("hlt");
     }
     //Signal EOI
     outb(0xA0, 0x20);
@@ -98,7 +105,7 @@ void install_isr(uint8_t base, isr_t handler)
     if (isr_handler_array[base] == 0)
         isr_handler_array[base] = handler;
     else
-        printk("[INTR]", "The interrupt ( %d ) has already been registered!\n", base);
+        printk("INTR", "The interrupt ( %d ) has already been registered!\n", base);
 }
 
 void uninstall_isr(uint8_t base)

@@ -19,7 +19,8 @@
 			"tuple": "c",
 			"type_traits": "c",
 			"utility": "c",
-			"variant": "c"
+			"variant": "c",
+			"linear_alloc.h": "c"
 		}
 	}
 }

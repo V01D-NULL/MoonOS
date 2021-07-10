@@ -1,71 +1,66 @@
 #include "CR.h"
 
-static inline uint32_t cr0_read()
+static inline uint64_t cr0_read()
 {
     uint64_t cr;
     asm volatile(
-        "mov %%cr0, %%rax\n\t"
-        "mov %%eax, %0\n\t"
-        : "=m"(cr)
+        "mov %%cr0, %0\n\t"
+        : "=r"(cr)
         :
         : "%rax"
     );
     return cr;
 }
 
-static inline uint32_t cr1_read()
+static inline uint64_t cr1_read()
 {
     uint64_t cr;
     asm volatile(
-        "mov %%cr1, %%rax\n\t"
-        "mov %%eax, %0\n\t"
-        : "=m"(cr)
+        "mov %%cr1, %0\n\t"
+        : "=r"(cr)
         :
         : "%rax"
     );
     return cr;
 }
 
-static inline uint32_t cr2_read()
+static inline uint64_t cr2_read()
 {
     uint64_t cr;
     asm volatile(
-        "mov %%cr2, %%rax\n\t"
-        "mov %%eax, %0\n\t"
-        : "=m"(cr)
+        "mov %%cr2, %0\n\t"
+        : "=r"(cr)
         :
         : "%rax"
     );
     return cr;
 }
 
-static inline uint32_t cr3_read()
+static inline uint64_t cr3_read()
 {
     uint64_t cr;
     asm volatile(
-        "mov %%cr3, %%rax\n\t"
-        "mov %%eax, %0\n\t"
-        : "=m"(cr)
+        "mov %%cr3, %0\n\t"
+        : "=r"(cr)
         :
         : "%rax"
     );
     return cr;
 }
 
-static inline uint32_t cr4_read()
+static inline uint64_t cr4_read()
 {
     uint64_t cr;
     asm volatile(
-        "mov %%cr4, %%rax\n\t"
-        "mov %%eax, %0\n\t"
-        : "=m"(cr)
+        "mov %%cr4, %0\n\t"
+        : "=r"(cr)
         :
         : "%rax"
     );
     return cr;
 }
 
-uint32_t cr_read(enum CR_NUMBER cr)
+uint64_t cr_read(enum CR_NUMBER cr)
 {
     switch (cr)
     {
