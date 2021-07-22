@@ -22,7 +22,7 @@ LIMINE_CD_BIN = iso/  # Path/to/limine-cd.bin
 ISO_NAME	  = ValidityOS.iso 
 
 # XORRISO  = @xorriso
-# ISO_OPTS = 
+# ISO_OPTS = SIGQUIT
 
 KLIBS 	 := ../libs
 FONT 	 := font/console.sfn

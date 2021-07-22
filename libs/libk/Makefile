@@ -22,7 +22,6 @@ $(TARGET): $(OBJ)
 
 %.o: %.c
 	@printf "[libk @ CC] [ $< ]\n";
-	@printf "DEBUG: $(CFLAGS)\n\n";
 	$(CC) $(CFLAGS) -c $< -o $@
 
 %.o: %.s

@@ -19,6 +19,7 @@
 #include "vga.cursor.h"
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 /**
  * @brief VGA information

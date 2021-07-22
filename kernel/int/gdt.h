@@ -12,7 +12,7 @@
 #define GDT_H
 
 #include <stdint.h>
-#include "../common.h"
+#include "../util/common.h"
 #include "../amd64/validity.h"
 
 /**

@@ -1,5 +1,5 @@
 #include "gfx.h"
-#include "../../common.h"
+#include "../../util/common.h"
 #include "../../amd64/validity.h"
 
 #define SSFN_CONSOLEBITMAP_TRUECOLOR        /* use the special renderer for 32 bit truecolor packed pixels */
@@ -82,7 +82,7 @@ void gfx_restore_colors()
 long char_cnt = 0;
 void putc(uint32_t unicode, int x, int y)
 {
-    if (x != -1 || y != -1)
+    if (x != -1 && y != -1)
     {
         ssfn_dst.x = x;
         ssfn_dst.y = y;

@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include "../drivers/vga/vga.h"
 #include "../amd64/validity.h"
+#include <stdbool.h>
 
 #define PAGE_SIZE   (4096)
 #define PMM_INVALID 0xc0ffee

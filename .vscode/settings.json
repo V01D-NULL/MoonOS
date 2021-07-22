@@ -1,0 +1,10 @@
+{
+	"files.associations": {
+		"vmm.h": "c",
+		"idt.h": "c",
+		"cpu.h": "c",
+		"x86.h": "c",
+		"gdt.h": "c",
+		"common.h": "c"
+	}
+}

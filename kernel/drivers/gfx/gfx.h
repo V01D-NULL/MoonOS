@@ -15,9 +15,10 @@
 #include "../../boot/bootloader_stivale2.h"
 #include <libk/kprintf.h>
 #include <libk/kstring.h>
-#include "../../common.h"
+#include "../../util/common.h"
 #include <stdarg.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #define OPERATION_BUSY 0x231B //unicode hourglass
 #define OPERATION_OK   0x2705 //unicode checkmark

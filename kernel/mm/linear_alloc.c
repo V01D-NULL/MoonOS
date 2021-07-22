@@ -31,7 +31,6 @@ int linear_mm_init(void *start, uint64_t size)
     return EXIT_SUCCESS;
 }
 
-//TODO: Align bytes by `byte_align_ammount' for optimization purposes
 uint8_t *linear_alloc(uint64_t size, int byte_align_ammount) {
     
     serial_set_color(BASH_GREEN);

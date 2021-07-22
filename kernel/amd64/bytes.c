@@ -1,5 +1,5 @@
 #include "bytes.h"
-#include "../common.h"
+#include "../util/common.h"
 
 uint16_t byte_order_reverse_short16(uint16_t byte)
 {

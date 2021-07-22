@@ -37,7 +37,7 @@
 #include "libk/kassert.h"
 #include "liballoc/bitmap.h"
 
-#include "common.h"
+#include "util/common.h"
 
 #include "mm/ram.h"
 #include "mm/pmm.h"
@@ -50,7 +50,9 @@ void banner();
 void kmain(boot_info_t *bootvars)
 {
     /* Init the VESA printing routines, font loading, etc */
-    gfx_init(*bootvars, 0xffffff, 0x0);
+    // gfx_init(*bootvars, 0x00, 0xf0bacde);
+    // gfx_clear(0xf0bacde);
+    gfx_init(*bootvars, 0xffffff, 0x00);
 
     /* Init the CPU hardware struct */
     cpu_info_init(*bootvars);
@@ -60,8 +62,8 @@ void kmain(boot_info_t *bootvars)
     pmm_init(bootvars->mmap.memmap, bootvars->mmap.entries);
     vmm_init();
 
-    volatile uint32_t *ptr = (volatile uint32_t*) 0xA00000000;
-    uint32_t trigger_page_fault = *ptr;  // force page fault by reading location
+    volatile uint32_t *ptr = (volatile uint32_t *)0xA00000000;
+    uint32_t trigger_page_fault = *ptr; // force page fault by reading location
 
     for (;;)
     {
@@ -82,15 +84,8 @@ void banner()
 
     debug("%s%s%s%s", p1, p2, p3, p4);
 
-    gfx_set_colors(0x4863A0, 0x0); //Dark/Dirty blue on black bg
-    printk("", "%s", p1);
-    gfx_set_colors(0x6698FF, 0x0); //Light blue on black bg
-    printk("", "%s", p2);
-    gfx_set_colors(0x6960EC, 0x0); //Dark Purple on black bg
-    printk("", "%s", p3);
-    gfx_set_colors(0x4863A0, 0x0); //Dark/Dirty blue on black bg
-    printk("", "%s", p4);
-
+    gfx_set_colors(0xffffff, 0x0);
+    printk("Banner", "\n%s%s%s%s", p1, p2, p3, p4);
     gfx_restore_colors(); //Restore default color scheme
     delay(200);
 }

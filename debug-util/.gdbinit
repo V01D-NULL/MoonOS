@@ -1,4 +1,4 @@
-file kernel/Validity.elf
+file kernel/kernel.elf
 
 target remote :1234
 

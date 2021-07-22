@@ -7,27 +7,35 @@
 #include "paging/CR.h"
 #include <stdint.h>
 
-#define PAGE_TABLE_LIMIT 1024
+#define FLAGS_RW   0b00000010   // Read-write
+#define FLAGS_PRIV 0b00000100   // User/supervisor
+#define FLAGS_WT   0b00001000   // Write-through
+#define FLAGS_CD   0b00010000   // Cache-disable
+
+#define PAGE_NOT_PRESENT 0x0
+
+#define TLB_FLUSH(param_addr) asm volatile("invlpg (%[addr])" ::[addr] "r"(param_addr));
+#define PAGE_LOAD_CR3(pml4)   asm volatile("mov %0, %%cr3\n" ::"r"(pml4) : "memory");
 
 struct pte
 {
-    uint8_t present: 1;
-    uint8_t readwrite: 1;
-    uint8_t supervisor: 1;
-    uint8_t writethrough: 1;
-    uint8_t cache_disabled: 1;
-    uint8_t accessed: 1;
-    uint8_t dirty: 1;
-    uint8_t ignore: 1;
-    uint8_t global: 1;
-    uint8_t avail: 3;
-    uint64_t address: 42;
-}__pack_bytes; /* There's no need to use pack bytes but I tend to use that with bitfields */
-typedef struct pte pte_t;
+    uint8_t present : 1;
+    uint8_t readwrite : 1;
+    uint8_t supervisor : 1;
+    uint8_t writethrough : 1;
+    uint8_t cache_disabled : 1;
+    uint8_t accessed : 1;
+    uint8_t dirty : 1;
+    uint8_t ignore : 1;
+    uint8_t global : 1;
+    uint8_t avail : 3;
+    uint64_t address : 48;
+    uint8_t padding : 4; //Ignore
+} __pack_bytes;
 
 __page_align struct page_directory
 {
-    pte_t page_tables[512];
+    struct pte page_tables[512];
 };
 
 /* A 4 level paging struct which holds info about the levels and page offset */
@@ -41,12 +49,13 @@ typedef struct
 } page_info_t;
 
 void vmm_init();
-page_info_t vmm_dissect_vaddr(uint64_t virt_addr);
-static uint64_t vmm_get_lv4();
+void vmm_map(struct page_directory *pml4, size_t vaddr, size_t paddr, int flags);
+void vmm_remap(struct page_directory *pml4, size_t vaddr, size_t paddr, int flags);
+void vmm_unmap(struct page_directory *pml4, size_t vaddr, int flags);
 
-static inline void vmm_set_new_pte(
-    pte_t new_pte_entry,
-    uintptr_t level
-);
+struct pte vmm_create_entry(uint64_t paddr, int flags);
+struct pte vmm_purge_entry();
+
+page_info_t vmm_dissect_vaddr(uint64_t virt_addr);
 
 #endif // VMM_H

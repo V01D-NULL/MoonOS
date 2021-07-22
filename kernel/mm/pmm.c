@@ -108,7 +108,6 @@ void *pmm_alloc()
         return NULL;
 
     pfa_mark_page_as_used((void*)offset, false);
-
     return ((void*) BIT_TO_ADDRESS(offset));
 }
 
@@ -127,9 +126,9 @@ void pmm_alloc_pages(uint64_t n)
 }
 
 /**
- * @brief Free a bit in the bitmap / free a page
+ * @brief Free a bit in the bitmap / free a page (using an address returned by pmm_alloc)
  * 
- * @param bit_index 
+ * @param page 
  * @return int32_t Returns PMM_INVALID on error and 0 on success
  */
 int32_t pmm_free(void *page)

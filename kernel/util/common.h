@@ -9,14 +9,12 @@
  * 
  */
 
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef COMMON_UTIL_H
+#define COMMON_UTIL_H
 
 #include <stdint.h>
 
-//Checks if the bit is set. Returns 1 if true, 0 if false.
-// Input is the variable containing the value to be checked, bit_index = Nth bit to check.
-#define CHECK_BIT(variable, bit_index)      (((variable)>>(bit_index)) & 1) //First bit shift to the given bit index (N). Then simply OR it with 1 to check if it is set.
+#define CHECK_BIT(variable, bit_index)      (((variable)>>(bit_index)) & 1)
 #define SET_BIT(variable, bit_index, value) (((variable)>>bit_index) | value)
 
 //Get the lower or upper 32 bits of a 64 bit data type
@@ -28,11 +26,6 @@
 #define BASE_8  8
 #define BASE_10 10
 #define BASE_16 16
-
-#define true 1
-#define false 0
-#define null (void*)0
-typedef int bool;
 
 inline void outb(uint16_t port, uint8_t val)
 {

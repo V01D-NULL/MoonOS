@@ -1,5 +1,5 @@
 #include "kassert.h"
-#include "common.h"
+#include "util/common.h"
 #include "drivers/gfx/gfx.h"
 
 void __assert_impl(const char *file, uint64_t line, const char* func, const char *desc) {

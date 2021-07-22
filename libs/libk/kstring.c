@@ -12,13 +12,26 @@ void memcpy (uint8_t *dest, const uint8_t *src, uint64_t len)
 	}
 }
 
-void memset(void *dest, uint8_t val, uint64_t len)
+void *memset (void *dest, const uint8_t val, size_t len)
 {
-	for (size_t i = 0; i < len; i++)
-	{
-		*(uint8_t*)dest++ = val;
-	}
+  uint8_t *ptr = (uint8_t*)dest;
+
+  while (len--)
+  {
+    *ptr++ = val;
+  }
+
+  return dest;
 }
+// void memset(void *dest, uint8_t val, uint64_t len)
+// {
+// 	debug("dest => 0x%llx | %p\n", (uint8_t*)dest, (uint8_t*)dest);
+// 	for (size_t i = 0; i < len; i++)
+// 	{
+// 		*(uint8_t*)dest = val;
+// 		*(uint8_t*)dest++;
+// 	}
+// }
 
 // Returns 1 if src is less than dst
 // Returns -1 if src is greater than dst

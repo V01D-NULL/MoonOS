@@ -14,10 +14,8 @@
 #define ADDRESS_TO_BIT(x) ((uint64_t)x / PAGE_SIZE / 8) //Here we do the same as above but in reverse (Note: You have to do x -= MM_BASE before calling this function. I'm to lazy to fix it so I wrote a lenghty comment instead)
 
 #define PFA_ERR 0x1
-#define PFA_OK     0x0
+#define PFA_OK  0x0
 
-//Todo: Implement this
-void *request_pages(void *address);
 
 //Mark a single page as free
 int pfa_mark_page_as_free(void *address, bool calculate_absolute_address);

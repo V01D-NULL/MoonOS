@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include "../common.h"
+#include "../util/common.h"
 #include "../amd64/cpu.h"
 #include "../amd64/validity.h"
 
