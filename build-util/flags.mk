@@ -45,6 +45,7 @@ CFLAGS := 				 \
 	-mno-sse			 \
 	-mno-sse2			 \
 	-mno-red-zone
+	# -DUSE_VGA
 
 ASMFLAGS = -felf64 -g -F dwarf
 LDINTERNALFLAGS := \

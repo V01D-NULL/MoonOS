@@ -41,6 +41,15 @@ struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
     .framebuffer_bpp    = 0
 };
 
+#ifdef USE_VGA
+__SECTION(".stivale2hdr")
+struct stivale2_header stivale_hdr = {
+    .entry_point = 0,
+    .stack = (uintptr_t)stack + sizeof(stack),
+    .flags = 0,
+    .tags = 0//(uintptr_t)&framebuffer_hdr_tag
+};
+#else
 __SECTION(".stivale2hdr")
 struct stivale2_header stivale_hdr = {
     .entry_point = 0,
@@ -48,8 +57,8 @@ struct stivale2_header stivale_hdr = {
     .flags = 0,
     .tags = (uintptr_t)&framebuffer_hdr_tag
 };
+#endif
 
-//Stolen from the limine barebones tutorial
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id) {
     struct stivale2_tag *current_tag = (void *)stivale2_struct->tags;
     for (;;) {
@@ -80,6 +89,10 @@ void kinit(struct stivale2_struct *bootloader_info) {
     
     init_gdt();
     init_idt();
+
+    #ifdef USE_VGA
+    vga_init(0xff, 0x0);
+    #endif
 
     struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
     struct stivale2_struct_tag_smp *smp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_SMP_ID);

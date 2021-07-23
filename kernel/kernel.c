@@ -46,6 +46,10 @@
 #include "mm/linear_alloc.h"
 
 void banner();
+void abc(regs_t r)
+{
+    //do stuff
+}
 
 void kmain(boot_info_t *bootvars)
 {
@@ -59,8 +63,14 @@ void kmain(boot_info_t *bootvars)
     banner();
     cpu_info();
 
+    // asm("ud2");
+    // for(;;);
+
     pmm_init(bootvars->mmap.memmap, bootvars->mmap.entries);
     vmm_init();
+
+    // install_isr(100, &abc);
+    // asm("int $100");
 
     volatile uint32_t *ptr = (volatile uint32_t *)0xA00000000;
     uint32_t trigger_page_fault = *ptr; // force page fault by reading location

@@ -40,7 +40,7 @@ debugger_session: $(KERNEL_HDD)
 	$(EMU) $(EMU_DEBUG_OPTS)
 
 _iso:
-	mkdir iso/
+	mkdir iso/ || echo ""
 	@cp $(KERNEL_ELF) boot/kernel.elf
 	@cp boot/* iso/
 	xorriso -as mkisofs -b limine-cd.bin -no-emul-boot -boot-load-size 4 -boot-info-table iso/ -o ValidityOS.iso
@@ -52,5 +52,5 @@ quick_recompile:
 	@rm -f $(KERNEL_HDD) kernel/kernel.elf
 	@printf "\n";
 	@$(MAKE) --no-print-directory -C libs
-	@printf "\n";
+	@printf "\n"
 	@$(MAKE) --no-print-directory -C kernel

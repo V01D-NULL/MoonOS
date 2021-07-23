@@ -5,6 +5,9 @@
 		"cpu.h": "c",
 		"x86.h": "c",
 		"gdt.h": "c",
-		"common.h": "c"
+		"common.h": "c",
+		"bitmap.h": "c",
+		"drm.h": "c",
+		"bytes.h": "c"
 	}
 }

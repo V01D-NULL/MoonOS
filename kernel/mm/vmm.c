@@ -21,17 +21,11 @@ void vmm_init()
     assert((vmm_pml4 = pmm_alloc()) != NULL);
     invl_pml4();
 
-    //Temporary page mapping test
-    vmm_map(vmm_pml4, 0xa0000000, 0xa0000000, FLAGS_RW | FLAGS_PRIV);
-    vmm_map(vmm_pml4, 0xabcdef12, 0xdeadbeef, FLAGS_RW | FLAGS_PRIV);
-    vmm_map(vmm_pml4, 0xabcdef12, 0xdeadbeef, FLAGS_RW | FLAGS_PRIV);
-    vmm_unmap(vmm_pml4, 0xabcdef12, 0x3);
-    vmm_unmap(vmm_pml4, 0xabcdef12, 0x3);
+    for (uintptr_t i = 0; i < 0x80000000; i += PAGE_SIZE)
+        vmm_map(vmm_pml4, i, i + MM_BASE, 3);
 
-    // asm volatile("mov %0, %%cr3"
-    //              :
-    //              : "r"(vmm_pml4)
-    //              : "memory");
+    // Pagefaults, double faults, then pagefaults and halts
+    // PAGE_LOAD_CR3(vmm_pml4);
 
     lv4_pg = cr_read(CR3);
     debug("%llx\n", lv4_pg);
@@ -94,6 +88,7 @@ void vmm_map(struct page_directory *pml4, size_t vaddr, size_t paddr, int flags)
     assert(((pml2 = vmm_get_pml(pml3, info.lv3, flags)) != NULL));
     assert(((pml1 = vmm_get_pml(pml2, info.lv2, flags)) != NULL));
     pml1->page_tables[info.lv1].address = paddr | flags;
+    // printk("vmm", "Map   address 0x%llx\n", pml1->page_tables[info.lv1].address);
 }
 
 //Same as vmm_map except that it doesn't check if a page has been mapped allowing you to edit the page flags
@@ -118,7 +113,7 @@ void vmm_unmap(struct page_directory *pml4, size_t vaddr, int flags)
 
     if (pml1->page_tables[info.lv1].address != PAGE_NOT_PRESENT)
     {
-        printk("vmm", "Unmapping address 0x%llx\n", info.lv1, pml1->page_tables[info.lv1].address);
+        printk("vmm", "Unmap address 0x%llx\n", pml1->page_tables[info.lv1].address);
         void *pte_address = VAR_TO_VOID_PTR(uint64_t, pml1->page_tables[info.lv1].address << 12);
         pmm_free(pte_address);
         pml1->page_tables[info.lv1] = vmm_purge_entry();
@@ -134,10 +129,9 @@ void vmm_unmap(struct page_directory *pml4, size_t vaddr, int flags)
 
 struct pte vmm_create_entry(uint64_t paddr, int flags)
 {
-    return (struct pte)
-    {
+    return (struct pte){
         .present = 1,
-        .readwrite = (flags & FLAGS_RW)    ? 1 : 0,
+        .readwrite = (flags & FLAGS_RW) ? 1 : 0,
         .supervisor = (flags & FLAGS_PRIV) ? 1 : 0,
         .writethrough = (flags & FLAGS_WT) ? 1 : 0,
         .cache_disabled = 0,
@@ -146,8 +140,7 @@ struct pte vmm_create_entry(uint64_t paddr, int flags)
         .ignore = 0,
         .global = 0,
         .avail = 0,
-        .address = paddr >> 12
-    };
+        .address = paddr >> 12};
 }
 
 struct pte vmm_purge_entry()
@@ -161,6 +154,6 @@ static inline void invl_pml4()
 {
     for (int i = 0; i < PAGE_SIZE; i++)
     {
-        *GENERIC_CAST(uint8_t*, vmm_pml4) = 0x0;
+        *GENERIC_CAST(uint8_t *, vmm_pml4) = 0x0;
     }
 }

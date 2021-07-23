@@ -192,7 +192,9 @@ void printk(char *status, char *fmt, ...)
         puts(" ] ");
     }
     puts((const char*)&buffer);
-
+    #ifdef USE_VGA
+    vga_puts((char*)&buffer, false, false);
+    #endif
     delay(20);
 }
 
