@@ -2,10 +2,12 @@
 #include "libk/kassert.h"
 #include "../amd64/validity.h"
 #include "../drivers/gfx/gfx.h"
+#include "../int/gdt.h"
+#include "../int/idt.h"
 #include "../util/ptr.h"
 #include <stdbool.h>
 
-static struct page_directory *vmm_pml4;
+struct page_directory *vmm_pml4;
 
 //Level4 page table aka the contents of CR3
 static uint64_t lv4_pg;
@@ -16,19 +18,28 @@ static struct page_directory *vmm_get_pml(
 static inline void invl_pml4();
 static uint64_t vmm_get_lv4();
 
+struct page_directory *get_pml4()
+{
+    return vmm_pml4;
+}
+
 void vmm_init()
 {
     assert((vmm_pml4 = pmm_alloc()) != NULL);
-    invl_pml4();
 
-    for (uintptr_t i = 0; i < 0x80000000; i += PAGE_SIZE)
-        vmm_map(vmm_pml4, i, i + MM_BASE, 3);
+    printk("vmm", "pml4 resides at 0x%x\n", vmm_pml4);
+    
+    vmm_map(vmm_pml4, 0xa0000000, 0xa0000000, FLAGS_PRIV | FLAGS_RW);
 
-    // Pagefaults, double faults, then pagefaults and halts
-    // PAGE_LOAD_CR3(vmm_pml4);
+    debug("Old PML4: %llx\n", cr_read(CR3)); // Bootloader pml4
+    PAGE_LOAD_CR3(GENERIC_CAST(uint64_t*, vmm_pml4));
+    
+    init_gdt();
+    init_idt();
 
-    lv4_pg = cr_read(CR3);
-    debug("%llx\n", lv4_pg);
+    lv4_pg = cr_read(CR3); // Kernel pml4
+    debug("New PML4: %llx\n", lv4_pg);
+
     printk("vmm", "Initialised vmm\n");
 }
 
@@ -67,6 +78,7 @@ static struct page_directory *vmm_get_pml(struct page_directory *entry, size_t l
         entry->page_tables[level].readwrite = (flags & FLAGS_RW) ? 1 : 0;
         entry->page_tables[level].supervisor = (flags & FLAGS_PRIV) ? 1 : 0;
         entry->page_tables[level].writethrough = (flags & FLAGS_WT) ? 1 : 0;
+        return entry;
     }
     else
     {
@@ -87,8 +99,7 @@ void vmm_map(struct page_directory *pml4, size_t vaddr, size_t paddr, int flags)
     assert(((pml3 = vmm_get_pml(pml4, info.lv4, flags)) != NULL));
     assert(((pml2 = vmm_get_pml(pml3, info.lv3, flags)) != NULL));
     assert(((pml1 = vmm_get_pml(pml2, info.lv2, flags)) != NULL));
-    pml1->page_tables[info.lv1].address = paddr | flags;
-    // printk("vmm", "Map   address 0x%llx\n", pml1->page_tables[info.lv1].address);
+    pml1->page_tables[info.lv1] = vmm_create_entry(paddr + info.page_offset, flags);
 }
 
 //Same as vmm_map except that it doesn't check if a page has been mapped allowing you to edit the page flags
@@ -100,7 +111,7 @@ void vmm_remap(struct page_directory *pml4, size_t vaddr, size_t paddr, int flag
     assert(((pml3 = vmm_get_pml(pml4, info.lv4, flags)) != NULL));
     assert(((pml2 = vmm_get_pml(pml3, info.lv3, flags)) != NULL));
     assert(((pml1 = vmm_get_pml(pml2, info.lv2, flags)) != NULL));
-    pml1->page_tables[info.lv1].address = paddr | flags;
+    pml1->page_tables[info.lv1] = vmm_create_entry(paddr + info.page_offset, flags);
 }
 
 void vmm_unmap(struct page_directory *pml4, size_t vaddr, int flags)
@@ -140,7 +151,8 @@ struct pte vmm_create_entry(uint64_t paddr, int flags)
         .ignore = 0,
         .global = 0,
         .avail = 0,
-        .address = paddr >> 12};
+        .address = paddr
+    };
 }
 
 struct pte vmm_purge_entry()

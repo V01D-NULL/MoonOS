@@ -9,7 +9,7 @@ pmm_t pmm;
 void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
 {
     size_t top = 0;
-    //Step 1. Calculate the size of the bitmap 
+    //Step 1. Calculate the size of the bitmap
     for (int i = 0; i < entries; i++)
     {
         if (mmap[i].type != STIVALE2_MMAP_USABLE)
@@ -22,9 +22,9 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
             highest_page = top;
         }
     }
-    
+
     //Used for sanity check
-    pmm.bitmap = (bitmap_size_type*) 0x0;
+    pmm.bitmap = (bitmap_size_type *)0x0;
 
     //Set the size of the bitmap
     //highest_page / PAGE_SIZE = amount of pages in total, and higest_page / PAGE_SIZE / 8 will get the amount of bytes the bitmap will occupy since 1 byte = 8 bits
@@ -32,7 +32,7 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
     pmm.size = bitmap_size_bytes;
 
     debug("no. of pages in total: %d\n", ALIGN_UP(highest_page / PAGE_SIZE));
-    
+
     debug("Bitmap top  address: 0x%lx\n", top);
     debug("bitmap size: 0x%x, %ld\n", bitmap_size_bytes, bitmap_size_bytes);
 
@@ -46,9 +46,9 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
         if (mmap[i].length >= bitmap_size_bytes)
         {
             debug("Found a big enough block of  memory to host the bitmap (size: %ld), bitmap_size_bytes: %ld\n", mmap[i].length, bitmap_size_bytes);
-            
+
             //Set the base of the bitmap (MM_BASE makes sure that the bitmap is within the higher half of the kernel and not at mmap[i].base which would likely be in unmapped memory)
-            pmm.bitmap = (bitmap_size_type*) (mmap[i].base + MM_BASE);
+            pmm.bitmap = (bitmap_size_type *)(mmap[i].base + MM_BASE);
 
             //Create a bitmap
             pmm.bitmap_manager = bitmap_init(pmm.bitmap, bitmap_size_bytes);
@@ -57,12 +57,12 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
             debug("Start of the bitmap: %llx, %d\n", mmap[i].base, mmap[i].base);
 
             // Set each entry to free
-            memset((uint8_t*) pmm.bitmap_manager.pool, 0x0, bitmap_size_bytes);
+            memset((uint8_t *)pmm.bitmap_manager.pool, 0x0, bitmap_size_bytes);
 
             //Resize page
             mmap[i].base += bitmap_size_bytes;
             mmap[i].length -= bitmap_size_bytes;
-            pfa_mark_page_as_used((void*)(mmap[i].base +  mmap[i].length), true);
+            pfa_mark_page_as_used((void *)(mmap[i].base + mmap[i].length), true);
 
             debug("Shrunk mmap entry: %ld\nShrunk mmap base: %ld\n", mmap[i].base, mmap[i].length);
             break;
@@ -70,10 +70,11 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
     }
 
     //Sanity check, if this fails then there isn't enough memory to store the bitmap
-    if (pmm.bitmap == (bitmap_size_type*)0x0) {
-        printk("ERR","Couldn't store bitmap\n");
+    if (pmm.bitmap == (bitmap_size_type *)0x0)
+    {
+        printk("ERR", "Couldn't store bitmap\n");
         for (;;)
-            asm ("hlt");
+            asm("hlt");
     }
 
     //Step 3.
@@ -83,13 +84,13 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
         {
             if (mmap[i].type == STIVALE2_MMAP_KERNEL_AND_MODULES)
             {
-                pfa_mark_page_as_used((void*) ((mmap[i].base + mmap[i].length) / PAGE_SIZE), true);
+                pfa_mark_page_as_used((void *)((mmap[i].base + mmap[i].length) / PAGE_SIZE), true);
                 debug("Reserved kernel and kernel modules\n");
             }
-            pfa_mark_page_as_used((void*) ((mmap[i].base + mmap[i].length) / PAGE_SIZE), true);
+            pfa_mark_page_as_used((void *)((mmap[i].base + mmap[i].length) / PAGE_SIZE), true);
         }
     }
-    debug("Bitmap resides at: 0x%llx\nhighest page: 0x%llx\n", (uint64_t) pmm.bitmap, highest_page);
+    debug("Bitmap resides at: 0x%llx\nhighest page: 0x%llx\n", (uint64_t)pmm.bitmap, highest_page);
 
     printk("pmm", "Initialised pmm\n");
 }
@@ -107,8 +108,10 @@ void *pmm_alloc()
     if (offset == PMM_INVALID)
         return NULL;
 
-    pfa_mark_page_as_used((void*)offset, false);
-    return ((void*) BIT_TO_ADDRESS(offset));
+    pfa_mark_page_as_used((void *)offset, false);
+
+    return ((void *)(BIT_TO_ADDRESS(offset) - VMM_BASE & 0xffffffff));
+    
 }
 
 //TODO: Add a pmm_alloc_pages which allocates n pages (4k in size). This will be a wrapper function for pfa_request_pages()
@@ -137,9 +140,9 @@ int32_t pmm_free(void *page)
     if (int_page > MM_BASE)
     {
         int_page -= MM_BASE;
-        
+
         //Is the page/bit already free?
-        if (pfa_mark_page_as_free((void*) ADDRESS_TO_BIT(int_page),false) == 1)
+        if (pfa_mark_page_as_free((void *)ADDRESS_TO_BIT(int_page), false) == 1)
         {
             debug("pmm_free: Invalid free on bit %d | Reason: Bit is already free\n", ADDRESS_TO_BIT(int_page));
             return PMM_INVALID;

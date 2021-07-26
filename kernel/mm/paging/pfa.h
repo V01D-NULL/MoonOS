@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "../pmm.h"
+#include "../../util/ptr.h"
 #include <liballoc/bitmap.h>
 
 /*

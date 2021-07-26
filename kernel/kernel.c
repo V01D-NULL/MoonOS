@@ -46,16 +46,15 @@
 #include "mm/linear_alloc.h"
 
 void banner();
-void abc(regs_t r)
+void something(regs_t *r)
 {
-    //do stuff
+    printk("isr", "something");
 }
 
 void kmain(boot_info_t *bootvars)
 {
     /* Init the VESA printing routines, font loading, etc */
     // gfx_init(*bootvars, 0x00, 0xf0bacde);
-    // gfx_clear(0xf0bacde);
     gfx_init(*bootvars, 0xffffff, 0x00);
 
     /* Init the CPU hardware struct */
@@ -63,14 +62,8 @@ void kmain(boot_info_t *bootvars)
     banner();
     cpu_info();
 
-    // asm("ud2");
-    // for(;;);
-
     pmm_init(bootvars->mmap.memmap, bootvars->mmap.entries);
     vmm_init();
-
-    // install_isr(100, &abc);
-    // asm("int $100");
 
     volatile uint32_t *ptr = (volatile uint32_t *)0xA00000000;
     uint32_t trigger_page_fault = *ptr; // force page fault by reading location
@@ -80,7 +73,6 @@ void kmain(boot_info_t *bootvars)
         asm("hlt");
     }
 }
-
 const char *p1 = " _  _   __   __    __  ____  __  ____  _  _     __   ____\n";
 const char *p2 = "/ )( \\ / _\\ (  )  (  )(    \\(  )(_  _)( \\/ )   /  \\ / ___)\n";
 const char *p3 = "\\ \\/ //    \\/ (_/\\ )(  ) D ( )(   )(   )  /   (  O )\\___ \\ \n";

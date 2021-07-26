@@ -1,6 +1,7 @@
 %include "asm/defs.inc"
 
 extern isr_handler
+extern idt_set_entry
 
 _asm_isr_handler_stub:
     cld
@@ -10,6 +11,46 @@ _asm_isr_handler_stub:
     popa64
     _cleanup_stack 16  ; Clean up pushed error code and interrupt number from stack
     iretq              ; Pop other flags and return to normal execution State
+
+
+; params: r10 = isr{number} aka `offset`, r11 = index
+zero_user_isr:
+    mov rdx, 0x8E   ; type_attr
+    mov rcx, r10    ; offset
+    mov r8, r11     ; idx
+    call idt_set_entry
+    ret
+
+global load_idt
+load_idt:
+    ; Set isrs 48-255 to dummy entries, otherwise it's just a nasty #GP
+    push rdi
+    mov rdi, 0x08 ; Selector
+    mov rsi, 0x0  ; ist
+    %assign i 48
+    %rep 208
+    mov r10, isr%+i
+    mov r11, i
+    call zero_user_isr
+    %assign i i+1
+    %endrep
+    pop rdi
+
+    lidt [rdi]
+
+    ; Reload cs and ds
+    push 0x08
+    push .reload
+    retfq
+    .reload:
+       mov ax, 0x10
+       mov ds, ax
+       mov fs, ax
+       mov gs, ax
+       mov ss, ax
+       mov es, ax
+       sti
+       ret
 
 %macro isr 1
 global isr%1
@@ -27,33 +68,13 @@ isr_err%1:
     jmp _asm_isr_handler_stub
 %endmacro
 
-global load_idt
-load_idt:
-    lidt [rdi]
-
-    ; Reload cs and ds
-    push 0x08
-    push .reload
-    retfq
-    .reload:
-       mov ax, 0x10
-       mov ds, ax
-       mov fs, ax
-       mov gs, ax
-       mov ss, ax
-       mov es, ax
-       sti
-       ret
-
 ; CPU exceptions
-isr 0
-isr 1
-isr 2
-isr 3
-isr 4
-isr 5
-isr 6
-isr 7
+%assign n 0
+%rep 8
+    isr n
+%assign n n+1
+%endrep
+
 isr_err 8
 isr 9
 isr_err 10
@@ -61,38 +82,23 @@ isr_err 11
 isr_err 12
 isr_err 13
 isr_err 14
-isr 15
-isr 16
-isr 17
-isr 18
-isr 19
-isr 20
-isr 21
-isr 22
-isr 23
-isr 24
-isr 25
-isr 26
-isr 27
-isr 28
-isr 29
-isr 30
-isr 31
+
+%assign n 15
+%rep 17
+    isr n
+%assign n n+1
+%endrep
 
 ; IRQ's
-isr 32
-isr 33
-isr 34
-isr 35
-isr 36
-isr 37
-isr 38
-isr 39
-isr 40
-isr 41
-isr 42
-isr 43
-isr 44
-isr 45
-isr 46
-isr 47
+%assign n 32
+%rep 16
+    isr n
+%assign n n+1
+%endrep
+
+; User defined isrs
+%assign n 48
+%rep 208
+    isr n
+%assign n n+1
+%endrep

@@ -3,7 +3,9 @@
 #include "../drivers/gfx/gfx.h"
 #include "../drivers/io/serial.h"
 #include "../mm/paging/CR.h"
+#include "../mm/vmm.h"
 #include "../amd64/bytes.h"
+#include "../util/ptr.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -48,11 +50,12 @@ void isr_handler(regs_t regs)
     if (regs.isr_number < 32)
     {
         serial_set_color(BASH_RED);
-        printk("INTR", "%s (err_code %ld)\n", exception_messages[regs.isr_number], regs.error_code);
+        printk("INT", "%s (err_code %ld)\n", exception_messages[regs.isr_number], regs.error_code);
 
         if (regs.isr_number == 14)
         {
-            printk("INTR ~ #PF", "Faulting address: 0x%lx\n", cr_read(CR2));
+            printk("INT ~ #PF", "Faulting address: 0x%lx\n", cr_read(CR2));
+            // vmm_map(get_pml4(), cr_read(CR2), cr_read(CR2), 0x3);
         }
         else if (regs.isr_number == 6)
         {
@@ -95,31 +98,22 @@ void isr_handler(regs_t regs)
                 asm("hlt");
         }
     }
+
+    TRY_EXEC_HANDLER(regs.isr_number);
+
     //Signal EOI
     outb(0xA0, 0x20);
     outb(0x20, 0x20);
 
-    // printk("INT", "isr_handler_array[%d] = %d\n", regs.isr_number, isr_handler_array[regs.isr_number]);
-    if (isr_handler_array[regs.isr_number] != 0)
-    {
-        isr_handler_array[regs.isr_number]((regs_t *)&regs);
-    }
-    //Ignore CPU exceptions and IRQ's, because the first will never be unhandled, and the second option will be utterly useless spam to the serial device
-    else if (regs.isr_number > 47)
-    {
-        debug("Unhandled interrupt %x (%ld)\n", regs.isr_number, regs.isr_number);
-    }
 }
 
 void install_isr(uint8_t base, isr_t handler)
 {
     if (isr_handler_array[base] == 0)
+    {
         isr_handler_array[base] = handler;
+        idt_set_entry(0x08, 0, 0x8E, GENERIC_CAST(uint64_t, isr_handler_array[base]), base);
+    }
     else
-        printk("INTR", "The interrupt ( %d ) has already been registered!\n", base);
-}
-
-void uninstall_isr(uint8_t base)
-{
-    isr_handler_array[base] = 0;
+        printk("INT", "The interrupt ( %d ) has already been registered!\n", base);
 }

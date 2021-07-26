@@ -6,7 +6,7 @@ LD = @$(ARCH)-ld
 AS = @nasm
 
 EMU = qemu-system-x86_64
-EMU_OPTS = -m 2G -serial mon:stdio -hda $(KERNEL_HDD) -D log.txt -d int -no-reboot -no-shutdown # -monitor stdio 
+EMU_OPTS = -m 2G -hda $(KERNEL_HDD) -D log.txt -d int -no-reboot -no-shutdown -serial stdio
 EMU_DEBUG_OPTS = $(EMU_OPTS) -S -s --no-reboot
 
 CFILES	 := $(shell find ./ -type f -name '*.c')

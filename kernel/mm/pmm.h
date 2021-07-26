@@ -15,6 +15,8 @@
 #define ALIGN_UP(__number) (((__number) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 #define ALIGN_DOWN(__number) ((__number) & ~(PAGE_SIZE - 1))
 #define PMM_ABS_ADDRESS(address) ((0xffffffffUL << 32) | address)
+                 
+#define VMM_BASE 0xffff80000000000
 
 IMPORT_LDDEF(__offset__);
 #define MM_BASE (uintptr_t)__offset__

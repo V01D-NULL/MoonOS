@@ -15,7 +15,7 @@
 #define PAGE_NOT_PRESENT 0x0
 
 #define TLB_FLUSH(param_addr) asm volatile("invlpg (%[addr])" ::[addr] "r"(param_addr));
-#define PAGE_LOAD_CR3(pml4)   asm volatile("mov %0, %%cr3\n" ::"r"(pml4) : "memory");
+#define PAGE_LOAD_CR3(pml4)   asm volatile("mov %0, %%cr3\n" ::"a"(pml4) : "memory");
 
 struct pte
 {
@@ -35,7 +35,7 @@ struct pte
 
 __page_align struct page_directory
 {
-    struct pte page_tables[512];
+    struct pte page_tables[512] __page_align;
 };
 
 /* A 4 level paging struct which holds info about the levels and page offset */
@@ -57,5 +57,7 @@ struct pte vmm_create_entry(uint64_t paddr, int flags);
 struct pte vmm_purge_entry();
 
 page_info_t vmm_dissect_vaddr(uint64_t virt_addr);
+
+struct page_directory *get_pml4();
 
 #endif // VMM_H

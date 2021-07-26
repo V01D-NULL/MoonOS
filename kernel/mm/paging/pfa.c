@@ -56,7 +56,7 @@ int pfa_mark_page_as_used(void *address, bool calculate_absolute_address)
             return PFA_ERR;
 
         size_t addr = BIT_TO_ADDRESS(idx);
-        debug("pfa_reserve_ok for address 0x%llx w/ bit index %ld\n", addr, idx);
+        // debug("pfa_reserve_ok for address 0x%llx w/ bit index %ld\n", addr, idx);
         
         /* Set bit in bitmap aka reserve a page */
         pmm.bitmap_manager.set(pmm.bitmap_manager.pool, idx);
@@ -69,7 +69,7 @@ int pfa_mark_page_as_used(void *address, bool calculate_absolute_address)
         if (pmm.bitmap_manager.get(pmm.bitmap_manager.pool, idx) == BITMAP_USED)
             return PFA_ERR;
 
-        debug("pfa_reserve_ok for bit index %ld\n", idx);
+        // debug("pfa_reserve_ok for bit index %ld\n", idx);
 
         /* Set bit in bitmap aka reserve a page */
         pmm.bitmap_manager.set(pmm.bitmap_manager.pool, idx);

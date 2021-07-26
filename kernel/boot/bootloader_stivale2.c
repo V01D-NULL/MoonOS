@@ -87,9 +87,6 @@ void kinit(struct stivale2_struct *bootloader_info) {
 
     serial_set_color(BASH_WHITE);
     
-    init_gdt();
-    init_idt();
-
     #ifdef USE_VGA
     vga_init(0xff, 0x0);
     #endif
