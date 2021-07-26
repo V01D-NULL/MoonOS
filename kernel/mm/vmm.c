@@ -15,7 +15,6 @@ static uint64_t lv4_pg;
 static struct page_directory *vmm_get_pml(
     struct page_directory *entry,
     size_t level, int flags);
-static inline void invl_pml4();
 static uint64_t vmm_get_lv4();
 
 struct page_directory *get_pml4()
@@ -29,7 +28,9 @@ void vmm_init()
 
     printk("vmm", "pml4 resides at 0x%x\n", vmm_pml4);
     
-    vmm_map(vmm_pml4, 0xa0000000, 0xa0000000, FLAGS_PRIV | FLAGS_RW);
+    for (int i = MM_BASE; i < MM_BASE + (PAGE_SIZE * 4); i += PAGE_SIZE) {
+        vmm_map(vmm_pml4, i, i, FLAGS_PRIV | FLAGS_RW | FLAGS_PRIV);
+    }
 
     debug("Old PML4: %llx\n", cr_read(CR3)); // Bootloader pml4
     PAGE_LOAD_CR3(GENERIC_CAST(uint64_t*, vmm_pml4));
@@ -151,7 +152,7 @@ struct pte vmm_create_entry(uint64_t paddr, int flags)
         .ignore = 0,
         .global = 0,
         .avail = 0,
-        .address = paddr
+        .address = paddr >> 12
     };
 }
 
@@ -162,10 +163,3 @@ struct pte vmm_purge_entry()
     return purged_entry;
 }
 
-static inline void invl_pml4()
-{
-    for (int i = 0; i < PAGE_SIZE; i++)
-    {
-        *GENERIC_CAST(uint8_t *, vmm_pml4) = 0x0;
-    }
-}
