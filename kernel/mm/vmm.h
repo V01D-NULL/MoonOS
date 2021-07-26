@@ -15,7 +15,7 @@
 #define PAGE_NOT_PRESENT 0x0
 
 #define TLB_FLUSH(param_addr) asm volatile("invlpg (%[addr])" ::[addr] "r"(param_addr));
-#define PAGE_LOAD_CR3(pml4)   asm volatile("mov %0, %%cr3\n" ::"a"(pml4) : "memory");
+#define PAGE_LOAD_CR3(pml4)   asm volatile("mov %0, %%cr3\n" ::"r"(pml4) : "memory");
 
 struct pte
 {
@@ -29,8 +29,7 @@ struct pte
     uint8_t ignore : 1;
     uint8_t global : 1;
     uint8_t avail : 3;
-    uint64_t address : 48;
-    uint8_t padding : 4; //Ignore
+    uint64_t address : 52;
 } __pack_bytes;
 
 __page_align struct page_directory

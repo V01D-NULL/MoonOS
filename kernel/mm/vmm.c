@@ -24,46 +24,29 @@ struct page_directory *get_pml4()
 
 void vmm_init()
 {
-    assert((vmm_pml4 = pmm_alloc()) != NULL);
-
-    printk("vmm", "pml4 resides at 0x%x\n", vmm_pml4);
-    
-    for (int i = MM_BASE; i < MM_BASE + (PAGE_SIZE * 4); i += PAGE_SIZE) {
-        vmm_map(vmm_pml4, i, i, FLAGS_PRIV | FLAGS_RW | FLAGS_PRIV);
-    }
-
-    debug("Old PML4: %llx\n", cr_read(CR3)); // Bootloader pml4
-    PAGE_LOAD_CR3(GENERIC_CAST(uint64_t*, vmm_pml4));
-    
     init_gdt();
     init_idt();
 
-    lv4_pg = cr_read(CR3); // Kernel pml4
-    debug("New PML4: %llx\n", lv4_pg);
+    assert((vmm_pml4 = pmm_alloc()) != NULL);
+
+    printk("vmm", "pml4 resides at 0x%x\n", vmm_pml4);
+
+    // My impl for page mapping
+    for (uint64_t i = MM_BASE; i < MM_BASE + (PAGE_SIZE * 4); i += PAGE_SIZE) {
+        vmm_map(vmm_pml4, i, i, 0x7);
+    }
+
+    // Pasted from limine for testing as a sanity check- Doesn't work, the hunt for bugs continues
+    // for (uint64_t i = 0; i < 0x80000000; i += 0x200000) {
+    //     vmm_map(vmm_pml4, 0xffffffff80000000 + i, i, 0x03);
+    // }
+
+    debug("Old PML4: %llx\n", cr_read(CR3)); // Bootloader pml4
+    PAGE_LOAD_CR3(GENERIC_CAST(uint64_t, vmm_pml4));
+
+    debug("New PML4: %llx\n", cr_read(CR3)); // Kernel pml4
 
     printk("vmm", "Initialised vmm\n");
-}
-
-page_info_t vmm_dissect_vaddr(uint64_t virt_addr)
-{
-    page_info_t pg_info;
-    const int bitmask = 0x1FF;
-
-    pg_info.page_offset = virt_addr & 0xfff;
-    virt_addr >>= 12;
-
-    pg_info.lv1 = virt_addr & bitmask;
-    virt_addr >>= 9;
-
-    pg_info.lv2 = virt_addr & bitmask;
-    virt_addr >>= 9;
-
-    pg_info.lv3 = virt_addr & bitmask;
-    virt_addr >>= 9;
-
-    pg_info.lv4 = virt_addr & bitmask;
-
-    return pg_info;
 }
 
 //Return the address of the level4 page table
@@ -163,3 +146,66 @@ struct pte vmm_purge_entry()
     return purged_entry;
 }
 
+page_info_t vmm_dissect_vaddr(uint64_t virt_addr)
+{
+    page_info_t pg_info;
+    const int bitmask = 0x1FF;
+
+    pg_info.page_offset = virt_addr & 0xfff;
+    virt_addr >>= 12;
+
+    pg_info.lv1 = virt_addr & bitmask;
+    virt_addr >>= 9;
+
+    pg_info.lv2 = virt_addr & bitmask;
+    virt_addr >>= 9;
+
+    pg_info.lv3 = virt_addr & bitmask;
+    virt_addr >>= 9;
+
+    pg_info.lv4 = virt_addr & bitmask;
+
+    return pg_info;
+}
+
+// static uint64_t *pml4 = 0;
+
+// void vmm_init()
+// {
+//     // pml4 = cr_read(CR3);
+//     init_gdt();
+//     init_idt();
+
+//     pml4 = pmm_alloc();
+//     debug("%llx\n", pml4);
+//     vmm_map(0xA00000000, 0xA00000000, 0x3);
+//     PAGE_LOAD_CR3(pml4);
+// }
+
+// uint64_t *get(uint64_t *pml, uint64_t idx)
+// {
+//     if (pml[idx] & 1)
+//     {
+//         return (uint64_t *)(size_t)(pml[idx] & ~((uint64_t)0xfff));
+//     }
+//     else
+//     {
+//         uint64_t *addr = pmm_alloc();
+//         pml[idx] = (size_t)addr | 0b111;
+//         return addr;
+//     }
+// }
+
+// void vmm_map(uint64_t vaddr, uint64_t paddr, int flags)
+// {
+//     page_info_t info = vmm_dissect_vaddr(vaddr);
+//     uint64_t *pml3, *pml2, *pml1 = NULL;
+//     pml3 = get(pml4, info.lv4);
+//     pml2 = get(pml3, info.lv3);
+//     pml1 = get(pml2, info.lv2);
+//     pml1[info.lv1] = paddr + info.page_offset | flags;
+//     debug("pml4 - 0x%llx\n", pml4);
+//     debug("pml3 - 0x%llx\n", pml3);
+//     debug("pml2 - 0x%llx\n", pml2);
+//     debug("pml1 - 0x%llx\n", pml1);
+// }
