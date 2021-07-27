@@ -110,7 +110,12 @@ void *pmm_alloc()
 
     pfa_mark_page_as_used((void *)offset, false);
 
-    return ((void *)(BIT_TO_ADDRESS(offset) - VMM_BASE >> 12 & 0xffffffff));
+    void *aligned_address = VAR_TO_VOID_PTR(
+        uint64_t,
+        ALIGN_UP((BIT_TO_ADDRESS(offset) - VMM_BASE >> 12 & 0xffffffff))
+    ); __page_align;
+    
+    return aligned_address;
 }
 
 //TODO: Add a pmm_alloc_pages which allocates n pages (4k in size). This will be a wrapper function for pfa_request_pages()
