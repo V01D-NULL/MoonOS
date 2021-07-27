@@ -29,7 +29,9 @@ void vmm_init()
 
     assert((vmm_pml4 = pmm_alloc()) != NULL);
 
-    printk("vmm", "pml4 resides at 0x%x\n", vmm_pml4);
+    printk("vmm", "pml4 resides at 0x%llx\n", vmm_pml4);
+
+
 
     // My impl for page mapping
     for (uint64_t i = MM_BASE; i < MM_BASE + (PAGE_SIZE * 4); i += PAGE_SIZE) {
@@ -57,8 +59,10 @@ static uint64_t vmm_get_lv4()
 
 static struct page_directory *vmm_get_pml(struct page_directory *entry, size_t level, int flags)
 {
+    debug("ok\n");
     if (entry->page_tables->present)
     {
+        debug("present\n");
         entry->page_tables[level].readwrite = (flags & FLAGS_RW) ? 1 : 0;
         entry->page_tables[level].supervisor = (flags & FLAGS_PRIV) ? 1 : 0;
         entry->page_tables[level].writethrough = (flags & FLAGS_WT) ? 1 : 0;
@@ -66,7 +70,9 @@ static struct page_directory *vmm_get_pml(struct page_directory *entry, size_t l
     }
     else
     {
+        debug("try alloc\n");
         uint64_t addr = VOID_PTR_TO_64(pmm_alloc());
+        debug("ok alloc\n");
         entry->page_tables[level] = vmm_create_entry(addr, flags);
         return entry;
     }
@@ -167,45 +173,3 @@ page_info_t vmm_dissect_vaddr(uint64_t virt_addr)
 
     return pg_info;
 }
-
-// static uint64_t *pml4 = 0;
-
-// void vmm_init()
-// {
-//     // pml4 = cr_read(CR3);
-//     init_gdt();
-//     init_idt();
-
-//     pml4 = pmm_alloc();
-//     debug("%llx\n", pml4);
-//     vmm_map(0xA00000000, 0xA00000000, 0x3);
-//     PAGE_LOAD_CR3(pml4);
-// }
-
-// uint64_t *get(uint64_t *pml, uint64_t idx)
-// {
-//     if (pml[idx] & 1)
-//     {
-//         return (uint64_t *)(size_t)(pml[idx] & ~((uint64_t)0xfff));
-//     }
-//     else
-//     {
-//         uint64_t *addr = pmm_alloc();
-//         pml[idx] = (size_t)addr | 0b111;
-//         return addr;
-//     }
-// }
-
-// void vmm_map(uint64_t vaddr, uint64_t paddr, int flags)
-// {
-//     page_info_t info = vmm_dissect_vaddr(vaddr);
-//     uint64_t *pml3, *pml2, *pml1 = NULL;
-//     pml3 = get(pml4, info.lv4);
-//     pml2 = get(pml3, info.lv3);
-//     pml1 = get(pml2, info.lv2);
-//     pml1[info.lv1] = paddr + info.page_offset | flags;
-//     debug("pml4 - 0x%llx\n", pml4);
-//     debug("pml3 - 0x%llx\n", pml3);
-//     debug("pml2 - 0x%llx\n", pml2);
-//     debug("pml1 - 0x%llx\n", pml1);
-// }
