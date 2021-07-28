@@ -26,12 +26,24 @@ int32_t pmm_free(void *page);
 int32_t find_first_free_block();
 void pmm_alloc_pages(uint64_t n);
 
-typedef struct pmm
+typedef struct
 {
     liballoc_bitmap_t bitmap_manager;
     bitmap_size_type *bitmap; //Bitmap buffer / bitmap arena
     size_t size;
     bool is_bitmap_hosted; //If all attempts to host the bitmap fail this boolean will kick in and kernel panic
 } pmm_t;
+
+typedef struct
+{
+    /* Used to parse the memory map */
+    long entries;
+    struct stivale2_mmap_entry *map;
+    uint64_t base;
+    uint64_t length;
+
+    uint64_t abs_top; // The highest address specified in the mmap
+    uint64_t abs_base; // The lowest address specified in the mmap
+} mmap_t;
 
 #endif // BITMAP_PMM_H

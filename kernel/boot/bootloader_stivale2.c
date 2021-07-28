@@ -130,7 +130,6 @@ void kinit(struct stivale2_struct *bootloader_info) {
             if (internal_mmap->type == STIVALE2_MMAP_USABLE) //|| internal_mmap->type == STIVALE2_MMAP_ACPI_RECLAIMABLE || internal_mmap->type == STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE)
             {
                 bootvars.mmap.free_ram += internal_mmap->length;
-                debug(true, "entry: 0x%llx | length: 0x%llx\n", internal_mmap->base, internal_mmap->length);
             }
             else {
                 bootvars.mmap.used_ram += internal_mmap->length;

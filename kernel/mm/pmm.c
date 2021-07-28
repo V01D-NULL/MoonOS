@@ -6,17 +6,87 @@
 
 size_t highest_page;
 pmm_t pmm;
+mmap_t phys_mmap;
+
+bool in_range(void *_address)
+{
+    uint64_t address = GENERIC_CAST(uint64_t, _address);
+
+    if (address >= phys_mmap.abs_base && address <= phys_mmap.abs_top)
+        return true;
+        
+    return false;
+}
+
+const char *get_mmap_type(int entry);
+void dump_mmap()
+{
+    debug(true, "Full mmap dump:\n");
+    for (int i = 0; i < phys_mmap.entries; i++)
+    {
+        debug(true, "0x%llx - 0%llx [%d - %s]\n", 
+            phys_mmap.map[i].base,
+            phys_mmap.map[i].base + phys_mmap.map[i].length - 1,
+            phys_mmap.map[i].type,
+            get_mmap_type(
+                phys_mmap.map[i].type
+            )
+        );
+    }
+    debug(false, "\n");
+}
+
+const char *get_mmap_type(int entry)
+{
+    printk("pmm", "got entry: %d\n", entry);
+    switch (entry)
+    {
+        case STIVALE2_MMAP_USABLE:
+            return "Stivale2 mmap usable";
+
+        case STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE:
+            return "Stivale2 bootloader reclaimable";
+
+        case STIVALE2_MMAP_RESERVED:
+            return "Stivale2 mmap reserved";
+
+        case STIVALE2_MMAP_KERNEL_AND_MODULES:
+            return "Stivale2 mmap kernel and modules";
+
+        case STIVALE2_MMAP_ACPI_RECLAIMABLE:
+            return "Stivale2 mmap acpi reclaimable";
+
+        case STIVALE2_MMAP_BAD_MEMORY:
+            return "Stivale2 mmap bad memory";
+
+        default:
+            return "???";
+        
+    }
+}
 
 void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
 {
-    debug(true, "Memory map:\n");
+    phys_mmap.entries = entries;
+    phys_mmap.map = mmap;
+
+    phys_mmap.abs_base = mmap[0].base;
+    
     size_t top = 0;
+    bool abs_base_set = false;
+
     //Step 1. Calculate the size of the bitmap
     for (int i = 0; i < entries; i++)
     {
         if (mmap[i].type != STIVALE2_MMAP_USABLE)
             continue;
 
+        if (!abs_base_set) {
+            phys_mmap.abs_base = mmap[i].base;
+            abs_base_set = true;
+        }
+
+        //This isn't really efficient, but I can't be bothered.
         top = mmap[i].base + mmap[i].length;
 
         if (top > highest_page)
@@ -24,11 +94,14 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
             highest_page = top;
         }
 
-        debug(true, "Base at 0x%llx | Top: 0x%llx\n", mmap[i].base, mmap[i].base + mmap[i].length - 1);
+        // debug(true, "0x%llx - 0x%llx\n", mmap[i].base + VMM_BASE, (mmap[i].base + mmap[i].length - 1) + VMM_BASE);
+        phys_mmap.abs_top = (mmap[i].base + mmap[i].length - 1) + VMM_BASE;
     }
+    
+    dump_mmap();
 
     //Used for sanity check
-    pmm.bitmap = (bitmap_size_type *)0x0;
+    pmm.bitmap = GENERIC_CAST(bitmap_size_type *, 0x0);
 
     //Set the size of the bitmap
     //highest_page / PAGE_SIZE = amount of pages in total, and higest_page / PAGE_SIZE / 8 will get the amount of bytes the bitmap will occupy since 1 byte = 8 bits
@@ -94,6 +167,7 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
             pfa_mark_page_as_used((void *)((mmap[i].base + mmap[i].length) / PAGE_SIZE), true);
         }
     }
+
     printk("pmm", "Initialised pmm\n");
 }
 
@@ -110,14 +184,24 @@ void *pmm_alloc()
     if (offset == PMM_INVALID)
         return NULL;
 
-    pfa_mark_page_as_used((void *)offset, false);
-
     void *aligned_address = VAR_TO_VOID_PTR(
         uint64_t,
-        ALIGN_UP(BIT_TO_ADDRESS(offset))
-    ); __page_align;
+        ALIGN_UP(BIT_TO_ADDRESS(offset) + phys_mmap.abs_base)
+    );
     
+    if (!in_range(aligned_address))
+    {
+        debug(true, "Physical address 0x%llx is out of bounds! Memory map spans from 0x%llx - 0x%llx\n",
+            GENERIC_CAST(size_t, aligned_address),
+            phys_mmap.abs_base,
+            phys_mmap.abs_top
+        );
+        return NULL;
+    }
+    
+    pfa_mark_page_as_used((void *)offset, false);
     return aligned_address;
+
 }
 
 //TODO: Add a pmm_alloc_pages which allocates n pages (4k in size). This will be a wrapper function for pfa_request_pages()

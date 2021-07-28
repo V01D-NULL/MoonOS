@@ -45,21 +45,21 @@ void vmm_init()
     // }
 
     
-    // for (uint64_t i = MM_BASE; i < MM_BASE + 0x100000000; i += PAGE_SIZE)
-    // {
-    //     vmm_map(vmm_pml4, i, i, 0x3);
-    // }
+    for (uint64_t i = MM_BASE; i < MM_BASE + 0x100000000; i += PAGE_SIZE)
+    {
+        vmm_map(vmm_pml4, i, i, 0x3);
+    }
 
-    // for (uintptr_t i = 0; i < 0x100000000; i += PAGE_SIZE)
-    // {
-    //     vmm_map(vmm_pml4, i, i, 0x3);
-    //     vmm_map(vmm_pml4, i, i + VMM_BASE, 0x3);
-    // }
+    for (uintptr_t i = 0; i < 0x100000000; i += PAGE_SIZE)
+    {
+        vmm_map(vmm_pml4, i, i, 0x3);
+        vmm_map(vmm_pml4, i, i + VMM_BASE, 0x3);
+    }
 
-    // for (uintptr_t i = 0; i < 0x80000000; i += PAGE_SIZE)
-    // {
-    //     vmm_map(vmm_pml4, i, i + MM_BASE, 0x3);
-    // }
+    for (uintptr_t i = 0; i < 0x80000000; i += PAGE_SIZE)
+    {
+        vmm_map(vmm_pml4, i, i + MM_BASE, 0x3);
+    }
 
     debug(true, "Old PML4: %llx\n", cr_read(CR3)); // Bootloader pml4
     PAGE_LOAD_CR3(GENERIC_CAST(uint64_t, vmm_pml4) - VMM_BASE);

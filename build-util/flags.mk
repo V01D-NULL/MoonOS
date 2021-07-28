@@ -6,7 +6,7 @@ LD = @$(ARCH)-ld
 AS = @nasm
 
 EMU = qemu-system-x86_64
-EMU_OPTS = -m 2G -hda $(KERNEL_HDD) -D log.txt -d int -no-reboot -no-shutdown -serial stdio
+EMU_OPTS = -m 256M -hda $(KERNEL_HDD) -D log.txt -d int -no-reboot -no-shutdown -serial stdio
 EMU_DEBUG_OPTS = $(EMU_OPTS) -S -s --no-reboot
 
 CFILES	 := $(shell find ./ -type f -name '*.c')
@@ -23,6 +23,7 @@ ISO_NAME	  = ValidityOS.iso
 
 # XORRISO  = @xorriso
 # ISO_OPTS = SIGQUIT
+
 
 KLIBS 	 := ../libs
 FONT 	 := font/console.sfn
