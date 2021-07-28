@@ -18,7 +18,7 @@ int pfa_mark_page_as_free(void *address, bool calculate_absolute_address)
             return PFA_ERR;
 
         size_t addr = BIT_TO_ADDRESS(idx);
-        debug("pfa_free_ok for address 0x%llx w/ bit index %ld\n", (uintptr_t)addr, idx);
+        // debug("pfa_free_ok for address 0x%llx w/ bit index %ld\n", (uintptr_t)addr, idx);
         
         /* Clear bit in bitmap aka free a page */
         pmm.bitmap_manager.clear(pmm.bitmap_manager.pool, idx);
@@ -31,7 +31,7 @@ int pfa_mark_page_as_free(void *address, bool calculate_absolute_address)
         if (pmm.bitmap_manager.get(pmm.bitmap_manager.pool, idx) == BITMAP_FREE)
             return PFA_ERR;
 
-        debug("pfa_free_ok for bit index %ld\n", idx);
+        // debug("pfa_free_ok for bit index %ld\n", idx);
 
         /* Clear bit in bitmap aka free a page */
         pmm.bitmap_manager.clear(pmm.bitmap_manager.pool, idx);

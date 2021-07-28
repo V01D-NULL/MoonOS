@@ -63,9 +63,9 @@ void isr_handler(regs_t regs)
             printk("INT", "Opcode: %x\n", byte_order_reverse_char8(regs.rip & 0xff));
         }
 
-        debug("INT#%d - %s (err_code %ld)\n", regs.isr_number, exception_messages[regs.isr_number], regs.error_code);
+        debug(true, "INT#%d - %s (err_code %ld)\n", regs.isr_number, exception_messages[regs.isr_number], regs.error_code);
         serial_set_color(BASH_WHITE);
-        debug("Register dump:\n"
+        debug(false, "Register dump:\n"
               "rax 0x%x, rbx 0x%x, rcx 0x%x, rdx    0x%x\n"
               "rbp 0x%x, rsp 0x%x, rdi 0x%x, rsi    0x%x\n"
               "rip 0x%x, cs  0x%x, ss  0x%x, rflags 0x%x\n"

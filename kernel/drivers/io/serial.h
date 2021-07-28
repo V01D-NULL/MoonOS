@@ -33,7 +33,10 @@ char serial_read();
 void serial_write_str(const char* str);
 void serial_set_color(const char* color_code);
 
+#define debug(log_verbose, ...) if (log_verbose) impl_verbose_debug(__FILE__, __LINE__, __VA_ARGS__); else impl_quiet_debug(__VA_ARGS__);
+
 /// Output a formatted string to the serial port
-int debug(char* fmt, ...);
+void impl_verbose_debug(char *file, int line, char* fmt, ...);
+void impl_quiet_debug(char *fmt, ...);
 
 #endif

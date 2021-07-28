@@ -49,9 +49,9 @@ void bitmap_log_all_bits(liballoc_bitmap_t bitmap)
 {
     for (int i = 0; i < bitmap.size; i++)
     {
-        debug("%ld", bitmap.get(bitmap.pool, i));
+        // debug("%ld", bitmap.get(bitmap.pool, i));
     }
-    debug("\n");
+    // debug("\n");
 }
 
 /**

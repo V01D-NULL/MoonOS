@@ -13,5 +13,5 @@ void x86_cpuid_vendor_string(const char *rax, const char *rbx, const char *rcx)
     cpu_hardware.vendor_string = final_string;
 
     printk("cpuid", "CPU Vendor: %s\n", final_string);
-    debug("===========================================\nVendor string: %s\n===========================================\n", final_string);
+    debug(false, "===========================================\nVendor string: %s\n===========================================\n", final_string);
 }

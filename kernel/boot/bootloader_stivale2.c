@@ -95,6 +95,7 @@ void kinit(struct stivale2_struct *bootloader_info) {
     struct stivale2_struct_tag_smp *smp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_SMP_ID);
     struct stivale2_struct_tag_memmap *mmap = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
     
+
     if (fb != NULL) {
         bootvars.vesa.fb_addr = fb->framebuffer_addr;
         bootvars.vesa.fb_width = fb->framebuffer_width;
@@ -120,6 +121,7 @@ void kinit(struct stivale2_struct *bootloader_info) {
         
         for (int i = 0; i < mmap->entries; i++)
         {
+            
             bootvars.mmap.memmap[i] = mmap->memmap[i];
             struct stivale2_mmap_entry *internal_mmap = &mmap->memmap[i];
             
@@ -128,6 +130,7 @@ void kinit(struct stivale2_struct *bootloader_info) {
             if (internal_mmap->type == STIVALE2_MMAP_USABLE) //|| internal_mmap->type == STIVALE2_MMAP_ACPI_RECLAIMABLE || internal_mmap->type == STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE)
             {
                 bootvars.mmap.free_ram += internal_mmap->length;
+                debug(true, "entry: 0x%llx | length: 0x%llx\n", internal_mmap->base, internal_mmap->length);
             }
             else {
                 bootvars.mmap.used_ram += internal_mmap->length;
@@ -136,17 +139,17 @@ void kinit(struct stivale2_struct *bootloader_info) {
     }
 
     //It's ugly code but pretty output :)
-    debug("Total RAM: ");
+    debug(false, "Total RAM: ");
     serial_set_color(BASH_CYAN);
-    debug("%ld kb\n", bootvars.mmap.total_ram);
+    debug(false, "%ld kb\n", bootvars.mmap.total_ram);
     serial_set_color(BASH_WHITE);
-    debug("Free  RAM: ");
+    debug(false, "Free  RAM: ");
     serial_set_color(BASH_CYAN);
-    debug("%ld kb\n", bootvars.mmap.free_ram);
+    debug(false, "%ld kb\n", bootvars.mmap.free_ram);
     serial_set_color(BASH_WHITE);
-    debug("Used  RAM: ");
+    debug(false, "Used  RAM: ");
     serial_set_color(BASH_CYAN);
-    debug("%ld kb\n", bootvars.mmap.used_ram);
+    debug(false, "%ld kb\n", bootvars.mmap.used_ram);
     serial_set_color(BASH_WHITE);
     
     ram_manager_init(&bootvars);

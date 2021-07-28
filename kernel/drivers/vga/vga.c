@@ -29,7 +29,7 @@ void set_color(const int BGCOLOR, const int FGCOLOR) {
 }
 
 void set_scroll_speed(uint32_t speed) {
-	debug("Set scroll speed from %d to %d\n", vga.text_scroll_speed, speed);
+	debug(true, "Set scroll speed from %d to %d\n", vga.text_scroll_speed, speed);
 	vga.text_scroll_speed = speed;
 }
 

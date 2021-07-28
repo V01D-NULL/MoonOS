@@ -46,10 +46,6 @@
 #include "mm/linear_alloc.h"
 
 void banner();
-void something(regs_t *r)
-{
-    printk("isr", "something");
-}
 
 void kmain(boot_info_t *bootvars)
 {
@@ -84,7 +80,7 @@ void banner()
     putc(0x24b8, -1, -1);
     putc('\n', -1, -1);
 
-    debug("%s%s%s%s", p1, p2, p3, p4);
+    debug(false, "%s%s%s%s", p1, p2, p3, p4);
 
     gfx_set_colors(0xffffff, 0x0);
     printk("Banner", "\n%s%s%s%s", p1, p2, p3, p4);
