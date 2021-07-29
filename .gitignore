@@ -2,6 +2,7 @@
 *.a
 *.o
 *.elf
+*.map
 ValidityOS.hdd
 ValidityOS.iso
 

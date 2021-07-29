@@ -6,7 +6,8 @@ LD = @$(ARCH)-ld
 AS = @nasm
 
 EMU = qemu-system-x86_64
-EMU_OPTS = -m 256M -hda $(KERNEL_HDD) -D log.txt -d int -no-reboot -no-shutdown -serial stdio
+EMU_OPTS = -m 256M -cdrom $(ISO_NAME) -D log.txt -d int -no-reboot -no-shutdown -serial stdio
+EMU_OPTS_KVM = -M q35 -cpu host -m 256M -enable-kvm -serial stdio -no-reboot -no-shutdown -cdrom $(ISO_NAME) -d guest_errors
 EMU_DEBUG_OPTS = $(EMU_OPTS) -S -s --no-reboot
 
 CFILES	 := $(shell find ./ -type f -name '*.c')
@@ -15,15 +16,7 @@ OBJ_C    := $(CFILES:.c=.o)
 OBJ_ASM  := $(ASMFILES:.s=.o)
 OBJ		 := $(OBJ_C) $(OBJ_ASM)
 
-# ISO Creation
-
-LIMINE_CD_BIN = iso/  # Path/to/limine-cd.bin
-# ISO_ROOT_DIR  = iso/
 ISO_NAME	  = ValidityOS.iso 
-
-# XORRISO  = @xorriso
-# ISO_OPTS = SIGQUIT
-
 
 KLIBS 	 := ../libs
 FONT 	 := font/console.sfn
@@ -49,7 +42,8 @@ CFLAGS := 				 \
 	# -DUSE_VGA
 
 ASMFLAGS = -felf64 -g -F dwarf
-LDINTERNALFLAGS := \
-	-Tlinker.ld    \
-	-static        \
+LDINTERNALFLAGS :=  \
+	-Map kernel.map \
+	-Tlinker.ld     \
+	-static         \
 	-nostdlib      

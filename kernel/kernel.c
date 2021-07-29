@@ -45,6 +45,9 @@
 #include "mm/paging/pfa.h"
 #include "mm/linear_alloc.h"
 
+#include "trace/strace.h"
+#include "panic.h"
+
 void banner();
 
 void kmain(boot_info_t *bootvars)
@@ -58,11 +61,13 @@ void kmain(boot_info_t *bootvars)
     banner();
     cpu_info();
 
-    pmm_init(bootvars->mmap.memmap, bootvars->mmap.entries);
-    vmm_init();
+    panic("what you know about rolling down in the deep");
+    
+    // pmm_init(bootvars->mmap.memmap, bootvars->mmap.entries);
+    // vmm_init();
 
-    volatile uint32_t *ptr = (volatile uint32_t *)0xA00000000;
-    uint32_t trigger_page_fault = *ptr; // force page fault by reading location
+    // volatile uint32_t *ptr = (volatile uint32_t *)0xA00000000;
+    // uint32_t trigger_page_fault = *ptr; // force page fault by reading location
 
     for (;;)
     {

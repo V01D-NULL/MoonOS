@@ -17,15 +17,15 @@ CFLAGS := $(CFLAGS) \
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	@printf "[liballoc @ AR] Archiving object files\n";
+	@printf " AR  Archiving object files\n";
 	$(AR) rcs $@ $^
 
 %.o: %.c
-	@printf "[liballoc @ CC] [ $< ]\n";
+	@printf " CC  $<\n";
 	$(CC) $(CFLAGS) -c $< -o $@
 
 %.o: %.s
-	@printf "[liballoc @ AS] [ $< ]\n";
+	@printf " AS  $<\n";
 	$(AS) $(ASMFLAGS) $< -o $@
 
 clean:

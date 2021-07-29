@@ -16,5 +16,6 @@
 #define __SECTION(_section) __attribute__((section(_section)))
 #define __DEPRECATION_INBOUND __attribute__((warning("This functionality is marked for deprecation. Please update your code to meet the latest requirements ASAP.")))
 #define __DEPRECATION_OVERDUE __attribute__((error ("This functionality is marked deprecated. Please update your code to meet the latest requirements to ensure a successful compilation of the Validity kernel.")))
+#define BINARY_IMPORT(name) asm(".global %1\n%1: .incbin %0\n" :: "r"(name) "r"(name));
 
 #endif // VALIDITY_DEFS_H

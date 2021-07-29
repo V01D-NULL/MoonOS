@@ -38,7 +38,6 @@ void dump_mmap()
 
 const char *get_mmap_type(int entry)
 {
-    printk("pmm", "got entry: %d\n", entry);
     switch (entry)
     {
         case STIVALE2_MMAP_USABLE:
@@ -59,9 +58,11 @@ const char *get_mmap_type(int entry)
         case STIVALE2_MMAP_BAD_MEMORY:
             return "Stivale2 mmap bad memory";
 
+        case STIVALE2_MMAP_FRAMEBUFFER:
+            return "Stivale2 mmap fb";
+
         default:
             return "???";
-        
     }
 }
 
@@ -69,7 +70,6 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
 {
     phys_mmap.entries = entries;
     phys_mmap.map = mmap;
-
     phys_mmap.abs_base = mmap[0].base;
     
     size_t top = 0;
@@ -81,10 +81,10 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
         if (mmap[i].type != STIVALE2_MMAP_USABLE)
             continue;
 
-        if (!abs_base_set) {
-            phys_mmap.abs_base = mmap[i].base;
-            abs_base_set = true;
-        }
+        // if (!abs_base_set) {
+        //     phys_mmap.abs_base = mmap[i].base;
+        //     abs_base_set = true;
+        // }
 
         //This isn't really efficient, but I can't be bothered.
         top = mmap[i].base + mmap[i].length;

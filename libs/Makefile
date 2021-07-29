@@ -1,7 +1,7 @@
 .PHONY: all clean
 
 all: libk.a liballoc.a
-	@printf "[LIBS] Built all kernel archive libraries\n";
+	@printf "(LIBS) Built all kernel archive libraries\n";
 
 libk.a:
 	@$(MAKE) --no-print-directory -C libk all
