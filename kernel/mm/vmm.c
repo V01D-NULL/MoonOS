@@ -7,6 +7,8 @@
 #include "../util/ptr.h"
 #include <stdbool.h>
 
+#define GB 0x40000000UL
+
 struct page_directory *vmm_pml4;
 
 //Level4 page table aka the contents of CR3
@@ -35,35 +37,28 @@ void vmm_init()
     init_gdt();
     init_idt();
 
-    assert((vmm_pml4 = pmm_alloc()) != NULL);
+    assert((vmm_pml4 = pmm_alloc() - VMM_BASE) != NULL);
     printk("vmm", "pml4 resides at 0x%llx\n", vmm_pml4);
 
-    // identity_map(MM_BASE, MM_BASE + 0x100000);
-    // My impl for page mapping
-    // for (uint64_t i = MM_BASE; i < MM_BASE + (PAGE_SIZE * 4); i += PAGE_SIZE) {
-    //     vmm_map(vmm_pml4, i, i, 0x7);
-    // }
-
-    
-    for (uint64_t i = MM_BASE; i < MM_BASE + 0x100000000; i += PAGE_SIZE)
+    //Identity map first 4 GB
+    for (uintptr_t i = 0; i < 4 * GB; i += PAGE_SIZE)
     {
-        vmm_map(vmm_pml4, i, i, 0x3);
+        vmm_map(vmm_pml4, i, i, FLAGS_RW);
     }
 
-    for (uintptr_t i = 0; i < 0x100000000; i += PAGE_SIZE)
+    //Map physical address 0x0-4GB to virtual address 0xffff800000000000
+    for (uintptr_t i = 0; i < 4 * GB; i += PAGE_SIZE)
     {
-        vmm_map(vmm_pml4, i, i, 0x3);
-        vmm_map(vmm_pml4, i, i + VMM_BASE, 0x3);
+        vmm_map(vmm_pml4, 0xffff800000000000 + i, i, FLAGS_RW);
     }
 
     for (uintptr_t i = 0; i < 0x80000000; i += PAGE_SIZE)
     {
-        vmm_map(vmm_pml4, i, i + MM_BASE, 0x3);
+        vmm_map(vmm_pml4, 0xffffffff80000000, i, FLAGS_RW);
     }
 
     debug(true, "Old PML4: %llx\n", cr_read(CR3)); // Bootloader pml4
-    PAGE_LOAD_CR3(GENERIC_CAST(uint64_t, vmm_pml4) - VMM_BASE);
-
+    PAGE_LOAD_CR3(GENERIC_CAST(uint64_t, vmm_pml4));
     debug(true, "New PML4: %llx\n", cr_read(CR3)); // Kernel pml4
 
     printk("vmm", "Initialised vmm\n");

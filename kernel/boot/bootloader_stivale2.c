@@ -21,7 +21,7 @@
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id);
 
-static uint8_t stack[345859];
+static __section_align uint8_t stack[345859];
 
 struct stivale2_header_tag_smp smp_hdr_tag = {
     .tag = {

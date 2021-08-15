@@ -61,10 +61,8 @@ void kmain(boot_info_t *bootvars)
     banner();
     cpu_info();
 
-    panic("what you know about rolling down in the deep");
-    
-    // pmm_init(bootvars->mmap.memmap, bootvars->mmap.entries);
-    // vmm_init();
+    pmm_init(bootvars->mmap.memmap, bootvars->mmap.entries);
+    vmm_init();
 
     // volatile uint32_t *ptr = (volatile uint32_t *)0xA00000000;
     // uint32_t trigger_page_fault = *ptr; // force page fault by reading location
