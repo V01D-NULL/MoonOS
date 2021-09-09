@@ -16,12 +16,15 @@
 #include <stdint.h>
 
 /* bitmap size can be changed globally by changing this typedef */
-typedef uint32_t bitmap_size_type;
+typedef uint8_t bitmap_size_type;
 
 //BITMAP_BLOCK_SIZE = bitmap_size_type in bits
-#define BITMAP_BLOCK_SIZE       (sizeof(bitmap_size_type) * 8)
+#define BITMAP_BLOCK_SIZE       (sizeof(bitmap_size_type))
 #define BITMAP_USED    1
 #define BITMAP_FREE    0
+
+#define PAGE_2_BIT(page) (((size_t)page) / 0x1000)
+#define BIT_2_PAGE(bit)  (((size_t)bit) * 0x1000)
 
 /* main functions */
 typedef struct liballoc_bmp {

@@ -21,12 +21,12 @@
 #define COM3 0x3E8
 #define COM4 0x2E8
 
-#define BASH_RED     "\e[31m"
-#define BASH_CYAN    "\e[36m"
-#define BASH_GREEN   "\e[32m"
-#define BASH_WHITE   "\e[97m"
-#define BASH_YELLOW  "\e[93m"
-#define BASH_DEFAULT "\e[39m"
+#define BASH_RED     "\033[31m"
+#define BASH_CYAN    "\033[36m"
+#define BASH_GREEN   "\033[32m"
+#define BASH_WHITE   "\033[97m"
+#define BASH_YELLOW  "\033[93m"
+#define BASH_DEFAULT "\033[39m"
 
 void serial_write(char chr);
 char serial_read();

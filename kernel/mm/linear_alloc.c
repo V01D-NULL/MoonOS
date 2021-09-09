@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include "../util/ptr.h"
 #include "linear_alloc.h"
 #include "ram.h"
 
@@ -24,7 +25,7 @@ int linear_mm_init(void *start, uint64_t size)
     mem_manager.start = start;
     mem_manager.first_free_addr = start;
     mem_manager.allocation_ptr = start;
-    mem_manager.end = start + size; //End address of the linear memory buffer
+    mem_manager.end = VAR_TO_VOID_PTR(size_t, GENERIC_CAST(uintptr_t, start) + size); //End address of the linear memory buffer
     
     debug(true, "linear_mm_init: LinearAllocation pool start address: 0x%x\nlinear_mm_init: LinearAllocation pool end address: 0x%x\n", (size_t)mem_manager.start, (size_t)mem_manager.end);
     serial_set_color(BASH_WHITE);

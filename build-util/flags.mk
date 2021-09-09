@@ -1,4 +1,4 @@
-ARCH = x86_64-elf
+ARCH = 
 
 CC = @$(ARCH)-gcc
 AR = @$(ARCH)-ar
@@ -6,7 +6,10 @@ LD = @$(ARCH)-ld
 AS = @nasm
 
 EMU = qemu-system-x86_64
-EMU_OPTS = -m 256M -cdrom $(ISO_NAME) -D log.txt -d int -no-reboot -no-shutdown -serial stdio
+EMU_OPTS = \
+        -M q35 -cpu host -m 256M \
+        -enable-kvm -serial stdio -no-reboot \
+        -no-shutdown -rtc base=localtime -cdrom $(ISO_NAME)
 EMU_OPTS_KVM = -M q35 -cpu host -m 256M -enable-kvm -serial stdio -no-reboot -no-shutdown -cdrom $(ISO_NAME) -d guest_errors
 EMU_DEBUG_OPTS = $(EMU_OPTS) -S -s --no-reboot
 
@@ -24,6 +27,7 @@ FONT 	 := font/console.sfn
 # Kernel compiler / linker flags
 CFLAGS := 				 \
 	-I ../libs/			 \
+	-std=c11			 \
 	-O2	-pipe -g		 \
 	-ffreestanding       \
 	-fno-stack-protector \
@@ -38,12 +42,13 @@ CFLAGS := 				 \
 	-lgcc				 \
 	-mno-sse			 \
 	-mno-sse2			 \
+	-pedantic			 \
+	-Wall				 \
+	-Werror				 \
 	-mno-red-zone
-	# -DUSE_VGA
 
 ASMFLAGS = -felf64 -g -F dwarf
 LDINTERNALFLAGS :=  \
-	-Map kernel.map \
 	-Tlinker.ld     \
 	-static         \
 	-nostdlib      

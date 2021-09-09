@@ -2,7 +2,7 @@
 #include "idt.h"
 #include "../drivers/gfx/gfx.h"
 #include "../drivers/io/serial.h"
-#include "../mm/paging/CR.h"
+#include "../mm/cpu/CR.h"
 #include "../mm/vmm.h"
 #include "../amd64/bytes.h"
 #include "../util/ptr.h"
@@ -95,7 +95,7 @@ void isr_handler(regs_t regs)
         if (!canReturn)
         {
             for (;;)
-                asm("hlt");
+                __asm__("hlt");
         }
     }
 

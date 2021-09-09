@@ -21,7 +21,7 @@ void __assert_impl(const char *file, uint64_t line, const char* func, const char
  * 
  * @param[in] x 'x' is a logical expression. It fails the assertion if x is not true, if x is true however, the assertion succeeds
  */
-#define assert(x) ({ (x) ? 0 : __assert_impl(__FILE__, __LINE__, __FUNCTION__, #x); })
+#define assert(x) { (x) ? (void)0 : __assert_impl(__FILE__, __LINE__, __func__, #x); }
 
 
 

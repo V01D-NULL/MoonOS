@@ -7,5 +7,5 @@ void __assert_impl(const char *file, uint64_t line, const char* func, const char
     printk("ASSERT", "%s:%d: %s: Assertion `%s' failed", (char*)file, line, func, desc);
 
     for (;;)
-        asm ("hlt");
+        __asm__ ("hlt");
 }

@@ -1,13 +1,13 @@
 #include "serial.h"
 
-#define PRINT_LINE_NUM(file, line_buff) ({ \
+#define PRINT_LINE_NUM(file, line_buff)  { \
         serial_set_color(BASH_GREEN);      \
         serial_write_str(file);            \
         serial_write_str(":");             \
         serial_write_str(line_buff);       \
         serial_set_color(BASH_WHITE);      \
         serial_write_str(" ");             \
-    })
+    }
 
 static int serial_received()
 {
@@ -46,9 +46,6 @@ void serial_write_str(const char *str)
 //Writes a bash color code which will change the color of the output
 void serial_set_color(const char *color_code)
 {
-    if (color_code[0] != '\e')
-        return;
-
     serial_write_str(color_code);
 }
 

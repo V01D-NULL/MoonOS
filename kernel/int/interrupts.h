@@ -33,7 +33,7 @@
 
 static inline bool IS_IRQ(int vector) { return (vector <= IRQ15 && vector >= IRQ0); }
 
-#define TRY_EXEC_HANDLER(base) ({                                                              \
+#define TRY_EXEC_HANDLER(base)  {                                                              \
     if (isr_handler_array[regs.isr_number] != 0)                                               \
     {                                                                                          \
         isr_handler_array[regs.isr_number] GENERIC_CAST(regs_t *, &regs);                      \
@@ -45,7 +45,7 @@ static inline bool IS_IRQ(int vector) { return (vector <= IRQ15 && vector >= IRQ
             debug(true, "Unhandled interrupt 0x%x (%ld)\n", regs.isr_number, regs.isr_number); \
         }                                                                                      \
     }                                                                                          \
-})
+}
 
 typedef void (*isr_t)(regs_t *);
 

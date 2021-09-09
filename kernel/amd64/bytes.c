@@ -3,7 +3,7 @@
 
 uint8_t byte_order_reverse_char8(uint8_t byte)
 {
-    uint8_t res;
+    uint8_t res = 0;
     for (int i = 0; i < 8; i++)
     {
         res <<= 1;

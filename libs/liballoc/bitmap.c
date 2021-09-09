@@ -41,6 +41,7 @@ void bitmap_fill(liballoc_bitmap_t bitmap)
     }
 }
 
+#include <stdbool.h>
 /**
 * @brief Log each bit in the bitmap
 * @param[in] bitmap A handle to the bitmap that should be accessed
@@ -49,9 +50,9 @@ void bitmap_log_all_bits(liballoc_bitmap_t bitmap)
 {
     for (int i = 0; i < bitmap.size; i++)
     {
-        // debug("%ld", bitmap.get(bitmap.pool, i));
+        debug(false, "%ld", bitmap.get(bitmap.pool, i));
     }
-    // debug("\n");
+    debug(false, "\n");
 }
 
 /**
@@ -67,6 +68,7 @@ liballoc_bitmap_t bitmap_init(bitmap_size_type *pool, uint64_t size)
     bmp.clear = bitmap_unset;
     bmp.set   = bitmap_set;
     bmp.get   = bitmap_get;
+    memset(bmp.pool, 0, size);
     return bmp;
 }
 

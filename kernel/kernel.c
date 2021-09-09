@@ -38,11 +38,11 @@
 #include "liballoc/bitmap.h"
 
 #include "util/common.h"
+#include "util/ptr.h"
 
 #include "mm/ram.h"
 #include "mm/pmm.h"
 #include "mm/vmm.h"
-#include "mm/paging/pfa.h"
 #include "mm/linear_alloc.h"
 
 #include "trace/strace.h"
@@ -62,14 +62,19 @@ void kmain(boot_info_t *bootvars)
     cpu_info();
 
     pmm_init(bootvars->mmap.memmap, bootvars->mmap.entries);
-    vmm_init();
+    // vmm_init();
+    uintptr_t *ptr1 = VAR_TO_VOID_PTR(uintptr_t, pmm_alloc());
+    debug(true, "ptr1 = %lX\n", ptr1);
+    pmm_alloc();
+    pmm_alloc();
+    pmm_alloc();
 
     // volatile uint32_t *ptr = (volatile uint32_t *)0xA00000000;
     // uint32_t trigger_page_fault = *ptr; // force page fault by reading location
 
     for (;;)
     {
-        asm("hlt");
+        __asm__("hlt");
     }
 }
 const char *p1 = " _  _   __   __    __  ____  __  ____  _  _     __   ____\n";

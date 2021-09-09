@@ -36,7 +36,7 @@ void gfx_init(boot_info_t boot, int fg, int bg)
 
     gfx_h.last_known_fg = fg;
     gfx_h.last_known_bg = bg;
-    bg == 0x0 ? 0x0 : gfx_clear(bg);
+    bg == 0x0 ? (void)0x0 : gfx_clear(bg);
 }
 
 void put_pixel(int x, int y, int color)

@@ -12,15 +12,13 @@ void cpu_info_init(boot_info_t cpu_info)
 
 void cpu_info()
 {
-    struct cpuid_regs_t r;
-    r.function = 0x01;
     ASM_x86_cpuid_vendor_string();
     printk("cpuid", "CPU Count: %d\n", cpu_hardware.cpu_count);
 }
 
 void cpuid(struct cpuid_regs_t *cpuid_regs)
 {
-    asm volatile(
+    __asm__ volatile(
         __asm_flavor_intel
         "mov eax, %0\n"
         "cpuid\n"
