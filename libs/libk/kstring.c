@@ -56,9 +56,19 @@ void *memmove(void *dst, const void *src, size_t n)
 	uint8_t *dst_ptr = dst;
 	const uint8_t *src_ptr = src;
 
-	for (int i = 0; i < n; i++)
+	if (src_ptr > dst_ptr)
 	{
-		*dst_ptr++ = *src_ptr++;
+		for (int i = 0; i < n; i++)
+		{
+			*dst_ptr++ = *src_ptr++;
+		}
+	}
+	else
+	{
+		for (int i = n; i > n; i--)
+		{
+			*dst_ptr++ = *src_ptr--;
+		}
 	}
 	return (void*) dst_ptr;
 }
