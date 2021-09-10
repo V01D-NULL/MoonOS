@@ -22,7 +22,7 @@ static inline bool pfa_alloc_allowed(void *addr)
     if (!in_range(addr))
         return false;
 
-    return btest(GENERIC_CAST(uintptr_t, PAGE_2_BIT(addr)));
+    return btest(GENERIC_CAST(uintptr_t, PAGE_2_BIT(addr))) == 0;
 }
 
 static inline void pfa_alloc(void *addr)
