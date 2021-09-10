@@ -45,7 +45,6 @@
 #include "mm/vmm.h"
 #include "mm/linear_alloc.h"
 
-#include "trace/strace.h"
 #include "panic.h"
 
 void banner();
@@ -61,16 +60,20 @@ void kmain(boot_info_t *bootvars)
     banner();
     cpu_info();
 
+    init_gdt();
+    init_idt();
     pmm_init(bootvars->mmap.memmap, bootvars->mmap.entries);
     // vmm_init();
     uintptr_t *ptr1 = VAR_TO_VOID_PTR(uintptr_t, pmm_alloc());
     debug(true, "ptr1 = %lX\n", ptr1);
-    pmm_alloc();
-    pmm_alloc();
-    pmm_alloc();
+    void PTR res = pmm_alloc_any((void PTR) 0xFFFFFF);
+    debug(true, "%lx\n", (uintptr_t)res);
+    // pmm_alloc();
+    // pmm_alloc();
+    // pmm_alloc();
 
     // volatile uint32_t *ptr = (volatile uint32_t *)0xA00000000;
-    // uint32_t trigger_page_fault = *ptr; // force page fault by reading location
+    // uint32_t __attribute__((unused)) trigger_page_fault = *ptr; // force page fault by reading location
 
     for (;;)
     {

@@ -2,20 +2,27 @@
 #include <stdint.h>
 #include "../drivers/gfx/gfx.h"
 #include "../util/ptr.h"
+#include "../util/iterator.h"
 #include "../panic.h"
 #include "memdefs.h"
 
 pmm_t pmm;
-size_t highest_page;
 mmap_t phys_mmap;
-struct usable_mem_range umem_range;
+size_t highest_page;
+static uint8_t PTR bitmap;
+
+#define bset(bit, cmd)  (cmd == BIT_SET) ? (bitmap[bit / 8] |= (1 << (bit % 8))) : (bitmap[bit / 8] &= ~(1 << (bit % 8)))
+#define btest(bit)      ((bitmap[bit / 8] & (1 << (bit % 8))))
+
+static inline void *find_free_block_at(size_t offset);
 
 // Note: This function assumes the address has not been converteted to an index yet
 static inline bool pfa_alloc_allowed(void *addr)
 {
-    //Todo: Check if address is within memory range marked as usable
+    if (!in_range(addr))
+        return false;
 
-    return (pmm.bitmap_manager.get(pmm.bitmap_manager.pool, GENERIC_CAST(uintptr_t, PAGE_2_BIT(addr)) / PAGE_SIZE) == BITMAP_USED);
+    return btest(GENERIC_CAST(uintptr_t, PAGE_2_BIT(addr)));
 }
 
 static inline void pfa_alloc(void *addr)
@@ -25,26 +32,47 @@ static inline void pfa_alloc(void *addr)
     if (!pfa_alloc_allowed(addr))
         return;
 
-    pmm.bitmap_manager.set(pmm.bitmap, index);
+    bset(index, BIT_SET);
 }
 
-static inline void pfa_free(void *addr)
+static inline int pfa_free(void *addr)
 {
     uintptr_t index = GENERIC_CAST(uintptr_t, PAGE_2_BIT(addr));
 
     if (!pfa_alloc_allowed(addr))
-        return;
+        return 1;
 
-    pmm.bitmap_manager.clear(pmm.bitmap, index);
+    bset(index, BIT_CLEAR);
+    return 0;
+}
+
+static inline void pfa_free_multiple(void *addr, size_t n)
+{
+    struct iterator itr;
+    I_POPULATE(itr, 0, n);
+
+    I_ITERATE(itr)
+    { 
+        void PTR addr_offset = VAR_TO_VOID_PTR(uintptr_t, (uintptr_t)addr + (itr.iterator_index * PAGE_SIZE));
+        if (pfa_free(addr_offset))
+            break;
+    }
 }
 
 bool in_range(void *_address)
 {
     uint64_t address = GENERIC_CAST(uint64_t, _address);
 
-    if (address >= phys_mmap.abs_base && address <= phys_mmap.abs_top)
-        return true;
+    for (int i = 0; i < phys_mmap.entries; i++)
+    {
+        if (phys_mmap.map[i].type != STIVALE2_MMAP_USABLE)
+            continue;
+        
+        if (address >= phys_mmap.map[i].base && address <= phys_mmap.map[i].base + phys_mmap.map[i].length - 1)
+            return true;
+    }
 
+    // debug(true, "Address %lx is out of range\n", address);
     return false;
 }
 
@@ -113,7 +141,7 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
     }
 
     //Step 1. Calculate the size of the bitmap
-    phys_mmap.abs_top = top;
+    phys_mmap.abs_top = mmap[entries - 1].base + mmap[entries - 1].length - 1;
     dump_mmap();
 
     //highest_page / PAGE_SIZE = amount of pages in total, and higest_page / PAGE_SIZE / 8 will get the amount of bytes the bitmap will occupy since 1 byte = 8 bits
@@ -131,41 +159,47 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
         {
             debug(true, "Found a big enough block of memory to host the bitmap (size: %ld), size : %ldKiB\n", mmap[i].length, bitmap_size_bytes / 1024);
 
-            pmm.bitmap = GENERIC_CAST(bitmap_size_type PTR, to_virt(mmap[i].base));
-            pmm.bitmap_manager = bitmap_init(pmm.bitmap, bitmap_size_bytes);
+            bitmap = GENERIC_CAST(bitmap_size_type PTR, mmap[i].base);
 
             debug(true, "(phys) Bitmap stored at %lX-%lX\n", mmap[i].base, mmap[i].base + mmap[i].length - 1);
             memset(GENERIC_CAST(void PTR, pmm.bitmap_manager.pool), PMM_FULL, bitmap_size_bytes);
             
-            pfa_free(VAR_TO_VOID_PTR(uintptr_t, to_virt(mmap[i].base + mmap[i].length)));
-                
+            mmap[i].base += bitmap_size_bytes;
+            mmap[i].length -= bitmap_size_bytes;
+
             break;
         }
     }
 
     //Sanity check, if this fails then there isn't enough memory to store the bitmap
-    if (pmm.bitmap == GENERIC_CAST(bitmap_size_type PTR, PMM_FREE))
+    if (bitmap == GENERIC_CAST(bitmap_size_type PTR, PMM_FREE))
     {
-        panic("Couldn't store bitmap\n");
+        panic("Couldn't store bitmap");
     }
 
     //Step 3.
+    size_t mem_lo = 0;
+    size_t mem_hi = 0;
     for (int i = 0; i < entries; i++)
     {
         if (mmap[i].type != STIVALE2_MMAP_USABLE)
             continue;
 
-        debug(true, "Freeing %lx\n", to_virt(mmap[i].base));
-        pfa_free(VAR_TO_VOID_PTR(uintptr_t, to_virt(mmap[i].base)));
+        mem_lo = mmap[i].base;
+        mem_hi = mmap[i].base + mmap[i].length - 1;
+        
+        debug(true, "pmm_init: Freeing %lx-%lx | Pages: %ld\n", mem_lo, mem_hi, get_page_count((void PTR) mem_lo, mem_hi));
+        pfa_free_multiple((void PTR) mem_lo, mem_hi);
     }
 
-    pfa_free(VAR_TO_VOID_PTR(uintptr_t, to_virt(0))); //Bit 0 is a nullptr
-    bitmap_log_all_bits(pmm.bitmap_manager);
-    printk("pmm", "Initialised pmm\n");
+    debug(true, "bit0: %d\n", btest(0) == 0);
+    bset(0, BIT_SET); //bit 0 is a nullptr
+    debug(true, "bit0: %d\n", btest(0) == 0);
+    printk("pmm", "Initialized pmm\n");
 }
 
 /**
- * @brief Alloc n number of pages & return a pointer to the allocated memory
+ * @brief Alloc the first free page found & return a pointer to the beginning of it
  * 
  * @return void* Returns NULL on error and a pointer to the allocated memory on success.
  */
@@ -175,8 +209,6 @@ void *pmm_alloc()
 
     if (block == PMM_INVALID)
         return NULL;
-
-    debug(true, "Attempting to alloc address: %llX\n", (uintptr_t)block);
 
     if (!in_range(block))
     {
@@ -192,11 +224,24 @@ void *pmm_alloc()
     return block;
 }
 
+void *pmm_alloc_any(void *addr)
+{
+    void PTR block = find_free_block_at(PAGE_2_BIT(addr));
+    if (block == NULL)
+        return NULL;
+
+    /* pfa_alloc() checks if the memory is marked as usable, for that reason it isn't used here */
+    uintptr_t index = GENERIC_CAST(uintptr_t, PAGE_2_BIT(addr));
+    bset(index, BIT_SET);
+
+    return block;
+}
+
 /**
  * @brief Free a bit in the bitmap / free a page (using an address returned by pmm_alloc)
  * 
  * @param page 
- * @return int32_t Returns PMM_INVALID on error and 0 on success
+ * @return int32_t Returns 1 on error and 0 on success
  */
 int32_t pmm_free(void *page)
 {
@@ -210,16 +255,22 @@ int32_t pmm_free(void *page)
 /**
  * @brief Find the first free bit in the bitmap and return it's index
  * 
- * @return uint32_t Returns PMM_INVALID on error and the address of the first free block in the bitmap on success
+ * @return void* Returns PMM_INVALID on error and the address of the first free block in the bitmap on success
  */
 void *find_first_free_block()
 {
-    for (int i = 0; i < PAGE_2_BIT(highest_page); i++)
+    for (size_t i = 0; i < PAGE_2_BIT(highest_page); i++)
     {
-        if ((pmm.bitmap[i / 8] >> (i % 8) & 1))
+        if (btest(i) == 0)
         {
             return VAR_TO_VOID_PTR(size_t, BIT_2_PAGE(i));
         }
     }
+    
     return PMM_INVALID;
+}
+
+static inline void *find_free_block_at(size_t offset)
+{
+    return (btest(offset) == 0 ? VAR_TO_VOID_PTR(size_t, BIT_2_PAGE(offset)) : NULL);
 }

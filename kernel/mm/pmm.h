@@ -19,9 +19,6 @@
 #define MM_BASE  0xffffffff80000000 
 #define VMM_BASE 0xffff800000000000
 
-#define bset(bit, cmd)  (val == BIT_CLEAR) ? (bitmap[bit / 8] |= (1 << (bit % 8))) : (bitmap[bit / 8] &= ~(1 << (bit % 8)))
-#define btest(bit)      ((bitmap[bit / 8] >> bit % 8) & 1)
-
 enum {
     BIT_CLEAR = 0x1,
     BIT_SET
@@ -30,9 +27,10 @@ enum {
 void pmm_init(struct stivale2_mmap_entry *mmap, int entries);
 
 void *pmm_alloc();
-int32_t pmm_free(void *page);
 void *find_first_free_block();
-void pmm_alloc_pages(uint64_t n);
+void *pmm_alloc_any(void *addr);
+int32_t pmm_free(void *page);
+bool in_range(void *_address);
 
 typedef struct
 {
