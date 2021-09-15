@@ -1,9 +1,9 @@
 #include "pmm.h"
 #include <stdint.h>
-#include "../drivers/gfx/gfx.h"
-#include "../util/ptr.h"
-#include "../util/iterator.h"
-#include "../panic.h"
+#include <drivers/gfx/gfx.h>
+#include <util/ptr.h>
+#include <util/iterator.h>
+#include <panic.h>
 #include "memdefs.h"
 
 pmm_t pmm;
@@ -35,15 +35,10 @@ static inline void pfa_alloc(void *addr)
     bset(index, BIT_SET);
 }
 
-static inline int pfa_free(void *addr)
+static inline void pfa_free(void *addr)
 {
     uintptr_t index = GENERIC_CAST(uintptr_t, PAGE_2_BIT(addr));
-
-    if (!pfa_alloc_allowed(addr))
-        return 1;
-
     bset(index, BIT_CLEAR);
-    return 0;
 }
 
 static inline void pfa_free_multiple(size_t address_base, size_t n)
@@ -189,11 +184,9 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
         mem_hi = mmap[i].base + mmap[i].length - 1;
         
         debug(true, "pmm_init: Freeing %lx-%lx | Pages: %ld\n", mem_lo, mem_hi, get_page_count((void PTR) mem_lo, mem_hi));
-        size_t len = mmap[i].length / PAGE_SIZE;
-        size_t page = mmap[i].base / PAGE_SIZE;
-
+        size_t len  = PAGE_2_BIT(mmap[i].length);
+        size_t page = PAGE_2_BIT(mmap[i].base);
         pfa_free_multiple(page, len);
-        // pfa_free_multiple((void PTR) mem_lo, mmap[i].length);
     }
 
     printk("pmm", "Initialized pmm\n");
@@ -222,7 +215,8 @@ void *pmm_alloc()
 
     memset(block, 0, PAGE_SIZE);
     pfa_alloc(VAR_TO_VOID_PTR(uintptr_t, (GENERIC_CAST(uintptr_t, block))));
-    return VAR_TO_VOID_PTR(uintptr_t, to_virt(GENERIC_CAST(uintptr_t, block)));
+    return block;
+    // return VAR_TO_VOID_PTR(uintptr_t, to_virt(GENERIC_CAST(uintptr_t, block)));
 }
 
 void *pmm_alloc_any(void *addr)
@@ -238,19 +232,38 @@ void *pmm_alloc_any(void *addr)
     return block;
 }
 
+//Find a memory entry by it's tag up to `retries` times
+struct memtag_range pmm_find_tag(size_t tag, int retries)
+{
+    struct memtag_range result;
+    size_t counter = 0;
+    
+    for (size_t i = 0; i < phys_mmap.entries; i++)
+    {
+        if (phys_mmap.map[i].type != tag)
+            continue;
+        
+        if (counter == retries)
+            break;
+
+        result.base  = phys_mmap.map[i].base;
+        result.size = (result.base + phys_mmap.map[i].length) - 1;
+        counter++;    
+    }
+
+    return result;
+}
+
 /**
  * @brief Free a bit in the bitmap / free a page (using an address returned by pmm_alloc)
  * 
  * @param page 
  * @return int32_t Returns 1 on error and 0 on success
  */
-int32_t pmm_free(void *page)
+void pmm_free(void *page)
 {
-    uintptr_t index = GENERIC_CAST(uintptr_t, PAGE_2_BIT(page));
-    (void)index;
-    pfa_free(VAR_TO_VOID_PTR(uintptr_t, page));
-
-    return 0;
+    memset(page, 0, PAGE_SIZE);
+    pfa_free(page);
 }
 
 /**

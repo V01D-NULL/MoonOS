@@ -2,10 +2,10 @@
 #define BITMAP_PMM_H
 
 #include <liballoc/bitmap.h>
-#include "ram.h"
 #include <stdint.h>
-#include "../drivers/vga/vga.h"
-#include "../amd64/validity.h"
+#include <drivers/vga/vga.h>
+#include <amd64/validity.h>
+#include <stivale2.h>
 #include <stdbool.h>
 
 #define PAGE_SIZE   4096
@@ -25,12 +25,18 @@ enum {
 };
 
 void pmm_init(struct stivale2_mmap_entry *mmap, int entries);
-
 void *pmm_alloc();
 void *find_first_free_block();
 void *pmm_alloc_any(void *addr);
-int32_t pmm_free(void *page);
+void pmm_free(void *page);
 bool in_range(void *_address);
+struct memtag_range pmm_find_tag(size_t tag, int retries);
+
+struct memtag_range
+{
+    uint64_t base;
+    uint64_t size;
+};
 
 typedef struct
 {
