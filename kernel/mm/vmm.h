@@ -28,7 +28,7 @@ typedef struct
 } page_info_t;
 
 void vmm_init();
-void vmm_map(size_t vaddr, size_t paddr, int flags);
+void vmm_map(uint64_t *pml4, size_t vaddr, size_t paddr, int flags);
 page_info_t vmm_dissect_vaddr(uint64_t virt_addr);
 
 uint64_t *vmm_get_lv4();

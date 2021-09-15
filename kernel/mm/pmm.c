@@ -221,7 +221,7 @@ void *pmm_alloc()
     }
 
     memset(block, 0, PAGE_SIZE);
-    pfa_alloc(VAR_TO_VOID_PTR(uintptr_t, to_virt(GENERIC_CAST(uintptr_t, block))));
+    pfa_alloc(VAR_TO_VOID_PTR(uintptr_t, (GENERIC_CAST(uintptr_t, block))));
     return VAR_TO_VOID_PTR(uintptr_t, to_virt(GENERIC_CAST(uintptr_t, block)));
 }
 

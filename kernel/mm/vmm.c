@@ -11,18 +11,18 @@
 #define GB 0x40000000UL
 
 // struct page_directory pml4;
-uint64_t *pml4;
+// uint64_t *pml4;
 
 static uint64_t *vmm_get_pml(
     uint64_t *entry,
     size_t level, int flags
 );
 
-void identity_map(size_t start, size_t end, int flags)
+void identity_map(uint64_t *pml4, size_t start, size_t end, int flags)
 {
     for (size_t i = start; i < end; i += PAGE_SIZE)
     {
-        vmm_map(i, i, flags);
+        vmm_map(pml4, i, i, flags);
     }
 }
 
@@ -31,11 +31,11 @@ void vmm_init()
     init_gdt();
     init_idt();
 
-    *pml4 = from_virt(GENERIC_CAST(uintptr_t, pmm_alloc()));
+    uint64_t *pml4 = (uint64_t*)from_virt(GENERIC_CAST(uintptr_t, pmm_alloc()));
     printk("vmm", "pml4 resides at 0x%llx\n", pml4);
     
     // Identity map first 4 GB
-    identity_map(0, 4 * GB, FLAGS_PR | FLAGS_RW);
+    identity_map(pml4, 0, 4 * GB, FLAGS_PR | FLAGS_RW);
 
     //Map physical address 0x0-4GB to virtual address 0xffff800000000000
     // for (uintptr_t i = 0; i < 4 * GB; i += PAGE_SIZE)
@@ -63,14 +63,14 @@ static uint64_t *vmm_get_pml(uint64_t *entry, size_t level, int flags)
     }
     else
     {
-        entry[level] = VOID_PTR_TO_64(pmm_alloc());
-        // debug(true, "alloc(): 0x%lX\n", pmm_alloc());
+        // entry[level] = VOID_PTR_TO_64(pmm_alloc());
+        debug(true, "alloc(): 0x%lX\n", pmm_alloc());
         entry[level] |= flags;
         return GENERIC_CAST(uint64_t*, entry[level]);
     }
 }
 
-void vmm_map(size_t vaddr, size_t paddr, int flags)
+void vmm_map(uint64_t *pml4, size_t vaddr, size_t paddr, int flags)
 {
     //TODO:
     //Performance tweak: Use an algorithm to save an address
