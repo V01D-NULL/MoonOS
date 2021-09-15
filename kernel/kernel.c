@@ -66,11 +66,6 @@ void kmain(boot_info_t *bootvars)
     // vmm_init();
     uintptr_t *ptr1 = VAR_TO_VOID_PTR(uintptr_t, pmm_alloc());
     debug(true, "ptr1 = %lX\n", ptr1);
-    void PTR res = pmm_alloc_any((void PTR) 0xFFFFFF);
-    debug(true, "%lx\n", (uintptr_t)res);
-    // pmm_alloc();
-    // pmm_alloc();
-    // pmm_alloc();
 
     // volatile uint32_t *ptr = (volatile uint32_t *)0xA00000000;
     // uint32_t __attribute__((unused)) trigger_page_fault = *ptr; // force page fault by reading location

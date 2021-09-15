@@ -7,7 +7,7 @@
 #include "memdefs.h"
 
 pmm_t pmm;
-mmap_t phys_mmap;
+static mmap_t phys_mmap;
 size_t highest_page;
 static uint8_t PTR bitmap;
 
@@ -46,16 +46,13 @@ static inline int pfa_free(void *addr)
     return 0;
 }
 
-static inline void pfa_free_multiple(void *addr, size_t n)
+static inline void pfa_free_multiple(size_t address_base, size_t n)
 {
-    struct iterator itr;
-    I_POPULATE(itr, 0, n);
+    size_t len = address_base + n;
 
-    I_ITERATE(itr)
-    { 
-        void PTR addr_offset = VAR_TO_VOID_PTR(uintptr_t, (uintptr_t)addr + (itr.iterator_index * PAGE_SIZE));
-        if (pfa_free(addr_offset))
-            break;
+    for (int i = address_base; i < len; i++)
+    {
+        bset(i, BIT_CLEAR);
     }
 }
 
@@ -66,13 +63,16 @@ bool in_range(void *_address)
     for (int i = 0; i < phys_mmap.entries; i++)
     {
         if (phys_mmap.map[i].type != STIVALE2_MMAP_USABLE)
+        {
             continue;
+        }
         
-        if (address >= phys_mmap.map[i].base && address <= phys_mmap.map[i].base + phys_mmap.map[i].length - 1)
+        if (address >= phys_mmap.map[i].base && address <= (phys_mmap.map[i].base + phys_mmap.map[i].length) - 1)
+        {
             return true;
+        }
     }
 
-    // debug(true, "Address %lx is out of range\n", address);
     return false;
 }
 
@@ -162,7 +162,7 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
             bitmap = GENERIC_CAST(bitmap_size_type PTR, mmap[i].base);
 
             debug(true, "(phys) Bitmap stored at %lX-%lX\n", mmap[i].base, mmap[i].base + mmap[i].length - 1);
-            memset(GENERIC_CAST(void PTR, pmm.bitmap_manager.pool), PMM_FULL, bitmap_size_bytes);
+            memset(VAR_TO_VOID_PTR(uint8_t PTR, bitmap), PMM_FULL, bitmap_size_bytes);
             
             mmap[i].base += bitmap_size_bytes;
             mmap[i].length -= bitmap_size_bytes;
@@ -189,12 +189,13 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
         mem_hi = mmap[i].base + mmap[i].length - 1;
         
         debug(true, "pmm_init: Freeing %lx-%lx | Pages: %ld\n", mem_lo, mem_hi, get_page_count((void PTR) mem_lo, mem_hi));
-        pfa_free_multiple((void PTR) mem_lo, mem_hi);
+        size_t len = mmap[i].length / PAGE_SIZE;
+        size_t page = mmap[i].base / PAGE_SIZE;
+
+        pfa_free_multiple(page, len);
+        // pfa_free_multiple((void PTR) mem_lo, mmap[i].length);
     }
 
-    debug(true, "bit0: %d\n", btest(0) == 0);
-    bset(0, BIT_SET); //bit 0 is a nullptr
-    debug(true, "bit0: %d\n", btest(0) == 0);
     printk("pmm", "Initialized pmm\n");
 }
 
@@ -221,7 +222,7 @@ void *pmm_alloc()
 
     memset(block, 0, PAGE_SIZE);
     pfa_alloc(VAR_TO_VOID_PTR(uintptr_t, to_virt(GENERIC_CAST(uintptr_t, block))));
-    return block;
+    return VAR_TO_VOID_PTR(uintptr_t, to_virt(GENERIC_CAST(uintptr_t, block)));
 }
 
 void *pmm_alloc_any(void *addr)
@@ -260,7 +261,7 @@ int32_t pmm_free(void *page)
 void *find_first_free_block()
 {
     for (size_t i = 0; i < PAGE_2_BIT(highest_page); i++)
-    {
+    {   
         if (btest(i) == 0)
         {
             return VAR_TO_VOID_PTR(size_t, BIT_2_PAGE(i));
