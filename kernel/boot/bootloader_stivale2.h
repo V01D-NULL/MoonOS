@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include "../stivale2.h"
+#include <stivale2.h>
 
 /**
  * @brief CPU information provided by the bootloader

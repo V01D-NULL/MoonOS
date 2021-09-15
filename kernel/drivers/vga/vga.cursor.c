@@ -1,6 +1,6 @@
 #include "vga.cursor.h"
 #include "vga.h"
-#include "../../amd64/validity.h"
+#include <amd64/validity.h>
 
 __export vga_hdr_t vga;
 

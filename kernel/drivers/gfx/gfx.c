@@ -1,6 +1,6 @@
 #include "gfx.h"
-#include "../../util/common.h"
-#include "../../amd64/validity.h"
+#include <util/common.h>
+#include <amd64/validity.h>
 
 #define SSFN_CONSOLEBITMAP_TRUECOLOR        /* use the special renderer for 32 bit truecolor packed pixels */
 #define SSFN_NOIMPLEMENTATION               /* don't include the normal renderer implementation */

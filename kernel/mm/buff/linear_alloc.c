@@ -1,7 +1,6 @@
 #include <stdbool.h>
-#include "../util/ptr.h"
+#include <util/ptr.h>
 #include "linear_alloc.h"
-#include "ram.h"
 
 linear_tracker_t mem_manager;
 
@@ -16,9 +15,6 @@ int linear_mm_init(void *start, uint64_t size)
         serial_set_color(BASH_WHITE);
         return EXIT_FAILURE;
     }
-
-    //Can we allocate any memory at all or is the RAM full?
-    assert(ram_manager_get_free() > size);
 
     //Init size, start & first free addr
     mem_manager.size = size;
@@ -47,31 +43,12 @@ uint8_t *linear_alloc(uint64_t size, int byte_align_ammount) {
 
     //Are we trying to allocate more memory than we have in the Allocation Pool?
     assert((void*)(size + mem_manager.first_free_addr) <= mem_manager.end);
-
-    //Do we have enough RAM to allocate the memory?
-    assert((align((size_t)(mem_manager.first_free_addr += size), byte_align_ammount)) <= ram_manager_get_free()); //Update the first free address
     mem_manager.allocation_ptr = mem_manager.first_free_addr;
 
     debug(true, "linear_alloc: Allocated %ld bytes, current buffer address: 0x%x (AllocationPool: 0x%x - 0x%x)\n", size, mem_manager.allocation_ptr, mem_manager.start, mem_manager.end);
     
     debug(true, "linear_alloc: ");
     serial_set_color(BASH_WHITE);
-    //Update RAM statistics
-    uint64_t old_ram = ram_manager_get_used();
-    ram_manager_add(size);
-    
-    debug(true,
-        "RAM statistics (used/total):\n"
-        "(old) %lld mb/%lld GB ~ %lld/%lld kb\n"
-        "(new) %lld mb/%lld GB ~ %lld/%lld kb\n",
-            /* old RAM stat */
-            old_ram / 1024, ram_manager_get_total() / 1024 / 1024,
-            old_ram, ram_manager_get_total(),
-
-            /* new RAM stat */
-            ram_manager_get_used() / 1024, ram_manager_get_total() / 1024 / 1024,
-            ram_manager_get_used(), ram_manager_get_total()
-    );
     
     return mem_manager.allocation_ptr;
 }

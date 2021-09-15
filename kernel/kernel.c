@@ -13,37 +13,35 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#include "stivale2.h"
-#include "boot/bootloader_stivale2.h"
+#include <stivale2.h>
+#include <boot/bootloader_stivale2.h>
 
-#include "amd64/cpu.h"
-#include "amd64/validity.h"
-#include "amd64/bytes.h"
+#include <amd64/cpu.h>
+#include <amd64/validity.h>
+#include <amd64/bytes.h>
 
-#include "int/gdt.h"
-#include "int/idt.h"
-#include "int/interrupts.h"
+#include <int/gdt.h>
+#include <int/idt.h>
+#include <int/interrupts.h>
 
-#include "drivers/io/serial.h"
-#include "drivers/gfx/gfx.h"
+#include <drivers/io/serial.h>
+#include <drivers/gfx/gfx.h>
 
-#include "hal/apic.h"
+#include <hal/apic.h>
 
-#include "asm/x86/x86.h"
+#include <asm/x86/x86.h>
 
-//Defined in libs/libk/
-#include "libk/kstring.h"
-#include "libk/kprintf.h"
-#include "libk/kassert.h"
-#include "liballoc/bitmap.h"
+#include <libk/kstring.h>
+#include <libk/kprintf.h>
+#include <libk/kassert.h>
+#include <liballoc/bitmap.h>
 
-#include "util/common.h"
-#include "util/ptr.h"
+#include <util/common.h>
+#include <util/ptr.h>
 
-#include "mm/ram.h"
-#include "mm/pmm.h"
-#include "mm/vmm.h"
-#include "mm/linear_alloc.h"
+#include <mm/pmm.h>
+#include <mm/vmm.h>
+#include <mm/buff/linear_alloc.h>
 
 #include "panic.h"
 
@@ -51,6 +49,9 @@ void banner();
 
 void kmain(boot_info_t *bootvars)
 {
+    init_gdt();
+    init_idt();
+
     /* Init the VESA printing routines, font loading, etc */
     // gfx_init(*bootvars, 0x00, 0xf0bacde);
     gfx_init(*bootvars, 0xffffff, 0x00);
@@ -63,15 +64,16 @@ void kmain(boot_info_t *bootvars)
     init_gdt();
     init_idt();
     pmm_init(bootvars->mmap.memmap, bootvars->mmap.entries);
-    // vmm_init();
+    vmm_init();
     
-    debug(true, "ptr1 = %lX\n", (uintptr_t *)pmm_alloc());
-    debug(true, "ptr2 = %lX\n", (uintptr_t *)pmm_alloc());
-    debug(true, "ptr3 = %lX\n", (uintptr_t *)pmm_alloc());
-    debug(true, "ptr4 = %lX\n", (uintptr_t *)pmm_alloc());
-
-    // volatile uint32_t *ptr = (volatile uint32_t *)0xA00000000;
+    uint32_t *ptr = (uint32_t *)0xA00000000;
+    vmm_map(0xA00000000, 0xA00000000, 3);
     // uint32_t __attribute__((unused)) trigger_page_fault = *ptr; // force page fault by reading location
+
+    vmm_unmap(0xA00000000);
+    uint32_t __attribute__((unused)) trigger_page_fault2 = *ptr;
+
+    printk("OK", "Kernel end");
 
     for (;;)
     {

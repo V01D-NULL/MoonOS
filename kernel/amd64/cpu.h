@@ -17,8 +17,8 @@
 */
 
 #include <stdint.h>
-#include "../asm/x86/x86.h"
-#include "../boot/bootloader_stivale2.h"
+#include <asm/x86/x86.h>
+#include <boot/bootloader_stivale2.h>
 
 struct cpuid_regs_t
 {

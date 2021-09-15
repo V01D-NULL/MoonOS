@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include "../drivers/io/serial.h"
+#include <drivers/io/serial.h>
 
 #define BYTE_EXTRACTION_MASK 0xFF
 

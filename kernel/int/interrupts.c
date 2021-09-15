@@ -1,11 +1,11 @@
 #include "interrupts.h"
 #include "idt.h"
-#include "../drivers/gfx/gfx.h"
-#include "../drivers/io/serial.h"
-#include "../mm/cpu/CR.h"
-#include "../mm/vmm.h"
-#include "../amd64/bytes.h"
-#include "../util/ptr.h"
+#include <drivers/gfx/gfx.h>
+#include <drivers/io/serial.h>
+#include <mm/cpu/CR.h>
+#include <mm/vmm.h>
+#include <amd64/bytes.h>
+#include <util/ptr.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -55,7 +55,9 @@ void isr_handler(regs_t regs)
         if (regs.isr_number == 14)
         {
             printk("INT ~ #PF", "Faulting address: 0x%lx\n", cr_read(CR2));
-            // vmm_map(get_pml4(), cr_read(CR2), cr_read(CR2), 0x3);
+            uint64_t cr2 = cr_read(CR2);
+            vmm_guess_and_map(cr2, regs.error_code);
+            return;
         }
         else if (regs.isr_number == 6)
         {
@@ -66,11 +68,11 @@ void isr_handler(regs_t regs)
         debug(true, "INT#%d - %s (err_code %ld)\n", regs.isr_number, exception_messages[regs.isr_number], regs.error_code);
         serial_set_color(BASH_WHITE);
         debug(false, "Register dump:\n"
-              "rax 0x%x, rbx 0x%x, rcx 0x%x, rdx    0x%x\n"
-              "rbp 0x%x, rsp 0x%x, rdi 0x%x, rsi    0x%x\n"
-              "rip 0x%x, cs  0x%x, ss  0x%x, rflags 0x%x\n"
-              "r8  0x%x, r9  0x%x, r10 0x%x, r11    0x%x\n"
-              "r12 0x%x, r13 0x%x, r14 0x%x, r15    0x%x\n",
+                     "rax 0x%x, rbx 0x%x, rcx 0x%x, rdx    0x%x\n"
+                     "rbp 0x%x, rsp 0x%x, rdi 0x%x, rsi    0x%x\n"
+                     "rip 0x%x, cs  0x%x, ss  0x%x, rflags 0x%x\n"
+                     "r8  0x%x, r9  0x%x, r10 0x%x, r11    0x%x\n"
+                     "r12 0x%x, r13 0x%x, r14 0x%x, r15    0x%x\n",
               regs.rax,
               regs.rbx,
               regs.rcx,
@@ -104,7 +106,6 @@ void isr_handler(regs_t regs)
     //Signal EOI
     outb(0xA0, 0x20);
     outb(0x20, 0x20);
-
 }
 
 void install_isr(uint8_t base, isr_t handler)

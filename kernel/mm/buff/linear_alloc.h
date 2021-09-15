@@ -15,9 +15,9 @@
 #include <stdint.h>
 #include <libk/kassert.h>
 #include <libk/kstdlib.h>
-#include "../drivers/io/serial.h"
-#include "../boot/bootloader_stivale2.h"
-#include "../amd64/validity.h"
+#include <drivers/io/serial.h>
+#include <boot/bootloader_stivale2.h>
+#include <amd64/validity.h>
 
 /*
     Q&D linear memory allocator | Will be replaced by a more advanced memory managment algorithm eventually

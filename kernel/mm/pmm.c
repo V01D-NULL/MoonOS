@@ -6,7 +6,6 @@
 #include <panic.h>
 #include "memdefs.h"
 
-pmm_t pmm;
 static mmap_t phys_mmap;
 size_t highest_page;
 static uint8_t PTR bitmap;
@@ -141,7 +140,6 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
 
     //highest_page / PAGE_SIZE = amount of pages in total, and higest_page / PAGE_SIZE / 8 will get the amount of bytes the bitmap will occupy since 1 byte = 8 bits
     size_t bitmap_size_bytes = ALIGN_UP(highest_page / PAGE_SIZE / 8);
-    pmm.size = bitmap_size_bytes;
 
     //Step 2. Find a big enough block to host the bitmap
     for (int i = 0; i < entries; i++)

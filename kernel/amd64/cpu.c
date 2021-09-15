@@ -1,5 +1,5 @@
 #include "cpu.h"
-#include "../drivers/gfx/gfx.h"
+#include <drivers/gfx/gfx.h>
 
 cpu_hw_t cpu_hardware;
 

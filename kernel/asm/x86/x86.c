@@ -1,8 +1,8 @@
 #include "x86.h"
-#include "../../amd64/cpu.h"
-#include "../../amd64/validity.h"
-#include "../../drivers/gfx/gfx.h"
-#include "../../drivers/io/serial.h"
+#include <amd64/cpu.h>
+#include <amd64/validity.h>
+#include <drivers/gfx/gfx.h>
+#include <drivers/io/serial.h>
 
 __export cpu_hw_t cpu_hardware;
 

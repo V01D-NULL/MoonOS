@@ -13,7 +13,7 @@
 
 #include <libk/kprintf.h>
 #include <libk/kstring.h>
-#include "../../util/common.h"
+#include <util/common.h>
 #include <stdint.h>
 
 #define COM1 0x3F8

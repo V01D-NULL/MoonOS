@@ -8,15 +8,15 @@
  * @copyright Copyright (c) 2021
  * 
  */
-#include "../drivers/io/serial.h"
 #include "bootloader_stivale2.h"
-#include "../drivers/gfx/gfx.h"
-#include "../amd64/validity.h"
-#include "../stivale2.h"
-#include "../int/idt.h"
-#include "../int/gdt.h"
-#include "../kernel.h"
-#include "../mm/pmm.h"
+#include <drivers/io/serial.h>
+#include <drivers/gfx/gfx.h>
+#include <amd64/validity.h>
+#include <stivale2.h>
+#include <int/idt.h>
+#include <int/gdt.h>
+#include <kernel.h>
+#include <mm/pmm.h>
 #include <stdint.h>
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id);
@@ -150,8 +150,6 @@ void kinit(struct stivale2_struct *bootloader_info) {
     serial_set_color(BASH_CYAN);
     debug(false, "%ld kb\n", bootvars.mmap.used_ram);
     serial_set_color(BASH_WHITE);
-    
-    ram_manager_init(&bootvars);
 
     kmain(&bootvars);
 }

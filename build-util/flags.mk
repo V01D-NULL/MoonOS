@@ -1,8 +1,8 @@
 ARCH = 
 
-CC = @$(ARCH)-gcc
-AR = @$(ARCH)-ar
-LD = @$(ARCH)-ld
+CC = @gcc
+AR = @ar
+LD = @ld.lld
 AS = @nasm
 
 EMU = qemu-system-x86_64
@@ -27,6 +27,7 @@ FONT 	 := font/console.sfn
 # Kernel compiler / linker flags
 CFLAGS := 				 \
 	-I ../libs/			 \
+	-I ../kernel/		 \
 	-std=c11			 \
 	-O2	-pipe -g		 \
 	-ffreestanding       \

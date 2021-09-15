@@ -1,8 +1,8 @@
 #include "idt.h"
 #include <stddef.h>
 #include <stdint.h>
-#include "../amd64/validity.h"
-#include "../util/ptr.h"
+#include <amd64/validity.h>
+#include <util/ptr.h>
 
 static struct idt_desc idt[256];
 

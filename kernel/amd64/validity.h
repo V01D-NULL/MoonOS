@@ -1,7 +1,7 @@
 #ifndef VALIDITY_DEFS_H
 #define VALIDITY_DEFS_H
 
-//Some #define's were taken from https://github.com/GENADEV/GENADEV_OS/blob/main/src/kernel/arm-v-8/genadev.h (Technically I wrote those so it doesn't really matter but yolo - #shameless-plug)
+//Some #define's were taken from https://github.com/GENADEV/GENADEV_OS/blob/main/src/kernel/arm-v-8/genadev.h (Technically I wrote those so it doesn't really matter)
 #define __export extern 
 #define __no_optimize volatile
 #define __no_return __attribute__((noreturn)) void

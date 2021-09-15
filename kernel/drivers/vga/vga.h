@@ -14,7 +14,7 @@
 #include <libk/kstring.h>
 #include <libk/kprintf.h>
 
-#include "../io/serial.h"
+#include <drivers/io/serial.h>
 #include <stdarg.h>
 #include "vga.cursor.h"
 #include <stdint.h>

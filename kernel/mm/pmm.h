@@ -1,7 +1,6 @@
 #ifndef BITMAP_PMM_H
 #define BITMAP_PMM_H
 
-#include <liballoc/bitmap.h>
 #include <stdint.h>
 #include <drivers/vga/vga.h>
 #include <amd64/validity.h>
@@ -37,14 +36,6 @@ struct memtag_range
     uint64_t base;
     uint64_t size;
 };
-
-typedef struct
-{
-    liballoc_bitmap_t bitmap_manager;
-    bitmap_size_type *bitmap; //Bitmap buffer / bitmap arena
-    size_t size;
-    bool is_bitmap_hosted; //If all attempts to host the bitmap fail this boolean will kick in and kernel panic
-} pmm_t;
 
 typedef struct
 {

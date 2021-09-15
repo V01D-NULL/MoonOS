@@ -12,8 +12,8 @@
 #define GDT_H
 
 #include <stdint.h>
-#include "../util/common.h"
-#include "../amd64/validity.h"
+#include <util/common.h>
+#include <amd64/validity.h>
 
 /**
  * @brief Defines a memory segment

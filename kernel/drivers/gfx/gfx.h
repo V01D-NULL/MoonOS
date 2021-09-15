@@ -12,10 +12,10 @@
 #ifndef GFX_H
 #define GFX_H
 
-#include "../../boot/bootloader_stivale2.h"
+#include <boot/bootloader_stivale2.h>
 #include <libk/kprintf.h>
 #include <libk/kstring.h>
-#include "../../util/common.h"
+#include <util/common.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdbool.h>

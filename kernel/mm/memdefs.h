@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include "pmm.h"
-#include "../util/ptr.h"
+#include <util/ptr.h>
 
 /* These two helper utils were inspired by brutal */
 static inline uintptr_t to_virt(uintptr_t phys) { return GENERIC_CAST(uintptr_t, phys + VMM_BASE); }

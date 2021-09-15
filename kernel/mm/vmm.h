@@ -1,8 +1,8 @@
 #ifndef VMM_H
 #define VMM_H
 
-#include "../amd64/validity.h"
-#include "../drivers/io/serial.h"
+#include <amd64/validity.h>
+#include <drivers/io/serial.h>
 #include "cpu/CR.h"
 #include <stdint.h>
 
@@ -17,10 +17,9 @@
 #define TLB_FLUSH(param_addr) __asm__ volatile("invlpg (%[addr])" ::[addr] "r"(param_addr));
 #define PAGE_LOAD_CR3(pml4)   __asm__ volatile("mov %0, %%cr3\n" ::"r"(pml4) : "memory");
 
-/* A 4 level paging struct which holds info about the levels and page offset */
+/* A 4 level paging struct which holds info about the levels */
 typedef struct
 {
-    uintptr_t page_offset;
     uintptr_t lv1;
     uintptr_t lv2;
     uintptr_t lv3;
@@ -28,9 +27,11 @@ typedef struct
 } page_info_t;
 
 void vmm_init();
-void vmm_map(uint64_t *pml4, size_t vaddr, size_t paddr, int flags);
-page_info_t vmm_dissect_vaddr(uint64_t virt_addr);
+void vmm_map(size_t vaddr, size_t paddr, int flags);
+void vmm_unmap(size_t vaddr);
 
 uint64_t *vmm_get_lv4();
+page_info_t vmm_dissect_vaddr(uint64_t virt_addr);
+void vmm_guess_and_map(uint64_t cr2, int error_code);
 
 #endif // VMM_H
