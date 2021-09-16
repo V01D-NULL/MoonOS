@@ -5,8 +5,8 @@
 #include "pmm.h"
 #include <util/ptr.h>
 
-const uintptr_t VMEM_LV5_BASE = 0xff00000000000000UL;
-const uintptr_t VMEM_LV4_BASE = 0xffff800000000000UL;
+static const uintptr_t VMEM_LV5_BASE = 0xff00000000000000UL;
+static const uintptr_t VMEM_LV4_BASE = 0xffff800000000000UL;
 static bool la57_enabled = false;
 
 /* These two helper utils were inspired by brutal */
