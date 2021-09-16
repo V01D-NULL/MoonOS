@@ -7,10 +7,11 @@ AS = @nasm
 
 EMU = qemu-system-x86_64
 EMU_OPTS = \
-        -M q35 -cpu host -m 256M \
-        -enable-kvm -serial stdio -no-reboot \
-        -no-shutdown -rtc base=localtime -cdrom $(ISO_NAME)
-EMU_OPTS_KVM = -M q35 -cpu host -m 256M -enable-kvm -serial stdio -no-reboot -no-shutdown -cdrom $(ISO_NAME) -d guest_errors
+        -M q35 -cpu qemu64 -m 256M \
+        -serial stdio -no-reboot \
+        -no-shutdown -cdrom $(ISO_NAME)
+
+EMU_OPTS_CUTTING_EDGE = $(EMU_OPTS) -cpu qemu64,+la57
 EMU_DEBUG_OPTS = $(EMU_OPTS) -S -s --no-reboot
 
 CFILES	 := $(shell find ./ -type f -name '*.c')

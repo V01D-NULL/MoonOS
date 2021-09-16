@@ -23,11 +23,16 @@ void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id);
 
 static __section_align uint8_t stack[345859];
 
+struct stivale2_tag level5_paging_tag = {
+    .identifier = STIVALE2_HEADER_TAG_5LV_PAGING_ID,
+    .next = 0
+};
+
 struct stivale2_header_tag_smp smp_hdr_tag = {
     .tag = {
         .identifier = STIVALE2_HEADER_TAG_SMP_ID,
-        .next = 0
-    },
+        .next = (uintptr_t)&level5_paging_tag
+    }
 };
 
 struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {

@@ -7,23 +7,13 @@ I will attempt to make it POSIX compliant
 <img src="screenshot/1.png">
 
 # Features
-- HTML Doxygen kernel and library documentation (not hosted anywhere yet)
-- Stivale2 boot protocol
 - Limine bootloader
-- GDT (Credits to https://github.com/ethan4984/rock/ for the gdt code (The only change I made was to add a null descriptor to the GDT))
-- Interrupts
 - CPU Identification
-- Serial output
-- Rock solid kprintf(vga), printk (vesa) & debug(serial) functions
-- Barebones kernel library (strlen, memcmp, memcpy, vsnprintf, etc)
-- Linear memory allocation (Physical)
-- Bitmap library which can handle multiple instances of bitmaps
 - Vesa with font loading using ssfn2
-- Bitmap based pmm
+- Support for 4 and 5 level paging
 
 # Future features:
 - A simple heap
-- Paging
 - APIC
 - ACPI
 - Userland support
@@ -35,10 +25,10 @@ I will attempt to make it POSIX compliant
 	- GPU's
 	- And much more
 - A libc for the userland
-- Setting up a webpage for the doxygen docs (hosted by github)
 
 # This is currently being working on:
-- vmm
+- vmm cleanup
+- Parsing ACPI tables
 
 # Directory walkthrough:
 - libs/   	  --  Here you will find kernel libs and ports. (Planning on putting things like bash and Doom in this lib/ folder)
@@ -53,7 +43,6 @@ I will attempt to make it POSIX compliant
 - Install needed tools:
 	- sudo apt update
 	- sudo apt install build-essential nasm qemu-system-x86
-	- IMPORTANT: You will need to have an x86_64 cross-compiler setup to build Validity. (Alternatively you can comment out the ARCH variable in flags.mk however this isn't recommended as compiling without a cross-compiler may cause unexpected behaviour)
 - Build kernel
 	- git clone < REPO >
 	- cd < REPO_DIR >
@@ -61,8 +50,7 @@ I will attempt to make it POSIX compliant
 	- make run
 
 ## Building an ISO
-- First build and move limine-cd.bin and limine.sys into boot/
-- Run make && make _iso, that's it!
+- Run `make`, that's literally all there is to it, lol :)
 
 # My journey: (Inspiration for newcomers)
 I have always wanted to make an OS, so one day I decided to build one.

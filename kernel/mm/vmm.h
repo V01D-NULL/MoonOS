@@ -3,8 +3,9 @@
 
 #include <amd64/validity.h>
 #include <drivers/io/serial.h>
-#include "cpu/CR.h"
+#include <mm/cpu/CR.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #define FLAGS_PR   1   // Present
 #define FLAGS_RW   2   // Read-write
@@ -24,13 +25,14 @@ typedef struct
     uintptr_t lv2;
     uintptr_t lv3;
     uintptr_t lv4;
+    uintptr_t lv5;
 } page_info_t;
 
-void vmm_init();
+void vmm_init(bool has_5_level_paging);
 void vmm_map(size_t vaddr, size_t paddr, int flags);
 void vmm_unmap(size_t vaddr);
 
-uint64_t *vmm_get_lv4();
+uint64_t *vmm_get_root();
 page_info_t vmm_dissect_vaddr(uint64_t virt_addr);
 void vmm_guess_and_map(uint64_t cr2, int error_code);
 

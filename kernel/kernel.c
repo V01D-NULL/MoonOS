@@ -41,6 +41,7 @@
 
 #include <mm/pmm.h>
 #include <mm/vmm.h>
+#include <mm/memdefs.h>
 #include <mm/buff/linear_alloc.h>
 
 #include "panic.h"
@@ -61,16 +62,14 @@ void kmain(boot_info_t *bootvars)
     banner();
     cpu_info();
 
-    init_gdt();
-    init_idt();
     pmm_init(bootvars->mmap.memmap, bootvars->mmap.entries);
-    vmm_init();
-    
-    uint32_t *ptr = (uint32_t *)0xA00000000;
-    vmm_map(0xA00000000, 0xA00000000, 3);
-    // uint32_t __attribute__((unused)) trigger_page_fault = *ptr; // force page fault by reading location
+    vmm_init(check_la57());
 
-    vmm_unmap(0xA00000000);
+    //vmm_unmap(0xA00000000);
+    uint32_t *ptr = (uint32_t *)0xA00000000;
+    // vmm_map(0xA00000000, 0xA00000000, 3);
+    uint32_t __attribute__((unused)) trigger_page_fault = *ptr; // force page fault by reading location
+    
     uint32_t __attribute__((unused)) trigger_page_fault2 = *ptr;
 
     printk("OK", "Kernel end");

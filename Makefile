@@ -10,10 +10,14 @@ include build-util/flags.mk
 
 .PHONY: clean all run
 
-all: font quick_recompile $(KERNEL_HDD)
+all: font quick_recompile $(KERNEL_HDD) ISO
 
 run: quick_recompile ISO
+ifeq ($(modern), yes)
+	$(EMU) $(EMU_OPTS_CUTTING_EDGE)
+else
 	$(EMU) $(EMU_OPTS)
+endif
 
 kvm: quick_recompile ISO
 	$(EMU) $(EMU_OPTS_KVM)
