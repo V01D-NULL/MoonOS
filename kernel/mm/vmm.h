@@ -31,6 +31,7 @@ typedef struct
 void vmm_init(bool has_5_level_paging);
 void vmm_map(size_t vaddr, size_t paddr, int flags);
 void vmm_unmap(size_t vaddr);
+void vmm_remap(size_t vaddr_old, size_t vaddr_new, int flags);
 
 uint64_t *vmm_get_root();
 page_info_t vmm_dissect_vaddr(uint64_t virt_addr);

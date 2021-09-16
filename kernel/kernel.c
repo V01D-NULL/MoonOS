@@ -65,10 +65,10 @@ void kmain(boot_info_t *bootvars)
     pmm_init(bootvars->mmap.memmap, bootvars->mmap.entries);
     vmm_init(check_la57());
 
-    //vmm_unmap test:
+    //vmm_remap test:
     uint64_t *ptr = (uint64_t *)(0xA000000000);
     *ptr = 1; // force page fault by writing location
-    vmm_unmap((uint64_t)ptr);
+    vmm_remap(0xA000000000, 0xA000002000, 3);
     
     printk("OK", "Kernel end");
 

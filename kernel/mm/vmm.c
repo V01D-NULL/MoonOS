@@ -104,7 +104,6 @@ void vmm_map(size_t vaddr, size_t paddr, int flags)
     }
 }
 
-//Todo: This does not unmap pages, why?
 void vmm_unmap(size_t vaddr)
 {
     page_info_t info = vmm_dissect_vaddr(vaddr);
@@ -116,6 +115,7 @@ void vmm_unmap(size_t vaddr)
         pml3 = vmm_get_pml(pml4, info.lv4);
         pml2 = vmm_get_pml(pml3, info.lv3);
         pml1 = vmm_get_pml(pml2, info.lv2);
+        debug(true, "pml[%d] = %llx\n", info.lv1, pml1[info.lv1] & ~(511));
         pml1[info.lv1] = 0;
     }
     else
@@ -127,6 +127,40 @@ void vmm_unmap(size_t vaddr)
         pml1[info.lv1] = 0;
     }
     TLB_FLUSH(vaddr);
+}
+
+void vmm_remap(size_t vaddr_old, size_t vaddr_new, int flags)
+{
+    page_info_t info = vmm_dissect_vaddr(vaddr_old);
+    size_t paddr = 0;
+
+    /* Save the physical address `vaddr_old` was mapped to, purge that entry in the TLB
+       and remap the page to a new virtual address (physical address stays the same) 
+    */
+    if (la57_enabled)
+    {
+        uint64_t *pml4, *pml3, *pml2, *pml1 = NULL;
+        pml4 = vmm_get_pml_or_alloc(rootptr, info.lv5, flags);
+        pml3 = vmm_get_pml_or_alloc(pml4, info.lv4, flags);
+        pml2 = vmm_get_pml_or_alloc(pml3, info.lv3, flags);
+        pml1 = vmm_get_pml_or_alloc(pml2, info.lv2, flags);
+        paddr = pml1[info.lv1] & ~(511);
+        pml1[info.lv1] = 0;
+        TLB_FLUSH(vaddr_old);
+    }
+
+    else
+    {
+        uint64_t *pml3, *pml2, *pml1 = NULL;
+        pml3 = vmm_get_pml_or_alloc(rootptr, info.lv4, flags);
+        pml2 = vmm_get_pml_or_alloc(pml3, info.lv3, flags);
+        pml1 = vmm_get_pml_or_alloc(pml2, info.lv2, flags);
+        paddr = pml1[info.lv1] & ~(511);
+        pml1[info.lv1] = 0;
+        TLB_FLUSH(vaddr_old);
+    }
+    
+    vmm_map(vaddr_new, paddr, flags);
 }
 
 //Pagefault handler
