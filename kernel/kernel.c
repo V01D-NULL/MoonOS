@@ -65,13 +65,11 @@ void kmain(boot_info_t *bootvars)
     pmm_init(bootvars->mmap.memmap, bootvars->mmap.entries);
     vmm_init(check_la57());
 
-    //vmm_unmap(0xA00000000);
-    uint32_t *ptr = (uint32_t *)0xA00000000;
-    // vmm_map(0xA00000000, 0xA00000000, 3);
-    uint32_t __attribute__((unused)) trigger_page_fault = *ptr; // force page fault by reading location
+    //vmm_unmap test:
+    uint64_t *ptr = (uint64_t *)(0xA000000000);
+    *ptr = 1; // force page fault by writing location
+    vmm_unmap((uint64_t)ptr);
     
-    uint32_t __attribute__((unused)) trigger_page_fault2 = *ptr;
-
     printk("OK", "Kernel end");
 
     for (;;)

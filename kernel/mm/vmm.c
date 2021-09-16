@@ -73,10 +73,10 @@ no_alloc:
     return GENERIC_CAST(uint64_t *, (entry[level] & ~(511)));
 }
 
-// static uint64_t *vmm_get_pml(uint64_t *entry, size_t level)
-// {
-//     return GENERIC_CAST(uint64_t*, (entry[level] & ~(511)));
-// }
+static uint64_t *vmm_get_pml(uint64_t *entry, size_t level)
+{
+    return GENERIC_CAST(uint64_t *, (entry[level] & ~(511)));
+}
 
 void vmm_map(size_t vaddr, size_t paddr, int flags)
 {
@@ -107,16 +107,26 @@ void vmm_map(size_t vaddr, size_t paddr, int flags)
 //Todo: This does not unmap pages, why?
 void vmm_unmap(size_t vaddr)
 {
-    // page_info_t info = vmm_dissect_vaddr(vaddr);
+    page_info_t info = vmm_dissect_vaddr(vaddr);
 
-    // uint64_t *pml3, *pml2, *pml1 = NULL;
-    // pml3 = vmm_get_pml(pml4, info.lv4);
-    // pml2 = vmm_get_pml(pml3, info.lv3);
-    // pml1 = vmm_get_pml(pml2, info.lv2);
-    // pml1[info.lv1] = 0;
-
-    __asm__ volatile("invlpg (%0)" ::"r"(vaddr)
-                     : "memory");
+    if (la57_enabled)
+    {
+        uint64_t *pml4, *pml3, *pml2, *pml1 = NULL;
+        pml4 = vmm_get_pml(rootptr, info.lv5);
+        pml3 = vmm_get_pml(pml4, info.lv4);
+        pml2 = vmm_get_pml(pml3, info.lv3);
+        pml1 = vmm_get_pml(pml2, info.lv2);
+        pml1[info.lv1] = 0;
+    }
+    else
+    {
+        uint64_t *pml3, *pml2, *pml1 = NULL;
+        pml3 = vmm_get_pml(rootptr, info.lv4);
+        pml2 = vmm_get_pml(pml3, info.lv3);
+        pml1 = vmm_get_pml(pml2, info.lv2);
+        pml1[info.lv1] = 0;
+    }
+    TLB_FLUSH(vaddr);
 }
 
 //Pagefault handler
