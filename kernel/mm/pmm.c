@@ -1,8 +1,9 @@
 #include "pmm.h"
 #include <stdint.h>
-#include <drivers/gfx/gfx.h>
+#include <drivers/vbe/vbe.h>
 #include <util/ptr.h>
 #include <util/iterator.h>
+#include <liballoc/bitmap.h>
 #include <panic.h>
 #include "memdefs.h"
 

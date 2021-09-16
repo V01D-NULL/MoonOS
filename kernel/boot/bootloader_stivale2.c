@@ -10,7 +10,6 @@
  */
 #include "bootloader_stivale2.h"
 #include <drivers/io/serial.h>
-#include <drivers/gfx/gfx.h>
 #include <amd64/validity.h>
 #include <stivale2.h>
 #include <int/idt.h>

@@ -57,7 +57,7 @@ ISO: $(KERNEL_HDD)
 # Remove the HDD & elf file while saving all object files (fewer files will be recompiled)
 quick_recompile:
 	@printf " LD  Creating font binary\n";
-	ld -r -b binary -o kernel/drivers/gfx/__font__.o font/console.sfn
+	ld -r -b binary -o kernel/drivers/vbe/__font__.o font/console.sfn
 	@rm -f $(KERNEL_HDD) kernel/kernel.elf
 	@printf "\n";
 	@$(MAKE) --no-print-directory -C libs

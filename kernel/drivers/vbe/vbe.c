@@ -1,4 +1,4 @@
-#include "gfx.h"
+#include "vbe.h"
 #include <util/common.h>
 #include <amd64/validity.h>
 

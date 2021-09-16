@@ -9,7 +9,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJ)
 	@printf " LD  Linking object files\n";
-	$(LD) $(LDINTERNALFLAGS) ./drivers/gfx/__font__.o $(OBJ) $(KLIBS)/libk.a $(KLIBS)/liballoc.a -o $@
+	$(LD) $(LDINTERNALFLAGS) ./drivers/vbe/__font__.o $(OBJ) $(KLIBS)/libk.a $(KLIBS)/liballoc.a -o $@
 
 %.o: %.c
 	@printf " CC  $<\n";

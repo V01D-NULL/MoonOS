@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "pmm.h"
 #include <util/ptr.h>
+#include <mm/cpu/CR.h>
 
 static const uintptr_t VMEM_LV5_BASE = 0xff00000000000000UL;
 static const uintptr_t VMEM_LV4_BASE = 0xffff800000000000UL;

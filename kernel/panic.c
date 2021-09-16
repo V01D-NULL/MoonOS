@@ -1,8 +1,8 @@
 #include "panic.h"
-#include "util/ptr.h"
-#include "drivers/gfx/gfx.h"
-#include "drivers/io/serial.h"
-#include "amd64/validity.h"
+#include <util/ptr.h>
+#include <drivers/vbe/vbe.h>
+#include <drivers/io/serial.h>
+#include <amd64/validity.h>
 #include <stdarg.h>
 #include <libk/kprintf.h>
 

@@ -1,6 +1,6 @@
 #include "kassert.h"
 #include "util/common.h"
-#include "drivers/gfx/gfx.h"
+#include "drivers/vbe/vbe.h"
 
 void __assert_impl(const char *file, uint64_t line, const char* func, const char *desc) {
     gfx_set_colors(0xF70D1A, 0x0);

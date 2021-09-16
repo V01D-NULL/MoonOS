@@ -25,7 +25,7 @@
 #include <int/interrupts.h>
 
 #include <drivers/io/serial.h>
-#include <drivers/gfx/gfx.h>
+#include <drivers/vbe/vbe.h>
 
 #include <hal/apic.h>
 
@@ -64,11 +64,6 @@ void kmain(boot_info_t *bootvars)
 
     pmm_init(bootvars->mmap.memmap, bootvars->mmap.entries);
     vmm_init(check_la57());
-
-    //vmm_remap test:
-    uint64_t *ptr = (uint64_t *)(0xA000000000);
-    *ptr = 1; // force page fault by writing location
-    vmm_remap(0xA000000000, 0xA000002000, 3);
     
     printk("OK", "Kernel end");
 

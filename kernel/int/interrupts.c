@@ -1,6 +1,6 @@
 #include "interrupts.h"
 #include "idt.h"
-#include <drivers/gfx/gfx.h>
+#include <drivers/vbe/vbe.h>
 #include <drivers/io/serial.h>
 #include <mm/cpu/CR.h>
 #include <mm/vmm.h>
