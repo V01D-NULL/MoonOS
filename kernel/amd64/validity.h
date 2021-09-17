@@ -7,6 +7,7 @@
 #define __no_return __attribute__((noreturn)) void
 #define __section_align  __attribute__((aligned (16)))
 #define __section_align8 __attribute__((aligned (8)))
+#define __section_align4k __attribute__((aligned (4096)))
 #define __pack_bytes __attribute__((packed))
 #define __asm_flavor_intel ".intel_syntax noprefix\n"
 #define __asm_flavor_at_t  ".att_syntax prefix\n"

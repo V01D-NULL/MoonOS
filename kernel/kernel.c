@@ -63,10 +63,12 @@ void kmain(boot_info_t *bootvars)
     banner();
     cpu_info();
 
-    pmm_init(bootvars->mmap.memmap, bootvars->mmap.entries);
     vmm_init(check_la57());
     
     backtrace_stack(4);    
+
+    // void *ptr = NULL;
+    // debug(true, "(ubsan test) ptr: %lx\n", ptr);
 
     printk("OK", "Kernel end");
 

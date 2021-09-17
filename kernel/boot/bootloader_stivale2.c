@@ -16,6 +16,7 @@
 #include <int/gdt.h>
 #include <kernel.h>
 #include <mm/pmm.h>
+#include <panic.h>
 #include <stdint.h>
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id);
@@ -118,42 +119,26 @@ void kinit(struct stivale2_struct *bootloader_info) {
 
     if (mmap != NULL)
     {
-        bootvars.mmap.entries = mmap->entries;
-        bootvars.mmap.base = mmap->memmap->base;
-        bootvars.mmap.length = mmap->memmap->length;
-        bootvars.mmap.type = mmap->memmap->type;
-        
-        for (int i = 0; i < mmap->entries; i++)
-        {
-            
-            bootvars.mmap.memmap[i] = mmap->memmap[i];
-            struct stivale2_mmap_entry *internal_mmap = &mmap->memmap[i];
-            
-            bootvars.mmap.total_ram += internal_mmap->length;
-
-            if (internal_mmap->type == STIVALE2_MMAP_USABLE) //|| internal_mmap->type == STIVALE2_MMAP_ACPI_RECLAIMABLE || internal_mmap->type == STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE)
-            {
-                bootvars.mmap.free_ram += internal_mmap->length;
-            }
-            else {
-                bootvars.mmap.used_ram += internal_mmap->length;
-            }
-        }
+        pmm_init(mmap->memmap, mmap->entries);
+    }
+    else
+    {
+        panic("Did not get a memory map from the bootloader");
     }
 
     //It's ugly code but pretty output :)
-    debug(false, "Total RAM: ");
-    serial_set_color(BASH_CYAN);
-    debug(false, "%ld kb\n", bootvars.mmap.total_ram);
-    serial_set_color(BASH_WHITE);
-    debug(false, "Free  RAM: ");
-    serial_set_color(BASH_CYAN);
-    debug(false, "%ld kb\n", bootvars.mmap.free_ram);
-    serial_set_color(BASH_WHITE);
-    debug(false, "Used  RAM: ");
-    serial_set_color(BASH_CYAN);
-    debug(false, "%ld kb\n", bootvars.mmap.used_ram);
-    serial_set_color(BASH_WHITE);
+    // debug(false, "Total RAM: ");
+    // serial_set_color(BASH_CYAN);
+    // debug(false, "%ld kb\n", bootvars.mmap.total_ram);
+    // serial_set_color(BASH_WHITE);
+    // debug(false, "Free  RAM: ");
+    // serial_set_color(BASH_CYAN);
+    // debug(false, "%ld kb\n", bootvars.mmap.free_ram);
+    // serial_set_color(BASH_WHITE);
+    // debug(false, "Used  RAM: ");
+    // serial_set_color(BASH_CYAN);
+    // debug(false, "%ld kb\n", bootvars.mmap.used_ram);
+    // serial_set_color(BASH_WHITE);
 
     kmain(&bootvars);
 }

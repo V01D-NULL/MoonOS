@@ -41,7 +41,6 @@ typedef struct
 {
     /* Used to parse the memory map */
     long entries;
-    struct stivale2_mmap_entry *map;
     uint64_t base;
     uint64_t length;
 

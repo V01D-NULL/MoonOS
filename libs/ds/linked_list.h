@@ -2,6 +2,7 @@
 #define LINKED_LIST_H
 
 #include <stdint.h>
+#include <amd64/validity.h>
 
 /* Default linked list */
 struct ds_default_list

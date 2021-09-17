@@ -17,5 +17,5 @@ ds.a:
 	@mv ds/$@ .	
 
 clean:
-	@rm -f libk.a liballoc.a
+	@rm -f libk.a liballoc.a ds.a
 	@$(MAKE) --no-print-directory -C libk clean

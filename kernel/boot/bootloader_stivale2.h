@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stivale2.h>
+#include <amd64/validity.h>
 
 /**
  * @brief CPU information provided by the bootloader
@@ -59,10 +60,10 @@ typedef struct boot_vesa {
  * 
  */
 typedef struct boot_info {
-    boot_cpu_t  cpu;
+    boot_cpu_t  cpu ;
     boot_vesa_t vesa;
     boot_mmap_t mmap;
-} boot_info_t;
+} boot_info_t __section_align4k;
 
 
 #endif // BOOTLOADER_STIVALE2_INIT_H

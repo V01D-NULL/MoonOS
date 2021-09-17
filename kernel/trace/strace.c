@@ -13,7 +13,7 @@ void backtrace_stack(int frames)
     size_t i = 0;
     while (i < frames && stackframe)
     {
-        debug(false, "%llx\n", stackframe->value);       
+        debug(false, "%llx\n", stackframe->value);  
         ds_default_next(&stackframe);
         i++;
     }

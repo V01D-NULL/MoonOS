@@ -8,6 +8,7 @@
 #include "memdefs.h"
 
 static mmap_t phys_mmap;
+static struct stivale2_mmap_entry *map;
 size_t highest_page;
 static uint8_t PTR bitmap;
 
@@ -57,12 +58,12 @@ bool in_range(void *_address)
 
     for (int i = 0; i < phys_mmap.entries; i++)
     {
-        if (phys_mmap.map[i].type != STIVALE2_MMAP_USABLE)
-        {
-            continue;
-        }
+        // if (map[i].type != STIVALE2_MMAP_USABLE)
+        // {
+        //     continue;
+        // }
         
-        if (address >= phys_mmap.map[i].base && address <= (phys_mmap.map[i].base + phys_mmap.map[i].length) - 1)
+        if (address >= map[i].base && address <= (map[i].base + map[i].length) - 1)
         {
             return true;
         }
@@ -78,11 +79,11 @@ void dump_mmap()
     for (int i = 0; i < phys_mmap.entries; i++)
     {
         debug(true, "0x%llx - 0x%llx [%d - %s]\n",
-              phys_mmap.map[i].base,
-              phys_mmap.map[i].base + phys_mmap.map[i].length - 1,
-              phys_mmap.map[i].type,
+              map[i].base,
+              map[i].base + map[i].length - 1,
+              map[i].type,
               get_mmap_type(
-                  phys_mmap.map[i].type));
+                  map[i].type));
     }
     debug(false, "\n");
 }
@@ -120,7 +121,7 @@ const char *get_mmap_type(int entry)
 void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
 {
     phys_mmap.entries = entries;
-    phys_mmap.map = mmap;
+    map = mmap;
     phys_mmap.abs_base = mmap[0].base;
 
     size_t top = 0;
@@ -239,14 +240,14 @@ struct memtag_range pmm_find_tag(size_t tag, int retries)
     
     for (size_t i = 0; i < phys_mmap.entries; i++)
     {
-        if (phys_mmap.map[i].type != tag)
+        if (map[i].type != tag)
             continue;
         
         if (counter == retries)
             break;
 
-        result.base  = phys_mmap.map[i].base;
-        result.size = (result.base + phys_mmap.map[i].length) - 1;
+        result.base  = map[i].base;
+        result.size = (result.base + map[i].length) - 1;
         counter++;    
     }
 

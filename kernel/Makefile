@@ -1,6 +1,7 @@
 include ../build-util/flags.mk
 
 TARGET := kernel.elf
+KLIBS  := $(shell find ../libs -type f -name '*.a')
 
 .PHONY: all clean
 

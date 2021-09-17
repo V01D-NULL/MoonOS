@@ -5,6 +5,7 @@
 #include <amd64/validity.h>
 #include <stdarg.h>
 #include <libk/kprintf.h>
+#include <trace/strace.h>
 
 char panic_buff[512];
 __no_return panic(const char *fmt, ...)
@@ -16,6 +17,8 @@ __no_return panic(const char *fmt, ...)
 
 	printk("panic", "KERNEL PANIC: %s\n", panic_buff);
 	debug(true, "KERNEL PANIC: %s\n", panic_buff);
+
+	backtrace_stack(10);	
 
 	for (;;);
 }
