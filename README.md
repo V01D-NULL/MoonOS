@@ -11,6 +11,7 @@ I will attempt to make it POSIX compliant
 - CPU Identification
 - Vesa with font loading using ssfn2
 - Support for 4 and 5 level paging
+- Stacktrace/symbol backtrace
 
 # Future features:
 - A simple heap
@@ -31,11 +32,11 @@ I will attempt to make it POSIX compliant
 - Parsing ACPI tables
 
 # Directory walkthrough:
-- libs/   	  --  Here you will find kernel libs and ports. (Planning on putting things like bash and Doom in this lib/ folder)
+- libs/   	  --  Here you will find kernel libs.
 - kernel/ 	  --  Kernel source code, this is most likely all you really care about
 - build-util/ --  3rd party tools needed to build the Validity kernel + makefile flags
 - debug-util/ --  Files needed for debugging Validity.
-- boot/		  --  Everything limine needs to boot 
+- boot/		  --  Everything Validity needs in order to boot 
 - font/		  --  Contains the sfn font file which will be used by the kernel once VESA is enabled
 
 # Installation
@@ -50,7 +51,7 @@ I will attempt to make it POSIX compliant
 	- make run
 
 ## Building an ISO
-- Run `make`, that's literally all there is to it, lol :)
+- ISO files are generated after compiling the kernel. `make` suffices.
 
 # My journey: (Inspiration for newcomers)
 I have always wanted to make an OS, so one day I decided to build one.
@@ -64,7 +65,7 @@ I have started developing kernels about 8 months ago (with multiple month-long o
 
 I hope this inspired you to use this mindset when things seem too difficult to manage.
 
-Best of luck ~ V01D aka Tim.
+Best of luck ~ V01D (Tim).
 
 # Special thanks
 - Thanks go out to websites like lowlevel.eu or the osdev wiki but also some cool and really helpful os developers on github and discord.
