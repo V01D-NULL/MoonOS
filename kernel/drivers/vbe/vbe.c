@@ -102,7 +102,12 @@ void puts(const char *str)
         {
             ssfn_putc('\n');
         }
-        ssfn_putc(str[i]);
+
+        if (str[i] == '\t')
+            for(int j = 0; j < 4; j++)
+                ssfn_putc(' ');
+        else
+            ssfn_putc(str[i]);
         char_cnt++;
     }
     if (ssfn_dst.y >= gfx_h.fb_height)
