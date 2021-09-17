@@ -22,7 +22,7 @@ OBJ		 := $(OBJ_C) $(OBJ_ASM)
 
 ISO_NAME	  = ValidityOS.iso 
 
-KLIBS 	 := ../libs
+KLIBS 	 := $(shell find ../libs -type f -name '*.a')
 FONT 	 := font/console.sfn
 
 # Kernel compiler / linker flags
@@ -47,6 +47,7 @@ CFLAGS := 				 \
 	-pedantic			 \
 	-Wall				 \
 	-Werror				 \
+	-fno-omit-frame-pointer \
 	-mno-red-zone
 
 ASMFLAGS = -felf64 -g -F dwarf

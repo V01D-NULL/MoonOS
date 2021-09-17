@@ -44,6 +44,7 @@
 #include <mm/memdefs.h>
 #include <mm/buff/linear_alloc.h>
 
+#include <trace/strace.h>
 #include "panic.h"
 
 void banner();
@@ -65,6 +66,8 @@ void kmain(boot_info_t *bootvars)
     pmm_init(bootvars->mmap.memmap, bootvars->mmap.entries);
     vmm_init(check_la57());
     
+    backtrace_stack(4);    
+
     printk("OK", "Kernel end");
 
     for (;;)
