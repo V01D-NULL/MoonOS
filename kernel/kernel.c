@@ -51,47 +51,17 @@ void banner();
 
 void kmain(boot_info_t *bootvars)
 {
-    init_gdt();
-    init_idt();
-
-    /* Init the VESA printing routines, font loading, etc */
-    // gfx_init(*bootvars, 0x00, 0xf0bacde);
-    gfx_init(*bootvars, 0xffffff, 0x00);
-
     /* Init the CPU hardware struct */
     cpu_info_init(*bootvars);
-    banner();
     cpu_info();
 
     vmm_init(check_la57());
-    
-    backtrace_stack(4);    
+    create_safe_panic_area();
 
-    // void *ptr = NULL;
-    // debug(true, "(ubsan test) ptr: %lx\n", ptr);
-
-    printk("OK", "Kernel end");
+    panic("OK", "Kernel end");
 
     for (;;)
     {
         __asm__("hlt");
     }
-}
-const char *p1 = " _  _   __   __    __  ____  __  ____  _  _     __   ____\n";
-const char *p2 = "/ )( \\ / _\\ (  )  (  )(    \\(  )(_  _)( \\/ )   /  \\ / ___)\n";
-const char *p3 = "\\ \\/ //    \\/ (_/\\ )(  ) D ( )(   )(   )  /   (  O )\\___ \\ \n";
-const char *p4 = " \\__/ \\_/\\_/\\____/(__)(____/(__) (__) (__/     \\__/ (____/\n";
-
-void banner()
-{
-    printk("main", "Welcome to ValidityOS");
-    putc(0x24b8, -1, -1);
-    putc('\n', -1, -1);
-
-    debug(false, "%s%s%s%s", p1, p2, p3, p4);
-
-    gfx_set_colors(0xffffff, 0x0);
-    printk("Banner", "\n%s%s%s%s", p1, p2, p3, p4);
-    gfx_restore_colors(); //Restore default color scheme
-    delay(200);
 }

@@ -11,7 +11,8 @@ EMU_OPTS = \
         -serial stdio -no-reboot \
         -no-shutdown -cdrom $(ISO_NAME)
 
-EMU_OPTS_CUTTING_EDGE = $(EMU_OPTS) -cpu qemu64,+la57
+EMU_OPTS_KVM = -enable-kvm -cpu host
+EMU_OPTS_CUTTING_EDGE = -cpu qemu64,+la57
 EMU_DEBUG_OPTS = $(EMU_OPTS) -S -s --no-reboot
 
 CFILES	 := $(shell find ./ -type f -name '*.c')

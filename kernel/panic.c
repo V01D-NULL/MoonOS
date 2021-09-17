@@ -6,19 +6,34 @@
 #include <stdarg.h>
 #include <libk/kprintf.h>
 #include <trace/strace.h>
+#include <trace/sym.h>
+#include <libk/kassert.h>
+#include <mm/memdefs.h>
+#include <mm/vmm.h>
 
-char panic_buff[512];
 __no_return panic(const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
+	char panic_buff[512];
 	vsnprintf(GENERIC_CAST(char *, &panic_buff), GENERIC_CAST(size_t, -1), fmt, ap);
 	va_end(ap);
 
-	printk("panic", "KERNEL PANIC: %s\n", panic_buff);
-	debug(true, "KERNEL PANIC: %s\n", panic_buff);
+	printk("panic", "\n\tA kernel panic has occurred\n\t*** Reason: %s ***\n", panic_buff);
 
-	backtrace_stack(10);	
+	struct stacktrace_result res = backtrace_stack(10);
+	for (int i = 0; i < res.count; i++)
+	{
+		backtrace_symbol(res.trace_results[i].address);
+	}
 
-	for (;;);
+	for (;;)
+		;
+}
+
+void create_safe_panic_area()
+{
+	uint64_t panic = to_virt(from_phys(find_symbol_by_name("panic")));
+	assert(panic != -1);
+	vmm_map(panic, panic, FLAGS_PR);
 }

@@ -1,0 +1,2 @@
+#include "sym.h"
+sym_table_t symbol_table[] = {{0xFFFFFFFFFFFFFFFF, ""}};

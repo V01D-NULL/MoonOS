@@ -7,6 +7,7 @@
 #include <int/idt.h>
 #include <util/ptr.h>
 #include <stdbool.h>
+#include <trace/sym.h>
 
 #define GB 0x40000000UL
 
