@@ -130,7 +130,7 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
         if (mmap[i].type != STIVALE2_MMAP_USABLE)
             continue;
 
-        top = mmap[i].base + mmap[i].length;
+        top = mmap[i].base + mmap[i].length - 1;
         if (top > highest_page)
             highest_page = top;
     }
