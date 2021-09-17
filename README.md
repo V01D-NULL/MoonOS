@@ -10,9 +10,11 @@ Validity OS is a monolithic kernel targeting the x86_64 architecture, aiming to 
 - Vesa with font loading using ssfn2
 - Support for 4 and 5 level paging
 - Stacktrace/symbol backtrace
+- ubsan
 
 # Future features:
-- A simple heap
+- kasan
+- Heap
 - APIC
 - ACPI
 - Userland support
