@@ -43,13 +43,13 @@ Validity OS is a monolithic kernel targeting the x86_64 architecture, aiming to 
 ## Building: (assuming you are using a debian based distro)
 - Install needed tools:
 	- sudo apt update
-	- sudo apt install gcc nasm qemu-system-x86
+	- sudo apt install gcc nasm qemu-system-x86 libfuse-dev
 - Build kernel
 	- `make all` -- Build the kernel to an ISO file
 	- `make run` -- Run the kernel in qemu and build it if necessary
 	- `make kvm` -- Run the kernel in qemu with kvm and build it if necessary
 	- Command line options for `kvm` and `run`:
-		- `modern=yes` -- Emulate modern features (5 level paging for example)
+		- `modern=yes` -- Emulate modern features (5 level paging for example and uefi just to name a few)
 
 
 # My journey: (Inspiration for newcomers)

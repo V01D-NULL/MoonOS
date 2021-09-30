@@ -12,7 +12,7 @@ EMU_OPTS = \
         -no-shutdown -cdrom $(ISO_NAME)
 
 EMU_OPTS_KVM = -enable-kvm -cpu host
-EMU_OPTS_CUTTING_EDGE = -cpu qemu64,+la57
+EMU_OPTS_CUTTING_EDGE = -cpu qemu64,+la57 -bios /usr/share/ovmf/OVMF.fd
 EMU_DEBUG_OPTS = $(EMU_OPTS) -S -s --no-reboot
 
 CFILES	 := $(shell find ./ -type f -name '*.c')

@@ -19,7 +19,7 @@ else
 	$(EMU) $(EMU_OPTS)
 endif
 
-# modern=yes will attempt to use modern features, if the cpu does not support it, it will fallback to something else
+# modern=yes will attempt to use modern features. If the cpu does not support it, it will fallback to something else
 kvm: quick_recompile ISO
 ifeq ($(modern), yes)
 	$(EMU) $(EMU_OPTS) $(EMU_OPTS_KVM) $(EMU_OPTS_CUTTING_EDGE)
@@ -31,13 +31,14 @@ $(KERNEL_ELF):
 	@$(MAKE) --no-print-directory -C kernel
 
 $(KERNEL_HDD): $(KERNEL_ELF)
+	@$(MAKE) --no-print-directory -C echfs
 	@dd if=/dev/zero bs=1M count=0 seek=64 of=$(KERNEL_HDD) 								2> /dev/null
 	@parted -s $(KERNEL_HDD) mklabel gpt 													2> /dev/null
 	@parted -s $(KERNEL_HDD) mkpart primary 2048s 100% 										2> /dev/null
-	@./$(BUILD_UTIL_DIR)/echfs-utils -g -p0 $(KERNEL_HDD) quick-format 512 					2> /dev/null
-	@./$(BUILD_UTIL_DIR)/echfs-utils -g -p0 $(KERNEL_HDD) import $^ kernel.elf				2> /dev/null
-	@./$(BUILD_UTIL_DIR)/echfs-utils -g -p0 $(KERNEL_HDD) import boot/limine.cfg limine.cfg 2> /dev/null
-	@./$(BUILD_UTIL_DIR)/limine-install 	$(KERNEL_HDD)									2> /dev/null
+	@echfs/echfs-utils -g -p0 $(KERNEL_HDD) quick-format 512 								2> /dev/null
+	@echfs/echfs-utils -g -p0 $(KERNEL_HDD) import $^ kernel.elf							2> /dev/null
+	@echfs/echfs-utils -g -p0 $(KERNEL_HDD) import boot/limine.cfg limine.cfg				2> /dev/null
+	@limine/limine-install 	$(KERNEL_HDD)													2> /dev/null
 	
 symlist:
 	@echo '#include "sym.h"' > scripts/parsed.sym
@@ -57,12 +58,17 @@ debugger_session: $(KERNEL_HDD)
 	$(EMU) $(EMU_DEBUG_OPTS)
 
 ISO: $(KERNEL_HDD)
+	$(MAKE) -C limine
 	mkdir iso/ || echo ""
-	@cp limine/limine-cd.bin boot/
-	@cp limine/limine.sys boot/
-	@cp $(KERNEL_ELF) boot/kernel.elf
-	@cp boot/* iso/
-	xorriso -as mkisofs -b limine-cd.bin -no-emul-boot -boot-load-size 4 -boot-info-table iso/ -o ValidityOS.iso
+	@cp limine/BOOTIA32.EFI limine/BOOTX64.EFI limine/limine.sys limine/limine-cd.bin \
+	limine/limine-eltorito-efi.bin limine/limine-pxe.bin boot/limine.cfg $(KERNEL_ELF) iso/
+
+	xorriso -as mkisofs -b limine-cd.bin \
+	-no-emul-boot -boot-load-size 4 -boot-info-table \
+	--efi-boot limine-eltorito-efi.bin -efi-boot-part \
+	--efi-boot-image --protective-msdos-label iso -o $(ISO_NAME)
+
+	limine/limine-install $(ISO_NAME)
 
 # Remove the HDD & elf file while saving all object files (fewer files will be recompiled)
 quick_recompile:
