@@ -27,8 +27,6 @@
 #include <drivers/io/serial.h>
 #include <drivers/vbe/vbe.h>
 
-#include <hal/apic.h>
-
 #include <asm/x86/x86.h>
 
 #include <libk/kstring.h>
@@ -47,6 +45,8 @@
 #include <trace/strace.h>
 #include "panic.h"
 
+#include <hal/acpi/tables/rsdp.h>
+
 void banner();
 
 void kmain(boot_info_t *bootvars)
@@ -58,7 +58,10 @@ void kmain(boot_info_t *bootvars)
     vmm_init(check_la57());
     create_safe_panic_area();
 
-    panic("OK", "Kernel end");
+    rsdp_init(&bootvars->rsdp);
+
+
+    panic("Kernel end");
 
     for (;;)
     {

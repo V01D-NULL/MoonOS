@@ -35,5 +35,5 @@ void create_safe_panic_area()
 {
 	uint64_t panic = to_virt(from_phys(find_symbol_by_name("panic")));
 	assert(panic != -1);
-	vmm_map(panic, panic, FLAGS_PR);
+	vmm_remap(panic, panic, FLAGS_PR);
 }
