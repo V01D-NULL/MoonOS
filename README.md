@@ -1,7 +1,5 @@
 # VALIDITY OS
-Validity OS is a monolithic kernel targeting the x86_64 architecture.
-
-I will attempt to make it POSIX compliant
+Validity OS is a monolithic kernel targeting the x86_64 architecture, aiming to be POSIX compliant.
 
 # Screenshots:
 <img src="screenshot/1.png">
@@ -12,9 +10,11 @@ I will attempt to make it POSIX compliant
 - Vesa with font loading using ssfn2
 - Support for 4 and 5 level paging
 - Stacktrace/symbol backtrace
+- ubsan
 
 # Future features:
-- A simple heap
+- kasan
+- Heap
 - APIC
 - ACPI
 - Userland support
@@ -28,8 +28,8 @@ I will attempt to make it POSIX compliant
 - A libc for the userland
 
 # This is currently being working on:
-- vmm cleanup
 - Parsing ACPI tables
+- Double buffering
 
 # Directory walkthrough:
 - libs/   	  --  Here you will find kernel libs.
@@ -43,15 +43,14 @@ I will attempt to make it POSIX compliant
 ## Building: (assuming you are using a debian based distro)
 - Install needed tools:
 	- sudo apt update
-	- sudo apt install build-essential nasm qemu-system-x86
+	- sudo apt install gcc nasm qemu-system-x86
 - Build kernel
-	- git clone < REPO >
-	- cd < REPO_DIR >
-	- make all
-	- make run
+	- `make all` -- Build the kernel to an ISO file
+	- `make run` -- Run the kernel in qemu and build it if necessary
+	- `make kvm` -- Run the kernel in qemu with kvm and build it if necessary
+	- Command line options for `kvm` and `run`:
+		- `modern=yes` -- Emulate modern features (5 level paging for example)
 
-## Building an ISO
-- ISO files are generated after compiling the kernel. `make` suffices.
 
 # My journey: (Inspiration for newcomers)
 I have always wanted to make an OS, so one day I decided to build one.
