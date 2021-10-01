@@ -31,6 +31,7 @@ $(KERNEL_ELF):
 
 $(KERNEL_HDD): $(KERNEL_ELF)
 	@$(MAKE) --no-print-directory -C echfs
+	@$(MAKE) --no-print-directory -C limine
 	@dd if=/dev/zero bs=1M count=0 seek=64 of=$(KERNEL_HDD) 								2> /dev/null
 	@parted -s $(KERNEL_HDD) mklabel gpt 													2> /dev/null
 	@parted -s $(KERNEL_HDD) mkpart primary 2048s 100% 										2> /dev/null
@@ -57,7 +58,6 @@ debugger_session: $(KERNEL_HDD)
 	$(EMU) $(EMU_DEBUG_OPTS)
 
 ISO: $(KERNEL_HDD)
-	$(MAKE) -C limine
 	mkdir iso/ || echo ""
 	@cp limine/BOOTIA32.EFI limine/BOOTX64.EFI limine/limine.sys limine/limine-cd.bin \
 	limine/limine-eltorito-efi.bin limine/limine-pxe.bin boot/limine.cfg $(KERNEL_ELF) iso/
