@@ -70,7 +70,7 @@ ISO: $(KERNEL_HDD)
 	limine/limine-install $(ISO_NAME)
 
 # Remove the HDD & elf file while saving all object files (fewer files will be recompiled)
-quick_recompile:
+quick_recompile: symlist
 	@printf " LD  Creating font binary\n";
 	@ld -r -b binary -o kernel/drivers/vbe/__font__.o font/console.sfn
 	@rm -f $(KERNEL_HDD) kernel/kernel.elf
