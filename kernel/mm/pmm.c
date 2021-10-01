@@ -95,20 +95,23 @@ const char *get_mmap_type(int entry)
     case STIVALE2_MMAP_USABLE:
         return "Stivale2 mmap usable";
 
-    case STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE:
-        return "Stivale2 bootloader reclaimable";
-
     case STIVALE2_MMAP_RESERVED:
         return "Stivale2 mmap reserved";
 
-    case STIVALE2_MMAP_KERNEL_AND_MODULES:
-        return "Stivale2 mmap kernel and modules";
-
     case STIVALE2_MMAP_ACPI_RECLAIMABLE:
         return "Stivale2 mmap acpi reclaimable";
+    
+    case STIVALE2_MMAP_ACPI_NVS:
+        return "Stivale2 mmap acpi nvs";
 
     case STIVALE2_MMAP_BAD_MEMORY:
         return "Stivale2 mmap bad memory";
+
+    case STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE:
+        return "Stivale2 bootloader reclaimable";
+
+    case STIVALE2_MMAP_KERNEL_AND_MODULES:
+        return "Stivale2 mmap kernel and modules";
 
     case STIVALE2_MMAP_FRAMEBUFFER:
         return "Stivale2 mmap fb";
