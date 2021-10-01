@@ -3,7 +3,7 @@
 *.o
 *.elf
 *.map
-Kernel/parsed.sym
+kernel/parsed.sym
 ValidityOS.hdd
 ValidityOS.iso
 
