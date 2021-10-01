@@ -19,6 +19,7 @@
 #include <mm/pmm.h>
 #include <panic.h>
 #include <stdint.h>
+#include <printk.h>
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id);
 

@@ -10,6 +10,7 @@
 #include <libk/kassert.h>
 #include <mm/memdefs.h>
 #include <mm/vmm.h>
+#include <printk.h>
 
 __no_return panic(const char *fmt, ...)
 {

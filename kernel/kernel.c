@@ -33,6 +33,7 @@
 #include <libk/kprintf.h>
 #include <libk/kassert.h>
 #include <liballoc/bitmap.h>
+#include <libgraphics/double-buffering.h>
 
 #include <util/common.h>
 #include <util/ptr.h>
@@ -59,7 +60,6 @@ void kmain(boot_info_t *bootvars)
     create_safe_panic_area();
 
     rsdp_init(&bootvars->rsdp);
-
 
     panic("Kernel end");
 

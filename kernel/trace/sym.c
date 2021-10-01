@@ -1,6 +1,8 @@
 #include "sym.h"
 #include <util/ptr.h>
-#include <drivers/vbe/vbe.h>
+#include <printk.h>
+#include <stddef.h>
+#include <libk/kstring.h>
 
 extern sym_table_t symbol_table[];
 

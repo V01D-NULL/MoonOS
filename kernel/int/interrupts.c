@@ -8,6 +8,7 @@
 #include <util/ptr.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <printk.h>
 
 isr_t isr_handler_array[255] = {0};
 static bool canReturn = false;

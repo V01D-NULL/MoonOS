@@ -5,6 +5,7 @@
 #include <util/iterator.h>
 #include <liballoc/bitmap.h>
 #include <panic.h>
+#include <printk.h>
 #include "memdefs.h"
 
 static mmap_t phys_mmap;

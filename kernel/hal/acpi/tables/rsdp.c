@@ -4,6 +4,7 @@
 #include <util/ptr.h>
 #include <stdbool.h>
 #include <panic.h>
+#include <printk.h>
 
 struct rsdp_tableV1 rsdp_v1;
 struct rsdp_tableV2 rsdp_v2;

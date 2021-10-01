@@ -1,5 +1,5 @@
 #include "cpu.h"
-#include <drivers/vbe/vbe.h>
+#include <printk.h>
 
 cpu_hw_t cpu_hardware;
 

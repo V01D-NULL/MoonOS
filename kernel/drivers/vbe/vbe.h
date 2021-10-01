@@ -40,7 +40,7 @@ void gfx_set_colors(uint32_t fg, uint32_t bg);
 void gfx_restore_colors();
 void gfx_scroll();
 void gfx_vertical_scroll(int n);
-
+void gfx_clear_x(int y1, int color);
 /**
  * @brief Initialise the (vesa) graphics context
  * 
@@ -57,39 +57,5 @@ void put_pixel(int x, int y, int color);
  * @param color Color to clear the screen with
  */
 void gfx_clear(int color);
-
-/**
- * @brief Print a single unicode character
- * 
- * @param unicode  Unicode character
- * @param x        X screen coordinate
- * @param y        Y screen coordinate
- */
-void putc(uint32_t unicode, int x, int y);
-
-/**
- * @brief Print a null terminated string to the screen
- * 
- * @param str 
- */
-void puts(const char *str);
-
-/**
- * @brief  Printf for VESA
- * 
- * @param status  The status of the operation (OK, ERR, or anything else.) (Example output: "[ MEMORY ]")
- * @param fmt     Format string
- * @param ...
- */
-void printk(char *status, char *fmt, ...);
-
-/**
- * @brief Printf for VESA with the addition that this function waits for a function to finish
- * 
- * @param callback  Function to wait for
- * @param fmt       Format string
- * @param ... 
- */
-void printk_wait(bool (*callback)(), char *fmt,  ...);
 
 #endif // GFX_H

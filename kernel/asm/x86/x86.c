@@ -3,6 +3,7 @@
 #include <amd64/validity.h>
 #include <drivers/vbe/vbe.h>
 #include <drivers/io/serial.h>
+#include <printk.h>
 
 __export cpu_hw_t cpu_hardware;
 
