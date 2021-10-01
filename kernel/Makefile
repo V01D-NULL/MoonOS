@@ -1,4 +1,4 @@
-include ../build-util/flags.mk
+include ../flags.mk
 
 TARGET := kernel.elf
 KLIBS  := $(shell find ../libs -type f -name '*.a')

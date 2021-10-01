@@ -1,12 +1,11 @@
 KERNEL_HDD 	   = ValidityOS.hdd
 KERNEL_ELF	   = kernel/kernel.elf
-BUILD_UTIL_DIR = build-util
 
 # CHANGE ME! I will be the terminal in which you can debug ValidityOS.
 DEBUG_TERMINAL = gnome-terminal
 DEBUG_TERMINAL_OPTS = --tab "[DEBUG] ValidityOS [DEBUG]" --command
 
-include build-util/flags.mk
+include ./flags.mk
 
 .PHONY: clean all run
 

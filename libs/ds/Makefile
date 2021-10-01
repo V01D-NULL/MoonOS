@@ -1,4 +1,4 @@
-include ../../build-util/flags.mk
+include ../../flags.mk
 
 TARGET := ds.a
 
