@@ -1,9 +1,9 @@
 [submodule "limine"]
 	path = limine
-	url = https://github.com/limine-bootloader/limine/
+	url = https://github.com/limine-bootloader/limine
 [submodule "echfs"]
 	path = echfs
-	url = https://github.com/echfs/echfs
+	url = https://github.com/echfs/echfs.git
 [submodule "scalable-font2"]
 	path = scalable-font2
 	url = https://gitlab.com/bztsrc/scalable-font2/
