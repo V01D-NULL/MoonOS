@@ -92,7 +92,7 @@ void xsdt_init(uint64_t rsdp_base)
     uint8_t *addr = (uint8_t *)rsdp_base + 20;
     rsdp_v2.rsdp = rsdp_v1;
     rsdp_v2.length = *addr;
-    rsdp_v2.xsdt_address = rsdp_base; // sizeof(rsdp_v2.length) + sizeof(rsdp_v2.xsdt_address) -- 4 + 8
+    rsdp_v2.xsdt_address = rsdp_base;
 
     printk("acpi-xstd", "Length: %d\n", rsdp_v2.length);
     rsdp_verify_checksum(rsdp_base);
