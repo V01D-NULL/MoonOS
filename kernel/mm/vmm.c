@@ -117,7 +117,6 @@ void vmm_unmap(size_t vaddr)
         pml3 = vmm_get_pml(pml4, info.lv4);
         pml2 = vmm_get_pml(pml3, info.lv3);
         pml1 = vmm_get_pml(pml2, info.lv2);
-        debug(true, "pml[%d] = %llx\n", info.lv1, pml1[info.lv1] & ~(511));
         pml1[info.lv1] = 0;
     }
     else
