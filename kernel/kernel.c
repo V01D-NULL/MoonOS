@@ -41,15 +41,15 @@
 #include <mm/pmm.h>
 #include <mm/vmm.h>
 #include <mm/memdefs.h>
-#include <mm/buff/linear_alloc.h>
+#include <mm/linear/linear_alloc.h>
 
 #include <trace/strace.h>
 #include "panic.h"
-
+#include "printk.h"
 #include <hal/acpi/tables/rsdp.h>
 
 void banner();
-
+extern gfx_header_t gfx_h;
 void kmain(boot_info_t *bootvars)
 {
     /* Init the CPU hardware struct */
@@ -60,9 +60,10 @@ void kmain(boot_info_t *bootvars)
     create_safe_panic_area();
 
     rsdp_init(&bootvars->rsdp);
-
-    panic("Kernel end");
-
+    
+    double_buffering_init();
+    kernel_log_init();
+    
     for (;;)
     {
         __asm__("hlt");

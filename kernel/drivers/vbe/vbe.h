@@ -41,21 +41,8 @@ void gfx_restore_colors();
 void gfx_scroll();
 void gfx_vertical_scroll(int n);
 void gfx_clear_x(int y1, int color);
-/**
- * @brief Initialise the (vesa) graphics context
- * 
- * @param boot  Bootloader information structure
- * @param fg    Default foreground color
- * @param bg    Default background color
- */
 void gfx_init(boot_info_t boot, int fg, int bg);
 void put_pixel(int x, int y, int color);
-
-/**
- * @brief Clear the entire screen with specified color
- * 
- * @param color Color to clear the screen with
- */
 void gfx_clear(int color);
 
 #endif // GFX_H

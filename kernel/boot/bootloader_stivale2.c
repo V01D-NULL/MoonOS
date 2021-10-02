@@ -20,6 +20,7 @@
 #include <panic.h>
 #include <stdint.h>
 #include <printk.h>
+#include <libgraphics/double-buffering.h>
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id);
 
@@ -28,32 +29,25 @@ static __section_align uint8_t stack[345859];
 struct stivale2_struct_tag_rsdp rsdp_tag = {
     .tag = {
         .identifier = STIVALE2_STRUCT_TAG_RSDP_ID,
-        .next = 0
-    }
-};
+        .next = 0}};
 
 struct stivale2_tag level5_paging_tag = {
     .identifier = STIVALE2_HEADER_TAG_5LV_PAGING_ID,
-    .next = (uintptr_t)&rsdp_tag
-};
+    .next = (uintptr_t)&rsdp_tag};
 
 struct stivale2_header_tag_smp smp_hdr_tag = {
     .tag = {
         .identifier = STIVALE2_HEADER_TAG_SMP_ID,
-        .next = (uintptr_t)&level5_paging_tag
-    }
-};
+        .next = (uintptr_t)&level5_paging_tag}};
 
 struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
     // All tags need to begin with an identifier and a pointer to the next tag.
     .tag = {
         .identifier = STIVALE2_HEADER_TAG_FRAMEBUFFER_ID,
-        .next = (uintptr_t)&smp_hdr_tag
-    },
+        .next = (uintptr_t)&smp_hdr_tag},
     .framebuffer_width = 0,
     .framebuffer_height = 0,
-    .framebuffer_bpp = 0
-};
+    .framebuffer_bpp = 0};
 
 #ifdef USE_VGA
 __SECTION(".stivale2hdr")
@@ -69,8 +63,7 @@ struct stivale2_header stivale_hdr = {
     .entry_point = 0,
     .stack = (uintptr_t)stack + sizeof(stack),
     .flags = 0,
-    .tags = (uintptr_t)&framebuffer_hdr_tag
-};
+    .tags = (uintptr_t)&framebuffer_hdr_tag};
 #endif
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id)
@@ -101,22 +94,13 @@ const char *p4 = " \\__/ \\_/\\_/\\____/(__)(____/(__) (__) (__/     \\__/ (____
 
 void banner()
 {
-    printk("main", "Welcome to ValidityOS");
-    putc(0x24b8, -1, -1);
-    putc('\n', -1, -1);
+    printk("main", "Welcome to ValidityOS\n");
+    // putc(0x24b8, -1, -1, false);
+    // putc('\n', -1, -1, false);
 
     debug(false, "%s%s%s%s", p1, p2, p3, p4);
 
-    gfx_set_colors(0x4863A0, 0x0); //Dark/Dirty blue on black bg
-    printk("", "%s", p1);
-    gfx_set_colors(0x6698FF, 0x0); //Light blue on black bg
-    printk("", "%s", p2);
-    gfx_set_colors(0x6960EC, 0x0); //Dark Purple on black bg
-    printk("", "%s", p3);
-    gfx_set_colors(0x4863A0, 0x0); //Dark/Dirty blue on black bg
-    printk("", "%s", p4);
-    
-    gfx_restore_colors(); //Restore default color scheme
+    printk("Banner", "\n%s%s%s%s", p1, p2, p3, p4);
     delay(200);
 }
 
@@ -178,6 +162,6 @@ void kinit(struct stivale2_struct *bootloader_info)
     {
         bootvars.rsdp.rsdp_address = rsdp->rsdp;
     }
-
+    
     kmain(&bootvars);
 }
