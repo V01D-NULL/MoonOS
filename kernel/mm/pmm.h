@@ -2,10 +2,10 @@
 #define BITMAP_PMM_H
 
 #include <stdint.h>
-#include <drivers/vga/vga.h>
 #include <amd64/validity.h>
 #include <stivale2.h>
 #include <stdbool.h>
+#include <util/range.h>
 
 #define PAGE_SIZE   4096
 #define PMM_INVALID NULL
@@ -27,6 +27,7 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries);
 void *pmm_alloc();
 void *find_first_free_block();
 void *pmm_alloc_any(void *addr);
+range_t pmm_alloc_range(size_t pages);
 void pmm_free(void *page);
 bool in_range(void *_address);
 struct memtag_range pmm_find_tag(size_t tag, int retries);

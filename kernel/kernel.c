@@ -48,7 +48,6 @@
 #include "printk.h"
 #include <hal/acpi/tables/rsdp.h>
 
-void banner();
 extern gfx_header_t gfx_h;
 void kmain(boot_info_t *bootvars)
 {
@@ -63,7 +62,10 @@ void kmain(boot_info_t *bootvars)
     
     double_buffering_init();
     kernel_log_init();
-    
+
+    range_t r = pmm_alloc_range(2);
+    debug(true, "base: %llX, top: %llX\n", r.base, r.limit);
+
     for (;;)
     {
         __asm__("hlt");
