@@ -3,9 +3,11 @@
 #include <drivers/vbe/vbe.h>
 #include <util/ptr.h>
 #include <util/iterator.h>
-#include <liballoc/bitmap.h>
+#include <libk/kassert.h>
 #include <panic.h>
 #include <printk.h>
+#include <liballoc/bitmap.h>
+#include <drivers/io/serial.h>
 #include "memdefs.h"
 
 static mmap_t phys_mmap;
@@ -193,7 +195,7 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
         pfa_free_multiple(page, len);
     }
 
-    printk("pmm", "Initialized pmm\n");
+    // printk("pmm", "Initialized pmm\n");
 }
 
 /**
@@ -219,8 +221,8 @@ void *pmm_alloc()
 
     memset(block, 0, PAGE_SIZE);
     pfa_alloc(VAR_TO_VOID_PTR(uintptr_t, (GENERIC_CAST(uintptr_t, block))));
-    return block;
-    // return VAR_TO_VOID_PTR(uintptr_t, to_virt(GENERIC_CAST(uintptr_t, block)));
+    // return block;
+    return VAR_TO_VOID_PTR(uintptr_t, to_virt(GENERIC_CAST(uintptr_t, block)));
 }
 
 void *pmm_alloc_any(void *addr)
@@ -234,6 +236,19 @@ void *pmm_alloc_any(void *addr)
     bset(index, BIT_SET);
 
     return block;
+}
+
+range_t pmm_alloc_range(size_t pages)
+{   
+    uint64_t* base = (uint64_t*)pmm_alloc();
+    uint64_t* top = (uint64_t*)0;
+
+    for (size_t i = 0; i < pages; i++)
+    {
+        assert((top = (uint64_t*)pmm_alloc()) != NULL);
+    }
+    
+    return (range_t) {(size_t)base, (size_t)top};
 }
 
 //Find a memory entry by it's tag up to `retries` times
