@@ -12,6 +12,17 @@ void memcpy (uint8_t *dest, const uint8_t *src, uint64_t len)
 	}
 }
 
+void memcpy32(uint32_t *dest, const uint32_t *src, uint64_t len)
+{
+	for (; len != 0; len--)
+	{
+		*dest = *src;
+
+		dest++;
+		src++;
+	}
+}
+
 void *memset (void *dest, const uint8_t val, size_t len)
 {
   uint8_t *ptr = (uint8_t*)dest;

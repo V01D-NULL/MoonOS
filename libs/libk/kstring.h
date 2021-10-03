@@ -27,6 +27,7 @@
  * @param len  The amount of bytes to copy
  */
 void memcpy(uint8_t *dest, const uint8_t *src, uint64_t len);
+void memcpy32(uint32_t *dest, const uint32_t *src, uint64_t len);
 
 /**
  * @brief Set *n* bytes equal to val

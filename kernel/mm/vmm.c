@@ -18,16 +18,16 @@ void vmm_init(bool has_5_level_paging)
 {
     la57_enabled = has_5_level_paging;
 
-    rootptr = (uint64_t *)pmm_alloc();
+    rootptr = (uint64_t *)(from_virt((uintptr_t)pmm_alloc()));
     if (la57_enabled)
     {
         debug(true, "Using 5 level paging\n");
-        printk("vmm", "pml5 resides at 0x%llx\n", rootptr);
+        // printk("vmm", "pml5 resides at 0x%llx\n", rootptr);
     }
     else
     {
         debug(true, "Using 4 level paging\n");
-        printk("vmm", "pml4 resides at 0x%llx\n", rootptr);
+        // printk("vmm", "pml4 resides at 0x%llx\n", rootptr);
     }
 
     // First 4 GB in phys mem
@@ -60,7 +60,7 @@ void vmm_init(bool has_5_level_paging)
     init_gdt();
     init_idt();
 
-    printk("vmm", "Initialised vmm\n");
+    // printk("vmm", "Initialised vmm\n");
 }
 
 static uint64_t *vmm_get_pml_or_alloc(uint64_t *entry, size_t level, int flags)
@@ -68,7 +68,7 @@ static uint64_t *vmm_get_pml_or_alloc(uint64_t *entry, size_t level, int flags)
     if (entry[level] & 1)
         goto no_alloc;
 
-    entry[level] = VOID_PTR_TO_64(pmm_alloc());
+    entry[level] = from_virt((uintptr_t)pmm_alloc());
     entry[level] |= flags;
 
 no_alloc:
@@ -117,7 +117,6 @@ void vmm_unmap(size_t vaddr)
         pml3 = vmm_get_pml(pml4, info.lv4);
         pml2 = vmm_get_pml(pml3, info.lv3);
         pml1 = vmm_get_pml(pml2, info.lv2);
-        debug(true, "pml[%d] = %llx\n", info.lv1, pml1[info.lv1] & ~(511));
         pml1[info.lv1] = 0;
     }
     else
@@ -189,7 +188,7 @@ page_info_t vmm_dissect_vaddr(uint64_t virt_addr)
     page_info_t pg_info;
     const int bitmask = 0x1FF;
 
-    virt_addr >>= 12;
+    pg_info.off = virt_addr >>= 12;
 
     pg_info.lv1 = virt_addr & bitmask;
     virt_addr >>= 9;

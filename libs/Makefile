@@ -21,7 +21,8 @@ libgraphics.a:
 	@mv libgraphics/$@ .	
 
 clean:
-	@rm -f libk.a liballoc.a ds.a
+	@rm -f libk.a liballoc.a ds.a libgraphics.a
 	@$(MAKE) --no-print-directory -C libk clean
 	@$(MAKE) --no-print-directory -C liballoc clean
 	@$(MAKE) --no-print-directory -C ds clean
+	@$(MAKE) --no-print-directory -C libgraphics clean
