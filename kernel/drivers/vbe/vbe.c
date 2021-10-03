@@ -2,14 +2,6 @@
 #include <util/common.h>
 #include <amd64/validity.h>
 
-#define SSFN_CONSOLEBITMAP_TRUECOLOR        /* use the special renderer for 32 bit truecolor packed pixels */
-#define SSFN_NOIMPLEMENTATION               /* don't include the normal renderer implementation */
-#include <3rdParty/ssfn.h>
-
-__export uint8_t _binary_font_console_sfn_start;
-__export uint8_t _binary_font_console_sfn_size;
-__export uint8_t _binary_font_console_sfn_end;
-
 gfx_header_t gfx_h;
 uint32_t *framebuffer_address;
 
@@ -22,17 +14,6 @@ void gfx_init(boot_info_t boot, int fg, int bg)
     gfx_h.fb_pitch = boot.vesa.fb_pitch;
 
     framebuffer_address = (uint32_t*) gfx_h.fb_addr;
-
-    ssfn_src =
-    (ssfn_font_t*)&_binary_font_console_sfn_start;   /* the bitmap font to use */
-
-    ssfn_dst.ptr = (uint8_t*)boot.vesa.fb_addr; /* address of the linear frame buffer */
-    ssfn_dst.w = boot.vesa.fb_width;            /* width */
-    ssfn_dst.h = boot.vesa.fb_height;           /* height */
-    ssfn_dst.p = boot.vesa.fb_pitch;            /* bytes per line */
-    ssfn_dst.x = ssfn_dst.y = 0;                /* pen position */
-    ssfn_dst.fg = fg;                   /* foreground color */
-    ssfn_dst.bg = bg;   //TODO: Make sure upper bits (0xff...) are 255
 
     gfx_h.last_known_fg = fg;
     gfx_h.last_known_bg = bg;
@@ -66,18 +47,6 @@ void gfx_clear_x(int y1, int color)
             // debug("(%d, %d)\n", x, y);
         }
     }
-}
-
-void gfx_set_colors(uint32_t fg, uint32_t bg)
-{
-    ssfn_dst.fg = fg;
-    ssfn_dst.bg = bg;
-}
-
-void gfx_restore_colors()
-{
-    ssfn_dst.fg = gfx_h.last_known_fg;
-    ssfn_dst.bg = gfx_h.last_known_bg;
 }
 
 //Move everything up by 1 line

@@ -219,10 +219,10 @@ void *pmm_alloc()
         return NULL;
     }
 
-    // memset(block, 0, PAGE_SIZE);
+    memset(block, 0, PAGE_SIZE);
     pfa_alloc(VAR_TO_VOID_PTR(uintptr_t, (GENERIC_CAST(uintptr_t, block))));
-    return block;
-    // return VAR_TO_VOID_PTR(uintptr_t, to_virt(GENERIC_CAST(uintptr_t, block)));
+    // return block;
+    return VAR_TO_VOID_PTR(uintptr_t, to_virt(GENERIC_CAST(uintptr_t, block)));
 }
 
 void *pmm_alloc_any(void *addr)

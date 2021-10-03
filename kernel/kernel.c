@@ -55,15 +55,12 @@ void kmain(boot_info_t *bootvars)
     cpu_info_init(*bootvars);
     cpu_info();
 
-    vmm_init(check_la57());
-    create_safe_panic_area();
-
     rsdp_init(&bootvars->rsdp);
-
-    // printk("main", "testing double buffering...\n");
-    // printk("main", "double buffering works!\n");
-    fill_rect(20, 20, 40, 40, 0xFFFFFF);
-    fill_rect(40, 40, 60, 60, 0xFFFFFF);
+    // double_buffering_init();
+    // fill_rect(20, 20, 40, 40, 0xFFFFFF);
+    // fill_rect(40, 40, 60, 60, 0xDEADBEEF);
+    // fill_rect(80, 80, 100, 100, 0xDABABAAA);
+    // fill_rect(120, 120, 140, 140, 0xDA35901E);
 
     for (;;)
     {

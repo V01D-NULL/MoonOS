@@ -17,6 +17,8 @@
 #include <int/gdt.h>
 #include <kernel.h>
 #include <mm/pmm.h>
+#include <mm/vmm.h>
+#include <mm/memdefs.h>
 #include <panic.h>
 #include <stdint.h>
 #include <printk.h>
@@ -92,14 +94,15 @@ const char *p2 = "/ )( \\ / _\\ (  )  (  )(    \\(  )(_  _)( \\/ )   /  \\ / ___
 const char *p3 = "\\ \\/ //    \\/ (_/\\ )(  ) D ( )(   )(   )  /   (  O )\\___ \\ \n";
 const char *p4 = " \\__/ \\_/\\_/\\____/(__)(____/(__) (__) (__/     \\__/ (____/\n";
 
-void banner()
+void banner(bool serial_only)
 {
+    if (serial_only)
+    {
+        debug(false, "%s%s%s%s", p1, p2, p3, p4);
+        return;
+    }
+
     printk("main", "Welcome to ValidityOS\n");
-    // putc(0x24b8, -1, -1, false);
-    // putc('\n', -1, -1, false);
-
-    debug(false, "%s%s%s%s", p1, p2, p3, p4);
-
     printk("Banner", "\n%s%s%s%s", p1, p2, p3, p4);
     delay(200);
 }
@@ -114,7 +117,8 @@ void kinit(struct stivale2_struct *bootloader_info)
     boot_info_t bootvars; //Hardware information from the bootloader
 
     serial_set_color(BASH_WHITE);
-
+    banner(true); /* Write banner to serial device */
+    
     struct stivale2_struct_tag_memmap *mmap = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
     struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
     struct stivale2_struct_tag_smp *smp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_SMP_ID);
@@ -133,26 +137,37 @@ void kinit(struct stivale2_struct *bootloader_info)
 
         /* Init the VESA printing routines, font loading, etc */
         gfx_init(bootvars, 0xffffff, 0x00);
-        // banner();
     }
 
     if (mmap != NULL)
     {
         pmm_init(mmap->memmap, mmap->entries);
+        vmm_init(check_la57());        
+        create_safe_panic_area();
+
         double_buffering_init();
-        // kernel_log_init();
-        // puts("hi\n");
-        // puts("there\n");
-        fill_rect(20, 20, 40, 40, 0xFFFFFF);
-        fill_rect(80, 80, 180, 180, 0xFFFFFF);
-        for (;;);
+        banner(false); /* Write banner to framebuffer */
+        printk("pmm", "Initialized pmm\n");
+
+        /* vmm */
+        if (la57_enabled)
+        {
+            debug(true, "Using 5 level paging\n");
+            printk("vmm", "pml5 resides at 0x%llx\n", cr_read(CR3));
+        }
+        else
+        {
+            debug(true, "Using 4 level paging\n");
+            printk("vmm", "pml4 resides at 0x%llx\n", cr_read(CR3));
+        }
+        printk("vmm", "Initialized vmm\n");
+        printk("bootloader-stivale2", "Initialized double buffering\n");
     }
     else
     {
         //Todo: In this stage panic should not use the double buffering printk, puts, putc as they haven't been initialized therefore nothing would be printed
-        panic("Did not get a memory map from the bootloader");
+        early_panic("early_panic: Did not get a memory map from the bootloader");
     }
-
 
     if (smp != NULL)
     {
@@ -166,6 +181,6 @@ void kinit(struct stivale2_struct *bootloader_info)
     {
         bootvars.rsdp.rsdp_address = rsdp->rsdp;
     }
-    
+
     kmain(&bootvars);
 }
