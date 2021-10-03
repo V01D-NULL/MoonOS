@@ -21,7 +21,7 @@ Validity OS is a monolithic kernel targeting the x86_64 architecture, aiming to 
 - ACPI
 - FADT
 - MADT
-- XSDT
+- XSTD
 - SMBIOS
 - Userland support
 - Multitasking
