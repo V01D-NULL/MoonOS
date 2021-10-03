@@ -11,15 +11,20 @@ Validity OS is a monolithic kernel targeting the x86_64 architecture, aiming to 
 - Support for 4 and 5 level paging
 - Stacktrace/symbol backtrace
 - ubsan
+- Heap (You can barely call it a heap)
+- Double buffering
+- Parsing the RSDP
 
 # Future features:
 - kasan
-- Heap
 - APIC
 - ACPI
+- FADT
+- MADT
+- XSDT
+- SMBIOS
 - Userland support
 - Multitasking
-- SMP
 - Many hardware drivers including but not limited to:
 	- Network cards
 	- ATA
@@ -28,8 +33,7 @@ Validity OS is a monolithic kernel targeting the x86_64 architecture, aiming to 
 - A libc for the userland
 
 # This is currently being working on:
-- Parsing ACPI tables
-- Double buffering
+- SMP
 
 # Directory walkthrough:
 - libs/   	  --  Here you will find kernel libs.
@@ -37,7 +41,6 @@ Validity OS is a monolithic kernel targeting the x86_64 architecture, aiming to 
 - build-util/ --  3rd party tools needed to build the Validity kernel + makefile flags
 - debug-util/ --  Files needed for debugging Validity.
 - boot/		  --  Everything Validity needs in order to boot 
-- font/		  --  Contains the sfn font file which will be used by the kernel once VESA is enabled
 
 # Installation
 ## Building: (assuming you are using a debian based distro)
