@@ -7,7 +7,7 @@ Validity OS is a monolithic kernel targeting the x86_64 architecture, aiming to 
 # Features
 - Limine bootloader
 - CPU Identification
-- Vesa with font loading using ssfn2
+- Vesa with a bitmap font embedded in a header file
 - Support for 4 and 5 level paging
 - Stacktrace/symbol backtrace
 - ubsan
