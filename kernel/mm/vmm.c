@@ -188,7 +188,7 @@ page_info_t vmm_dissect_vaddr(uint64_t virt_addr)
     page_info_t pg_info;
     const int bitmask = 0x1FF;
 
-    virt_addr >>= 12;
+    pg_info.off = virt_addr >>= 12;
 
     pg_info.lv1 = virt_addr & bitmask;
     virt_addr >>= 9;

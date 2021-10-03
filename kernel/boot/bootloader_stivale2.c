@@ -115,14 +115,9 @@ void kinit(struct stivale2_struct *bootloader_info)
 
     serial_set_color(BASH_WHITE);
 
-#ifdef USE_VGA
-    vga_init(0xff, 0x0);
-#else
-    struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
-#endif
-
-    struct stivale2_struct_tag_smp *smp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_SMP_ID);
     struct stivale2_struct_tag_memmap *mmap = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
+    struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
+    struct stivale2_struct_tag_smp *smp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_SMP_ID);
     struct stivale2_struct_tag_rsdp *rsdp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_RSDP_ID);
 
     init_gdt();
@@ -138,8 +133,26 @@ void kinit(struct stivale2_struct *bootloader_info)
 
         /* Init the VESA printing routines, font loading, etc */
         gfx_init(bootvars, 0xffffff, 0x00);
-        banner();
+        // banner();
     }
+
+    if (mmap != NULL)
+    {
+        pmm_init(mmap->memmap, mmap->entries);
+        double_buffering_init();
+        // kernel_log_init();
+        // puts("hi\n");
+        // puts("there\n");
+        fill_rect(20, 20, 40, 40, 0xFFFFFF);
+        fill_rect(80, 80, 180, 180, 0xFFFFFF);
+        for (;;);
+    }
+    else
+    {
+        //Todo: In this stage panic should not use the double buffering printk, puts, putc as they haven't been initialized therefore nothing would be printed
+        panic("Did not get a memory map from the bootloader");
+    }
+
 
     if (smp != NULL)
     {
@@ -147,15 +160,6 @@ void kinit(struct stivale2_struct *bootloader_info)
         bootvars.cpu.bootstrap_processor_lapic_id = smp->bsp_lapic_id;
         bootvars.cpu.acpi_processor_uid = smp->smp_info->processor_id;
         bootvars.cpu.lapic_id = smp->smp_info->lapic_id;
-    }
-
-    if (mmap != NULL)
-    {
-        pmm_init(mmap->memmap, mmap->entries);
-    }
-    else
-    {
-        panic("Did not get a memory map from the bootloader");
     }
 
     if (rsdp != NULL)

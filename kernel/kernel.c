@@ -59,12 +59,11 @@ void kmain(boot_info_t *bootvars)
     create_safe_panic_area();
 
     rsdp_init(&bootvars->rsdp);
-    
-    double_buffering_init();
-    kernel_log_init();
 
-    range_t r = pmm_alloc_range(2);
-    debug(true, "base: %llX, top: %llX\n", r.base, r.limit);
+    // printk("main", "testing double buffering...\n");
+    // printk("main", "double buffering works!\n");
+    fill_rect(20, 20, 40, 40, 0xFFFFFF);
+    fill_rect(40, 40, 60, 60, 0xFFFFFF);
 
     for (;;)
     {

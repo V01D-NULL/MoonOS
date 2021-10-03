@@ -21,6 +21,7 @@
 /* A 4 level paging struct which holds info about the levels */
 typedef struct
 {
+    uintptr_t off;
     uintptr_t lv1;
     uintptr_t lv2;
     uintptr_t lv3;

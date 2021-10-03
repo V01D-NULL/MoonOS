@@ -133,8 +133,8 @@ void putc(char c, int _x, int _y, bool _swap_buffers)
         {
             if ((font[(c * char_height) + y]) & (1 << x))
             {
-                put_pixel(_x + char_width - x, _y + y, 0xFFFFFF);
-                // buffer_pixel(_x + char_width - x, _y + y, 0xFFFFFF);
+                // put_pixel(_x + char_width - x, _y + y, 0xFFFFFF);
+                buffer_pixel(_x + char_width - x, _y + y, 0xFFFFFF);
             }
         }
     }
@@ -151,5 +151,5 @@ void puts(const char *s)
         putc(s[i], console_x, console_y, false);
         console_x += char_width;
     }
-    // swap_buffers();
+    swap_buffers();
 }
