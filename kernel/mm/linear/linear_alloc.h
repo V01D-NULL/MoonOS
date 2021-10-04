@@ -17,7 +17,7 @@
 #include <libk/kstdlib.h>
 #include <drivers/io/serial.h>
 #include <boot/bootloader_stivale2.h>
-#include <amd64/validity.h>
+#include <amd64/moon.h>
 
 /*
     Q&D linear memory allocator | Will be replaced by a more advanced memory managment algorithm eventually

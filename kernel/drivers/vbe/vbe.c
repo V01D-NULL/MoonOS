@@ -1,6 +1,6 @@
 #include "vbe.h"
 #include <util/common.h>
-#include <amd64/validity.h>
+#include <amd64/moon.h>
 #include <drivers/io/serial.h>
 
 gfx_header_t gfx_h;

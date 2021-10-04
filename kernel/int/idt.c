@@ -1,7 +1,7 @@
 #include "idt.h"
 #include <stddef.h>
 #include <stdint.h>
-#include <amd64/validity.h>
+#include <amd64/moon.h>
 #include <util/ptr.h>
 
 static struct idt_desc idt[256];

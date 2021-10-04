@@ -21,7 +21,7 @@ OBJ_C    := $(CFILES:.c=.o)
 OBJ_ASM  := $(ASMFILES:.s=.o)
 OBJ		 := $(OBJ_C) $(OBJ_ASM)
 
-ISO_NAME	  = ValidityOS.iso 
+ISO_NAME	  = MoonOS.iso 
 
 FONT 	 := font/console.sfn
 

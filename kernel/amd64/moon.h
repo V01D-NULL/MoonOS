@@ -1,5 +1,5 @@
-#ifndef VALIDITY_DEFS_H
-#define VALIDITY_DEFS_H
+#ifndef MOON_DEFS_H
+#define MOON_DEFS_H
 
 //Some #define's were taken from https://github.com/GENADEV/GENADEV_OS/blob/main/src/kernel/arm-v-8/genadev.h (Technically I wrote those so it doesn't really matter)
 #define __export extern 
@@ -19,4 +19,4 @@
 #define __DEPRECATION_OVERDUE __attribute__((error ("This functionality is marked deprecated. Please update your code to meet the latest requirements to ensure a successful compilation of the Validity kernel.")))
 #define BINARY_IMPORT(name) __asm__(".global %1\n%1: .incbin %0\n" :: "r"(name) "r"(name));
 
-#endif // VALIDITY_DEFS_H
+#endif // MOON_DEFS_H

@@ -15,7 +15,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stivale2.h>
-#include <amd64/validity.h>
+#include <amd64/moon.h>
 
 /**
  * @brief CPU information provided by the bootloader

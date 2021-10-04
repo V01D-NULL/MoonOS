@@ -17,7 +17,7 @@
 #include <boot/bootloader_stivale2.h>
 
 #include <amd64/cpu.h>
-#include <amd64/validity.h>
+#include <amd64/moon.h>
 #include <amd64/bytes.h>
 
 #include <int/gdt.h>

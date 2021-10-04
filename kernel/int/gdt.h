@@ -13,7 +13,7 @@
 
 #include <stdint.h>
 #include <util/common.h>
-#include <amd64/validity.h>
+#include <amd64/moon.h>
 
 /**
  * @brief Defines a memory segment

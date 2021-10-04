@@ -1,9 +1,9 @@
-KERNEL_HDD 	   = ValidityOS.hdd
+KERNEL_HDD 	   = MoonOS.hdd
 KERNEL_ELF	   = kernel/kernel.elf
 
-# CHANGE ME! I will be the terminal in which you can debug ValidityOS.
+# CHANGE ME! I will be the terminal in which you can debug MoonOS.
 DEBUG_TERMINAL = gnome-terminal
-DEBUG_TERMINAL_OPTS = --tab "[DEBUG] ValidityOS [DEBUG]" --command
+DEBUG_TERMINAL_OPTS = --tab "[DEBUG] MoonOS [DEBUG]" --command
 
 include ./flags.mk
 

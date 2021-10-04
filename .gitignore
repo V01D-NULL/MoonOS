@@ -4,8 +4,9 @@
 *.elf
 *.map
 kernel/parsed.sym
-ValidityOS.hdd
-ValidityOS.iso
+scripts/parsed.sym
+MoonOS.hdd
+MoonOS.iso
 
 # Limine related
 *.bin

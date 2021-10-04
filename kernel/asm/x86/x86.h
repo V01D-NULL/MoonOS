@@ -20,7 +20,7 @@
 
 #include <libk/kstring.h>
 #include <util/common.h>
-#include <amd64/validity.h>
+#include <amd64/moon.h>
 
 /// (x86_64) Return CPU vendor string
 __export const char *ASM_x86_cpuid_vendor_string();

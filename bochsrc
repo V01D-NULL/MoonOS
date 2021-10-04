@@ -8,7 +8,7 @@ megs: 512
 
 clock: sync=realtime, time0=local
 
-ata0-master: type=disk, path="ValidityOS.hdd", mode=flat
+ata0-master: type=disk, path="MoonOS.hdd", mode=flat
 
 boot: c
 

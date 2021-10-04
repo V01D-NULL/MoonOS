@@ -2,7 +2,7 @@
 #define BITMAP_PMM_H
 
 #include <stdint.h>
-#include <amd64/validity.h>
+#include <amd64/moon.h>
 #include <stivale2.h>
 #include <stdbool.h>
 #include <util/range.h>

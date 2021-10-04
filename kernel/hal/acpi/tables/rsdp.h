@@ -2,7 +2,7 @@
 #define RSDP_H
 
 #include <stdint.h>
-#include <amd64/validity.h>
+#include <amd64/moon.h>
 #include <boot/bootloader_stivale2.h>
 
 #define ACPI_V1_LEGACY 0 /* Revision 0 == ACPI version 1.0 or lower */

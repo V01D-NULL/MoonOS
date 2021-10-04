@@ -1,7 +1,7 @@
 #ifndef VMM_H
 #define VMM_H
 
-#include <amd64/validity.h>
+#include <amd64/moon.h>
 #include <drivers/io/serial.h>
 #include <mm/cpu/CR.h>
 #include <stdint.h>
