@@ -2,9 +2,11 @@
 Moon OS is a monolithic kernel targeting the x86_64 architecture, aiming to be POSIX compliant.
 
 # Screenshots:
-<img src="screenshot/1.png">
+Bootsplash:
+<img src="screenshot/bootsplash.png">
 <br>
-<img src="screenshot/2.png">
+Verbose boot:
+<img src="screenshot/verbose_boot.png">
 <br>
 
 # Features
@@ -37,6 +39,7 @@ Moon OS is a monolithic kernel targeting the x86_64 architecture, aiming to be P
 - A libc for the userland
 
 # This is currently being working on:
+- Keyboard shortcut (esc, f1, f2, etc) for verbose boot
 - SMP
 
 # Directory walkthrough:

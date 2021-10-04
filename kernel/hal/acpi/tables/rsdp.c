@@ -1,5 +1,4 @@
 #include "rsdp.h"
-#include <drivers/vbe/vbe.h>
 #include <drivers/io/serial.h>
 #include <util/ptr.h>
 #include <stdbool.h>

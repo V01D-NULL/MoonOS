@@ -25,7 +25,6 @@
 #include <int/interrupts.h>
 
 #include <drivers/io/serial.h>
-#include <drivers/vbe/vbe.h>
 
 #include <asm/x86/x86.h>
 
@@ -51,7 +50,6 @@
 
 #include "panic.h"
 #include "printk.h"
-#include "img.h"
 
 extern gfx_header_t gfx_h;
 
@@ -63,10 +61,6 @@ void kmain(boot_info_t *bootvars)
 
     rsdp_init(&bootvars->rsdp);
     
-    flush_back_buffer();
-    draw_image(0, 0, IMG_WIDTH, IMG_HEIGHT, IMG_DATA, IMAGE_RGB);
-    set_console_offsets(-1, 7);
-    panic("This is fine");
 
     for (;;)
     {

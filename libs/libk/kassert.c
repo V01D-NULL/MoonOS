@@ -1,7 +1,6 @@
 #include "kassert.h"
 #include <util/common.h>
 #include <printk.h>
-#include <drivers/vbe/vbe.h>
 
 void __assert_impl(const char *file, uint64_t line, const char *func, const char *desc)
 {

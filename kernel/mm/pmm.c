@@ -1,6 +1,5 @@
 #include "pmm.h"
 #include <stdint.h>
-#include <drivers/vbe/vbe.h>
 #include <util/ptr.h>
 #include <util/iterator.h>
 #include <libk/kassert.h>

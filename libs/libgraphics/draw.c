@@ -9,9 +9,9 @@ void draw_image(int x1, int y1, int x2, int y2, const uint8_t *image, image_type
         return;
 
     int j = 0;
-    for (int y = y1; y < y2; y++)
+    for (int y = y1; y < (y2 + y1); y++)
     {
-        for (int x = x1; x < x2; x++)
+        for (int x = x1; x < (x2 + x1); x++)
         {
             uint32_t pixel = image[j] << 16 | image[j + 1] << 8 | image[j + 2];
             buffer_pixel(x, y, pixel);

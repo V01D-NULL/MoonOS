@@ -9,7 +9,6 @@
  * 
  */
 #include "bootloader_stivale2.h"
-#include <drivers/vbe/vbe.h>
 #include <drivers/io/serial.h>
 #include <amd64/moon.h>
 #include <stivale2.h>
@@ -23,6 +22,8 @@
 #include <stdint.h>
 #include <printk.h>
 #include <libgraphics/double-buffering.h>
+#include <libgraphics/draw.h>
+#include <libgraphics/bootsplash.h>
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id);
 
@@ -89,21 +90,35 @@ void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id)
     }
 }
 
-const char *p1 = " _  _   __   __    __  ____  __  ____  _  _     __   ____\n";
-const char *p2 = "/ )( \\ / _\\ (  )  (  )(    \\(  )(_  _)( \\/ )   /  \\ / ___)\n";
-const char *p3 = "\\ \\/ //    \\/ (_/\\ )(  ) D ( )(   )(   )  /   (  O )\\___ \\ \n";
-const char *p4 = " \\__/ \\_/\\_/\\____/(__)(____/(__) (__) (__/     \\__/ (____/\n";
+const char serial_message[] = {
+"███╗   ███╗ ██████╗  ██████╗ ███╗   ██╗ ██████╗ ███████╗ \n"
+"████╗ ████║██╔═══██╗██╔═══██╗████╗  ██║██╔═══██╗██╔════╝ \n"
+"██╔████╔██║██║   ██║██║   ██║██╔██╗ ██║██║   ██║███████╗ \n"
+"██║╚██╔╝██║██║   ██║██║   ██║██║╚██╗██║██║   ██║╚════██║ \n"
+"██║ ╚═╝ ██║╚██████╔╝╚██████╔╝██║ ╚████║╚██████╔╝███████║ \n"
+"╚═╝     ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝ \n"
+};
+
+const char fb_message[] = {
+    "\n"
+    " _____             _____ _____  \n"
+    "|     |___ ___ ___|     |   __| \n"
+    "| | | | . | . |   |  |  |__   | \n"
+    "|_|_|_|___|___|_|_|_____|_____| \n"
+    "\n"
+};
 
 void banner(bool serial_only)
 {
     if (serial_only)
     {
-        debug(false, "%s%s%s%s", p1, p2, p3, p4);
+        debug(false, "%s", serial_message);
         return;
     }
 
-    printk("main", "Welcome to ValidityOS\n");
-    printk("Banner", "\n%s%s%s%s", p1, p2, p3, p4);
+    set_console_color(0xFFFFFF);
+    printk("main", "Welcome to MoonOS\n");
+    printk("banner", "%s", fb_message);
     delay(200);
 }
 
@@ -133,10 +148,7 @@ void kinit(struct stivale2_struct *bootloader_info)
         bootvars.vesa.fb_width = fb->framebuffer_width;
         bootvars.vesa.fb_height = fb->framebuffer_height;
         bootvars.vesa.fb_bpp = fb->framebuffer_bpp;
-        bootvars.vesa.fb_pitch = fb->framebuffer_pitch;
-
-        /* Init the VESA printing routines, font loading, etc */
-        gfx_init(bootvars, 0xffffff, 0x00);
+        bootvars.vesa.fb_pitch = fb->framebuffer_pitch;        
     }
 
     if (mmap != NULL)
@@ -145,8 +157,12 @@ void kinit(struct stivale2_struct *bootloader_info)
         vmm_init(check_la57());        
         create_safe_panic_area();
 
-        double_buffering_init();
-        banner(false); /* Write banner to framebuffer */
+        double_buffering_init(&bootvars);
+        set_verbose_boot(true);
+        set_console_color(0xB6B6B6);
+
+        // draw_image((fb->framebuffer_width / 2) - (IMG_WIDTH / 2), (fb->framebuffer_height / 2) - (IMG_HEIGHT / 2), IMG_WIDTH, IMG_HEIGHT, IMG_DATA, IMAGE_RGB);
+        banner(false);
         printk("pmm", "Initialized pmm\n");
 
         /* vmm */
@@ -165,8 +181,9 @@ void kinit(struct stivale2_struct *bootloader_info)
     }
     else
     {
-        //Todo: In this stage panic should not use the double buffering printk, puts, putc as they haven't been initialized therefore nothing would be printed
-        early_panic("early_panic: Did not get a memory map from the bootloader");
+        debug(false, "\n!Did not get a memory map from the bootloader!\n");
+        for(;;)
+            ;
     }
 
     if (smp != NULL)

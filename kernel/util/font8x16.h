@@ -2,12 +2,10 @@
 #define FONT_8x16_H
 #include <stdint.h>
 
-static int char_width = 8;
-static int char_height = 16;
-static const int SPECIAL_NEWLINE = 1;
-static const int SPECIAL_TAB = 2;
+static const int char_width = 8;
+static const int char_height = 16;
 
-static uint8_t font[] = {
+static const uint8_t font[] = {
     0x00,
     0x00,
     0x00,

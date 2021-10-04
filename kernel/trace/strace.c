@@ -1,6 +1,5 @@
 #include "strace.h"
 #include <stdbool.h>
-#include <drivers/vbe/vbe.h>
 #include <drivers/io/serial.h>
 #include <ds/linked_list.h>
 

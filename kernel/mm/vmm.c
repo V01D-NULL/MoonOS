@@ -2,7 +2,6 @@
 #include "memdefs.h"
 #include <libk/kassert.h>
 #include <amd64/moon.h>
-#include <drivers/vbe/vbe.h>
 #include <int/gdt.h>
 #include <int/idt.h>
 #include <util/ptr.h>

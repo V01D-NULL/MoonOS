@@ -1,7 +1,6 @@
 #include "x86.h"
 #include <amd64/cpu.h>
 #include <amd64/moon.h>
-#include <drivers/vbe/vbe.h>
 #include <drivers/io/serial.h>
 #include <printk.h>
 

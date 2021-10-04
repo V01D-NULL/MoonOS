@@ -1,12 +1,20 @@
-#include <drivers/vbe/vbe.h>
+#include "double-buffering.h"
+#include <libk/kstring.h>
 #include <mm/heap/heap.h>
 
 static uint32_t *buffer;
-extern gfx_header_t gfx_h;
+static gfx_header_t gfx_h;
 
-void double_buffering_init()
+void double_buffering_init(boot_info_t *boot)
 {
+    gfx_h.fb_addr = boot->vesa.fb_addr;
+    gfx_h.fb_bpp  = boot->vesa.fb_bpp;
+    gfx_h.fb_height = boot->vesa.fb_height;
+    gfx_h.fb_width = boot->vesa.fb_width;
+    gfx_h.fb_pitch = boot->vesa.fb_pitch;
+
     buffer  = (uint32_t*) heap_alloc(gfx_h.fb_width * gfx_h.fb_height * (gfx_h.fb_bpp / 8)).base;
+    flush_back_buffer();
 }
 
 void swap_buffers()
