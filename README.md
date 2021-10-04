@@ -1,5 +1,5 @@
-# VALIDITY OS
-Validity OS is a monolithic kernel targeting the x86_64 architecture, aiming to be POSIX compliant.
+# Moon OS
+Moon OS is a monolithic kernel targeting the x86_64 architecture, aiming to be POSIX compliant.
 
 # Screenshots:
 <img src="screenshot/1.png">
