@@ -7,6 +7,6 @@
 void double_buffering_init();
 void swap_buffers();
 void buffer_pixel(int x, int y, int color);
-void fill_rect(int x1, int y1, int x2, int y2, int color);
+void flush_back_buffer();
 
 #endif // LIB_GRAPHICS_DOUBLE_BUFFERING_H

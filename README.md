@@ -3,6 +3,9 @@ Validity OS is a monolithic kernel targeting the x86_64 architecture, aiming to 
 
 # Screenshots:
 <img src="screenshot/1.png">
+<br>
+<img src="screenshot/2.png">
+<br>
 
 # Features
 - Limine bootloader
@@ -14,6 +17,7 @@ Validity OS is a monolithic kernel targeting the x86_64 architecture, aiming to 
 - Heap (You can barely call it a heap)
 - Double buffering
 - Parsing the RSDP
+- Basic image rendering
 
 # Future features:
 - kasan

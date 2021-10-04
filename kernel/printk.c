@@ -3,11 +3,27 @@
 #include <drivers/vbe/vbe.h>
 #include "printk.h"
 
-
 extern gfx_header_t gfx_h;
 char buffer[512];
 
 int console_x = 0, console_y = 0;
+
+void set_console_offsets(int x, int y)
+{
+    if (x == -1)
+    {
+        console_y = y * char_height;
+    }
+    else if (y == -1)
+    {
+        console_x = x * char_width;
+    }
+    else
+    {
+        console_x = x * char_width;
+        console_y = y * char_height;
+    }
+}
 
 void printk(char *status, char *fmt, ...)
 {
@@ -21,15 +37,14 @@ void printk(char *status, char *fmt, ...)
     puts(" ] ");
 
     puts((const char *)&buffer);
-    delay(20);
 }
 
-void putc(char c, int _x, int _y, bool _swap_buffers)
+void putc(char c, int _x, int _y)
 {
     if (c == '\n')
     {
         console_y += char_height;
-        console_x = char_width - (char_width+char_width); //For some reason setting console_x = 0 causes the line to be indented by one char, this fixes it
+        console_x = -char_width; /* 0 adds one character offset thus indenting strings by one character, the true offset 0 is actually negative char_width */
         goto end;
     }
 
@@ -44,16 +59,15 @@ void putc(char c, int _x, int _y, bool _swap_buffers)
         }
     }
 
-    end:
-    if (_swap_buffers)
-        swap_buffers();
+end:
+    return;
 }
 
 void puts(const char *s)
 {
     for (int i = 0, n = strlen(s); i < n; i++)
     {
-        putc(s[i], console_x, console_y, false);
+        putc(s[i], console_x, console_y);
         console_x += char_width;
     }
     swap_buffers();

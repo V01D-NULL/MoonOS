@@ -9,7 +9,7 @@ include ./flags.mk
 
 .PHONY: clean all run
 
-all: symlist font quick_recompile $(KERNEL_HDD) ISO
+all: symlist quick_recompile $(KERNEL_HDD) ISO
 
 run: quick_recompile ISO
 ifeq ($(modern), yes)
@@ -71,8 +71,6 @@ ISO: $(KERNEL_HDD)
 
 # Remove the HDD & elf file while saving all object files (fewer files will be recompiled)
 quick_recompile: symlist
-	@printf " LD  Creating font binary\n";
-	@ld -r -b binary -o kernel/drivers/vbe/__font__.o font/console.sfn
 	@rm -f $(KERNEL_HDD) kernel/kernel.elf
 	@printf "\n";
 	@$(MAKE) --no-print-directory -C libs

@@ -1,6 +1,7 @@
 #include "vbe.h"
 #include <util/common.h>
 #include <amd64/validity.h>
+#include <drivers/io/serial.h>
 
 gfx_header_t gfx_h;
 uint32_t *framebuffer_address;
@@ -18,6 +19,7 @@ void gfx_init(boot_info_t boot, int fg, int bg)
     gfx_h.last_known_fg = fg;
     gfx_h.last_known_bg = bg;
     bg == 0x0 ? (void)0x0 : gfx_clear(bg);
+    debug(0, "%d %d\n", boot.vesa.fb_width, boot.vesa.fb_height);
 }
 
 void put_pixel(int x, int y, int color)

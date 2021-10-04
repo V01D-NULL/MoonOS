@@ -19,15 +19,8 @@ void buffer_pixel(int x, int y, int color)
     buffer[y * (gfx_h.fb_pitch / sizeof(uint32_t)) + x] = color;
 }
 
-void fill_rect(int x1, int y1, int x2, int y2, int color)
+void flush_back_buffer()
 {
-    for (int y = y1; y < y2; y++)
-    {
-        for (int x = x1; x < x2; x++)
-        {
-            buffer[y * (gfx_h.fb_pitch / sizeof(uint32_t)) + x] = color;
-        }
-    }
-
+    memset(buffer, 0, gfx_h.fb_height * gfx_h.fb_pitch);
     swap_buffers();
 }

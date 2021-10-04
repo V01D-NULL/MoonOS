@@ -34,6 +34,7 @@
 #include <libk/kassert.h>
 #include <liballoc/bitmap.h>
 #include <libgraphics/double-buffering.h>
+#include <libgraphics/draw.h>
 
 #include <util/common.h>
 #include <util/ptr.h>
@@ -41,14 +42,19 @@
 #include <mm/pmm.h>
 #include <mm/vmm.h>
 #include <mm/memdefs.h>
+#include <mm/heap/heap.h>
 #include <mm/linear/linear_alloc.h>
 
 #include <trace/strace.h>
-#include "panic.h"
-#include "printk.h"
 #include <hal/acpi/tables/rsdp.h>
 
+
+#include "panic.h"
+#include "printk.h"
+#include "img.h"
+
 extern gfx_header_t gfx_h;
+
 void kmain(boot_info_t *bootvars)
 {
     /* Init the CPU hardware struct */
@@ -56,11 +62,11 @@ void kmain(boot_info_t *bootvars)
     cpu_info();
 
     rsdp_init(&bootvars->rsdp);
-    // double_buffering_init();
-    // fill_rect(20, 20, 40, 40, 0xFFFFFF);
-    // fill_rect(40, 40, 60, 60, 0xDEADBEEF);
-    // fill_rect(80, 80, 100, 100, 0xDABABAAA);
-    // fill_rect(120, 120, 140, 140, 0xDA35901E);
+    for(;;);
+    flush_back_buffer();
+    draw_image(0, 0, IMG_WIDTH, IMG_HEIGHT, IMG_DATA, IMAGE_RGB);
+    set_console_offsets(-1, 7);
+    panic("This is fine");
 
     for (;;)
     {

@@ -46,7 +46,6 @@ CFLAGS := 				 \
 	-mno-sse2			 \
 	-pedantic			 \
 	-Wall				 \
-	-Werror				 \
 	-fno-omit-frame-pointer \
 	-fsanitize=undefined \
 	-mno-red-zone

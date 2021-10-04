@@ -10,9 +10,9 @@ all: $(TARGET)
 
 $(TARGET): $(OBJ)
 	@printf " LD  Linking object files\n";
-	$(LD) $(LDINTERNALFLAGS) ./drivers/vbe/__font__.o $(OBJ) $(KLIBS) ./trace/symtable.o -o $@
+	$(LD) $(LDINTERNALFLAGS) $(OBJ) $(KLIBS) ./trace/symtable.o -o $@
 	python3 ../scripts/gensym.py $@
-	$(LD) $(LDINTERNALFLAGS) ./drivers/vbe/__font__.o $(OBJ) $(KLIBS) ./trace/symtable.o -o $@
+	$(LD) $(LDINTERNALFLAGS) $(OBJ) $(KLIBS) ./trace/symtable.o -o $@
 
 %.o: %.c
 	@printf " CC  $<\n";

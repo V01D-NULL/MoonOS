@@ -4,8 +4,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+void set_console_offsets(int x, int y);
 void printk(char *status, char *fmt, ...);
-void putc(char c, int _x, int _y, bool _swap_buffers);
+void putc(char c, int _x, int _y);
 void puts(const char *s);
 
 #endif // FMT_PRINTK_H
