@@ -62,7 +62,7 @@ void kmain(boot_info_t *bootvars)
     cpu_info();
 
     rsdp_init(&bootvars->rsdp);
-    for(;;);
+    
     flush_back_buffer();
     draw_image(0, 0, IMG_WIDTH, IMG_HEIGHT, IMG_DATA, IMAGE_RGB);
     set_console_offsets(-1, 7);
