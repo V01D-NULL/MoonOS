@@ -42,9 +42,9 @@ Moon OS is a monolithic kernel targeting the x86_64 architecture, aiming to be P
 # Directory walkthrough:
 - libs/   	  --  Here you will find kernel libs.
 - kernel/ 	  --  Kernel source code, this is most likely all you really care about
-- build-util/ --  3rd party tools needed to build the Validity kernel + makefile flags
-- debug-util/ --  Files needed for debugging Validity.
-- boot/		  --  Everything Validity needs in order to boot 
+- build-util/ --  3rd party tools needed to build the Moon kernel + makefile flags
+- debug-util/ --  Files needed for debugging Moon.
+- boot/		  --  Everything Moon needs in order to boot 
 
 # Installation
 ## Building: (assuming you are using a debian based distro)
