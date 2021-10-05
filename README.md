@@ -1,6 +1,6 @@
 # Moon OS
 
-<h2 align="center"> Moon OS is a monolithic kernel targeting the x86_64 architecture, aiming to be POSIX compliant in the future. </h2>
+<h2 align="center"> Moon OS is a monolithic kernel targeting the x86_64 architecture, aiming to be POSIX-like in the future. </h2>
 <p align="center">
 <img align="center" src="Logo 500x500.jpeg">
 </p>
