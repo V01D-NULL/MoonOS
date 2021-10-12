@@ -60,10 +60,10 @@ bool in_range(void *_address)
 
     for (int i = 0; i < phys_mmap.entries; i++)
     {
-        // if (map[i].type != STIVALE2_MMAP_USABLE)
-        // {
-        //     continue;
-        // }
+        if (map[i].type != STIVALE2_MMAP_USABLE)
+        {
+            continue;
+        }
         
         if (address >= map[i].base && address <= (map[i].base + map[i].length) - 1)
         {
