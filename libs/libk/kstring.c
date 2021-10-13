@@ -176,3 +176,16 @@ char *strrev(char *src)
 
     return src;
 }
+
+int parse_string_until_newline(char *str)
+{
+    int counter = 0;
+    for (int i = 0;; i++)
+    {
+        if (str[i] == '\n')
+            break;
+        counter++;
+    }
+
+    return counter + 1;
+}

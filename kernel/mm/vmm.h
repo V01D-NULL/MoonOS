@@ -18,10 +18,9 @@
 #define TLB_FLUSH(param_addr) __asm__ volatile("invlpg (%[addr])" ::[addr] "r"(param_addr));
 #define PAGE_LOAD_CR3(pml4)   __asm__ volatile("mov %0, %%cr3\n" ::"r"(pml4) : "memory");
 
-/* A 4 level paging struct which holds info about the levels */
+/* Represents the indexes of entries in the page tables */
 typedef struct
 {
-    uintptr_t off;
     uintptr_t lv1;
     uintptr_t lv2;
     uintptr_t lv3;

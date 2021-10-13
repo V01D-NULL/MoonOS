@@ -102,4 +102,7 @@ uint64_t strlen(const char *s);
  */
 char *strrev(char *src);
 
+//Look for the first newline and return it's index
+int parse_string_until_newline(char *str);
+
 #endif // LIB_KERNEL_STRING_H

@@ -10,7 +10,7 @@
 #include <printk.h>
 
 isr_t isr_handler_array[255] = {0};
-static bool canReturn = false;
+bool canReturn = false;
 
 static const char *exception_messages[] = {
     "Type: (#DE) Division Exception",
@@ -104,7 +104,8 @@ void isr_handler(regs_t regs)
     TRY_EXEC_HANDLER(regs.isr_number);
 
     //Signal EOI
-    outb(0xA0, 0x20);
+    if (regs.isr_number > 40)
+        outb(0xA0, 0x20);
     outb(0x20, 0x20);
 }
 
@@ -113,7 +114,6 @@ void install_isr(uint8_t base, isr_t handler)
     if (isr_handler_array[base] == 0)
     {
         isr_handler_array[base] = handler;
-        idt_set_entry(0x08, 0, 0x8E, GENERIC_CAST(uint64_t, isr_handler_array[base]), base);
     }
     else
         printk("INT", "The interrupt ( %d ) has already been registered!\n", base);

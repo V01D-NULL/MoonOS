@@ -1,9 +1,10 @@
 #include "double-buffering.h"
 #include <libk/kstring.h>
 #include <mm/heap/heap.h>
+#include <util/font8x16.h>
 
 static uint32_t *buffer;
-static gfx_header_t gfx_h;
+gfx_header_t gfx_h;
 
 void double_buffering_init(boot_info_t *boot)
 {
@@ -14,12 +15,15 @@ void double_buffering_init(boot_info_t *boot)
     gfx_h.fb_pitch = boot->vesa.fb_pitch;
 
     buffer  = (uint32_t*) heap_alloc(gfx_h.fb_width * gfx_h.fb_height * (gfx_h.fb_bpp / 8)).base;
-    flush_back_buffer();
+    flush_back_buffer(NULL);
 }
 
-void swap_buffers()
+void swap_buffers(uint32_t *custom_buffer)
 {
-    memcpy32((uint32_t*)gfx_h.fb_addr, buffer, gfx_h.fb_height * gfx_h.fb_pitch);
+    if (custom_buffer == NULL)
+        memcpy32((uint32_t*)gfx_h.fb_addr, buffer, gfx_h.fb_height * gfx_h.fb_pitch);
+    else
+        memcpy32((uint32_t*)gfx_h.fb_addr, custom_buffer, gfx_h.fb_height * gfx_h.fb_pitch);
 }
 
 void buffer_pixel(int x, int y, int color)
@@ -27,8 +31,19 @@ void buffer_pixel(int x, int y, int color)
     buffer[y * (gfx_h.fb_pitch / sizeof(uint32_t)) + x] = color;
 }
 
-void flush_back_buffer()
+void flush_back_buffer(uint32_t *custom_buffer)
 {
-    memset(buffer, 0, gfx_h.fb_height * gfx_h.fb_pitch);
-    swap_buffers();
+    if (custom_buffer == NULL)
+    {
+        memset(buffer, 0, gfx_h.fb_height * gfx_h.fb_pitch);
+    }
+    else
+    {
+        memset(custom_buffer, 0, gfx_h.fb_height * gfx_h.fb_pitch);
+    }
+}
+
+uint32_t *double_buffering_create_buffer()
+{
+    return (uint32_t*) heap_alloc(gfx_h.fb_width * gfx_h.fb_height * (gfx_h.fb_bpp / 8)).base;
 }

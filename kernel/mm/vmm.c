@@ -21,12 +21,10 @@ void vmm_init(bool has_5_level_paging)
     if (la57_enabled)
     {
         debug(true, "Using 5 level paging\n");
-        // printk("vmm", "pml5 resides at 0x%llx\n", rootptr);
     }
     else
     {
         debug(true, "Using 4 level paging\n");
-        // printk("vmm", "pml4 resides at 0x%llx\n", rootptr);
     }
 
     // First 4 GB in phys mem
@@ -47,19 +45,12 @@ void vmm_init(bool has_5_level_paging)
         vmm_map(to_phys(n), n, FLAGS_PR | FLAGS_RW);
     }
 
-    // Map framebuffer
-    struct memtag_range framebuffer = pmm_find_tag(STIVALE2_MMAP_FRAMEBUFFER, 1);
-    for (size_t n = 0; n < framebuffer.size; n += PAGE_SIZE)
-        vmm_map(n, n, FLAGS_PR | FLAGS_RW);
-
     debug(true, "Old PML4: %llx\n", cr_read(CR3)); // Bootloader pml{n}
     PAGE_LOAD_CR3(GENERIC_CAST(uint64_t, rootptr));
     debug(true, "New PML4: %llx\n", cr_read(CR3)); // Kernel pml{n}
 
     init_gdt();
     init_idt();
-
-    // printk("vmm", "Initialised vmm\n");
 }
 
 static uint64_t *vmm_get_pml_or_alloc(uint64_t *entry, size_t level, int flags)
@@ -187,7 +178,7 @@ page_info_t vmm_dissect_vaddr(uint64_t virt_addr)
     page_info_t pg_info;
     const int bitmask = 0x1FF;
 
-    pg_info.off = virt_addr >>= 12;
+    virt_addr >>= 12;
 
     pg_info.lv1 = virt_addr & bitmask;
     virt_addr >>= 9;

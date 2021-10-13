@@ -19,7 +19,7 @@ void draw_image(int x1, int y1, int x2, int y2, const uint8_t *image, image_type
         }
     }
 
-    swap_buffers();
+    swap_buffers(NULL);
 }
 
 void fill_rect(int x1, int y1, int x2, int y2, int color)
@@ -32,5 +32,5 @@ void fill_rect(int x1, int y1, int x2, int y2, int color)
         }
     }
 
-    swap_buffers();
+    swap_buffers(NULL);
 }

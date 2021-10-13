@@ -21,7 +21,7 @@ __no_return panic(const char *fmt, ...)
 	va_end(ap);
 
 	printk("panic", "\n\tA kernel panic has occurred\n\t*** Reason: %s ***\n", panic_buff);
-
+	debug(false, "Panic: %s\n", panic_buff);
 	struct stacktrace_result res = backtrace_stack(10);
 	for (int i = 0; i < res.count; i++)
 	{
@@ -34,7 +34,7 @@ __no_return panic(const char *fmt, ...)
 
 void create_safe_panic_area()
 {
-	uint64_t panic = to_virt(from_phys(find_symbol_by_name("panic")));
+	uint64_t panic = to_virt(from_phys_higher_half(find_symbol_by_name("panic")));
 	assert(panic != -1);
-	vmm_remap(panic, panic, FLAGS_PR);
+	// vmm_remap(panic, panic, FLAGS_PR);
 }

@@ -25,6 +25,7 @@
 #include <int/interrupts.h>
 
 #include <drivers/io/serial.h>
+#include <drivers/keyboard/keyboard.h>
 
 #include <asm/x86/x86.h>
 
@@ -47,20 +48,25 @@
 #include <trace/strace.h>
 #include <hal/acpi/tables/rsdp.h>
 
-
 #include "panic.h"
 #include "printk.h"
 
-extern gfx_header_t gfx_h;
-
 void kmain(boot_info_t *bootvars)
 {
+    __asm__ ("int $48");
     /* Init the CPU hardware struct */
     cpu_info_init(*bootvars);
     cpu_info();
 
+    // scroll();
+
     rsdp_init(&bootvars->rsdp);
-    
+
+    for (int i = 0; i < 40; i++)
+    {
+        printk("test", "A\n");
+        printk("test", "B\n");
+    }
 
     for (;;)
     {

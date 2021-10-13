@@ -20,8 +20,8 @@ static inline uintptr_t to_virt(uintptr_t phys)
 }
 static inline uintptr_t to_phys(uintptr_t physical_addr) { return GENERIC_CAST(uintptr_t, physical_addr + MM_BASE); }
 
-static inline uintptr_t from_virt(uintptr_t virt) { return GENERIC_CAST(uintptr_t, virt - VMM_BASE); }
-static inline uintptr_t from_phys(uintptr_t physical_higher_half_addr) { return GENERIC_CAST(uintptr_t, physical_higher_half_addr - MM_BASE); }
+static inline uintptr_t from_virt(uintptr_t phys) { return GENERIC_CAST(uintptr_t, phys - VMM_BASE); }
+static inline uintptr_t from_phys_higher_half(uintptr_t virt) { return GENERIC_CAST(uintptr_t, virt - MM_BASE); }
 
 static inline bool is_page_aligned(void *addr) { return GENERIC_CAST(size_t, addr) % PAGE_SIZE == 0; }
 

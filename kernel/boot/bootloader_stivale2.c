@@ -24,6 +24,7 @@
 #include <libgraphics/double-buffering.h>
 #include <libgraphics/draw.h>
 #include <libgraphics/bootsplash.h>
+#include <drivers/keyboard/keyboard.h>
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id);
 
@@ -116,7 +117,6 @@ void banner(bool serial_only)
         return;
     }
 
-    set_console_color(0xFFFFFF);
     printk("main", "Welcome to MoonOS\n");
     printk("banner", "%s", fb_message);
     delay(200);
@@ -130,7 +130,6 @@ void banner(bool serial_only)
 void kinit(struct stivale2_struct *bootloader_info)
 {
     boot_info_t bootvars; //Hardware information from the bootloader
-
     serial_set_color(BASH_WHITE);
     banner(true); /* Write banner to serial device */
     
@@ -158,10 +157,11 @@ void kinit(struct stivale2_struct *bootloader_info)
         create_safe_panic_area();
 
         double_buffering_init(&bootvars);
-        set_verbose_boot(true);
-        set_console_color(0xB6B6B6);
+        printk_init();
+        generic_keyboard_init(CHARSET_EN_US);
+        
+        bootsplash();
 
-        // draw_image((fb->framebuffer_width / 2) - (IMG_WIDTH / 2), (fb->framebuffer_height / 2) - (IMG_HEIGHT / 2), IMG_WIDTH, IMG_HEIGHT, IMG_DATA, IMAGE_RGB);
         banner(false);
         printk("pmm", "Initialized pmm\n");
 

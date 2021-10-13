@@ -44,8 +44,6 @@ CFLAGS := 				 \
 	-lgcc				 \
 	-mno-sse			 \
 	-mno-sse2			 \
-	-pedantic			 \
-	-Werror				 \
 	-Wall				 \
 	-fno-omit-frame-pointer \
 	-fsanitize=undefined \

@@ -3,15 +3,16 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <int/interrupts.h>
 
 /* Set the log color to 'new', returns the previous color used */
-uint32_t set_console_color(uint32_t new);
 void set_console_offsets(int x, int y);
 void printk(char *status, char *fmt, ...);
 void putc(char c, int _x, int _y);
 void puts(const char *s);
-
-void set_verbose_boot(bool new);
+void printk_init();
+void verbose_boot_irq(isr_t isr);
 bool is_verbose_boot();
+void scroll();
 
 #endif // FMT_PRINTK_H
