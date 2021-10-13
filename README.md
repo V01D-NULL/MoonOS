@@ -45,7 +45,6 @@ Verbose boot:
 - A libc for the userland
 
 # This is currently being working on:
-- Scrolling text (double buffering)
 - SMP
 
 # Directory walkthrough:
