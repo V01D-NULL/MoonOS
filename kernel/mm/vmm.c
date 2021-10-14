@@ -12,12 +12,14 @@
 #define GB 0x40000000UL
 
 static uint64_t *rootptr;
+static bool la57_enabled = false;
 
 void vmm_init(bool has_5_level_paging)
 {
     la57_enabled = has_5_level_paging;
 
     rootptr = (uint64_t *)(from_virt((uintptr_t)pmm_alloc()));
+
     if (la57_enabled)
     {
         debug(true, "Using 5 level paging\n");

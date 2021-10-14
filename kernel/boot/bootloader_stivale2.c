@@ -155,7 +155,7 @@ void kinit(struct stivale2_struct *bootloader_info)
         pmm_init(mmap->memmap, mmap->entries);
         vmm_init(check_la57());        
         create_safe_panic_area();
-
+        
         double_buffering_init(&bootvars);
         printk_init();
         generic_keyboard_init(CHARSET_EN_US);
@@ -166,7 +166,7 @@ void kinit(struct stivale2_struct *bootloader_info)
         printk("pmm", "Initialized pmm\n");
 
         /* vmm */
-        if (la57_enabled)
+        if (check_la57())
         {
             debug(true, "Using 5 level paging\n");
             printk("vmm", "pml5 resides at 0x%llx\n", cr_read(CR3));

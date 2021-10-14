@@ -242,6 +242,8 @@ range_t pmm_alloc_range(size_t pages)
     uint64_t* base = (uint64_t*)pmm_alloc();
     uint64_t* top = (uint64_t*)0;
 
+    assert(base != NULL);
+
     for (size_t i = 0; i < pages; i++)
     {
         assert((top = (uint64_t*)pmm_alloc()) != NULL);

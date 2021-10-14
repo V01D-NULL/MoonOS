@@ -15,9 +15,6 @@
 #define ALIGN_UP(__number) (((__number) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 #define ALIGN_DOWN(__number) ((__number) & ~(PAGE_SIZE - 1))
 
-#define MM_BASE  0xffffffff80000000
-#define VMM_BASE 0xffff800000000000
-
 enum {
     BIT_CLEAR = 0x1,
     BIT_SET

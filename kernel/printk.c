@@ -8,8 +8,6 @@
 #include <boot/bootloader_stivale2.h>
 #include <drivers/io/serial.h>
 
-#define status_to_str(status) ( #status )
-
 uint32_t console_x = 0, console_y = 0, kernel_log_color = 0xFFFFFF;
 static bool verbose_boot = false;
 char buffer[512];
@@ -68,6 +66,7 @@ void printk(char *status, char *fmt, ...)
 void putc(char c, int _x, int _y)
 {
     text_buffer[boot_log_offset++] = c;
+    
     if (c == '\n')
     {
         console_y += char_height;
