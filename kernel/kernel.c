@@ -50,6 +50,7 @@
 #include <hal/acpi/acpi.h>
 
 #include <sys/smp/smp.h>
+#include <sys/smp/spinlock.h>
 
 #include "panic.h"
 #include "printk.h"
@@ -58,7 +59,7 @@ void kmain(boot_info_t *bootvars)
 {
     acpi_init(&bootvars->rsdp);
     smp_init(&bootvars->cpu);
-
+    
     for (;;)
     {
         __asm__("hlt");

@@ -40,7 +40,7 @@ void rsdp_init(boot_rsdp_t *boot_rsdp_table)
     rsdp.checksum = *addr++;
     i++;
     (void)*addr++;
-
+    
     int counter = 0;
     for (int n = 0; n < 6; n++)
         rsdp.oem_string[counter++] = *addr++;

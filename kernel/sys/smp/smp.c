@@ -8,6 +8,7 @@ static volatile int cpu_up = 0;
 static void ap_startup(struct stivale2_smp_info *cpu)
 {
     printk("smp", "Started CPU#%d\n", cpu->lapic_id);
+
     cpu_up = 1;
     
     for(;;)

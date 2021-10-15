@@ -8,8 +8,12 @@
 #include <stdbool.h>
 #include <trace/sym.h>
 #include <printk.h>
+#include <panic.h>
+#include <sys/smp/spinlock.h>
 
 #define GB 0x40000000UL
+
+create_lock("vmm", vmm_lock);
 
 static uint64_t *rootptr;
 static bool la57_enabled = false;
@@ -74,9 +78,7 @@ static uint64_t *vmm_get_pml(uint64_t *entry, size_t level)
 
 void vmm_map(size_t vaddr, size_t paddr, int flags)
 {
-    //TODO:
-    //Performance tweak: Use an algorithm to save an address
-    //which has been mapped already and check if the address is already mapped here
+    acquire_lock(&vmm_lock);
     page_info_t info = vmm_dissect_vaddr(vaddr);
     if (la57_enabled)
     {
@@ -85,21 +87,38 @@ void vmm_map(size_t vaddr, size_t paddr, int flags)
         pml3 = vmm_get_pml_or_alloc(pml4, info.lv4, flags);
         pml2 = vmm_get_pml_or_alloc(pml3, info.lv3, flags);
         pml1 = vmm_get_pml_or_alloc(pml2, info.lv2, flags);
+
+        if(pml1[info.lv1])
+        {
+            panic("Attempted to map a mapped page! [ virt: 0x%lX | phys: 0x%lX | pml1[%d]: 0x%lX ]",
+                vaddr, paddr, info.lv1, pml1[info.lv1]
+            );
+        }
+
         pml1[info.lv1] = (paddr | flags);
     }
-
     else
     {
         uint64_t *pml3, *pml2, *pml1 = NULL;
         pml3 = vmm_get_pml_or_alloc(rootptr, info.lv4, flags);
         pml2 = vmm_get_pml_or_alloc(pml3, info.lv3, flags);
         pml1 = vmm_get_pml_or_alloc(pml2, info.lv2, flags);
+        
+        if (pml1[info.lv1] != 0)
+        {
+            panic("Attempted to map a mapped page! [ virt: 0x%lX | phys: 0x%lX | pml1[%d]: 0x%lX ]",
+                vaddr, paddr, info.lv1, pml1[info.lv1]
+            );
+        }
+
         pml1[info.lv1] = (paddr | flags);
     }
+    release_lock(&vmm_lock);
 }
 
 void vmm_unmap(size_t vaddr)
 {
+    acquire_lock(&vmm_lock);
     page_info_t info = vmm_dissect_vaddr(vaddr);
 
     if (la57_enabled)
@@ -120,10 +139,12 @@ void vmm_unmap(size_t vaddr)
         pml1[info.lv1] = 0;
     }
     TLB_FLUSH(vaddr);
+    acquire_lock(&vmm_lock);
 }
 
 void vmm_remap(size_t vaddr_old, size_t vaddr_new, int flags)
 {
+    acquire_lock(&vmm_lock);
     page_info_t info = vmm_dissect_vaddr(vaddr_old);
     size_t paddr = 0;
 
@@ -152,7 +173,8 @@ void vmm_remap(size_t vaddr_old, size_t vaddr_new, int flags)
         pml1[info.lv1] = 0;
         TLB_FLUSH(vaddr_old);
     }
-    
+
+    release_lock(&vmm_lock);
     vmm_map(vaddr_new, paddr, flags);
 }
 

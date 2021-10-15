@@ -8,6 +8,9 @@
 #include <liballoc/bitmap.h>
 #include <drivers/io/serial.h>
 #include "memdefs.h"
+#include <sys/smp/spinlock.h>
+
+create_lock("pmm", pmm_lock);
 
 static mmap_t phys_mmap;
 static struct stivale2_mmap_entry *map;
@@ -193,8 +196,6 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
         size_t page = PAGE_2_BIT(mmap[i].base);
         pfa_free_multiple(page, len);
     }
-
-    // printk("pmm", "Initialized pmm\n");
 }
 
 /**
@@ -204,6 +205,7 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
  */
 void *pmm_alloc()
 {
+    acquire_lock(&pmm_lock);
     void PTR block = find_first_free_block();
 
     if (block == PMM_INVALID)
@@ -220,12 +222,15 @@ void *pmm_alloc()
 
     memset(block, 0, PAGE_SIZE);
     pfa_alloc(VAR_TO_VOID_PTR(uintptr_t, (GENERIC_CAST(uintptr_t, block))));
-    // return block;
+
+    release_lock(&pmm_lock);
     return VAR_TO_VOID_PTR(uintptr_t, to_virt(GENERIC_CAST(uintptr_t, block)));
 }
 
 void *pmm_alloc_any(void *addr)
 {
+    acquire_lock(&pmm_lock);
+
     void PTR block = find_free_block_at(PAGE_2_BIT(addr));
     if (block == NULL)
         return NULL;
@@ -234,13 +239,15 @@ void *pmm_alloc_any(void *addr)
     uintptr_t index = GENERIC_CAST(uintptr_t, PAGE_2_BIT(addr));
     bset(index, BIT_SET);
 
+    release_lock(&pmm_lock);
     return block;
 }
 
 range_t pmm_alloc_range(size_t pages)
-{   
+{
+    //pmm_alloc acquires a spinlock already, no need to acquire one again
     uint64_t* base = (uint64_t*)pmm_alloc();
-    uint64_t* top = (uint64_t*)0;
+    uint64_t* top = NULL;
 
     assert(base != NULL);
 
@@ -282,8 +289,10 @@ struct memtag_range pmm_find_tag(size_t tag, int retries)
  */
 void pmm_free(void *page)
 {
+    acquire_lock(&pmm_lock);
     memset(page, 0, PAGE_SIZE);
     pfa_free(page);
+    release_lock(&pmm_lock);
 }
 
 /**

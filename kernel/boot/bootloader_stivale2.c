@@ -130,6 +130,7 @@ void kinit(struct stivale2_struct *bootloader_info)
 
     init_gdt();
     init_idt();
+    generic_keyboard_init(CHARSET_EN_US);
 
     if (fb != NULL)
     {
@@ -142,13 +143,12 @@ void kinit(struct stivale2_struct *bootloader_info)
 
     if (mmap != NULL)
     {
-        pmm_init(mmap->memmap, mmap->entries);
+        pmm_init(mmap->memmap, mmap->entries);        
         vmm_init(check_la57());
         create_safe_panic_area();
 
         double_buffering_init(&bootvars);
         printk_init();
-        generic_keyboard_init(CHARSET_EN_US);
 
         bootsplash();
 
