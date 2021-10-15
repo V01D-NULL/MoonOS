@@ -32,17 +32,8 @@ struct cpuid_regs_t
 
 void cpuid(struct cpuid_regs_t *cpuid_regs);
 
-void cpu_info();
+void log_cpuid_results();
 
-/**
- * @brief CPU information
- * 
- */
-typedef struct cpu_hw {
-    uint64_t cpu_count;
-    uint32_t bsp_lapic_id; //Bootstrap Processor lapic id
-    char     *vendor_string;
-} cpu_hw_t;
 
 /**
  * @brief A list of registers preserved by the interupt stack frame
@@ -72,12 +63,5 @@ typedef struct regs {
     int64_t rsp;
     int64_t ss;
 } regs_t;
-
-/**
- * @brief Gather CPU information from various sources & combine them into a single struct
- * 
- * @param[in] cpu_info Bootloader cpu information
- */
-void cpu_info_init(boot_info_t cpu_info);
 
 #endif // CPU_H

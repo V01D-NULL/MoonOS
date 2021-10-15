@@ -5,11 +5,11 @@
 #include <panic.h>
 #include <printk.h>
 
-struct rsdp_tableV1 rsdp_v1;
-struct rsdp_tableV2 rsdp_v2;
-struct xstd_table xstd;
+#define READ_PTR(in_ptr)  tmp1 = *in_ptr++, tmp2 = *in_ptr++, tmp3 = *in_ptr++, tmp4 = *in_ptr++
+#define CONCAT_INT32(out)   out = tmp1 << 24 | tmp2 << 16 | tmp3 << 8 | tmp4
 
-void xsdt_init(uint64_t rsdp_base);
+struct RSDP rsdp;
+
 void rsdp_verify_checksum(uint64_t rsdp_address);
 
 static int is_acpi_v2(uint64_t rsdp_base)
@@ -23,44 +23,57 @@ static int is_acpi_v2(uint64_t rsdp_base)
     return revision;
 }
 
-/* Parse RSDT table, if availbable the xstd table is parsed instead */
+/* Parse RSDT table, if available the xsdt table is parsed instead */
 void rsdp_init(boot_rsdp_t *boot_rsdp_table)
 {
+    rsdp_verify_checksum(boot_rsdp_table->rsdp_address);
+
     printk("acpi-rsdp", "RSDP Table: %llX\n", boot_rsdp_table->rsdp_address);
     uint8_t *addr = (uint8_t *)boot_rsdp_table->rsdp_address;
 
-    /* RSDT */
+    // I could comment all this code, but I could also just link the ACPI specification :^)
+    // https://uefi.org/htmlspecs/ACPI_Spec_6_4_html/05_ACPI_Software_Programming_Model/ACPI_Software_Programming_Model.html#rsdp-structure
     int i = 0;
     for (; i < 7; i++)
-        rsdp_v1.signature[i] = *addr++;
+        rsdp.signature[i] = *addr++;
 
-    rsdp_v1.checksum = *addr++;
+    rsdp.checksum = *addr++;
     i++;
+    (void)*addr++;
 
     int counter = 0;
-    for (int n = 0; n < 7; n++)
-        rsdp_v1.oem_string[counter++] = *addr++;
+    for (int n = 0; n < 6; n++)
+        rsdp.oem_string[counter++] = *addr++;
 
-    rsdp_v1.revision = *addr++;
-    rsdp_v1.rsdt_address = (size_t)boot_rsdp_table->rsdp_address + (*addr + 4);
+    rsdp.revision = *addr++;
 
-    printk("acpi-rsdp", "Signature: %s\n", rsdp_v1.signature);
-    printk("acpi-rsdp", "Checksum: %d | %X\n", rsdp_v1.checksum, rsdp_v1.checksum);
-    printk("acpi-rsdp", "Oem string: %s\n", rsdp_v1.oem_string);
+    int64_t tmp1, tmp2, tmp3, tmp4;
+    READ_PTR(addr);
+    CONCAT_INT32(rsdp.rsdt_address);
 
-    /* XSTD */
-    if (is_acpi_v2(boot_rsdp_table->rsdp_address) > ACPI_V1_LEGACY)
+    printk("acpi-rsdp", "Signature: %s\n", rsdp.signature);
+    printk("acpi-rsdp", "Oem string: %s\n", rsdp.oem_string);
+
+    /* XSDT */
+    if (is_acpi_v2(boot_rsdp_table->rsdp_address))
     {
-        printk("acpi-xstd", "ACPI Version: 2.0+ (detection based on revision)\n");
-        printk("acpi-rsdp", "RSDT address: %llX\n", rsdp_v1.rsdt_address);
+        READ_PTR(addr);
+        CONCAT_INT32(rsdp.length);
 
-        xsdt_init(boot_rsdp_table->rsdp_address);
-        return;
+        READ_PTR(addr); //Read tmp1-4, i.e. the first 4 bytes of the 8 byte wide xsdt address
+        int64_t tmp5 = *addr++, tmp6 = *addr++, tmp7 = *addr++, tmp8 = *addr++;
+        rsdp.xsdt_address = (tmp8 << 56 | tmp7 << 48 | tmp6 << 40 | tmp5 << 32 | tmp4 << 24 | tmp3 << 16 | tmp2 << 8 | tmp1);
+
+        printk("acpi-xsdt", "ACPI Version: 2.0+ (detection based on revision)\n");
+        printk("acpi-rsdp", "RSDP table size: %d\n", rsdp.length);
+        printk("acpi-rsdp", "XSDT address: %llX\n", rsdp.xsdt_address);
     }
-
-    printk("acpi-rsdp", "Revision: %d (Assuming ACPI version 1.0)\n", rsdp_v1.revision);
-    printk("acpi-rsdp", "RSDT address: %llX\n", rsdp_v1.rsdt_address);
-    rsdp_verify_checksum(boot_rsdp_table->rsdp_address);
+    /* RSDT */
+    else
+    {
+        printk("acpi-rsdp", "Revision: %d (Assuming ACPI version 1.0)\n", rsdp.revision);
+        printk("acpi-rsdp", "RSDT address: %llX\n", rsdp.rsdt_address);
+    }
 }
 
 void rsdp_verify_checksum(uint64_t rsdp_address)
@@ -83,17 +96,11 @@ void rsdp_verify_checksum(uint64_t rsdp_address)
     }
     else
     {
-        panic("RSDP checksum is invalid (%lX)\n", checksum & 0xFF);
+        panic("RSDP checksum is invalid (%X)\n", checksum & 0xFF);
     }
 }
 
-void xsdt_init(uint64_t rsdp_base)
+struct RSDP get_rsdp()
 {
-    uint8_t *addr = (uint8_t *)rsdp_base + 20;
-    rsdp_v2.rsdp = rsdp_v1;
-    rsdp_v2.length = *addr;
-    rsdp_v2.xsdt_address = rsdp_base;
-
-    printk("acpi-xstd", "Length: %d\n", rsdp_v2.length);
-    rsdp_verify_checksum(rsdp_base);
+    return rsdp;
 }

@@ -33,7 +33,7 @@ Verbose boot:
 - ACPI
 - FADT
 - MADT
-- XSTD
+- XSDT
 - SMBIOS
 - Userland support
 - Multitasking

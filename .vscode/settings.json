@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "printk.h": "c",
+        "cpu.h": "c"
+    },
+    "files.exclude": {
+        "**/*.o": true,
+        "**/*.sym": true
+    }
+}

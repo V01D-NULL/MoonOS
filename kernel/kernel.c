@@ -47,17 +47,17 @@
 
 #include <trace/strace.h>
 #include <hal/acpi/tables/rsdp.h>
+#include <hal/acpi/acpi.h>
+
+#include <sys/smp/smp.h>
 
 #include "panic.h"
 #include "printk.h"
 
 void kmain(boot_info_t *bootvars)
 {
-    /* Init the CPU hardware struct */
-    cpu_info_init(*bootvars);
-    cpu_info();
-
-    rsdp_init(&bootvars->rsdp);
+    acpi_init(&bootvars->rsdp);
+    smp_init(&bootvars->cpu);
 
     for (;;)
     {

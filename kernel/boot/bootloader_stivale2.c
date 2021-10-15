@@ -53,22 +53,14 @@ struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
     .framebuffer_height = 0,
     .framebuffer_bpp = 0};
 
-#ifdef USE_VGA
+
 __SECTION(".stivale2hdr")
 struct stivale2_header stivale_hdr = {
     .entry_point = 0,
     .stack = (uintptr_t)stack + sizeof(stack),
     .flags = 0,
-    .tags = 0 //(uintptr_t)&framebuffer_hdr_tag
+    .tags = (uintptr_t)&framebuffer_hdr_tag
 };
-#else
-__SECTION(".stivale2hdr")
-struct stivale2_header stivale_hdr = {
-    .entry_point = 0,
-    .stack = (uintptr_t)stack + sizeof(stack),
-    .flags = 0,
-    .tags = (uintptr_t)&framebuffer_hdr_tag};
-#endif
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id)
 {
@@ -92,13 +84,12 @@ void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id)
 }
 
 const char serial_message[] = {
-"███╗   ███╗ ██████╗  ██████╗ ███╗   ██╗ ██████╗ ███████╗ \n"
-"████╗ ████║██╔═══██╗██╔═══██╗████╗  ██║██╔═══██╗██╔════╝ \n"
-"██╔████╔██║██║   ██║██║   ██║██╔██╗ ██║██║   ██║███████╗ \n"
-"██║╚██╔╝██║██║   ██║██║   ██║██║╚██╗██║██║   ██║╚════██║ \n"
-"██║ ╚═╝ ██║╚██████╔╝╚██████╔╝██║ ╚████║╚██████╔╝███████║ \n"
-"╚═╝     ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝ \n"
-};
+    "███╗   ███╗ ██████╗  ██████╗ ███╗   ██╗ ██████╗ ███████╗ \n"
+    "████╗ ████║██╔═══██╗██╔═══██╗████╗  ██║██╔═══██╗██╔════╝ \n"
+    "██╔████╔██║██║   ██║██║   ██║██╔██╗ ██║██║   ██║███████╗ \n"
+    "██║╚██╔╝██║██║   ██║██║   ██║██║╚██╗██║██║   ██║╚════██║ \n"
+    "██║ ╚═╝ ██║╚██████╔╝╚██████╔╝██║ ╚████║╚██████╔╝███████║ \n"
+    "╚═╝     ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝ \n"};
 
 const char fb_message[] = {
     "\n"
@@ -106,8 +97,7 @@ const char fb_message[] = {
     "|     |___ ___ ___|     |   __| \n"
     "| | | | . | . |   |  |  |__   | \n"
     "|_|_|_|___|___|_|_|_____|_____| \n"
-    "\n"
-};
+    "\n"};
 
 void banner(bool serial_only)
 {
@@ -132,7 +122,7 @@ void kinit(struct stivale2_struct *bootloader_info)
     boot_info_t bootvars; //Hardware information from the bootloader
     serial_set_color(BASH_WHITE);
     banner(true); /* Write banner to serial device */
-    
+
     struct stivale2_struct_tag_memmap *mmap = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
     struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
     struct stivale2_struct_tag_smp *smp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_SMP_ID);
@@ -147,19 +137,19 @@ void kinit(struct stivale2_struct *bootloader_info)
         bootvars.vesa.fb_width = fb->framebuffer_width;
         bootvars.vesa.fb_height = fb->framebuffer_height;
         bootvars.vesa.fb_bpp = fb->framebuffer_bpp;
-        bootvars.vesa.fb_pitch = fb->framebuffer_pitch;        
+        bootvars.vesa.fb_pitch = fb->framebuffer_pitch;
     }
 
     if (mmap != NULL)
     {
         pmm_init(mmap->memmap, mmap->entries);
-        vmm_init(check_la57());        
+        vmm_init(check_la57());
         create_safe_panic_area();
-        
+
         double_buffering_init(&bootvars);
         printk_init();
         generic_keyboard_init(CHARSET_EN_US);
-        
+
         bootsplash();
 
         banner(false);
@@ -182,7 +172,7 @@ void kinit(struct stivale2_struct *bootloader_info)
     else
     {
         debug(false, "\n!Did not get a memory map from the bootloader!\n");
-        for(;;)
+        for (;;)
             ;
     }
 
@@ -192,12 +182,15 @@ void kinit(struct stivale2_struct *bootloader_info)
         bootvars.cpu.bootstrap_processor_lapic_id = smp->bsp_lapic_id;
         bootvars.cpu.acpi_processor_uid = smp->smp_info->processor_id;
         bootvars.cpu.lapic_id = smp->smp_info->lapic_id;
+        bootvars.cpu.smp_info = smp->smp_info;
     }
 
     if (rsdp != NULL)
     {
         bootvars.rsdp.rsdp_address = rsdp->rsdp;
     }
+
+    log_cpuid_results();
 
     kmain(&bootvars);
 }

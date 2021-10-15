@@ -26,6 +26,7 @@ typedef struct boot_cpu {
     uint32_t  acpi_processor_uid;
     uint32_t  lapic_id;
     uint32_t  bootstrap_processor_lapic_id;
+    struct stivale2_smp_info *smp_info;
 } boot_cpu_t;
 
 
