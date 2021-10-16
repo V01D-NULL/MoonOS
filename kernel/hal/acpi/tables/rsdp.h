@@ -4,17 +4,15 @@
 #include <stdint.h>
 #include <amd64/moon.h>
 #include <boot/bootloader_stivale2.h>
-#include "sdt.h"
 #include <hal/acpi/acpi.h>
-
-#define ACPI_V1_LEGACY 0 /* Revision 0 == ACPI version 1.0 or lower */
+#include <stdbool.h>
 
 struct RSDP
 {
     // Version 1.0
     char signature[8];
     uint8_t checksum;
-    char oem_string[8];
+    char oem_string[6];
     uint8_t revision;
     uint32_t rsdt_address;
 
@@ -27,5 +25,6 @@ struct RSDP
 
 void rsdp_init(boot_rsdp_t *boot_rsdp_table);
 struct RSDP get_rsdp();
+bool use_xsdt();
 
 #endif // RSDP_H
