@@ -108,22 +108,17 @@ int strcmp (char *str1, char *str2)
 	return failed;
 }
 
-int strncmp(char *str1, char *str2)
+int strncmp(char *str1, char *str2, size_t n)
 {
-	int i = 0;
-	while (str1[i] && str2[i])
+	for (size_t i = 0; i < n; i++)
 	{
-		if (str1[i] + 1 == '\0' && str2[i] + 1 == '\0')
-		{
-			return 0;
-		}
-		else if (str1[i] != str2[i])
-		{
+		if (str1[i] != str2[i])
 			return -1;
-		}
-		i++;
+		
+		if (str1[i] == '\0')
+			return 0;
 	}
-	return 1;
+	return 0;
 }
 
 // Copy the NULL-terminated string src into dest, and return dest
