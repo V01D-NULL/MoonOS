@@ -60,6 +60,12 @@ void kmain(boot_info_t *bootvars)
     acpi_init(&bootvars->rsdp);
     smp_init(&bootvars->cpu);
     
+    acpi_table_t result = acpi_find_table("MADT");
+    if (result != NULL)
+    {
+        debug(true, "Found FADT table @ %p\n", result);
+    }
+    
     for (;;)
     {
         __asm__("hlt");

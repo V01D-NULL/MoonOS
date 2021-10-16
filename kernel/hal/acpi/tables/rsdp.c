@@ -33,23 +33,29 @@ void rsdp_init(boot_rsdp_t *boot_rsdp_table)
 
     // I could comment all this code, but I could also just link the ACPI specification :^)
     // https://uefi.org/htmlspecs/ACPI_Spec_6_4_html/05_ACPI_Software_Programming_Model/ACPI_Software_Programming_Model.html#rsdp-structure
-    int i = 0;
-    for (; i < 7; i++)
-        rsdp.signature[i] = *addr++;
+    for (int i = 0; i < 8; i++)
+        debug(false, "%c",*addr++);
+    debug(false,"\n");
+        // rsdp.signature[i] = *addr++;
 
     rsdp.checksum = *addr++;
-    i++;
-    (void)*addr++;
     
     int counter = 0;
     for (int n = 0; n < 6; n++)
         rsdp.oem_string[counter++] = *addr++;
 
     rsdp.revision = *addr++;
-
-    int64_t tmp1, tmp2, tmp3, tmp4;
-    READ_PTR(addr);
-    CONCAT_INT32(rsdp.rsdt_address);
+    // (void)*addr++;
+    int32_t tmp1, tmp2, tmp3, tmp4;
+    // for (int i = 0; i < 4; i++)
+    // {
+    //     debug(false, "%X", *addr++);
+    // }
+    // debug(false, "\n");
+    // tmp1 = *addr++, tmp2 = *addr++, tmp3 = *addr++, tmp4 = *addr++;
+    rsdp.rsdt_address = 0xE22FEF;//tmp1 << 24 | tmp2 << 16 | tmp3 << 8 | tmp4;
+    // READ_PTR(addr);
+    // CONCAT_INT32(rsdp.rsdt_address);
 
     printk("acpi-rsdp", "Signature: %s\n", rsdp.signature);
     printk("acpi-rsdp", "Oem string: %s\n", rsdp.oem_string);

@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-struct sdt
+struct SDT
 {
     char signature[4];
     uint32_t length;
@@ -12,7 +12,7 @@ struct sdt
     char oem_string[6];
     char oem_table_id[8];
     uint32_t oem_revision;
-    uint32_t creatorID;
+    char creator_id[4];
     uint32_t creator_revision;
 };
 

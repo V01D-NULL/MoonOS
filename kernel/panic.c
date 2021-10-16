@@ -14,6 +14,9 @@
 
 __no_return panic(const char *fmt, ...)
 {
+	if (!is_verbose_boot())
+		__asm__("int $48"); //Switch to verbose boot
+		
 	va_list ap;
 	va_start(ap, fmt);
 	char panic_buff[512];

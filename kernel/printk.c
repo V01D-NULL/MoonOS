@@ -73,7 +73,7 @@ void putc(char c, int _x, int _y)
         console_x = -char_width; /* 0 adds one character offset thus indenting strings by one character, the true offset 0 is actually negative char_width */
         goto end;
     }
-
+    
     text2buffer();
 
 end:
@@ -104,6 +104,12 @@ void text2buffer()
             _y += char_height;
             _x = -char_width;
         }
+        else if (_x >= gfx_h.fb_width - -char_width)
+        {
+            _y += char_height;
+            _x  = -char_width;
+        }
+
         for (int y = 0; y < char_height; y++)
         {
             for (int x = 0; x < char_width; x++)

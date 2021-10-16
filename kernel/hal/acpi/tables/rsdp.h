@@ -5,6 +5,7 @@
 #include <amd64/moon.h>
 #include <boot/bootloader_stivale2.h>
 #include "sdt.h"
+#include <hal/acpi/acpi.h>
 
 #define ACPI_V1_LEGACY 0 /* Revision 0 == ACPI version 1.0 or lower */
 

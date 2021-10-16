@@ -3,10 +3,10 @@
 
 #include "sdt.h"
 
-struct rsdt_header
+struct RSDT
 {
-    struct sdt rsdt;
-    char children[];
+    struct SDT header;
+    uint32_t next[];
 } __pack_bytes;
 
 #endif // RSDT_H

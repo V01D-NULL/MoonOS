@@ -34,15 +34,6 @@ void *memset (void *dest, const uint8_t val, size_t len)
 
   return dest;
 }
-// void memset(void *dest, uint8_t val, uint64_t len)
-// {
-// 	debug("dest => 0x%llx | %p\n", (uint8_t*)dest, (uint8_t*)dest);
-// 	for (size_t i = 0; i < len; i++)
-// 	{
-// 		*(uint8_t*)dest = val;
-// 		*(uint8_t*)dest++;
-// 	}
-// }
 
 // Returns 1 if src is less than dst
 // Returns -1 if src is greater than dst
@@ -115,6 +106,24 @@ int strcmp (char *str1, char *str2)
 	}
 
 	return failed;
+}
+
+int strncmp(char *str1, char *str2)
+{
+	int i = 0;
+	while (str1[i] && str2[i])
+	{
+		if (str1[i] + 1 == '\0' && str2[i] + 1 == '\0')
+		{
+			return 0;
+		}
+		else if (str1[i] != str2[i])
+		{
+			return -1;
+		}
+		i++;
+	}
+	return 1;
 }
 
 // Copy the NULL-terminated string src into dest, and return dest
