@@ -36,7 +36,7 @@ static sym_table_t lookup(uint64_t address)
     }
 }
 
-uint64_t find_symbol_by_name(char *name)
+int64_t find_symbol_by_name(char *name)
 {
     for (size_t i = 0;; i++)
     {
