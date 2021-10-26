@@ -29,7 +29,7 @@ typedef struct
     uintptr_t lv5;
 } page_info_t;
 
-void vmm_init(bool has_5_level_paging, struct stivale2_mmap_entry *mmap, int entries);
+void vmm_init(bool has_5_level_paging);
 void vmm_map(size_t vaddr, size_t paddr, int flags);
 void vmm_unmap(size_t vaddr);
 void vmm_remap(size_t vaddr_old, size_t vaddr_new, int flags);

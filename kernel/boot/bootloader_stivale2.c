@@ -44,6 +44,19 @@ struct stivale2_header_tag_smp smp_hdr_tag = {
         .identifier = STIVALE2_HEADER_TAG_SMP_ID,
         .next = (uintptr_t)&level5_paging_tag}};
 
+static struct stivale2_header_tag_terminal terminal_hdr_tag = {
+    // All tags need to begin with an identifier and a pointer to the next tag.
+    .tag = {
+        // Identification constant defined in stivale2.h and the specification.
+        .identifier = STIVALE2_HEADER_TAG_TERMINAL_ID,
+        // If next is 0, it marks the end of the linked list of header tags.
+        .next = 0//(uintptr_t)&framebuffer_hdr_tag
+    },
+    // The terminal header tag possesses a flags field, leave it as 0 for now
+    // as it is unused.
+    .flags = 0
+};
+
 struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
     // All tags need to begin with an identifier and a pointer to the next tag.
     .tag = {
@@ -51,14 +64,15 @@ struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
         .next = (uintptr_t)&smp_hdr_tag},
     .framebuffer_width = 0,
     .framebuffer_height = 0,
-    .framebuffer_bpp = 0};
+    .framebuffer_bpp = 32
+};
 
-
-__SECTION(".stivale2hdr")
+// __SECTION(".stivale2hdr")
+__attribute__((section(".stivale2hdr"), used))
 struct stivale2_header stivale_hdr = {
     .entry_point = 0,
     .stack = (uintptr_t)stack + sizeof(stack),
-    .flags = 0,
+    .flags = (1 << 1) | (1 << 2),
     .tags = (uintptr_t)&framebuffer_hdr_tag
 };
 
@@ -119,10 +133,7 @@ void banner(bool serial_only)
  */
 void kinit(struct stivale2_struct *bootloader_info)
 {
-    boot_info_t bootvars; //Hardware information from the bootloader
-    serial_set_color(BASH_WHITE);
-    banner(true); /* Write banner to serial device */
-
+    boot_info_t bootvars;
     struct stivale2_struct_tag_memmap *mmap = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
     struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
     struct stivale2_struct_tag_smp *smp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_SMP_ID);
@@ -139,11 +150,22 @@ void kinit(struct stivale2_struct *bootloader_info)
         bootvars.vesa.fb_height = fb->framebuffer_height;
         bootvars.vesa.fb_bpp = fb->framebuffer_bpp;
         bootvars.vesa.fb_pitch = fb->framebuffer_pitch;
+
+        // uint32_t *ptr = (uint32_t *)bootvars.vesa.fb_addr;
+        // for (int i = 0; i < 1000; i++)
+        // {
+        //     ptr[i * (fb->framebuffer_pitch > 0 ? fb->framebuffer_pitch : 4096 / sizeof(uint32_t)) + i] = 0xFF0000;
+        // }
+        // debug(1, "Pitch: %x %d\n", fb->framebuffer_pitch, fb->framebuffer_pitch);
+    }
+    else
+    {
+        for(;;);
     }
 
     if (mmap != NULL)
     {
-        pmm_init(mmap->memmap, mmap->entries);        
+        pmm_init(mmap->memmap, mmap->entries);
         vmm_init(check_la57());
         create_safe_panic_area();
 

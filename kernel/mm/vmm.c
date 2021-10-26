@@ -18,7 +18,7 @@ create_lock("vmm", vmm_lock);
 static uint64_t *rootptr;
 static bool la57_enabled = false;
 
-void vmm_init(bool has_5_level_paging, struct stivale2_mmap_entry *mmap, int entries)
+void vmm_init(bool has_5_level_paging)
 {
     la57_enabled = has_5_level_paging;
 
@@ -64,7 +64,9 @@ static uint64_t *vmm_get_pml_or_alloc(uint64_t *entry, size_t level, int flags)
     if (entry[level] & 1)
         goto no_alloc;
 
-    entry[level] = from_virt((uintptr_t)pmm_alloc());
+    void *addr = NULL;
+    assert((addr = pmm_alloc()) != NULL);
+    entry[level] = from_virt(GENERIC_CAST(uintptr_t, addr));
     entry[level] |= flags;
 
 no_alloc:
