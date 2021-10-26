@@ -19,14 +19,14 @@ static void ap_startup(struct stivale2_smp_info *cpu)
 
 void smp_init(boot_cpu_t *smp)
 {
-    printk("smp-init", "Total CPU's: %d\n", smp->processor_count);
-    printk("smp-init", "Starting %d other cpu's\n", smp->processor_count - 1);
-
     if (smp->processor_count == 1)
     {
         printk("smp-init", "Failed to init smp; there is only 1 cpu\n");
         return;
     }
+    
+    printk("smp-init", "Total CPU's: %d\n", smp->processor_count);
+    printk("smp-init", "Starting %d other %s\n", smp->processor_count - 1, smp->processor_count > 2 ? "cpu's" : "cpu");
     
     for (int i = 0; i < smp->processor_count; i++)
     {
