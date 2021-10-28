@@ -90,7 +90,7 @@ void vmm_map(size_t vaddr, size_t paddr, int flags)
         pml2 = vmm_get_pml_or_alloc(pml3, info.lv3, flags);
         pml1 = vmm_get_pml_or_alloc(pml2, info.lv2, flags);
 
-        if(pml1[info.lv1])
+        if(pml1[info.lv1] != 0)
         {
             panic("Attempted to map a mapped page! [ virt: 0x%lX | phys: 0x%lX | pml1[%d]: 0x%lX ]",
                 vaddr, paddr, info.lv1, pml1[info.lv1]
