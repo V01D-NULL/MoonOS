@@ -1,7 +1,7 @@
 #include "cpu.h"
 #include <printk.h>
 
-void log_cpuid_results()
+void log_cpuid_results(void)
 {
     // The vendor string itself will do for now
     ASM_x86_cpuid_vendor_string();

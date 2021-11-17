@@ -24,7 +24,7 @@
 #include <int/idt.h>
 #include <int/interrupts.h>
 
-#include <drivers/io/serial.h>
+#include <devices/serial/serial.h>
 #include <drivers/keyboard/keyboard.h>
 
 #include <asm/x86/x86.h>
@@ -52,6 +52,8 @@
 #include <sys/smp/smp.h>
 #include <sys/smp/spinlock.h>
 
+#include <devices/term/tty/tty.h>
+
 #include "panic.h"
 #include "printk.h"
 
@@ -60,8 +62,16 @@ void kmain(boot_info_t *bootvars)
     acpi_init(&bootvars->rsdp);
     smp_init(&bootvars->cpu);
     
+    __asm__("int $48");
+    tty_init();
+    tty_puts("Foo\n");
+    tty_puts("BAR\n");
+    // tty_scroll_up();
+
     for (;;)
     {
+        tty_puts("Testing A\n");
+        tty_puts("Testing B\n");
         __asm__("hlt");
     }
 }

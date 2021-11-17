@@ -1,6 +1,6 @@
 #include "heap.h"
 #include <mm/pmm.h>
-#include <drivers/io/serial.h>
+#include <devices/serial/serial.h>
 
 heap_range_t heap_alloc(size_t bytes)
 {

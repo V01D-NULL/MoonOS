@@ -47,6 +47,6 @@ struct gdt_table {
  * @brief Setup and load the GDT
  * 
  */
-void init_gdt();
+void init_gdt(void);
 
 #endif // GDT_H

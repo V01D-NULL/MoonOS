@@ -10,7 +10,7 @@ static const uintptr_t VMEM_LV5_BASE = 0xff00000000000000UL;
 static const uintptr_t VMEM_LV4_BASE = 0xffff800000000000UL;
 static const uintptr_t KERNEL_CODE_BASE = 0xffffffff80000000;
 
-__attribute__((always_inline)) static inline bool check_la57() { return (cr_read(CR4) >> 12) & 1; }
+__attribute__((always_inline)) static inline bool check_la57(void) { return (cr_read(CR4) >> 12) & 1; }
 
 /* These two helper utils were inspired by brutal */
 static inline uintptr_t to_virt(uintptr_t phys)

@@ -1,6 +1,6 @@
 #include "interrupts.h"
 #include "idt.h"
-#include <drivers/io/serial.h>
+#include <devices/serial/serial.h>
 #include <mm/cpu/CR.h>
 #include <mm/vmm.h>
 #include <amd64/bytes.h>

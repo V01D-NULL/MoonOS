@@ -1,5 +1,5 @@
 #include "rsdp.h"
-#include <drivers/io/serial.h>
+#include <devices/serial/serial.h>
 #include <util/ptr.h>
 #include <stdbool.h>
 #include <panic.h>
@@ -62,12 +62,12 @@ void rsdp_verify_checksum(uint64_t rsdp_address)
     }
 }
 
-bool use_xsdt()
+bool use_xsdt(void)
 {
     return has_xsdt;
 }
 
-struct RSDP get_rsdp()
+struct RSDP get_rsdp(void)
 {
     return rsdp;
 }

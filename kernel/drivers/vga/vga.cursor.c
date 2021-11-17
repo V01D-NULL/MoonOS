@@ -5,7 +5,7 @@
 __export vga_hdr_t vga;
 
 // Updates the hardware cursor
-void vga_move_cursor()
+void vga_move_cursor(void)
 {
 	
 	uint16_t cursorLocation = vga.cursor_y * vga.row + vga.cursor_x;
@@ -16,7 +16,7 @@ void vga_move_cursor()
 	outb(0x3D5, cursorLocation);       // Send it
 }
 
-void vga_kill_cursor()
+void vga_kill_cursor(void)
 {
 	outb(0x3D4, 0x0A);
 	outb(0x3D5, 0x20);

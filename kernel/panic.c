@@ -1,6 +1,6 @@
 #include "panic.h"
 #include <util/ptr.h>
-#include <drivers/io/serial.h>
+#include <devices/serial/serial.h>
 #include <amd64/moon.h>
 #include <stdarg.h>
 #include <libk/kprintf.h>
@@ -27,12 +27,6 @@ __no_return panic(const char *fmt, ...)
 	if (!is_verbose_boot())
 		__asm__("int $48"); //Switch to verbose boot
 
-	uint32_t *ptr = (uint32_t*)fbaddr;
-	for (int i = 0; i < 1000; i++)
-	{
-		ptr[1 * (fbpitch / sizeof (uint32_t)) + i] = 0xFF0000;
-	}
-	for(;;);
 	va_list ap;
 	va_start(ap, fmt);
 	char panic_buff[512];
@@ -52,7 +46,7 @@ __no_return panic(const char *fmt, ...)
 		;
 }
 
-void create_safe_panic_area()
+void create_safe_panic_area(void)
 {
 	int64_t panic = to_virt(from_phys_higher_half(find_symbol_by_name("panic")));
 	assert(panic != -1);

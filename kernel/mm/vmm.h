@@ -2,7 +2,7 @@
 #define VMM_H
 
 #include <amd64/moon.h>
-#include <drivers/io/serial.h>
+#include <devices/serial/serial.h>
 #include <mm/cpu/CR.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -34,7 +34,7 @@ void vmm_map(size_t vaddr, size_t paddr, int flags);
 void vmm_unmap(size_t vaddr);
 void vmm_remap(size_t vaddr_old, size_t vaddr_new, int flags);
 
-uint64_t *vmm_get_root();
+uint64_t *vmm_get_root(void);
 page_info_t vmm_dissect_vaddr(uint64_t virt_addr);
 void vmm_guess_and_map(uint64_t cr2, int error_code);
 

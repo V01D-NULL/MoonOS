@@ -6,7 +6,7 @@
 #include <panic.h>
 #include <printk.h>
 #include <liballoc/bitmap.h>
-#include <drivers/io/serial.h>
+#include <devices/serial/serial.h>
 #include "memdefs.h"
 #include <sys/smp/spinlock.h>
 
@@ -78,7 +78,7 @@ bool in_range(void *_address)
 }
 
 const char *get_mmap_type(int entry);
-void dump_mmap()
+void dump_mmap(void)
 {
     debug(true, "Full mmap dump:\n");
     for (int i = 0; i < phys_mmap.entries; i++)
@@ -150,7 +150,7 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
 
     //highest_page / PAGE_SIZE = amount of pages in total, and higest_page / PAGE_SIZE / 8 will get the amount of bytes the bitmap will occupy since 1 byte = 8 bits
     size_t bitmap_size_bytes = ALIGN_UP(highest_page / PAGE_SIZE / 8);
-
+	debug(1, "bitmap_size_bytes: %d\n", bitmap_size_bytes);
     //Step 2. Find a big enough block to host the bitmap
     for (int i = 0; i < entries; i++)
     {
@@ -203,7 +203,7 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
  * 
  * @return void* Returns NULL on error and a pointer to the allocated memory on success.
  */
-void *pmm_alloc()
+void *pmm_alloc(void)
 {
     acquire_lock(&pmm_lock);
     void PTR block = find_first_free_block();
@@ -300,7 +300,7 @@ void pmm_free(void *page)
  * 
  * @return void* Returns PMM_INVALID on error and the address of the first free block in the bitmap on success
  */
-void *find_first_free_block()
+void *find_first_free_block(void)
 {
     for (size_t i = 0; i < PAGE_2_BIT(highest_page); i++)
     {   

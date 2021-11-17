@@ -4,7 +4,7 @@ __export void _load_gdt(uint64_t gdt_desc);
 
 static struct gdt_table gdt;
 
-void init_gdt()
+void init_gdt(void)
 {
     //Null descriptor
     gdt.gdt_table_memory_segments[0].limit     = 0;

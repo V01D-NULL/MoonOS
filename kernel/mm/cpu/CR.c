@@ -1,8 +1,8 @@
 #include "CR.h"
 
-static inline uint64_t cr0_read()
+static inline int64_t cr0_read(void)
 {
-    uint64_t cr;
+    int64_t cr;
     __asm__ volatile(
         "mov %%cr0, %0\n\t"
         : "=r"(cr)
@@ -12,9 +12,9 @@ static inline uint64_t cr0_read()
     return cr;
 }
 
-static inline uint64_t cr1_read()
+static inline int64_t cr1_read(void)
 {
-    uint64_t cr;
+    int64_t cr;
     __asm__ volatile(
         "mov %%cr1, %0\n\t"
         : "=r"(cr)
@@ -24,9 +24,9 @@ static inline uint64_t cr1_read()
     return cr;
 }
 
-static inline uint64_t cr2_read()
+static inline int64_t cr2_read(void)
 {
-    uint64_t cr;
+    int64_t cr;
     __asm__ volatile(
         "mov %%cr2, %0\n\t"
         : "=r"(cr)
@@ -36,9 +36,9 @@ static inline uint64_t cr2_read()
     return cr;
 }
 
-static inline uint64_t cr3_read()
+static inline int64_t cr3_read(void)
 {
-    uint64_t cr;
+    int64_t cr;
     __asm__ volatile(
         "mov %%cr3, %0\n\t"
         : "=r"(cr)
@@ -48,9 +48,9 @@ static inline uint64_t cr3_read()
     return cr;
 }
 
-static inline uint64_t cr4_read()
+static inline int64_t cr4_read(void)
 {
-    uint64_t cr;
+    int64_t cr;
     __asm__ volatile(
         "mov %%cr4, %0\n\t"
         : "=r"(cr)
@@ -60,7 +60,7 @@ static inline uint64_t cr4_read()
     return cr;
 }
 
-uint64_t cr_read(enum CR_NUMBER cr)
+int64_t cr_read(enum CR_NUMBER cr)
 {
     switch (cr)
     {

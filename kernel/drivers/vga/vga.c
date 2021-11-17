@@ -34,7 +34,7 @@ void set_scroll_speed(uint32_t speed) {
 }
 
 // Scrolls the text on the screen up by one line
-void vga_scroll()
+void vga_scroll(void)
 {    
     int i = 0;
     for(i = 0; i < (vga.row*vga.col-80); i++)
@@ -106,7 +106,7 @@ void vga_putc(char c)
 }
 
 // Clear the screen to all black by writting spaces to the framebuffer
-void vga_clear()
+void vga_clear(void)
 {
 	int i;
 
@@ -125,7 +125,7 @@ void vga_clear()
 	vga.vram = (uint16_t*)0xB8000; //Reset vram framebuffer
 }
 
-void op_ok()
+void op_ok(void)
 {
 	int last_fg = vga_hist.cell_color_fg;
 	int last_bg = vga_hist.cell_color_bg;

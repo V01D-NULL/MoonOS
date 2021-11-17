@@ -56,58 +56,58 @@ void idt_set_entry(uint16_t selector, uint8_t ist, uint8_t type_attr, uint64_t o
  * @brief Setup and load IDT
  * 
  */
-void init_idt();
+void init_idt(void);
 
 //CPU exceptions
-__export void isr0();
-__export void isr1();
-__export void isr2();
-__export void isr3();
-__export void isr4();
-__export void isr5();
-__export void isr6();
-__export void isr7();
-__export void isr_err8();
-__export void isr9();
-__export void isr_err10();
-__export void isr_err11();
-__export void isr_err12();
-__export void isr_err13();
-__export void isr_err14();
-__export void isr15();
-__export void isr16();
-__export void isr17();
-__export void isr18();
-__export void isr19();
-__export void isr20();
-__export void isr21();
-__export void isr22();
-__export void isr23();
-__export void isr24();
-__export void isr25();
-__export void isr26();
-__export void isr27();
-__export void isr28();
-__export void isr29();
-__export void isr30();
-__export void isr31();
+__export void isr0(void);
+__export void isr1(void);
+__export void isr2(void);
+__export void isr3(void);
+__export void isr4(void);
+__export void isr5(void);
+__export void isr6(void);
+__export void isr7(void);
+__export void isr_err8(void);
+__export void isr9(void);
+__export void isr_err10(void);
+__export void isr_err11(void);
+__export void isr_err12(void);
+__export void isr_err13(void);
+__export void isr_err14(void);
+__export void isr15(void);
+__export void isr16(void);
+__export void isr17(void);
+__export void isr18(void);
+__export void isr19(void);
+__export void isr20(void);
+__export void isr21(void);
+__export void isr22(void);
+__export void isr23(void);
+__export void isr24(void);
+__export void isr25(void);
+__export void isr26(void);
+__export void isr27(void);
+__export void isr28(void);
+__export void isr29(void);
+__export void isr30(void);
+__export void isr31(void);
 
 //HW interrupts
-__export void isr32();
-__export void isr33();
-__export void isr34();
-__export void isr35();
-__export void isr36();
-__export void isr37();
-__export void isr38();
-__export void isr39();
-__export void isr40();
-__export void isr41();
-__export void isr42(); 
-__export void isr43(); 
-__export void isr44(); 
-__export void isr45(); 
-__export void isr46(); 
-__export void isr47();
+__export void isr32(void);
+__export void isr33(void);
+__export void isr34(void);
+__export void isr35(void);
+__export void isr36(void);
+__export void isr37(void);
+__export void isr38(void);
+__export void isr39(void);
+__export void isr40(void);
+__export void isr41(void);
+__export void isr42(void); 
+__export void isr43(void); 
+__export void isr44(void); 
+__export void isr45(void); 
+__export void isr46(void); 
+__export void isr47(void);
 
 #endif // IDT_H

@@ -14,6 +14,14 @@ void memcpy (uint8_t *dest, const uint8_t *src, uint64_t len)
 
 void memcpy32(uint32_t *dest, const uint32_t *src, uint64_t len)
 {
+	// __asm__ volatile(
+	// 	"mov %0, %%rsi\n"
+	// 	"mov %1, %%rdi\n"
+	// 	"mov %2, %%rcx\n"
+	// 	"rep movsd\n"
+	// 	:: "r"(dest), "r"(src), "r"(len)
+	// 	: "rsi", "rdi", "rcx", "memory"
+	// );
 	for (; len != 0; len--)
 	{
 		*dest = *src;
@@ -22,6 +30,18 @@ void memcpy32(uint32_t *dest, const uint32_t *src, uint64_t len)
 		src++;
 	}
 }
+
+void memcpy64(uint64_t *dest, const uint64_t *src, uint64_t len)
+{
+	for (; len != 0; len--)
+	{
+		*dest = *src;
+
+		dest++;
+		src++;
+	}
+}
+
 
 void *memset (void *dest, const uint8_t val, size_t len)
 {
@@ -181,10 +201,10 @@ char *strrev(char *src)
     return src;
 }
 
-int parse_string_until_newline(char *str)
+size_t parse_string_until_newline(char *str)
 {
-    int counter = 0;
-    for (int i = 0;; i++)
+    size_t counter = 0;
+    for (size_t i = 0;; i++)
     {
         if (str[i] == '\n')
             break;

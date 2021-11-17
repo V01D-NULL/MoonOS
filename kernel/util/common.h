@@ -69,7 +69,7 @@ inline uint32_t inl(uint16_t port)
     return ret;
 }
 
-inline void io_wait() {
+inline void io_wait(void) {
     inb(0x80);
 }
 

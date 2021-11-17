@@ -23,14 +23,14 @@
 #include <amd64/moon.h>
 
 /// (x86_64) Return CPU vendor string
-__export const char *ASM_x86_cpuid_vendor_string();
+__export const char *ASM_x86_cpuid_vendor_string(void);
 
 /// (x86_64) Read from the RIP register
-__export int         ASM_x86_regs_read_rip();
+__export int         ASM_x86_regs_read_rip(void);
 
 //C functions:
 /// (C) Print vendor string
 void x86_cpuid_vendor_string(const char *a, const char *b, const char *c);
 
-void x86_cpu_info();
+void x86_cpu_info(void);
 #endif // ASM_ARCH_X86_H

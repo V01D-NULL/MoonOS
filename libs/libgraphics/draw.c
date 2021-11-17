@@ -1,6 +1,6 @@
 #include "draw.h"
 #include "double-buffering.h"
-#include <drivers/io/serial.h>
+#include <devices/serial/serial.h>
 
 void draw_image(int x1, int y1, int x2, int y2, const uint8_t *image, image_type_t img_type)
 {

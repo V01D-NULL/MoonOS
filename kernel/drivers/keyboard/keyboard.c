@@ -1,8 +1,8 @@
 #include "keyboard.h"
-#include <int/isr_list.h>
-#include <printk.h>
-#include <drivers/io/serial.h>
 #include <util/ptr.h>
+#include <int/isr_list.h>
+#include <devices/term/tty/tty.h>
+
 void keyboard_handler(isr_t isr);
 
 void generic_keyboard_init(charset_t charset)

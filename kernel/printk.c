@@ -6,7 +6,7 @@
 #include <stdarg.h>
 #include "printk.h"
 #include <boot/bootloader_stivale2.h>
-#include <drivers/io/serial.h>
+#include <devices/serial/serial.h>
 
 uint32_t console_x = 0, console_y = 0, kernel_log_color = 0xFFFFFF;
 static bool verbose_boot = false;
@@ -15,52 +15,56 @@ uint32_t *boot_log_buffer;
 char *text_buffer;
 int boot_log_offset = 0;
 extern gfx_header_t gfx_h;
+uint32_t *fb_addr;
 
-void text2buffer();
+void text2buffer(void);
 
-void printk_init()
+void printk_init(void)
 {
     boot_log_buffer = double_buffering_create_buffer();
     text_buffer     = (char*)double_buffering_create_buffer();
+    fb_addr         = (uint32_t*)gfx_h.fb_addr;
 }
 
-void verbose_boot_irq(isr_t isr)
-{
-    if (!verbose_boot)
-    {
-        flush_back_buffer(boot_log_buffer);
-        text2buffer();
-        swap_buffers(boot_log_buffer);
-    }
-    else
-    {
-        bootsplash();
-    }
+// void verbose_boot_irq(isr_t isr)
+// {
+//     if (!verbose_boot)
+//     {
+//         flush_back_buffer(boot_log_buffer);
+//         text2buffer();
+//         swap_buffers(boot_log_buffer);
+//     }
+//     else
+//     {
+//         bootsplash();
+//     }
 
-    verbose_boot = !verbose_boot;
-}
+//     verbose_boot = !verbose_boot;
+// }
 
-bool is_verbose_boot()
-{
-    return verbose_boot;
-}
+// bool is_verbose_boot(void)
+// {
+//     return verbose_boot;
+// }
 
 void printk(char *status, char *fmt, ...)
 {
-    va_list arg;
-    va_start(arg, fmt);
-    vsnprintf((char *)&buffer, (size_t)-1, fmt, arg);
-    va_end(arg);
+    (void)status;
+    (void)fmt;
+    // va_list arg;
+    // va_start(arg, fmt);
+    // vsnprintf((char *)&buffer, (size_t)-1, fmt, arg);
+    // va_end(arg);
 
-    puts("[ ");
-    puts(status);
-    puts(" ] ");
-    puts((const char *)&buffer);
+    // puts("[ ");
+    // puts(status);
+    // puts(" ] ");
+    // puts((const char *)&buffer);
 
-    if (console_y >= (gfx_h.fb_height - char_height))
-    {
-        scroll();
-    }
+    // if (console_y >= (gfx_h.fb_height - char_height))
+    // {
+    //     scroll();
+    // }
 }
 
 void putc(char c, int _x, int _y)
@@ -71,13 +75,7 @@ void putc(char c, int _x, int _y)
     {
         console_y += char_height;
         console_x = -char_width; /* 0 adds one character offset thus indenting strings by one character, the true offset 0 is actually negative char_width */
-        goto end;
     }
-    
-    text2buffer();
-
-end:
-    return;
 }
 
 void puts(const char *s)
@@ -87,12 +85,11 @@ void puts(const char *s)
         putc(s[i], console_x, console_y);
         console_x += char_width;
     }
-    if (verbose_boot)
-        swap_buffers(boot_log_buffer);
+    text2buffer();
 }
 
 // Convert text data (strings) to raw pixels in the back buffer so that they can be displayed to the screen
-void text2buffer()
+void text2buffer(void)
 {
     int _x = 0, _y = 0;
     for (int i = 0; i < boot_log_offset; i++)
@@ -120,6 +117,18 @@ void text2buffer()
                     int xpos = _x + char_width - x;
 
                     boot_log_buffer[ypos * (gfx_h.fb_pitch / sizeof(uint32_t)) + xpos] = kernel_log_color;
+
+                    if (verbose_boot)
+                        fb_addr[ypos * (gfx_h.fb_pitch / sizeof(uint32_t)) + xpos] = kernel_log_color;
+                }
+                else
+                {
+                    int ypos = _y + y;
+                    int xpos = _x + char_width - x;
+                    boot_log_buffer[ypos * (gfx_h.fb_pitch / sizeof(uint32_t)) + xpos] = 0;
+                    
+                    if (verbose_boot)
+                        fb_addr[ypos * (gfx_h.fb_pitch / sizeof(uint32_t)) + xpos] = 0;
                 }
             }
         }
@@ -127,6 +136,9 @@ void text2buffer()
     }
 }
 
+//TODO: Bug fix:
+// 'base' keeps getting larger and larger, leading me to suspect that the 'text_buffer'
+// is growing as well. This should not happen, the chars in the array should be scrolled, but the array must not grow.
 void scroll()
 {
     int offset = parse_string_until_newline(text_buffer);

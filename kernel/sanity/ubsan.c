@@ -26,7 +26,7 @@
     OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include <stdint.h>
-#include <drivers/io/serial.h>
+#include <devices/serial/serial.h>
 
 struct tu_source_location
 {
