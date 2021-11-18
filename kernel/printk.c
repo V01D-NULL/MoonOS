@@ -8,155 +8,102 @@
 #include <boot/bootloader_stivale2.h>
 #include <devices/serial/serial.h>
 
-uint32_t console_x = 0, console_y = 0, kernel_log_color = 0xFFFFFF;
-static bool verbose_boot = false;
+typedef struct {
+    char *text;
+    uint32_t x;
+    uint32_t y;
+    uint32_t fg;
+    uint32_t bg;
+    uint32_t width;
+    uint32_t height;
+    uint32_t offset;
+} fb_out_t;
+
 char buffer[512];
-uint32_t *boot_log_buffer;
-char *text_buffer;
-int boot_log_offset = 0;
+
+static fb_out_t fb_out;
+static bool is_verbose_boot = false;
 extern gfx_header_t gfx_h;
 uint32_t *fb_addr;
 
-void text2buffer(void);
+void puts(const char *s);
 
-void printk_init(void)
+void printk_init(bool verbose_boot)
 {
-    boot_log_buffer = double_buffering_create_buffer();
-    text_buffer     = (char*)double_buffering_create_buffer();
-    fb_addr         = (uint32_t*)gfx_h.fb_addr;
+    is_verbose_boot = verbose_boot;
+
+    // Init this even when verbose_boot is false since quiet boot can be overridden
+    fb_addr = (uint32_t*)gfx_h.fb_addr;
+    fb_out.text = (char*)double_buffering_create_buffer();
+    fb_out.width = gfx_h.fb_width / char_width;
+    fb_out.height = gfx_h.fb_height / char_height;
+    fb_out.bg = 0;
+    fb_out.fg = 0xFFFFFF;
+    fb_out.offset = 0;
 }
-
-// void verbose_boot_irq(isr_t isr)
-// {
-//     if (!verbose_boot)
-//     {
-//         flush_back_buffer(boot_log_buffer);
-//         text2buffer();
-//         swap_buffers(boot_log_buffer);
-//     }
-//     else
-//     {
-//         bootsplash();
-//     }
-
-//     verbose_boot = !verbose_boot;
-// }
-
-// bool is_verbose_boot(void)
-// {
-//     return verbose_boot;
-// }
 
 void printk(char *status, char *fmt, ...)
 {
-    (void)status;
-    (void)fmt;
-    // va_list arg;
-    // va_start(arg, fmt);
-    // vsnprintf((char *)&buffer, (size_t)-1, fmt, arg);
-    // va_end(arg);
+    if (!is_verbose_boot) return;
 
-    // puts("[ ");
-    // puts(status);
-    // puts(" ] ");
-    // puts((const char *)&buffer);
+    va_list arg;
+    va_start(arg, fmt);
+    vsnprintf((char *)&buffer, (size_t)-1, fmt, arg);
+    va_end(arg);
 
-    // if (console_y >= (gfx_h.fb_height - char_height))
-    // {
-    //     scroll();
-    // }
+    puts("[ ");
+    puts(status);
+    puts(" ] ");
+    puts((const char *)&buffer);
+
+    if (fb_out.x >= fb_out.width)
+    {
+        scroll();
+    }
 }
 
-void putc(char c, int _x, int _y)
+static inline void plot_pix_fb(uint32_t hex, int x, int y) {
+    fb_addr[y * (gfx_h.fb_pitch / sizeof(uint32_t)) + x] = hex;
+}
+
+void putc(char c, int x, int y)
 {
-    text_buffer[boot_log_offset++] = c;
-    
-    if (c == '\n')
-    {
-        console_y += char_height;
-        console_x = -char_width; /* 0 adds one character offset thus indenting strings by one character, the true offset 0 is actually negative char_width */
+    fb_out.text[fb_out.offset++] = c;
+
+    if (c == '\n') {
+        fb_out.y+=char_height;
+        fb_out.x = 0;
+        if (y >= fb_out.height) {
+            scroll();
+        }
+        return;
     }
+
+    for (int _y = 0; _y < char_height; _y++)
+    {
+        for (int _x = 0; _x < char_width; _x++)
+        {
+            bool draw_fg = (font[(c * char_height) + _y]) & (1 << _x);
+            int ypos = y + _y;
+            int xpos = x + char_width - _x;
+
+            plot_pix_fb(draw_fg ? fb_out.fg : fb_out.bg, xpos, ypos);
+        }
+    }
+    fb_out.x+=char_width;
 }
 
 void puts(const char *s)
 {
     for (int i = 0, n = strlen(s); i < n; i++)
-    {
-        putc(s[i], console_x, console_y);
-        console_x += char_width;
-    }
-    text2buffer();
+        putc(s[i], fb_out.x, fb_out.y);
 }
 
-// Convert text data (strings) to raw pixels in the back buffer so that they can be displayed to the screen
-void text2buffer(void)
-{
-    int _x = 0, _y = 0;
-    for (int i = 0; i < boot_log_offset; i++)
-    {
-        char c = text_buffer[i];
-
-        if (c == '\n')
-        {
-            _y += char_height;
-            _x = -char_width;
-        }
-        else if (_x >= gfx_h.fb_width - -char_width)
-        {
-            _y += char_height;
-            _x  = -char_width;
-        }
-
-        for (int y = 0; y < char_height; y++)
-        {
-            for (int x = 0; x < char_width; x++)
-            {
-                if ((font[(c * char_height) + y]) & (1 << x))
-                {
-                    int ypos = _y + y;
-                    int xpos = _x + char_width - x;
-
-                    boot_log_buffer[ypos * (gfx_h.fb_pitch / sizeof(uint32_t)) + xpos] = kernel_log_color;
-
-                    if (verbose_boot)
-                        fb_addr[ypos * (gfx_h.fb_pitch / sizeof(uint32_t)) + xpos] = kernel_log_color;
-                }
-                else
-                {
-                    int ypos = _y + y;
-                    int xpos = _x + char_width - x;
-                    boot_log_buffer[ypos * (gfx_h.fb_pitch / sizeof(uint32_t)) + xpos] = 0;
-                    
-                    if (verbose_boot)
-                        fb_addr[ypos * (gfx_h.fb_pitch / sizeof(uint32_t)) + xpos] = 0;
-                }
-            }
-        }
-        _x += char_width;
-    }
-}
-
-//TODO: Bug fix:
-// 'base' keeps getting larger and larger, leading me to suspect that the 'text_buffer'
-// is growing as well. This should not happen, the chars in the array should be scrolled, but the array must not grow.
 void scroll()
 {
-    int offset = parse_string_until_newline(text_buffer);
     
-    for (int i = offset, k = 0, buff_len = strlen(text_buffer)-1; i <= buff_len; i++, k++)
-    {
-        text_buffer[k] = text_buffer[i];
-    }
-
-    //Clear out left over chars
-    int base = strlen(text_buffer) - offset - 1;
-    for (int i = 0; i < offset; i++)
-    {
-        text_buffer[base + i] = ' ';
-    }
-
-    flush_back_buffer(boot_log_buffer);
-    console_x = -char_width;
-    console_y = gfx_h.fb_height - char_height;
-    text2buffer();
 }
+
+// Note: This should only be called when information
+// must be shown, a kernel panic for example
+void override_quiet_boot() { is_verbose_boot = true; }

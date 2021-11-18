@@ -26,7 +26,7 @@ void rsdp_init(boot_rsdp_t *boot_rsdp_table)
     /* XSDT */
     if (rsdp.revision >= 2)
     {
-        printk("acpi-xsdt", "ACPI Version: 2.0+ (detection based on revision)\n");
+        printk("acpi-rsdp", "ACPI Version: 2.0+ (detection based on revision)\n");
         printk("acpi-rsdp", "XSDT address: %llX\n", to_virt(rsdp.xsdt_address));
         has_xsdt = true;
     }

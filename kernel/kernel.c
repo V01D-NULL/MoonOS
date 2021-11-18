@@ -52,8 +52,6 @@
 #include <sys/smp/smp.h>
 #include <sys/smp/spinlock.h>
 
-#include <devices/term/tty/tty.h>
-
 #include "panic.h"
 #include "printk.h"
 
@@ -61,17 +59,11 @@ void kmain(boot_info_t *bootvars)
 {
     acpi_init(&bootvars->rsdp);
     smp_init(&bootvars->cpu);
-    
-    __asm__("int $48");
-    tty_init();
-    tty_puts("Foo\n");
-    tty_puts("BAR\n");
-    // tty_scroll_up();
-
+    panic("test");
+    // int a = 0;
     for (;;)
     {
-        tty_puts("Testing A\n");
-        tty_puts("Testing B\n");
+        // printk("-", "%d\n", a++);
         __asm__("hlt");
     }
 }

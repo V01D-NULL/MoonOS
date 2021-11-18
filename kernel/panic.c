@@ -13,28 +13,18 @@
 #include <libgraphics/double-buffering.h>
 #include "printk.h"
 
-static uint64_t fbaddr;
-static uint16_t fbpitch;
-
-void panic_init(uint64_t fb, uint16_t pitch)
-{
-	fbaddr = fb;
-	fbpitch = pitch;
-}
-
 __no_return panic(const char *fmt, ...)
 {
-	if (!is_verbose_boot())
-		__asm__("int $48"); //Switch to verbose boot
-
 	va_list ap;
 	va_start(ap, fmt);
 	char panic_buff[512];
 	vsnprintf(GENERIC_CAST(char *, &panic_buff), GENERIC_CAST(size_t, -1), fmt, ap);
 	va_end(ap);
 
+	override_quiet_boot();
+
 	printk("panic", "\n\tA kernel panic has occurred\n\t*** Reason: %s ***\n", panic_buff);
-	debug(false, "Panic: %s\n", panic_buff);
+	debug(false, "A kernel panic has occurred\n*** Reason: %s ***\n", panic_buff);
 	
 	struct stacktrace_result res = backtrace_stack(10);
 	for (int i = 0; i < res.count; i++)
@@ -44,11 +34,4 @@ __no_return panic(const char *fmt, ...)
 
 	for (;;)
 		;
-}
-
-void create_safe_panic_area(void)
-{
-	int64_t panic = to_virt(from_phys_higher_half(find_symbol_by_name("panic")));
-	assert(panic != -1);
-	vmm_remap(panic, panic, FLAGS_PR);
 }
