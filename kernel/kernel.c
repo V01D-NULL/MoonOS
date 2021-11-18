@@ -59,11 +59,35 @@ void kmain(boot_info_t *bootvars)
 {
     acpi_init(&bootvars->rsdp);
     smp_init(&bootvars->cpu);
-    panic("test");
-    // int a = 0;
+
+    int a = 0;
+
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    // printk("-", "%d\n", a++);
+    // printk("-", "%d\n", a++);
+    // printk("-", "%d\n", a++);
+    
     for (;;)
     {
-        // printk("-", "%d\n", a++);
+        printk("-", "%d\n", a++);
         __asm__("hlt");
     }
 }

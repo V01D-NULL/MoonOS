@@ -17,6 +17,7 @@ typedef struct {
     uint32_t width;
     uint32_t height;
     uint32_t offset;
+    bool override_bound_checking; // scroll() needs to enable this option to avoid becoming an infinite recursive function
 } fb_out_t;
 
 char buffer[512];
@@ -40,6 +41,7 @@ void printk_init(bool verbose_boot)
     fb_out.bg = 0;
     fb_out.fg = 0xFFFFFF;
     fb_out.offset = 0;
+    fb_out.override_bound_checking = false;
 }
 
 void printk(char *status, char *fmt, ...)
@@ -73,7 +75,7 @@ void putc(char c, int x, int y)
     if (c == '\n') {
         fb_out.y+=char_height;
         fb_out.x = 0;
-        if (y >= fb_out.height) {
+        if (y >= (fb_out.height*char_height) - (char_height*2) && !fb_out.override_bound_checking) {
             scroll();
         }
         return;
@@ -99,9 +101,41 @@ void puts(const char *s)
         putc(s[i], fb_out.x, fb_out.y);
 }
 
+void fast_clear(void)
+{
+    for (int i = 0; i < gfx_h.fb_height * gfx_h.fb_width; i++)
+    {
+        plot_pix_fb(fb_out.bg, i % gfx_h.fb_width, i / gfx_h.fb_width);
+    }
+}
+
 void scroll()
 {
-    
+    // int offset = parse_string_until_newline(fb_out.text);
+
+    for (int i = fb_out.width, k=0; i < fb_out.width * (fb_out.height - char_height); i++, k++) {
+        // if (fb_out.text[i] == '\0' && i < fb_out.width) {
+        //     int chars_to_clear = fb_out.width - i;
+        //     for (int j = 0; j < chars_to_clear; j++) {
+        //         fb_out.text[k+j] = ' ';
+        //     }
+        // }
+        fb_out.text[k] = fb_out.text[i];
+    }
+
+    // for (int i = offset; i < fb_out.offset-offset; i++) {
+    //     for (int k = 0; k < fb_out.width; k++) {
+    //         fb_out.text[k] = fb_out.text[i];
+    //     }
+    // }
+    fast_clear();
+
+    fb_out.x = fb_out.y = 0;
+    fb_out.offset = 0;
+    fb_out.override_bound_checking = true;
+    puts(fb_out.text);
+    fb_out.override_bound_checking = false;
+    // debug(true, "text:\n%s\n", fb_out.text);
 }
 
 // Note: This should only be called when information
