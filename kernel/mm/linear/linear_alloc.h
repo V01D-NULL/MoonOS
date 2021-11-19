@@ -15,7 +15,7 @@
 #include <stdint.h>
 #include <libk/kassert.h>
 #include <libk/kstdlib.h>
-#include <drivers/io/serial.h>
+#include <devices/serial/serial.h>
 #include <boot/bootloader_stivale2.h>
 #include <amd64/moon.h>
 
@@ -58,6 +58,6 @@ uint8_t *linear_alloc(uint64_t size, int byte_align_ammount);
  * @brief Release all memory in the linear buffer.
  * 
  */
-void linear_mm_release_buffer();
+void linear_mm_release_buffer(void);
 
 #endif // MM_LINEAR_H

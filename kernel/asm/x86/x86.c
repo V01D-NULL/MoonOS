@@ -1,7 +1,7 @@
 #include "x86.h"
 #include <amd64/cpu.h>
 #include <amd64/moon.h>
-#include <drivers/io/serial.h>
+#include <devices/serial/serial.h>
 #include <printk.h>
 
 void x86_cpuid_vendor_string(const char *rax, const char *rbx, const char *rcx)

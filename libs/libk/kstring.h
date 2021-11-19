@@ -24,6 +24,7 @@
  */
 void memcpy(uint8_t *dest, const uint8_t *src, uint64_t len);
 void memcpy32(uint32_t *dest, const uint32_t *src, uint64_t len);
+void memcpy64(uint64_t *dest, const uint64_t *src, uint64_t len);
 
 /**
  * @brief Set *n* bytes equal to val
@@ -100,6 +101,6 @@ uint64_t strlen(const char *s);
 char *strrev(char *src);
 
 //Look for the first newline and return it's index
-int parse_string_until_newline(char *str);
+size_t parse_string_until_newline(char *str);
 
 #endif // LIB_KERNEL_STRING_H

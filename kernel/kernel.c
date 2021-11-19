@@ -24,7 +24,7 @@
 #include <int/idt.h>
 #include <int/interrupts.h>
 
-#include <drivers/io/serial.h>
+#include <devices/serial/serial.h>
 #include <drivers/keyboard/keyboard.h>
 
 #include <asm/x86/x86.h>
@@ -59,9 +59,35 @@ void kmain(boot_info_t *bootvars)
 {
     acpi_init(&bootvars->rsdp);
     smp_init(&bootvars->cpu);
+
+    int a = 0;
+
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    printk("-", "%d\n", a++);
+    // printk("-", "%d\n", a++);
+    // printk("-", "%d\n", a++);
+    // printk("-", "%d\n", a++);
     
     for (;;)
     {
+        printk("-", "%d\n", a++);
         __asm__("hlt");
     }
 }

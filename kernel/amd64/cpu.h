@@ -32,7 +32,7 @@ struct cpuid_regs_t
 
 void cpuid(struct cpuid_regs_t *cpuid_regs);
 
-void log_cpuid_results();
+void log_cpuid_results(void);
 
 
 /**

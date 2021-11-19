@@ -4,7 +4,7 @@
 #include <hal/acpi/tables/madt/madt.h>
 
 #include <mm/memdefs.h>
-#include <drivers/io/serial.h>
+#include <devices/serial/serial.h>
 #include <libk/kstring.h>
 #include <printk.h>
 #include <stdbool.h>
@@ -25,7 +25,14 @@ void acpi_init(boot_rsdp_t *boot_rsdp_table)
     if ((madt = acpi_find_table("APIC")) != NULL)
     {
         printk("acpi", "Found MADT table @ %p\n", madt);
-        // madt_init(madt);
+        madt_init(madt);
+    }
+
+    acpi_table_t bgrt;
+    if ((bgrt = acpi_find_table("BGRT")) != NULL)
+    {
+        printk("acpi", "Found BGRT table @ %p\n", bgrt);
+        madt_init(bgrt);
     }
 }
 

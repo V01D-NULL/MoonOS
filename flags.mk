@@ -29,7 +29,7 @@ FONT 	 := font/console.sfn
 CFLAGS := 				 \
 	-I ../libs/			 \
 	-I ../kernel/		 \
-	-std=c11			 \
+	-std=gnu11			 \
 	-O2	-pipe -g		 \
 	-ffreestanding       \
 	-fno-stack-protector \

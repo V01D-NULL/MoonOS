@@ -1,10 +1,18 @@
 {
     "files.associations": {
         "printk.h": "c",
-        "cpu.h": "c"
+        "cpu.h": "c",
+        "double-buffering.h": "c",
+        "font8x16.h": "c",
+        "tty.utils.h": "c",
+        "serial.h": "c",
+        "ctypes.h": "c",
+        "stddef.h": "c",
+        "kstring.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,
         "**/*.sym": true
-    }
+    },
+    "cSpell.enabled": false
 }

@@ -3,6 +3,7 @@
 #include <printk.h>
 #include <stddef.h>
 #include <libk/kstring.h>
+#include <devices/serial/serial.h>
 
 extern sym_table_t symbol_table[];
 
@@ -58,4 +59,5 @@ void backtrace_symbol(uint64_t address)
 {
     sym_table_t sym = lookup(address);
     printk("backtrace", "%llx - %s\n", sym.addr, sym.name);
+    debug(false, "%llx - %s\n", sym.addr, sym.name);
 }

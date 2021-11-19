@@ -24,7 +24,7 @@ struct RSDP
 } __pack_bytes;
 
 void rsdp_init(boot_rsdp_t *boot_rsdp_table);
-struct RSDP get_rsdp();
-bool use_xsdt();
+struct RSDP get_rsdp(void);
+bool use_xsdt(void);
 
 #endif // RSDP_H

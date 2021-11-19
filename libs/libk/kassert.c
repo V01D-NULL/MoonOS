@@ -1,5 +1,5 @@
 #include "kassert.h"
-#include <drivers/io/serial.h>
+#include <devices/serial/serial.h>
 #include <util/common.h>
 #include <printk.h>
 

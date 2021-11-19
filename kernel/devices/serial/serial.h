@@ -29,7 +29,7 @@
 #define BASH_DEFAULT "\033[39m"
 
 void serial_write(char chr);
-char serial_read();
+char serial_read(void);
 void serial_write_str(const char* str);
 void serial_set_color(const char* color_code);
 

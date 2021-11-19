@@ -14,7 +14,7 @@
 #include <libk/kstring.h>
 #include <libk/kprintf.h>
 
-#include <drivers/io/serial.h>
+#include <devices/serial/serial.h>
 #include <stdarg.h>
 #include "vga.cursor.h"
 #include <stdint.h>
@@ -48,13 +48,13 @@ typedef struct vga_history {
 void vga_init(int fg, int bg);
 
 /// Scrolls the text on the screen down by one line
-void vga_scroll();
+void vga_scroll(void);
 
 /// Write a single character out to the screen
 void vga_putc(char c);
 
 /// Clear the screen to all black
-void vga_clear();
+void vga_clear(void);
 
 /// Output a null-terminated ASCII string to the monitor
 void vga_puts(char *c, bool is_task, bool operation_ok);
@@ -72,10 +72,10 @@ void set_color(const int BGCOLOR, const int FGCOLOR);
 void set_scroll_speed(uint32_t speed);
 
 /// Prints " [ OK ] " (with color coding)
-void op_ok();
+void op_ok(void);
 
 /// Prints "[TASK]" (with color coding)
-void op_task();
+void op_task(void);
 
 /// All VGA colors
 enum vga_color {

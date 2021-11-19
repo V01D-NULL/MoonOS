@@ -1,7 +1,7 @@
 /**
  * @file bootloader_stivale2.c
  * @author Tim (V01D)
- * @brief Hanldes information from the bootloader
+ * @brief Handles information from the bootloader
  * @version 0.1
  * @date 2021-04-15
  * 
@@ -9,7 +9,7 @@
  * 
  */
 #include "bootloader_stivale2.h"
-#include <drivers/io/serial.h>
+#include <devices/serial/serial.h>
 #include <amd64/moon.h>
 #include <stivale2.h>
 #include <int/idt.h>
@@ -28,33 +28,32 @@
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id);
 
-static __section_align uint8_t stack[345859];
+static __section_align uint8_t stack[8192];
+
+struct stivale2_struct_tag_cmdline cmdline_tag = {
+    .tag = {
+        .identifier = STIVALE2_STRUCT_TAG_CMDLINE_ID,
+        .next = 0
+    }
+};
 
 struct stivale2_struct_tag_rsdp rsdp_tag = {
     .tag = {
         .identifier = STIVALE2_STRUCT_TAG_RSDP_ID,
-        .next = 0}};
+        .next = (uintptr_t)&cmdline_tag
+    }
+};
 
 struct stivale2_tag level5_paging_tag = {
     .identifier = STIVALE2_HEADER_TAG_5LV_PAGING_ID,
-    .next = (uintptr_t)&rsdp_tag};
+    .next = (uintptr_t)&rsdp_tag
+};
 
 struct stivale2_header_tag_smp smp_hdr_tag = {
     .tag = {
         .identifier = STIVALE2_HEADER_TAG_SMP_ID,
-        .next = (uintptr_t)&level5_paging_tag}};
-
-static struct stivale2_header_tag_terminal terminal_hdr_tag = {
-    // All tags need to begin with an identifier and a pointer to the next tag.
-    .tag = {
-        // Identification constant defined in stivale2.h and the specification.
-        .identifier = STIVALE2_HEADER_TAG_TERMINAL_ID,
-        // If next is 0, it marks the end of the linked list of header tags.
-        .next = 0//(uintptr_t)&framebuffer_hdr_tag
-    },
-    // The terminal header tag possesses a flags field, leave it as 0 for now
-    // as it is unused.
-    .flags = 0
+        .next = (uintptr_t)&level5_paging_tag
+    }
 };
 
 struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
@@ -67,13 +66,19 @@ struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
     .framebuffer_bpp = 32
 };
 
-// __SECTION(".stivale2hdr")
-__attribute__((section(".stivale2hdr"), used))
+static struct stivale2_header_tag_terminal terminal_hdr_tag = {
+    .tag = {
+        .identifier = STIVALE2_HEADER_TAG_TERMINAL_ID,
+        .next = (uintptr_t)&framebuffer_hdr_tag},
+    .flags = 0
+};
+
+__SECTION(".stivale2hdr")
 struct stivale2_header stivale_hdr = {
     .entry_point = 0,
     .stack = (uintptr_t)stack + sizeof(stack),
-    .flags = (1 << 1) | (1 << 2),
-    .tags = (uintptr_t)&framebuffer_hdr_tag
+    .flags = (1 << 1) | (1 << 2) | (1 << 4),
+    .tags = (uintptr_t)&terminal_hdr_tag
 };
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id)
@@ -138,10 +143,7 @@ void kinit(struct stivale2_struct *bootloader_info)
     struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
     struct stivale2_struct_tag_smp *smp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_SMP_ID);
     struct stivale2_struct_tag_rsdp *rsdp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_RSDP_ID);
-
-    init_gdt();
-    init_idt();
-    generic_keyboard_init(CHARSET_EN_US);
+    struct stivale2_struct_tag_cmdline *cmdline = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_CMDLINE_ID);
 
     if (fb != NULL)
     {
@@ -150,29 +152,43 @@ void kinit(struct stivale2_struct *bootloader_info)
         bootvars.vesa.fb_height = fb->framebuffer_height;
         bootvars.vesa.fb_bpp = fb->framebuffer_bpp;
         bootvars.vesa.fb_pitch = fb->framebuffer_pitch;
-
-        // uint32_t *ptr = (uint32_t *)bootvars.vesa.fb_addr;
-        // for (int i = 0; i < 1000; i++)
-        // {
-        //     ptr[i * (fb->framebuffer_pitch > 0 ? fb->framebuffer_pitch : 4096 / sizeof(uint32_t)) + i] = 0xFF0000;
-        // }
-        // debug(1, "Pitch: %x %d\n", fb->framebuffer_pitch, fb->framebuffer_pitch);
     }
     else
     {
-        for(;;);
+        struct stivale2_struct_tag_terminal *term_str_tag;
+        term_str_tag = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_TERMINAL_ID);
+        if (term_str_tag != NULL)
+        {
+            void *term_write_ptr = (void *)term_str_tag->term_write;
+            void (*term_write)(const char *string, size_t length) = term_write_ptr;
+            term_write("Fatal: Cannot obtain framebuffer information", 44);
+        }
+        for (;;)
+            ;
     }
 
     if (mmap != NULL)
     {
+        init_gdt();
+        init_idt();
+        
         pmm_init(mmap->memmap, mmap->entries);
         vmm_init(check_la57());
-        create_safe_panic_area();
 
         double_buffering_init(&bootvars);
-        printk_init();
-
-        bootsplash();
+        
+        /* Is verbose boot specified in the command line? */
+        if (cmdline != NULL) {
+            if (strcmp((char*)cmdline->cmdline + 13, "NO") == 0)
+            {
+                printk_init(false);
+                bootsplash();
+            }
+            else
+            {
+                printk_init(true);
+            }
+        }
 
         banner(false);
         printk("pmm", "Initialized pmm\n");
@@ -194,6 +210,14 @@ void kinit(struct stivale2_struct *bootloader_info)
     else
     {
         debug(false, "\n!Did not get a memory map from the bootloader!\n");
+        struct stivale2_struct_tag_terminal *term_str_tag;
+        term_str_tag = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_TERMINAL_ID);
+        if (term_str_tag != NULL)
+        {
+            void *term_write_ptr = (void *)term_str_tag->term_write;
+            void (*term_write)(const char *string, size_t length) = term_write_ptr;
+            term_write("Fatal: Cannot obtain a memory map from the bootloader", 53);
+        }
         for (;;)
             ;
     }
@@ -213,6 +237,5 @@ void kinit(struct stivale2_struct *bootloader_info)
     }
 
     log_cpuid_results();
-
     kmain(&bootvars);
 }

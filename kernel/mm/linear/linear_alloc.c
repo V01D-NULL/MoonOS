@@ -54,7 +54,7 @@ uint8_t *linear_alloc(uint64_t size, int byte_align_ammount) {
 }
 
 // I hesitate to call this linear_free() because linear allocation doesn't really free() memory, it free's the whole buffer
-void linear_mm_release_buffer() {
+void linear_mm_release_buffer(void) {
     serial_set_color(BASH_GREEN);
     debug(true, "linear_mm_release_buffer: Releasing LinearAllocation Pool which is %ld bytes large\n", (uint64_t)mem_manager.start + (uint64_t)mem_manager.end);
     mem_manager.allocation_ptr = 0;

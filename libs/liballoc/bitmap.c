@@ -9,13 +9,13 @@
  * 
  */
 #include "bitmap.h"
-#include "drivers/io/serial.h"
+#include <devices/serial/serial.h>
 
 static bitmap_size_type get(bitmap_size_type byte, bitmap_size_type bit);
 void bitmap_set(bitmap_size_type *bitmap, bitmap_size_type bit);
 void bitmap_unset(bitmap_size_type *bitmap, bitmap_size_type bit);
 bitmap_size_type bitmap_get(bitmap_size_type *bitmap, bitmap_size_type bit);
-bitmap_size_type bitmap_allocate();
+bitmap_size_type bitmap_allocate(void);
 
 /**
 * @brief Set all bits in the bitmap arena to 0 (free)

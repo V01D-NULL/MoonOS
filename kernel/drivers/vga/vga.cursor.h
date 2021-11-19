@@ -18,13 +18,13 @@
  * 
  * The (x, y) coordinates are updated automatically by the kernel
  */
-void vga_move_cursor();
+void vga_move_cursor(void);
 
 /**
  * @brief Destroy / hide / disable the VGA cursor
  * 
  */
-void vga_kill_cursor();
+void vga_kill_cursor(void);
 
 /**
  * @brief Modify the cursors appearance

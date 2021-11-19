@@ -1,6 +1,6 @@
 #include "strace.h"
 #include <stdbool.h>
-#include <drivers/io/serial.h>
+#include <devices/serial/serial.h>
 #include <ds/linked_list.h>
 
 #include "sym.h"

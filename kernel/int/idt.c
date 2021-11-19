@@ -19,7 +19,7 @@ void idt_set_entry(uint16_t selector, uint8_t ist, uint8_t type_attr, uint64_t o
 
 __export void load_idt(uint64_t idtr);
 
-void init_idt()
+void init_idt(void)
 {
     idt_set_entry(0x08, 0, 0x8E, GENERIC_CAST(uint64_t, isr0), 0);
     idt_set_entry(0x08, 0, 0x8E, GENERIC_CAST(uint64_t, isr1), 1);

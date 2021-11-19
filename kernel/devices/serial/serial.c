@@ -9,12 +9,12 @@
         serial_write_str(" ");             \
     }
 
-static int serial_received()
+static int serial_received(void)
 {
     return (inb(COM1 + 5) & 1);
 }
 
-char serial_read()
+char serial_read(void)
 {
     while (serial_received() == 0)
         ;
@@ -22,7 +22,7 @@ char serial_read()
     return inb(COM1);
 }
 
-static int is_transit_empty()
+static int is_transit_empty(void)
 {
     return (inb(COM1 + 5) & 0x20);
 }

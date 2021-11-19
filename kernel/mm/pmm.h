@@ -21,8 +21,8 @@ enum {
 };
 
 void pmm_init(struct stivale2_mmap_entry *mmap, int entries);
-void *pmm_alloc();
-void *find_first_free_block();
+void *pmm_alloc(void);
+void *find_first_free_block(void);
 void *pmm_alloc_any(void *addr);
 range_t pmm_alloc_range(size_t pages);
 void pmm_free(void *page);

@@ -20,6 +20,6 @@ void double_buffering_init(boot_info_t *);
 void swap_buffers(uint32_t *custom_buffer);
 void buffer_pixel(int x, int y, int color);
 void flush_back_buffer(uint32_t *custom_buffer);
-uint32_t *double_buffering_create_buffer();
+uint32_t *double_buffering_create_buffer(void);
 
 #endif // LIB_GRAPHICS_DOUBLE_BUFFERING_H
