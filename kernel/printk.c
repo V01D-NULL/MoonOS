@@ -46,25 +46,26 @@ void printk_init(bool verbose_boot)
 
 void printk(char *status, char *fmt, ...)
 {
-    if (!is_verbose_boot) return;
-
     va_list arg;
     va_start(arg, fmt);
     vsnprintf((char *)&buffer, (size_t)-1, fmt, arg);
     va_end(arg);
 
+    if (!is_verbose_boot) {
+        serial_set_color(BASH_GREEN);
+        debug(false, "DEBUG: ");
+        serial_set_color(BASH_DEFAULT);
+        debug(false, "[%s] %s", status, buffer);
+        return;
+    }
+
     puts("[ ");
     puts(status);
     puts(" ] ");
     puts((const char *)&buffer);
-
-    if (fb_out.x >= fb_out.width)
-    {
-        scroll();
-    }
 }
 
-static inline void plot_pix_fb(uint32_t hex, int x, int y) {
+__attribute__((always_inline)) static inline void plot_pix_fb(uint32_t hex, int x, int y) {
     fb_addr[y * (gfx_h.fb_pitch / sizeof(uint32_t)) + x] = hex;
 }
 
@@ -75,7 +76,7 @@ void putc(char c, int x, int y)
     if (c == '\n') {
         fb_out.y+=char_height;
         fb_out.x = 0;
-        if (y >= (fb_out.height*char_height) - (char_height*2) && !fb_out.override_bound_checking) {
+        if (fb_out.y >= gfx_h.fb_height && !fb_out.override_bound_checking) {
             scroll();
         }
         return;
@@ -97,8 +98,9 @@ void putc(char c, int x, int y)
 
 void puts(const char *s)
 {
-    for (int i = 0, n = strlen(s); i < n; i++)
+    for (int i = 0, n = strlen(s); i < n; i++) {
         putc(s[i], fb_out.x, fb_out.y);
+    }
 }
 
 void fast_clear(void)
@@ -111,23 +113,10 @@ void fast_clear(void)
 
 void scroll()
 {
-    // int offset = parse_string_until_newline(fb_out.text);
-
-    for (int i = fb_out.width, k=0; i < fb_out.width * (fb_out.height - char_height); i++, k++) {
-        // if (fb_out.text[i] == '\0' && i < fb_out.width) {
-        //     int chars_to_clear = fb_out.width - i;
-        //     for (int j = 0; j < chars_to_clear; j++) {
-        //         fb_out.text[k+j] = ' ';
-        //     }
-        // }
+    for (int i = fb_out.width, k=0; i < fb_out.height * fb_out.width; i++, k++) {
         fb_out.text[k] = fb_out.text[i];
     }
 
-    // for (int i = offset; i < fb_out.offset-offset; i++) {
-    //     for (int k = 0; k < fb_out.width; k++) {
-    //         fb_out.text[k] = fb_out.text[i];
-    //     }
-    // }
     fast_clear();
 
     fb_out.x = fb_out.y = 0;
