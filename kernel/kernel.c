@@ -68,14 +68,14 @@ void kmain(boot_info_t *bootvars)
     smp_init(&bootvars->cpu);
     
     // scroll();
-    // int i = 0;
+    int i = 0;
     for (;;)
     {
-        // printk("-", "%d\n", i++);
-        printk("|", "a\n");
-        printk("/", "b\n");
-        printk("-", "c\n");
-        printk("\\", "d\n");
+        printk("-", "%d\n", i++);
+        // printk("|", "a\n");
+        // printk("/", "b\n");
+        // printk("-", "c\n");
+        // printk("\\", "d\n");
         // __asm__("hlt");
     }
 }

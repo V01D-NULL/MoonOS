@@ -72,7 +72,8 @@ __attribute__((always_inline)) static inline void plot_pix_fb(uint32_t hex, int 
 
 void putc(char c, int x, int y)
 {
-    fb_out.text[fb_out.offset++] = c;
+    if (!fb_out.override_bound_checking)
+        fb_out.text[y * fb_out.width + x] = c;
 
     if (c == '\n') {
         fb_out.y++;
@@ -117,18 +118,23 @@ void scroll()
     size_t offset = parse_string_until_newline(fb_out.text);
     memcpy(
         GENERIC_CAST(uint8_t*, fb_out.text),
-        GENERIC_CAST(uint8_t*, fb_out.text + offset),
-        fb_out.width * fb_out.height
+        GENERIC_CAST(uint8_t*, fb_out.text + fb_out.width),
+        fb_out.width * (fb_out.height-1) * gfx_h.fb_bpp
     );
-    // memset(fb_out.text + fb_out.height, 0, fb_out.width);
-    
-    // fast_clear();
-    
+    // memset((void*)(fb_out.text + (fb_out.width * fb_out.height)), 0, fb_out.width);
+
     fb_out.x = fb_out.y = 0;
     fb_out.offset = 0;
     fb_out.override_bound_checking = true;
     
-    puts(fb_out.text);
+    for (int y = 0; y < fb_out.height; y++)
+    {
+        for (int x = 0; x < fb_out.width; x++)
+        {
+            char c = fb_out.text[y * fb_out.width + x];
+            putc(c, x, y);
+        }
+    }
 
     fb_out.override_bound_checking = false;
 }
