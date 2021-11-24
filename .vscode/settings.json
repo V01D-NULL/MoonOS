@@ -8,11 +8,13 @@
         "serial.h": "c",
         "ctypes.h": "c",
         "stddef.h": "c",
-        "kstring.h": "c"
+        "kstring.h": "c",
+        "apic.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,
         "**/*.sym": true
     },
-    "cSpell.enabled": false
+    "cSpell.enabled": false,
+    "C_Cpp.errorSquiggles": "Disabled"
 }

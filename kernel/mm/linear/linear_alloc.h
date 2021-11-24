@@ -33,7 +33,7 @@ typedef struct linear_tracker {
     uint8_t *first_free_addr;
     void *end;
     uint8_t *allocation_ptr;
-} __pack_bytes linear_tracker_t;
+} gnu_pack_bytes linear_tracker_t;
 
 //
 /**

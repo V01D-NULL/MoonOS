@@ -7,8 +7,10 @@
 typedef struct
 {
     struct SDT sdt;
-} madt_t;
-
+    uint32_t local_apic_addr;
+    uint32_t local_apic_flags;
+    uint64_t local_apic_addr64;
+} gnu_pack_bytes madt_t;
 
 void madt_init(acpi_table_t madt);
 

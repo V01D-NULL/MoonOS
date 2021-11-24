@@ -8,6 +8,7 @@
 #include <libk/kstring.h>
 #include <printk.h>
 #include <stdbool.h>
+#include <panic.h>
 
 bool acpi_validate_sdt_checksum(struct SDT *sdt);
 
@@ -15,24 +16,15 @@ void acpi_init(boot_rsdp_t *boot_rsdp_table)
 {
     rsdp_init(boot_rsdp_table);
     
-    acpi_table_t facp;
-    if ((facp = acpi_find_table("FACP")) != NULL)
-    {
-        printk("acpi", "Found FACP table @ %p\n", facp);
-    }
-
     acpi_table_t madt;
     if ((madt = acpi_find_table("APIC")) != NULL)
     {
         printk("acpi", "Found MADT table @ %p\n", madt);
         madt_init(madt);
     }
-
-    acpi_table_t bgrt;
-    if ((bgrt = acpi_find_table("BGRT")) != NULL)
+    else
     {
-        printk("acpi", "Found BGRT table @ %p\n", bgrt);
-        madt_init(bgrt);
+        panic("No MADT table, no APIC - Refusing to boot");
     }
 }
 

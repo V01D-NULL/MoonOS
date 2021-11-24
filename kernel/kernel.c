@@ -19,6 +19,7 @@
 #include <amd64/cpu.h>
 #include <amd64/moon.h>
 #include <amd64/bytes.h>
+#include <amd64/msr.h>
 
 #include <int/gdt.h>
 #include <int/idt.h>
@@ -48,6 +49,7 @@
 #include <trace/strace.h>
 #include <hal/acpi/tables/rsdp.h>
 #include <hal/acpi/acpi.h>
+#include <hal/apic/apic.h>
 
 #include <sys/smp/smp.h>
 #include <sys/smp/spinlock.h>
@@ -57,13 +59,23 @@
 
 void kmain(boot_info_t *bootvars)
 {
+    if (!cpu_has_msr()) {
+        panic("MSR's aren't supported on this cpu");
+    }
+    
     acpi_init(&bootvars->rsdp);
+    lapic_init();
     smp_init(&bootvars->cpu);
     
-    int i = 0;
+    // scroll();
+    // int i = 0;
     for (;;)
     {
-        printk("-", "%d\n", i++);
-        __asm__("hlt");
+        // printk("-", "%d\n", i++);
+        printk("|", "a\n");
+        printk("/", "b\n");
+        printk("-", "c\n");
+        printk("\\", "d\n");
+        // __asm__("hlt");
     }
 }

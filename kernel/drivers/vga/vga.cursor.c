@@ -2,7 +2,7 @@
 #include "vga.h"
 #include <amd64/moon.h>
 
-__export vga_hdr_t vga;
+gnu_export vga_hdr_t vga;
 
 // Updates the hardware cursor
 void vga_move_cursor(void)

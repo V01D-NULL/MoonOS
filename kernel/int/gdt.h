@@ -26,7 +26,7 @@ struct memory_segment {
     uint8_t  access;
     uint8_t  gran;
     uint8_t  base_high;
-} __pack_bytes;
+} gnu_pack_bytes;
 
 /**
  * @brief The values used to load the GDT into memory using 'lgdt'
@@ -35,13 +35,13 @@ struct memory_segment {
 struct gdtr {
     uint16_t limit;
     uint64_t offset;
-} __pack_bytes;
+} gnu_pack_bytes;
 
 struct gdt_table {
     struct memory_segment gdt_table_memory_segments[5];
     //tss
     struct gdtr gdtr;
-} __pack_bytes;
+} gnu_pack_bytes;
 
 /**
  * @brief Setup and load the GDT

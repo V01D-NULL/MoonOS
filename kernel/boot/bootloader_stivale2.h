@@ -50,11 +50,12 @@ typedef struct boot_rsdp {
  * @brief A single structure that combines all bootloader-provided information structs
  * 
  */
-typedef struct boot_info {
+typedef struct
+{
     boot_cpu_t  cpu ;
     boot_vesa_t vesa;
     boot_rsdp_t rsdp;
-} boot_info_t __section_align4k;
+} boot_info_t gnu_section_align4k;
 
 
 #endif // BOOTLOADER_STIVALE2_INIT_H

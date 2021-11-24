@@ -7,6 +7,7 @@
 #include "printk.h"
 #include <boot/bootloader_stivale2.h>
 #include <devices/serial/serial.h>
+#include <util/ptr.h>
 
 typedef struct {
     char *text;
@@ -74,9 +75,9 @@ void putc(char c, int x, int y)
     fb_out.text[fb_out.offset++] = c;
 
     if (c == '\n') {
-        fb_out.y+=char_height;
+        fb_out.y++;
         fb_out.x = 0;
-        if (fb_out.y >= gfx_h.fb_height && !fb_out.override_bound_checking) {
+        if (fb_out.y >= fb_out.height && !fb_out.override_bound_checking) {
             scroll();
         }
         return;
@@ -86,14 +87,14 @@ void putc(char c, int x, int y)
     {
         for (int _x = 0; _x < char_width; _x++)
         {
-            bool draw_fg = (font[(c * char_height) + _y]) & (1 << _x);
-            int ypos = y + _y;
-            int xpos = x + char_width - _x;
+            bool draw_fg = font[(c * char_height) + _y] & (1 << _x);
+            int ypos = (y * char_height) + _y;
+            int xpos = (x * char_width) + char_width - _x;
 
             plot_pix_fb(draw_fg ? fb_out.fg : fb_out.bg, xpos, ypos);
         }
     }
-    fb_out.x+=char_width;
+    fb_out.x++;
 }
 
 void puts(const char *s)
@@ -113,18 +114,23 @@ void fast_clear(void)
 
 void scroll()
 {
-    for (int i = fb_out.width, k=0; i < fb_out.height * fb_out.width; i++, k++) {
-        fb_out.text[k] = fb_out.text[i];
-    }
-
-    fast_clear();
-
+    size_t offset = parse_string_until_newline(fb_out.text);
+    memcpy(
+        GENERIC_CAST(uint8_t*, fb_out.text),
+        GENERIC_CAST(uint8_t*, fb_out.text + offset),
+        fb_out.width * fb_out.height
+    );
+    // memset(fb_out.text + fb_out.height, 0, fb_out.width);
+    
+    // fast_clear();
+    
     fb_out.x = fb_out.y = 0;
     fb_out.offset = 0;
     fb_out.override_bound_checking = true;
+    
     puts(fb_out.text);
+
     fb_out.override_bound_checking = false;
-    // debug(true, "text:\n%s\n", fb_out.text);
 }
 
 // Note: This should only be called when information

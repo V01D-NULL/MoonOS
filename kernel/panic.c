@@ -13,7 +13,7 @@
 #include <libgraphics/double-buffering.h>
 #include "printk.h"
 
-__no_return panic(const char *fmt, ...)
+gnu_no_return panic(const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);

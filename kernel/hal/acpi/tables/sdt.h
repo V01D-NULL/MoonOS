@@ -14,6 +14,6 @@ struct SDT
     uint32_t oem_revision;
     char creator_id[4];
     uint32_t creator_revision;
-} __pack_bytes;
+} gnu_pack_bytes;
 
 #endif // SDT_H

@@ -28,7 +28,7 @@
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id);
 
-static __section_align uint8_t stack[8192];
+static gnu_section_align16 uint8_t stack[8192];
 
 struct stivale2_struct_tag_cmdline cmdline_tag = {
     .tag = {
@@ -73,7 +73,7 @@ static struct stivale2_header_tag_terminal terminal_hdr_tag = {
     .flags = 0
 };
 
-__SECTION(".stivale2hdr")
+SECTION(".stivale2hdr")
 struct stivale2_header stivale_hdr = {
     .entry_point = 0,
     .stack = (uintptr_t)stack + sizeof(stack),

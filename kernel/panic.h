@@ -4,6 +4,6 @@
 #include <amd64/moon.h>
 #include <stdint.h>
 
-__no_return panic(const char *fmt, ...);
+gnu_no_return panic(const char *fmt, ...);
 
 #endif // PANIC_H

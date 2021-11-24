@@ -7,6 +7,6 @@ struct RSDT
 {
     struct SDT header;
     uint32_t next[];
-} __pack_bytes;
+} gnu_pack_bytes;
 
 #endif // RSDT_H
