@@ -60,7 +60,7 @@ debugger_session: $(KERNEL_HDD)
 ISO: $(KERNEL_HDD)
 	mkdir iso/ || echo ""
 	@cp limine/BOOTIA32.EFI limine/BOOTX64.EFI limine/limine.sys limine/limine-cd.bin \
-	limine/limine-eltorito-efi.bin limine/limine-pxe.bin boot/limine.cfg $(KERNEL_ELF) iso/
+	limine/limine-eltorito-efi.bin limine/limine-pxe.bin boot/* $(KERNEL_ELF) iso/
 
 	xorriso -as mkisofs -b limine-cd.bin \
 	-no-emul-boot -boot-load-size 4 -boot-info-table \

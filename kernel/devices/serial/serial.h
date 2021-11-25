@@ -25,6 +25,8 @@
 #define BASH_CYAN    "\033[36m"
 #define BASH_GREEN   "\033[32m"
 #define BASH_WHITE   "\033[97m"
+#define BASH_GRAY    "\033[37m"
+#define BASH_PURPLE  "\033[35m"
 #define BASH_YELLOW  "\033[93m"
 #define BASH_DEFAULT "\033[39m"
 

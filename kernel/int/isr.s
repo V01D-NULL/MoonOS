@@ -39,11 +39,11 @@ load_idt:
     lidt [rdi]
 
     ; Reload cs and ds
-    push 0x08
+    push 0x28
     push .reload
     retfq
     .reload:
-       mov ax, 0x10
+       mov ax, 0x30
        mov ds, ax
        mov fs, ax
        mov gs, ax

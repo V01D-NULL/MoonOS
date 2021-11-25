@@ -38,7 +38,7 @@ struct gdtr {
 } gnu_pack_bytes;
 
 struct gdt_table {
-    struct memory_segment gdt_table_memory_segments[5];
+    struct memory_segment gdt_table_memory_segments[13];
     //tss
     struct gdtr gdtr;
 } gnu_pack_bytes;

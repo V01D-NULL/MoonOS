@@ -54,8 +54,6 @@ static void enumarate_apic_devices(madt_t** madt)
 
             if (*madt_interrupt_devices == LAPIC_ADDR_OVERRIDE) {
                 (*madt)->local_apic_addr64 = GENERIC_CAST(uint64_t, *madt_interrupt_devices + 0x4);
-                // printk("madt", "LAPIC 64 bit address: %lX\n", );
-
             }
 
             madt_interrupt_devices += madt_interrupt_devices[1];

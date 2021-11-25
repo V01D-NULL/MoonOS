@@ -6,8 +6,7 @@
 #include <int/interrupts.h>
 
 void printk(char *status, char *fmt, ...);
-void printk_init(bool verbose_boot);
-void scroll(void);
+void printk_init(bool verbose_boot, struct stivale2_struct_tag_terminal *term);
 
 // Note: This should only be called when information
 // must be shown, a kernel panic for example

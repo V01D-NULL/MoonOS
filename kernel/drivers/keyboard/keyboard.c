@@ -3,8 +3,6 @@
 #include <int/isr_list.h>
 #include <printk.h>
 
-void keyboard_handler(isr_t isr);
-
 void generic_keyboard_init(charset_t charset)
 {
     if (charset != CHARSET_EN_US)

@@ -139,6 +139,7 @@ void banner(bool serial_only)
 void kinit(struct stivale2_struct *bootloader_info)
 {
     boot_info_t bootvars;
+    struct stivale2_struct_tag_terminal *term = term = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_TERMINAL_ID);
     struct stivale2_struct_tag_memmap *mmap = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
     struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
     struct stivale2_struct_tag_smp *smp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_SMP_ID);
@@ -155,23 +156,14 @@ void kinit(struct stivale2_struct *bootloader_info)
     }
     else
     {
-        struct stivale2_struct_tag_terminal *term_str_tag;
-        term_str_tag = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_TERMINAL_ID);
-        if (term_str_tag != NULL)
-        {
-            void *term_write_ptr = (void *)term_str_tag->term_write;
-            void (*term_write)(const char *string, size_t length) = term_write_ptr;
-            term_write("Fatal: Cannot obtain framebuffer information", 44);
-        }
-        for (;;)
-            ;
+        for (;;);
     }
-
+    
     if (mmap != NULL)
     {
         init_gdt();
         init_idt();
-        
+
         pmm_init(mmap->memmap, mmap->entries);
         vmm_init(check_la57());
 
@@ -179,16 +171,20 @@ void kinit(struct stivale2_struct *bootloader_info)
         
         /* Is verbose boot specified in the command line? */
         if (cmdline != NULL) {
+            /* Panic */
+            if (term == NULL)
+                for(;;);
+            
             if (strcmp((char*)cmdline->cmdline + 13, "NO") == 0)
-            {
-                printk_init(false);
+            {   
+                printk_init(false, term);
                 bootsplash();
             }
             else
             {
-                printk_init(true);
+                printk_init(true, term);
             }
-        }
+        } else { for(;;); }
 
         banner(false);
         printk("pmm", "Initialized pmm\n");
