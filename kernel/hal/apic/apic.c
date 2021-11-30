@@ -3,15 +3,16 @@
 #include <amd64/msr.h>
 #include <printk.h>
 
-gnu_unused static uint32_t lapic_base = 0x0;
+static uint32_t lapic_base = 0x0;
 
-void lapic_init(void)
+void lapic_init(struct apic_device_info apic)
 {
-    msr_t regs;
-    memset((void*)&regs, 0, sizeof(msr_t));
+    lapic_base = apic.lapic_addr;
 
-    rdmsr(IA32_APIC_BASE, regs);
-    printk("lapic", "EAX:%X-EDX:%X\n", regs.eax, regs.edx);
+    printk("lapic", "lapic base: %lX\n", apic.lapic_addr);
+
+    for (int i = 0; i < apic.usable_ioapics; i++)
+        printk("lapic", "I/O APIC base: %X\n", apic.ioapics[i]->address);
 }
 
 void lapic_read()

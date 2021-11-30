@@ -25,7 +25,7 @@ global load_idt
 load_idt:
     ; Set isrs 48-255 to dummy entries, otherwise it's just a nasty #GP
     push rdi
-    mov rdi, 0x08 ; Selector
+    mov rdi, 0x28 ; Selector
     mov rsi, 0x0  ; ist
     %assign i 48
     %rep 208

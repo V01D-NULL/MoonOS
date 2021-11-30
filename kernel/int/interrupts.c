@@ -49,15 +49,17 @@ void isr_handler(regs_t regs)
     /* CPU exceptions */
     if (regs.isr_number < 32)
     {
+        override_quiet_boot();
         serial_set_color(BASH_RED);
         printk("INT", "%s (err_code %ld)\n", exception_messages[regs.isr_number], regs.error_code);
 
         if (regs.isr_number == 14)
         {
             printk("INT ~ #PF", "Faulting address: 0x%lx\n", cr_read(CR2));
-            uint64_t cr2 = cr_read(CR2);
-            vmm_guess_and_map(cr2, regs.error_code);
-            return;
+            
+            // uint64_t cr2 = cr_read(CR2);
+            // vmm_guess_and_map(cr2, regs.error_code);
+            // return;
         }
         else if (regs.isr_number == 6)
         {

@@ -58,7 +58,7 @@ void rsdp_verify_checksum(uint64_t rsdp_address)
     }
     else
     {
-        panic("RSDP checksum is invalid (%X)\n", checksum & 0xFF);
+        panic("RSDP checksum is invalid (%X)", checksum & 0xFF);
     }
 }
 

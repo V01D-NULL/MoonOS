@@ -263,6 +263,8 @@ range_t pmm_alloc_range(size_t pages)
 struct memtag_range pmm_find_tag(size_t tag, int retries)
 {
     struct memtag_range result;
+    result.base = 0;
+    result.size = 0;
     size_t counter = 0;
     
     for (size_t i = 0; i < phys_mmap.entries; i++)

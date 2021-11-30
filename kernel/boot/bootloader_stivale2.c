@@ -25,6 +25,7 @@
 #include <libgraphics/draw.h>
 #include <libgraphics/bootsplash.h>
 #include <drivers/keyboard/keyboard.h>
+#include <hal/pic/pic.h>
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id);
 
@@ -145,6 +146,7 @@ void kinit(struct stivale2_struct *bootloader_info)
     struct stivale2_struct_tag_smp *smp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_SMP_ID);
     struct stivale2_struct_tag_rsdp *rsdp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_RSDP_ID);
     struct stivale2_struct_tag_cmdline *cmdline = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_CMDLINE_ID);
+    struct stivale2_struct_tag_modules *modules = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_MODULES_ID);
 
     if (fb != NULL)
     {
@@ -161,20 +163,24 @@ void kinit(struct stivale2_struct *bootloader_info)
     
     if (mmap != NULL)
     {
-        init_gdt();
+        init_gdt((uint64_t)stack + sizeof(stack));
+
+        // Core#0 will remap the pic once.
+        // After acpi_init the pic is disabled in favor of the apic
+        pic_remap();
         init_idt();
 
         pmm_init(mmap->memmap, mmap->entries);
         vmm_init(check_la57());
 
         double_buffering_init(&bootvars);
-        
+
         /* Is verbose boot specified in the command line? */
         if (cmdline != NULL) {
             /* Panic */
             if (term == NULL)
                 for(;;);
-            
+
             if (strcmp((char*)cmdline->cmdline + 13, "NO") == 0)
             {   
                 printk_init(false, term);
@@ -184,7 +190,8 @@ void kinit(struct stivale2_struct *bootloader_info)
             {
                 printk_init(true, term);
             }
-        } else { for(;;); }
+        }
+        else { for(;;); }
 
         banner(false);
         printk("pmm", "Initialized pmm\n");
@@ -233,5 +240,5 @@ void kinit(struct stivale2_struct *bootloader_info)
     }
 
     log_cpuid_results();
-    kmain(&bootvars);
+    kmain(&bootvars, modules);
 }

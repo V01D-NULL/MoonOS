@@ -3,9 +3,9 @@
 
 %include "asm/defs.inc"
 
-global _load_gdt
+global load_gdt
 
-_load_gdt:
+load_gdt:
     lgdt [rdi]
     push 0x28
     push .flush

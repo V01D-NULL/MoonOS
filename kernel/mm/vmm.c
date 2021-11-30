@@ -32,8 +32,8 @@ void vmm_init(bool has_5_level_paging)
     {
         debug(true, "Using 4 level paging\n");
     }
-
-    // First 4 GB in phys mem
+    
+    // Map 4 GiB of lower half memory
     for (size_t n = 0; n < 4 * GB; n += PAGE_SIZE)
     {
         vmm_map(n, n, FLAGS_PR | FLAGS_RW);
@@ -54,9 +54,17 @@ void vmm_init(bool has_5_level_paging)
     debug(true, "Old PML4: %llx\n", cr_read(CR3)); // Bootloader pml{n}
     PAGE_LOAD_CR3(GENERIC_CAST(uint64_t, rootptr));
     debug(true, "New PML4: %llx\n", cr_read(CR3)); // Kernel pml{n}
+}
 
-    init_gdt();
-    init_idt();
+void vmm_adjust_lower_half_mapping(bool unmap, int flags)
+{
+    for (size_t n = 0; n < 4 * GB; n += PAGE_SIZE)
+    {
+        if (unmap)
+            vmm_unmap(n);
+        else    
+            vmm_remap(n, n, flags);
+    }
 }
 
 static uint64_t *vmm_get_pml_or_alloc(uint64_t *entry, size_t level, int flags)
@@ -176,8 +184,28 @@ void vmm_remap(size_t vaddr_old, size_t vaddr_new, int flags)
         TLB_FLUSH(vaddr_old);
     }
 
+    info = vmm_dissect_vaddr(vaddr_new);
+    if (la57_enabled)
+    {
+        uint64_t *pml4, *pml3, *pml2, *pml1 = NULL;
+        pml4 = vmm_get_pml_or_alloc(rootptr, info.lv5, flags);
+        pml3 = vmm_get_pml_or_alloc(pml4, info.lv4, flags);
+        pml2 = vmm_get_pml_or_alloc(pml3, info.lv3, flags);
+        pml1 = vmm_get_pml_or_alloc(pml2, info.lv2, flags);
+        pml1[info.lv1] = (paddr | flags);
+        TLB_FLUSH(vaddr_new);
+    }
+    else
+    {
+        uint64_t *pml3, *pml2, *pml1 = NULL;
+        pml3 = vmm_get_pml_or_alloc(rootptr, info.lv4, flags);
+        pml2 = vmm_get_pml_or_alloc(pml3, info.lv3, flags);
+        pml1 = vmm_get_pml_or_alloc(pml2, info.lv2, flags);
+        pml1[info.lv1] = (paddr | flags);
+        TLB_FLUSH(vaddr_new);
+    }
+
     release_lock(&vmm_lock);
-    vmm_map(vaddr_new, paddr, flags);
 }
 
 //Pagefault handler

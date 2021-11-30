@@ -12,20 +12,24 @@
 
 bool acpi_validate_sdt_checksum(struct SDT *sdt);
 
-void acpi_init(boot_rsdp_t *boot_rsdp_table)
+struct acpi_table_result acpi_init(boot_rsdp_t *boot_rsdp_table)
 {
+    struct acpi_table_result result;
+
     rsdp_init(boot_rsdp_table);
     
     acpi_table_t madt;
     if ((madt = acpi_find_table("APIC")) != NULL)
     {
         printk("acpi", "Found MADT table @ %p\n", madt);
-        madt_init(madt);
+        result.apic = madt_init(madt);
     }
     else
     {
         panic("No MADT table, no APIC - Refusing to boot");
     }
+
+    return result;
 }
 
 acpi_table_t acpi_find_table(const char *identifier)

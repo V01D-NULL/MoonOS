@@ -56,17 +56,21 @@
 
 #include "panic.h"
 #include "printk.h"
+#include <uspace/userspace.h>
 
-void kmain(boot_info_t *bootvars)
+void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 {
     if (!cpu_has_msr()) {
         panic("MSR's aren't supported on this cpu");
     }
     
-    acpi_init(&bootvars->rsdp);
-    lapic_init();
-    smp_init(&bootvars->cpu);
-    
+    printk("main", "Detected %d modules\n", mods->module_count);
+    printk("main", "Module string: %s\n", mods->modules[0].string);
+
+    // lapic_init(acpi_init(&bootvars->rsdp).apic);
+    // smp_init(&bootvars->cpu);
+
+
     for (;;)
     {
         __asm__("hlt");
