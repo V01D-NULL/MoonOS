@@ -18,7 +18,7 @@ create_lock("vmm", vmm_lock);
 static uint64_t *rootptr;
 static bool la57_enabled = false;
 
-void vmm_init(bool has_5_level_paging)
+void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap)
 {
     la57_enabled = has_5_level_paging;
 
@@ -32,11 +32,20 @@ void vmm_init(bool has_5_level_paging)
     {
         debug(true, "Using 4 level paging\n");
     }
-    
-    // Map 4 GiB of lower half memory
-    for (size_t n = 0; n < 4 * GB; n += PAGE_SIZE)
+  
+    // This mapping is required in order to use the stivale2 terminal
+    for (size_t i = 0; i < mmap->entries; i++) 
     {
-        vmm_map(n, n, FLAGS_PR | FLAGS_RW);
+	size_t base = mmap->memmap[i].base;
+	size_t top = base + mmap->memmap[i].length;
+	size_t type = mmap->memmap[i].type;
+	if (type == STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE || type == STIVALE2_MMAP_FRAMEBUFFER)
+	{
+	    for (; base < top; base += PAGE_SIZE)
+	    {
+		vmm_map(base, base, 3);
+	    }
+	}
     }
 
     // Map 0xff00... or 0xffff80... through 4GB
@@ -45,8 +54,8 @@ void vmm_init(bool has_5_level_paging)
         vmm_map(to_virt(n), n, FLAGS_PR | FLAGS_RW);
     }
 
-    // Map PMR's
-    for (size_t n = 0; n < 0x80000000; n += PAGE_SIZE)
+    // Map 2GiB of kernel code
+    for (size_t n = 0; n < 2 * GB; n += PAGE_SIZE)
     {
         vmm_map(to_phys(n), n, FLAGS_PR | FLAGS_RW);
     }

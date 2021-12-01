@@ -171,9 +171,7 @@ void kinit(struct stivale2_struct *bootloader_info)
         init_idt();
 
         pmm_init(mmap->memmap, mmap->entries);
-        vmm_init(check_la57());
-
-        double_buffering_init(&bootvars);
+        vmm_init(check_la57(), mmap);
 
         /* Is verbose boot specified in the command line? */
         if (cmdline != NULL) {
@@ -208,7 +206,6 @@ void kinit(struct stivale2_struct *bootloader_info)
             printk("vmm", "pml4 resides at 0x%llx\n", cr_read(CR3));
         }
         printk("vmm", "Initialized vmm\n");
-        printk("bootloader-stivale2", "Initialized double buffering\n");
     }
     else
     {
