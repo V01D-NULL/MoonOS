@@ -1,14 +1,13 @@
 ; Loads the 64 bit gdt
-[bits 64]
-
-%include "asm/defs.inc"
+bits 64
 
 global load_gdt
 
 load_gdt:
     lgdt [rdi]
     push 0x28
-    push .flush
+    lea rax, [rel .flush]
+    push rax
     retfq
 
     .flush:
