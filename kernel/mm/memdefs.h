@@ -5,37 +5,36 @@
 #include "pmm.h"
 #include <util/ptr.h>
 #include <mm/cpu/CR.h>
+#include <libk/kassert.h>
 
 static const uintptr_t VMEM_LV5_BASE = 0xff00000000000000UL;
 static const uintptr_t VMEM_LV4_BASE = 0xffff800000000000UL;
-static const uintptr_t KERNEL_CODE_BASE = 0xffffffff80000000;
+static const uintptr_t VMEM_CODE_BASE = 0xffffffff80000000;
 
-__attribute__((always_inline)) static inline bool check_la57(void) { return (cr_read(CR4) >> 12) & 1; }
+STATIC_INLINE bool check_la57(void) { return (cr_read(CR4) >> 12) & 1; }
 
-/* These two helper utils were inspired by brutal */
-static inline uintptr_t to_virt(uintptr_t phys)
+enum mapping_offset
 {
-    if (check_la57())
-        return GENERIC_CAST(uintptr_t, phys + VMEM_LV5_BASE);
+    CODE,
+    DATA
+};
 
-    return GENERIC_CAST(uintptr_t, phys + VMEM_LV4_BASE);
-}
-static inline uintptr_t to_phys(uintptr_t physical_addr)
+STATIC_INLINE size_t from_higher_half(size_t vaddr, enum mapping_offset off)
 {
-    return GENERIC_CAST(uintptr_t, physical_addr + KERNEL_CODE_BASE);
-}
-
-static inline uintptr_t from_virt(uintptr_t phys)
-{
-    if (check_la57())
-        return GENERIC_CAST(uintptr_t, phys - VMEM_LV5_BASE);
+    assert(off == CODE || off == DATA);
+    if (off == CODE)
+        return vaddr - VMEM_CODE_BASE;
     
-    return GENERIC_CAST(uintptr_t, phys - VMEM_LV4_BASE);
+    return vaddr - (check_la57() ? VMEM_LV5_BASE : VMEM_LV4_BASE);
 }
 
-static inline uintptr_t from_phys_higher_half(uintptr_t virt)
+STATIC_INLINE size_t to_higher_half(size_t vaddr, enum mapping_offset off)
 {
-    return GENERIC_CAST(uintptr_t, virt - KERNEL_CODE_BASE);
+    assert(off == CODE || off == DATA);
+    if (off == CODE)
+        return vaddr + VMEM_CODE_BASE;
+    
+    return vaddr + (check_la57() ? VMEM_LV5_BASE : VMEM_LV4_BASE);
 }
 
 static inline bool is_page_aligned(void *addr) { return GENERIC_CAST(size_t, addr) % PAGE_SIZE == 0; }
