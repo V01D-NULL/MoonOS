@@ -44,7 +44,7 @@ acpi_table_t acpi_find_table(const char *identifier)
         
         if (!strncmp(sdt->signature, (char*)identifier, 4) && acpi_validate_sdt_checksum(sdt))
         {
-            return (acpi_table_t) to_virt((uintptr_t)sdt);
+            return (acpi_table_t) to_higher_half((uintptr_t)sdt, DATA);
         }
     }
 
