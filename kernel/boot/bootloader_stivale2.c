@@ -140,7 +140,7 @@ void banner(bool serial_only)
 void kinit(struct stivale2_struct *bootloader_info)
 {
     boot_info_t bootvars;
-    struct stivale2_struct_tag_terminal *term = term = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_TERMINAL_ID);
+    struct stivale2_struct_tag_terminal *term = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_TERMINAL_ID);
     struct stivale2_struct_tag_memmap *mmap = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
     struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
     struct stivale2_struct_tag_smp *smp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_SMP_ID);
@@ -173,6 +173,9 @@ void kinit(struct stivale2_struct *bootloader_info)
         pmm_init(mmap->memmap, mmap->entries);
         vmm_init(check_la57(), mmap);
 
+        // Need heap...
+        // double_buffering_init(&bootvars);
+
         /* Is verbose boot specified in the command line? */
         if (cmdline != NULL) {
             /* Panic */
@@ -182,7 +185,7 @@ void kinit(struct stivale2_struct *bootloader_info)
             if (strcmp((char*)cmdline->cmdline + 13, "NO") == 0)
             {   
                 printk_init(false, term);
-                bootsplash();
+                // bootsplash(); // No double buffering available
             }
             else
             {
