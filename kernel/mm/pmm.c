@@ -224,7 +224,7 @@ void *pmm_alloc(void)
     pfa_alloc(VAR_TO_VOID_PTR(uintptr_t, (GENERIC_CAST(uintptr_t, block))));
 
     release_lock(&pmm_lock);
-    return VAR_TO_VOID_PTR(uintptr_t, to_virt(GENERIC_CAST(uintptr_t, block)));
+    return (void*)to_higher_half(GENERIC_CAST(uintptr_t, block), DATA);
 }
 
 void *pmm_alloc_any(void *addr)
@@ -246,14 +246,14 @@ void *pmm_alloc_any(void *addr)
 range_t pmm_alloc_range(size_t pages)
 {
     //pmm_alloc acquires a spinlock already, no need to acquire one again
-    uint64_t* base = (uint64_t*)pmm_alloc();
+    uint64_t* base = (uint64_t*)from_higher_half((uintptr_t)pmm_alloc(), DATA);
     uint64_t* top = NULL;
 
     assert(base != NULL);
 
     for (size_t i = 0; i < pages; i++)
     {
-        assert((top = (uint64_t*)pmm_alloc()) != NULL);
+        assert((top = (uint64_t*)(from_higher_half((uintptr_t)pmm_alloc(), DATA))) != NULL);
     }
     
     return (range_t) {(size_t)base, (size_t)top};
