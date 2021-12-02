@@ -45,7 +45,8 @@ Verbose boot:
 - A libc for the userland
 
 # This is currently being working on:
-- SMP
+- ELF Loading (for kernel daemons)
+- Scheduler
 
 # Directory walkthrough:
 - libs/   	  --  Here you will find kernel libs.
