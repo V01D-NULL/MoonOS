@@ -54,9 +54,11 @@
 #include <sys/smp/smp.h>
 #include <sys/smp/spinlock.h>
 
+#include <uspace/userspace.h>
+#include <elf/elf.h>
+
 #include "panic.h"
 #include "printk.h"
-#include <uspace/userspace.h>
 
 void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 {
@@ -67,6 +69,8 @@ void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
     printk("main", "Detected %d modules\n", mods->module_count);
     printk("main", "Module string: %s\n", mods->modules[0].string);
 
+    load_elf((const uint8_t*)mods->modules[0].begin, true);
+    
     // lapic_init(acpi_init(&bootvars->rsdp).apic);
     // smp_init(&bootvars->cpu);
 

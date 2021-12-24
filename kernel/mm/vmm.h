@@ -9,13 +9,15 @@
 #include <stivale2.h>
 #include <util/range.h>
 
-#define FLAGS_PR   1   // Present
-#define FLAGS_RW   2   // Read-write
-#define FLAGS_PRIV 4   // User/supervisor
-#define FLAGS_WT   8   // Write-through
-#define FLAGS_CD   16  // Cache-disable
-
-#define PAGE_NOT_PRESENT 0x0
+// Flags
+enum
+{
+    PG_PR   = 1,           // Present
+    PG_RW   = 2 | PG_PR,   // Read-write
+    PG_PRIV = 4 | PG_RW,   // User/supervisor
+    PG_WT   = 8,           // Write-through
+    PG_CD   = 16,          // Cache-disable
+};
 
 #define TLB_FLUSH(param_addr) __asm__ volatile("invlpg (%[addr])" ::[addr] "r"(param_addr));
 #define PAGE_LOAD_CR3(pml4)   __asm__ volatile("mov %0, %%cr3\n" ::"r"(pml4) : "memory");

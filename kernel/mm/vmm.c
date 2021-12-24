@@ -17,9 +17,16 @@ create_lock("vmm", vmm_lock);
 
 static uint64_t *rootptr;
 static bool la57_enabled = false;
+static bool panic_on_remap = false;
+
 STATIC_INLINE uint64_t index_of(uint64_t vaddr, int offset)
 {
     return vaddr >> (12 + 9 * (offset-1)) & 0x1FF;
+}
+
+void vmm_should_panic(bool b)
+{
+    panic_on_remap = b;
 }
 
 void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap)
@@ -28,36 +35,45 @@ void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap)
 
     rootptr = (uint64_t *)(from_higher_half((uintptr_t)pmm_alloc(), DATA));
 
-    if (la57_enabled)
+    if (la57_enabled) {
         debug(true, "Using 5 level paging\n");
+    }
     
-    // printk("test", "test\n");
     // This mapping is required in order to use the stivale2 terminal
     for (size_t i = 0; i < mmap->entries; i++) 
     {
         size_t base = mmap->memmap[i].base;
         size_t top = base + mmap->memmap[i].length;
+        
         size_t type = mmap->memmap[i].type;
         
-        if (type == STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE || type == STIVALE2_MMAP_FRAMEBUFFER)
+        if (
+            type == STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE ||
+            type == STIVALE2_MMAP_FRAMEBUFFER
+        )
         {
-            for (; base < top; base += PAGE_SIZE)
-            {
-                vmm_map(base, base, 3);
-            }
+            vmm_map_range((range_t) {.base = base, .limit = top}, 0, PG_PR);
+        }
+        else if (
+            type == STIVALE2_MMAP_USABLE ||
+            type == STIVALE2_MMAP_KERNEL_AND_MODULES
+        )
+        {
+            vmm_map_range((range_t) {.base = base, .limit = top}, 0, PG_RW);
         }
     }
+    // vmm_map_range((range_t) {.base = 0, .limit = 4 * GB}, 0, 3);
 
     // Map 2GiB of kernel data
-    vmm_map_range((range_t){.base = 0, .limit = 2 * GB}, la57_enabled ? VMEM_LV5_BASE : VMEM_LV4_BASE, 3);
+    vmm_map_range((range_t){.base = 0, .limit = 4 * GB}, la57_enabled ? VMEM_LV5_BASE : VMEM_LV4_BASE, PG_RW);
     
     // Map 2GiB of kernel code
-    vmm_map_range((range_t){.base = 0, .limit = 2 * GB}, VMEM_CODE_BASE, 3);
+    vmm_map_range((range_t){.base = 0, .limit = 2 * GB}, VMEM_CODE_BASE, PG_RW);
 
     debug(true, "Old PML4: %llx\n", cr_read(CR3)); // Bootloader pagemap
     PAGE_LOAD_CR3(GENERIC_CAST(uint64_t, rootptr));
     debug(true, "New PML4: %llx\n", cr_read(CR3)); // Kernel pagemap
-
+    vmm_should_panic(true);
 }
 
 static uint64_t *vmm_get_pml_or_alloc(uint64_t *entry, size_t level, int flags)
@@ -96,7 +112,7 @@ void vmm_map(size_t vaddr, size_t paddr, int flags)
         pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
         pml1 = vmm_get_pml_or_alloc(pml2, lv2, flags);
 
-        if(pml1[lv1] != 0)
+        if(pml1[lv1] != 0 && panic_on_remap)
         {
             panic("Attempted to map a mapped page! [ virt: 0x%lX | phys: 0x%lX | pml1[%d]: 0x%lX ]",
                 vaddr, paddr, lv1, pml1[lv1]
@@ -112,7 +128,7 @@ void vmm_map(size_t vaddr, size_t paddr, int flags)
         pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
         pml1 = vmm_get_pml_or_alloc(pml2, lv2, flags);
         
-        if (pml1[lv1] != 0)
+        if (pml1[lv1] != 0 && panic_on_remap)
         {
             panic("Attempted to map a mapped page! [ virt: 0x%lX | phys: 0x%lX | pml1[%d]: 0x%lX ]",
                 vaddr, paddr, lv1, pml1[lv1]
@@ -231,7 +247,7 @@ void vmm_guess_and_map(uint64_t cr2, int error_code)
 {
     /* Non present page */
     if (error_code & 1)
-        vmm_map(cr2, cr2, (error_code & 2) ? (FLAGS_PR | FLAGS_RW) : FLAGS_PR);
+        vmm_map(cr2, cr2, (error_code & 2) ? (PG_PR | PG_RW) : PG_PR);
 
     /* CPL = 3 */
     else if (error_code & 4)
@@ -242,7 +258,7 @@ void vmm_guess_and_map(uint64_t cr2, int error_code)
         ;
 
     else
-        vmm_map(cr2, cr2, FLAGS_PR | FLAGS_RW);
+        vmm_map(cr2, cr2, PG_PR | PG_RW);
 }
 
 uint64_t *vmm_get_kernel_pagemap(void)

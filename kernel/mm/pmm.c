@@ -15,10 +15,10 @@ create_lock("pmm", pmm_lock);
 static mmap_t phys_mmap;
 static struct stivale2_mmap_entry *map;
 size_t highest_page;
-static uint8_t PTR bitmap;
+static uint32_t PTR bitmap;
 
-#define bset(bit, cmd)  (cmd == BIT_SET) ? (bitmap[bit / 8] |= (1 << (bit % 8))) : (bitmap[bit / 8] &= ~(1 << (bit % 8)))
-#define btest(bit)      ((bitmap[bit / 8] & (1 << (bit % 8))))
+#define bset(bit, cmd)  (cmd == BIT_SET) ? (bitmap[bit / BITMAP_BLOCK_SIZE] |= (1 << (bit % BITMAP_BLOCK_SIZE))) : (bitmap[bit / BITMAP_BLOCK_SIZE] &= ~(1 << (bit % BITMAP_BLOCK_SIZE)))
+#define btest(bit)      ((bitmap[bit / BITMAP_BLOCK_SIZE] & (1 << (bit % BITMAP_BLOCK_SIZE))))
 
 static inline void *find_free_block_at(size_t offset);
 
@@ -196,6 +196,8 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
         size_t page = PAGE_2_BIT(mmap[i].base);
         pfa_free_multiple(page, len);
     }
+
+    debug(true, "top: %lX\n", top);
 }
 
 /**
