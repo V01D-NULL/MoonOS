@@ -57,9 +57,9 @@ void isr_handler(regs_t regs)
         {
             printk("INT ~ #PF", "Faulting address: 0x%lx\n", cr_read(CR2));
             
-            uint64_t cr2 = cr_read(CR2);
-            vmm_guess_and_map(cr2, regs.error_code);
-            return;
+            // uint64_t cr2 = cr_read(CR2);
+            // vmm_guess_and_map(cr2, regs.error_code);
+            // return;
         }
         else if (regs.isr_number == 6)
         {

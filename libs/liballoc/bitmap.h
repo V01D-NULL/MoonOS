@@ -19,7 +19,7 @@
 typedef uint8_t bitmap_size_type;
 
 //BITMAP_BLOCK_SIZE = bitmap_size_type in bits
-#define BITMAP_BLOCK_SIZE       (sizeof(bitmap_size_type))
+#define BITMAP_BLOCK_SIZE       (sizeof(bitmap_size_type) * 8)
 #define BITMAP_USED    1
 #define BITMAP_FREE    0
 

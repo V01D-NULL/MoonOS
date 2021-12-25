@@ -63,7 +63,7 @@
 void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 {
     if (!cpu_has_msr()) {
-        panic("MSR's aren't supported on this cpu");
+        // panic("MSR's aren't supported on this cpu");
     }
     
     printk("main", "Detected %d modules\n", mods->module_count);

@@ -9,6 +9,8 @@
 #include <stivale2.h>
 #include <util/range.h>
 
+#define GB 0x40000000UL
+
 // Flags
 enum
 {
@@ -19,8 +21,8 @@ enum
     PG_CD   = 16,          // Cache-disable
 };
 
-#define TLB_FLUSH(param_addr) __asm__ volatile("invlpg (%[addr])" ::[addr] "r"(param_addr));
-#define PAGE_LOAD_CR3(pml4)   __asm__ volatile("mov %0, %%cr3\n" ::"r"(pml4) : "memory");
+#define invlpg(param_addr) __asm__ volatile("invlpg (%[addr])" ::[addr] "r"(param_addr));
+#define wrcr3(pml4)   __asm__ volatile("mov %0, %%cr3\n" ::"r"(pml4) : "memory");
 
 void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap);
 void vmm_map(size_t vaddr, size_t paddr, int flags);

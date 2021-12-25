@@ -15,7 +15,7 @@ create_lock("pmm", pmm_lock);
 static mmap_t phys_mmap;
 static struct stivale2_mmap_entry *map;
 size_t highest_page;
-static uint32_t PTR bitmap;
+static uint8_t PTR bitmap;
 
 #define bset(bit, cmd)  (cmd == BIT_SET) ? (bitmap[bit / BITMAP_BLOCK_SIZE] |= (1 << (bit % BITMAP_BLOCK_SIZE))) : (bitmap[bit / BITMAP_BLOCK_SIZE] &= ~(1 << (bit % BITMAP_BLOCK_SIZE)))
 #define btest(bit)      ((bitmap[bit / BITMAP_BLOCK_SIZE] & (1 << (bit % BITMAP_BLOCK_SIZE))))

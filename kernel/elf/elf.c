@@ -2,7 +2,7 @@
 #include <panic.h>
 #include <printk.h>
 #include <devices/serial/serial.h>
-#include <mm/pmm.h>
+#include <mm/vmm.h>
 
 static Elf64_Ehdr elf_verify_ehdr(const uint8_t **elf);
 static void elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, bool do_panic);
@@ -44,11 +44,10 @@ static void elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, bool do_panic)
         if (phdr->p_type == PT_LOAD)
         {
             found_ptload = true;
-            printk("Elf", "Found loadable segment\n");
-            printk("Elf", "Virtual mapping: 0x%lX (%d bytes | %d pages)\n", phdr->p_vaddr, phdr->p_memsz, phdr->p_memsz / 4096);
+            printk("elf", "Found loadable segment\n");
+            printk("elf", "Virtual mapping: 0x%lX (%d bytes | %d pages)\n", phdr->p_vaddr, phdr->p_memsz, phdr->p_memsz / 4096);
             
-            // pmm_alloc();
-            // vmm_remap(phdr->p_vaddr, phdr->p_vaddr, 7);
+            
         }
         
         phdr += ehdr->e_phentsize;
