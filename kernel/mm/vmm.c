@@ -42,7 +42,6 @@ void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap)
     {
         size_t base = mmap->memmap[i].base;
         size_t top = base + mmap->memmap[i].length;
-        
         size_t type = mmap->memmap[i].type;
         
         if (
@@ -55,7 +54,7 @@ void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap)
     }
 
     // Map 2GiB of kernel data
-    vmm_map_range((range_t){.base = 0, .limit = 4 * GB}, la57_enabled ? VMEM_LV5_BASE : VMEM_LV4_BASE, PG_RW);
+    vmm_map_range((range_t){.base = 0, .limit = 2 * GB}, la57_enabled ? VMEM_LV5_BASE : VMEM_LV4_BASE, PG_RW);
     
     // Map 2GiB of kernel code
     vmm_map_range((range_t){.base = 0, .limit = 2 * GB}, VMEM_CODE_BASE, PG_RW);
