@@ -52,13 +52,6 @@ void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap)
         {
             vmm_map_range((range_t) {.base = base, .limit = top}, 0, PG_PR);
         }
-        // else if (
-        //     type == STIVALE2_MMAP_USABLE ||
-        //     type == STIVALE2_MMAP_KERNEL_AND_MODULES
-        // )
-        // {
-        //     vmm_map_range((range_t) {.base = base, .limit = top}, 0, PG_RW);
-        // }
     }
 
     // Map 2GiB of kernel data
