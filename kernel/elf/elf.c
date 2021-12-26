@@ -3,6 +3,8 @@
 #include <printk.h>
 #include <devices/serial/serial.h>
 #include <mm/vmm.h>
+#include <mm/pmm.h>
+#include <mm/memdefs.h>
 
 static Elf64_Ehdr elf_verify_ehdr(const uint8_t **elf);
 static void elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, bool do_panic);
@@ -46,8 +48,13 @@ static void elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, bool do_panic)
             found_ptload = true;
             printk("elf", "Found loadable segment\n");
             printk("elf", "Virtual mapping: 0x%lX (%d bytes | %d pages)\n", phdr->p_vaddr, phdr->p_memsz, phdr->p_memsz / 4096);
-            
-            
+
+            for (uint64_t i = 0; i < phdr->p_memsz / 4096; i++) {
+                // Todo: Create new pagemap for daemon (Requires scheduler, tasking, etc.
+                // Hence the usage of the kernel pagemap to keep it simple)
+                vmm_remap(phdr->p_vaddr + (i * 4096), phdr->p_vaddr + (i * 4096) , 7);
+            }
+            memcpy((uint8_t*)phdr, phdr->p_vaddr, phdr->p_filesz);
         }
         
         phdr += ehdr->e_phentsize;

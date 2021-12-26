@@ -33,15 +33,26 @@ void printk(char *status, char *fmt, ...)
         return;
     }
 
-    puts("\e[94m");
+    // puts("\e[94m");
+    puts("\033[0;37m");
     puts(status);
-    puts(BASH_GRAY ": ");
+    puts("\033[1;30m" ": ");
     puts((const char *)&buffer);
 }
 
 void puts(const char *s)
 {
     term_write(s, strlen(s));
+}
+
+void fmt_puts(const char *fmt, ...)
+{
+    va_list arg;
+    va_start(arg, fmt);
+    vsnprintf((char *)&buffer, (size_t)-1, fmt, arg);
+    va_end(arg);
+
+    puts((const char*)&buffer);
 }
 
 // Note: This should only be called when information

@@ -23,13 +23,22 @@ gnu_no_return panic(const char *fmt, ...)
 
 	override_quiet_boot();
 
-	printk("panic", "\n\tA kernel panic has occurred\n\t*** Reason: %s ***\n", panic_buff);
+	printk("panic", "\nA kernel panic has occurred\n*** Reason: %s ***\n", panic_buff);
 	debug(false, "A kernel panic has occurred\n*** Reason: %s ***\n", panic_buff);
 	
 	struct stacktrace_result res = backtrace_stack(10);
 	for (int i = 0; i < res.count; i++)
 	{
 		backtrace_symbol(res.trace_results[i].address);
+	}
+
+	printk("stackdump", "\033[0;37mDumping %s's stackframe\nStackframe size: 0x%x\n", sym_lookup(res.trace_results[1].address).name, res.caller_frame_size);
+	fmt_puts("\033[0;37m<addr>\t\t  <stack>\t   <stack+8>\n");
+	uint64_t rbp = res.caller_rbp;
+	for (uint64_t i = 0; i < 10; i++)
+	{
+		fmt_puts("%lx: %p %p\n", rbp, *(long*)(rbp), *(long*)(rbp + sizeof(long)));
+		rbp += 16;
 	}
 
 	for (;;)

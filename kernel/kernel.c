@@ -71,12 +71,18 @@ void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 
     load_elf((const uint8_t*)mods->modules[0].begin, true);
     
+    uint64_t rsp = 0;
+    __asm__ ("mov %%rsp, %0" : "=r"(rsp));
+    strace_save_rsp(rsp);
+    panic("Test");
     // lapic_init(acpi_init(&bootvars->rsdp).apic);
     // smp_init(&bootvars->cpu);
 
 
     for (;;)
     {
-        __asm__("hlt");
+        printk("hi", "Hello\n");
+        printk("ih", "olleh\n");
+        // __asm__("hlt");
     }
 }

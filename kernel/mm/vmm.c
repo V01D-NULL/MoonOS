@@ -53,6 +53,9 @@ void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap)
         }
     }
 
+    // Identity map 0-2GiB
+    vmm_map_range((range_t){.base = 0, .limit = 2 * GB}, 0, PG_RW);
+
     // Map 2GiB of kernel data
     vmm_map_range((range_t){.base = 0, .limit = 2 * GB}, la57_enabled ? VMEM_LV5_BASE : VMEM_LV4_BASE, PG_RW);
     
@@ -236,7 +239,7 @@ void vmm_guess_and_map(uint64_t cr2, int error_code)
 {
     /* Non present page */
     if (error_code & 1)
-        vmm_map(cr2, cr2, (error_code & 2) ? (PG_PR | PG_RW) : PG_PR);
+        vmm_map(cr2, cr2, (error_code & 2) ?  PG_RW : PG_PR);
 
     /* CPL = 3 */
     else if (error_code & 4)
@@ -247,7 +250,7 @@ void vmm_guess_and_map(uint64_t cr2, int error_code)
         ;
 
     else
-        vmm_map(cr2, cr2, PG_PR | PG_RW);
+        vmm_map(cr2, cr2, PG_RW);
 }
 
 uint64_t *vmm_get_kernel_pagemap(void)

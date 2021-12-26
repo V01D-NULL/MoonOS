@@ -7,6 +7,7 @@
 
 void printk(char *status, char *fmt, ...);
 void printk_init(bool verbose_boot, struct stivale2_struct_tag_terminal *term);
+void fmt_puts(const char *fmt, ...);
 
 // Note: This should only be called when information
 // must be shown, a kernel panic for example
