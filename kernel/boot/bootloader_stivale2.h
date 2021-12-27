@@ -12,6 +12,7 @@
 #ifndef BOOTLOADER_STIVALE2_INIT_H
 #define BOOTLOADER_STIVALE2_INIT_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <stivale2.h>
@@ -55,6 +56,7 @@ typedef struct
     boot_cpu_t  cpu ;
     boot_vesa_t vesa;
     boot_rsdp_t rsdp;
+    bool is_uefi;
 } boot_info_t gnu_section_align4k;
 
 

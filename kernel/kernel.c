@@ -62,10 +62,10 @@
 
 void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 {
-    if (!cpu_has_msr()) {
+    if (!cpu_has_msr() && bootvars->is_uefi) {
         panic("MSR's aren't supported on this cpu");
     }
-    
+
     printk("main", "Detected %d modules\n", mods->module_count);
     printk("main", "Module string: %s\n", mods->modules[0].string);
     
