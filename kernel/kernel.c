@@ -63,14 +63,14 @@
 void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 {
     if (!cpu_has_msr()) {
-        // panic("MSR's aren't supported on this cpu");
+        panic("MSR's aren't supported on this cpu");
     }
     
     printk("main", "Detected %d modules\n", mods->module_count);
     printk("main", "Module string: %s\n", mods->modules[0].string);
-
-    printk("elf", "%p\n", mods->modules[0].begin);
-    load_elf((const uint8_t*)mods->modules[0].begin, true);
+    
+    auto entry = (void (*)()) load_elf((const uint8_t*)mods->modules[0].begin, true);
+    entry();
     
     // lapic_init(acpi_init(&bootvars->rsdp).apic);
     // smp_init(&bootvars->cpu);

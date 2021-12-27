@@ -1,10 +1,11 @@
+OUTPUT_FORMAT(elf64-x86-64)
 ENTRY(_start)
 
 SECTIONS
 {
     . = 4M;
 
-    .text : ALIGN(0x1000) {
+    .text : ALIGN(4K) {
         *(.text*)
     }
 
@@ -12,11 +13,11 @@ SECTIONS
         *(.rodata*)
     }
 
-    .data : ALIGN(0x1000) {
+    .data : ALIGN(4K) {
         *(.data*)
     }
 
-    .bss : ALIGN(0x1000) {
+    .bss : ALIGN(4K) {
         *(COMMON)
         *(.bss*)
     }

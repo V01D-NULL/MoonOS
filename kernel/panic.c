@@ -24,7 +24,8 @@ gnu_no_return _panic(uint64_t rbp, uint64_t rsp, const char *fmt, ...)
 
 	override_quiet_boot();
 
-	printk("panic", "\nA kernel panic has occurred\n*** Reason: %s ***\n", panic_buff);
+	printk("panic", "\n\033[0;37mA kernel panic has occurred\n");
+	fmt_puts("*** Reason: %s***\n", panic_buff);
 	debug(false, "A kernel panic has occurred\n*** Reason: %s ***\n", panic_buff);
 	
 	struct stacktrace_result res = backtrace_stack(10);
@@ -35,7 +36,11 @@ gnu_no_return _panic(uint64_t rbp, uint64_t rsp, const char *fmt, ...)
 
 	size_t frame_size = rbp-rsp;
 	printk("stackdump", "\033[0;37mDumping %s's stackframe\nStackframe size: 0x%x\n", sym_lookup(res.trace_results[1].address).name, frame_size);
-	fmt_puts("\033[0;37m<addr>\t\t  <stack>\t   <stack+8>\n");
+	fmt_puts("<addr>\t\t  <stack>\t   <stack+8>\n");
+
+	// The larger the stackframe the less likely the chance of seeing messages
+	// printed earlier due to the terminal scrolling. 0x18 was chosen randomly.
+	if (frame_size > 0x18) frame_size = 0x18; // Todo: Write to file or something
 	
 	// Dump stackframe of the function that called panic()
 	for (uint64_t i = 0; i < frame_size; i++)
@@ -44,9 +49,9 @@ gnu_no_return _panic(uint64_t rbp, uint64_t rsp, const char *fmt, ...)
 			rbp, *(long*)(rbp),
 			*(long*)(rbp + sizeof(long))
 		);
-		rbp += 16;
+		rbp += sizeof(long) * 2;
 	}
 
 	for (;;)
-		;
+		__asm__("hlt");
 }

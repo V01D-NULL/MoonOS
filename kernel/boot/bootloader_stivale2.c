@@ -185,7 +185,6 @@ void kinit(struct stivale2_struct *bootloader_info)
             if (strcmp((char*)cmdline->cmdline + 13, "NO") == 0)
             {   
                 printk_init(false, term);
-                // bootsplash(); // No double buffering available
             }
             else
             {

@@ -58,6 +58,6 @@ int64_t find_symbol_by_name(char *name)
 void backtrace_symbol(uint64_t address)
 {
     sym_table_t sym = sym_lookup(address);
-    printk("backtrace", "%llx - %s\n", sym.addr, sym.name);
+    printk("backtrace", "\033[0;37m%llx - %s\n", sym.addr, sym.name);
     debug(false, "%llx - %s\n", sym.addr, sym.name);
 }

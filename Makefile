@@ -76,9 +76,9 @@ ISO: $(KERNEL_HDD)
 # Remove the HDD & elf file while saving all object files (fewer files will be recompiled)
 quick_recompile: symlist
 	@rm -f $(KERNEL_HDD) kernel/kernel.elf
-	@printf "\n";
+	@printf "\n"
+	@$(MAKE) --no-print-directory -C daemon/init
+	@printf "\n"
 	@$(MAKE) --no-print-directory -C libs
 	@printf "\n"
 	@$(MAKE) --no-print-directory -C kernel
-	@printf "\n"
-	@$(MAKE) --no-print-directory -C daemon/init
