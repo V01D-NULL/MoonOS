@@ -1,10 +1,33 @@
 #include "gdt.h"
+#include <libk/kstring.h>
 
-gnu_export void _load_gdt(uint64_t gdt_desc);
+gnu_export void load_gdt(uint64_t gdtr);
 
 static struct gdt_table gdt;
 
-void init_gdt(void)
+void set_tss_entry(uint64_t base, uint8_t flags, uint8_t access)
+{
+    gdt.tssd.size = 104;
+    gdt.tssd.base0 = base & 0xFFFF;
+    gdt.tssd.base1 = (base >> 16) & 0xFF;
+    gdt.tssd.access = access;
+    gdt.tssd.flags = flags;
+    gdt.tssd.base2 = (base >> 24) & 0xFF;
+    gdt.tssd.base3 = (base >> 32);
+    gdt.tssd.reserved = 0;
+}
+
+static tss_t tss;
+void init_tss(uint64_t stack)
+{
+    set_tss_entry((uintptr_t)&tss, 0x20, 0x89);
+    memset((void*)&tss, 0, sizeof(tss_t));
+
+    tss.RSP0 = stack;
+    tss.IST1 = 0; //Disable IST
+}
+
+void init_gdt(uint64_t stack)
 {
     //Null descriptor
     gdt.gdt_table_memory_segments[0].limit     = 0;
@@ -79,8 +102,11 @@ void init_gdt(void)
     gdt.gdt_table_memory_segments[8].access = 0xFA;
     gdt.gdt_table_memory_segments[8].gran = 0x20;
 
-    gdt.gdtr.offset = (uint64_t)&gdt.gdt_table_memory_segments;
-    gdt.gdtr.limit = sizeof(struct memory_segment) * 13 - 1;
+    init_tss(stack);
 
-    _load_gdt((uint64_t)&gdt.gdtr);
+    gdt.gdtr.offset = (uint64_t)&gdt.gdt_table_memory_segments;
+    gdt.gdtr.limit = sizeof(struct gdt_table) * 9 - 1;
+
+    load_gdt((uint64_t)&gdt.gdtr);
+    load_tss(0x48);
 }

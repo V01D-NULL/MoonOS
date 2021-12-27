@@ -13,34 +13,13 @@ _asm_isr_handler_stub:
     iretq              ; Pop other flags and return to normal execution State
 
 
-; params: r10 = isr{number} aka `offset`, r11 = index
-zero_user_isr:
-    mov rdx, 0x8E   ; type_attr
-    mov rcx, r10    ; offset
-    mov r8, r11     ; idx
-    call idt_set_entry
-    ret
-
 global load_idt
 load_idt:
-    ; Set isrs 48-255 to dummy entries, otherwise it's just a nasty #GP
-    push rdi
-    mov rdi, 0x08 ; Selector
-    mov rsi, 0x0  ; ist
-    %assign i 48
-    %rep 208
-    mov r10, isr%+i
-    mov r11, i
-    call zero_user_isr
-    %assign i i+1
-    %endrep
-    pop rdi
-
     lidt [rdi]
 
-    ; Reload cs and ds
     push 0x28
-    push .reload
+    lea rax, [rel .reload]
+    push rax
     retfq
     .reload:
        mov ax, 0x30

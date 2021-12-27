@@ -9,7 +9,9 @@
         "ctypes.h": "c",
         "stddef.h": "c",
         "kstring.h": "c",
-        "apic.h": "c"
+        "apic.h": "c",
+        "userspace.h": "c",
+        "cstdio": "c"
     },
     "files.exclude": {
         "**/*.o": true,

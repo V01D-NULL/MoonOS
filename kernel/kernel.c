@@ -54,19 +54,27 @@
 #include <sys/smp/smp.h>
 #include <sys/smp/spinlock.h>
 
+#include <uspace/userspace.h>
+#include <elf/elf.h>
+
 #include "panic.h"
 #include "printk.h"
 
-void kmain(boot_info_t *bootvars)
+void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 {
     if (!cpu_has_msr()) {
         panic("MSR's aren't supported on this cpu");
     }
     
-    acpi_init(&bootvars->rsdp);
-    lapic_init();
-    smp_init(&bootvars->cpu);
+    printk("main", "Detected %d modules\n", mods->module_count);
+    printk("main", "Module string: %s\n", mods->modules[0].string);
     
+    auto entry = (void (*)()) load_elf((const uint8_t*)mods->modules[0].begin, true);
+    entry();
+    
+    // lapic_init(acpi_init(&bootvars->rsdp).apic);
+    // smp_init(&bootvars->cpu);
+
     for (;;)
     {
         __asm__("hlt");

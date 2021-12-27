@@ -1,11 +1,14 @@
 #include "madt.h"
+#include <hal/acpi/acpi.h>
 #include <devices/serial/serial.h>
 #include <hal/apic/apic.h>
 #include <hal/pic/pic.h>
 #include <mm/memdefs.h>
 #include <printk.h>
 
+/* Entry types */
 #define LAPIC_ADDR_OVERRIDE 5 // Entry type 5 in the madt is the lapic address override
+#define IOAPIC              1
 
 static const char* interrupt_device_id_map[6] = {
     "LAPIC",
@@ -16,11 +19,13 @@ static const char* interrupt_device_id_map[6] = {
     "LAPIC Address override"
 };
 
+static struct apic_device_info apic_dev;
 static void enumarate_apic_devices(madt_t **madt);
 
-void madt_init(acpi_table_t madt_base)
+struct apic_device_info madt_init(void *madt_base)
 {
-    madt_t *madt = (madt_t*)from_virt(GENERIC_CAST(uintptr_t, madt_base));
+    madt_t *madt = (madt_t*)from_higher_half(GENERIC_CAST(uintptr_t, madt_base), DATA);
+    apic_dev.ioapics = pmm_alloc(); // TODO: Make this a heap allocation!
 
     // Strings aren't null terminated apparently, so we do it ourselves
     uint8_t oem_str[7];
@@ -31,15 +36,15 @@ void madt_init(acpi_table_t madt_base)
     memcpy(GENERIC_CAST(uint8_t*, oem_table_id), GENERIC_CAST(uint8_t*, madt->sdt.oem_table_id), 8);
     oem_table_id[8] = '\0';
 
-    madt->local_apic_addr = (uint32_t)to_virt(GENERIC_CAST(uintptr_t, madt + 0x24));
-    madt->local_apic_flags = (uint32_t)from_virt(GENERIC_CAST(uintptr_t, madt + 0x28));
+    apic_dev.lapic_addr = madt->local_apic_addr;
 
     pic_disable();
     enumarate_apic_devices(&madt);
 
     printk("madt", "OEM String: '%s'\n", oem_str);
     printk("madt", "OEM Table ID: '%s'\n", oem_table_id);
-    printk("madt", "LAPIC address: %lX\n", madt->local_apic_addr);
+
+    return apic_dev;
 }
 
 static void enumarate_apic_devices(madt_t** madt)
@@ -53,7 +58,11 @@ static void enumarate_apic_devices(madt_t** madt)
             printk("madt", "Detected %s\n", interrupt_device_id_map[*madt_interrupt_devices]);
 
             if (*madt_interrupt_devices == LAPIC_ADDR_OVERRIDE) {
-                (*madt)->local_apic_addr64 = GENERIC_CAST(uint64_t, *madt_interrupt_devices + 0x4);
+                apic_dev.lapic_addr = (uint64_t)madt_interrupt_devices+4;
+            }
+
+            if (*madt_interrupt_devices == IOAPIC) {
+                apic_dev.ioapics[apic_dev.usable_ioapics++] = GENERIC_CAST(struct ioapic_dev*, madt_interrupt_devices);
             }
 
             madt_interrupt_devices += madt_interrupt_devices[1];

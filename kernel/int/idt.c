@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include <amd64/moon.h>
 #include <util/ptr.h>
-#include <hal/pic/pic.h>
 
 static struct idt_desc idt[256];
 
@@ -54,10 +53,6 @@ void init_idt(void)
     idt_set_entry(0x28, 0, 0x8E, GENERIC_CAST(uint64_t, isr29), 29);
     idt_set_entry(0x28, 0, 0x8E, GENERIC_CAST(uint64_t, isr30), 30);
     idt_set_entry(0x28, 0, 0x8E, GENERIC_CAST(uint64_t, isr31), 31);
-
-    //Remap PIC
-    pic_remap();
-
     idt_set_entry(0x28, 0, 0x8E, GENERIC_CAST(uint64_t, isr32), 32);
     idt_set_entry(0x28, 0, 0x8E, GENERIC_CAST(uint64_t, isr33), 33);
     idt_set_entry(0x28, 0, 0x8E, GENERIC_CAST(uint64_t, isr34), 34);

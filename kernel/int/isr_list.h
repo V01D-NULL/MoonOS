@@ -17,6 +17,5 @@
 #define IRQ13 45
 #define IRQ14 46
 #define IRQ15 47
-#define ISR_VERBOSE_BOOT 48
 
 #endif // ISR_LIST_H

@@ -17,8 +17,8 @@ static struct stivale2_mmap_entry *map;
 size_t highest_page;
 static uint8_t PTR bitmap;
 
-#define bset(bit, cmd)  (cmd == BIT_SET) ? (bitmap[bit / 8] |= (1 << (bit % 8))) : (bitmap[bit / 8] &= ~(1 << (bit % 8)))
-#define btest(bit)      ((bitmap[bit / 8] & (1 << (bit % 8))))
+#define bset(bit, cmd)  (cmd == BIT_SET) ? (bitmap[bit / BITMAP_BLOCK_SIZE] |= (1 << (bit % BITMAP_BLOCK_SIZE))) : (bitmap[bit / BITMAP_BLOCK_SIZE] &= ~(1 << (bit % BITMAP_BLOCK_SIZE)))
+#define btest(bit)      ((bitmap[bit / BITMAP_BLOCK_SIZE] & (1 << (bit % BITMAP_BLOCK_SIZE))))
 
 static inline void *find_free_block_at(size_t offset);
 
@@ -196,6 +196,8 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
         size_t page = PAGE_2_BIT(mmap[i].base);
         pfa_free_multiple(page, len);
     }
+
+    debug(true, "top: %lX\n", top);
 }
 
 /**
@@ -224,7 +226,7 @@ void *pmm_alloc(void)
     pfa_alloc(VAR_TO_VOID_PTR(uintptr_t, (GENERIC_CAST(uintptr_t, block))));
 
     release_lock(&pmm_lock);
-    return VAR_TO_VOID_PTR(uintptr_t, to_virt(GENERIC_CAST(uintptr_t, block)));
+    return (void*)to_higher_half(GENERIC_CAST(uintptr_t, block), DATA);
 }
 
 void *pmm_alloc_any(void *addr)
@@ -246,14 +248,14 @@ void *pmm_alloc_any(void *addr)
 range_t pmm_alloc_range(size_t pages)
 {
     //pmm_alloc acquires a spinlock already, no need to acquire one again
-    uint64_t* base = (uint64_t*)pmm_alloc();
+    uint64_t* base = (uint64_t*)from_higher_half((uintptr_t)pmm_alloc(), DATA);
     uint64_t* top = NULL;
 
     assert(base != NULL);
 
     for (size_t i = 0; i < pages; i++)
     {
-        assert((top = (uint64_t*)pmm_alloc()) != NULL);
+        assert((top = (uint64_t*)(from_higher_half((uintptr_t)pmm_alloc(), DATA))) != NULL);
     }
     
     return (range_t) {(size_t)base, (size_t)top};
@@ -263,6 +265,8 @@ range_t pmm_alloc_range(size_t pages)
 struct memtag_range pmm_find_tag(size_t tag, int retries)
 {
     struct memtag_range result;
+    result.base = 0;
+    result.size = 0;
     size_t counter = 0;
     
     for (size_t i = 0; i < phys_mmap.entries; i++)

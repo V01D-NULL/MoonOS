@@ -7,7 +7,7 @@
 
 extern sym_table_t symbol_table[];
 
-static sym_table_t lookup(uint64_t address)
+sym_table_t sym_lookup(uint64_t address)
 {
     uint64_t corrected_address = 0;
     uint64_t index_new = 0;
@@ -57,7 +57,7 @@ int64_t find_symbol_by_name(char *name)
 
 void backtrace_symbol(uint64_t address)
 {
-    sym_table_t sym = lookup(address);
-    printk("backtrace", "%llx - %s\n", sym.addr, sym.name);
+    sym_table_t sym = sym_lookup(address);
+    printk("backtrace", "\033[0;37m%llx - %s\n", sym.addr, sym.name);
     debug(false, "%llx - %s\n", sym.addr, sym.name);
 }

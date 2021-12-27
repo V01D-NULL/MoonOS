@@ -11,52 +11,61 @@
 #include <panic.h>
 #include <sys/smp/spinlock.h>
 
-#define GB 0x40000000UL
-
 create_lock("vmm", vmm_lock);
 
-static uint64_t *rootptr;
+static uint64_t *kernel_pagemap;
 static bool la57_enabled = false;
+static bool panic_on_remap = false;
 
-void vmm_init(bool has_5_level_paging)
+STATIC_INLINE uint64_t index_of(uint64_t vaddr, int offset)
+{
+    return vaddr >> (12 + 9 * (offset-1)) & 0x1FF;
+}
+
+void vmm_should_panic(bool b)
+{
+    panic_on_remap = b;
+}
+
+void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap)
 {
     la57_enabled = has_5_level_paging;
 
-    rootptr = (uint64_t *)(from_virt((uintptr_t)pmm_alloc()));
+    kernel_pagemap = (uint64_t *)(from_higher_half((uintptr_t)pmm_alloc(), DATA));
 
-    if (la57_enabled)
-    {
+    if (la57_enabled) {
         debug(true, "Using 5 level paging\n");
     }
-    else
+    
+    // This mapping is required in order to use the stivale2 terminal
+    for (size_t i = 0; i < mmap->entries; i++) 
     {
-        debug(true, "Using 4 level paging\n");
+        size_t base = mmap->memmap[i].base;
+        size_t top = base + mmap->memmap[i].length;
+        size_t type = mmap->memmap[i].type;
+        
+        if (
+            type == STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE ||
+            type == STIVALE2_MMAP_FRAMEBUFFER
+        )
+        {
+            vmm_map_range((range_t) {.base = base, .limit = top}, 0, PG_PR);
+        }
     }
 
-    // First 4 GB in phys mem
-    for (size_t n = 0; n < 4 * GB; n += PAGE_SIZE)
-    {
-        vmm_map(n, n, FLAGS_PR | FLAGS_RW);
-    }
+    // Identity map 0-2GiB
+    vmm_map_range((range_t){.base = 0, .limit = 2 * GB}, 0, PG_RW);
 
-    // Map 0xff00... or 0xffff80... through 4GB
-    for (size_t n = 0; n < 4 * GB; n += PAGE_SIZE)
-    {
-        vmm_map(to_virt(n), n, FLAGS_PR | FLAGS_RW);
-    }
+    // Map 2GiB of kernel data
+    vmm_map_range((range_t){.base = 0, .limit = 2 * GB}, la57_enabled ? VMEM_LV5_BASE : VMEM_LV4_BASE, PG_RW);
+    
+    // Map 2GiB of kernel code
+    vmm_map_range((range_t){.base = 0, .limit = 2 * GB}, VMEM_CODE_BASE, PG_RW);
 
-    // Map PMR's
-    for (size_t n = 0; n < 0x80000000; n += PAGE_SIZE)
-    {
-        vmm_map(to_phys(n), n, FLAGS_PR | FLAGS_RW);
-    }
-
-    debug(true, "Old PML4: %llx\n", cr_read(CR3)); // Bootloader pml{n}
-    PAGE_LOAD_CR3(GENERIC_CAST(uint64_t, rootptr));
-    debug(true, "New PML4: %llx\n", cr_read(CR3)); // Kernel pml{n}
-
-    init_gdt();
-    init_idt();
+    debug(true, "Old PML4: %llx\n", cr_read(CR3)); // Bootloader pagemap
+    wrcr3(GENERIC_CAST(uint64_t, kernel_pagemap));
+    debug(true, "New PML4: %llx\n", cr_read(CR3)); // Kernel pagemap
+    // vmm_should_panic(true);
 }
 
 static uint64_t *vmm_get_pml_or_alloc(uint64_t *entry, size_t level, int flags)
@@ -66,7 +75,7 @@ static uint64_t *vmm_get_pml_or_alloc(uint64_t *entry, size_t level, int flags)
 
     void *addr = NULL;
     assert((addr = pmm_alloc()) != NULL);
-    entry[level] = from_virt(GENERIC_CAST(uintptr_t, addr));
+    entry[level] = from_higher_half(GENERIC_CAST(uintptr_t, addr), DATA);
     entry[level] |= flags;
 
 no_alloc:
@@ -81,39 +90,44 @@ static uint64_t *vmm_get_pml(uint64_t *entry, size_t level)
 void vmm_map(size_t vaddr, size_t paddr, int flags)
 {
     acquire_lock(&vmm_lock);
-    page_info_t info = vmm_dissect_vaddr(vaddr);
+    uint64_t lv4 = index_of(vaddr, 4);
+    uint64_t lv3 = index_of(vaddr, 3);
+    uint64_t lv2 = index_of(vaddr, 2);
+    uint64_t lv1 = index_of(vaddr, 1);
+
     if (la57_enabled)
     {
+        uint64_t lv5 = index_of(vaddr, 5);
         uint64_t *pml4, *pml3, *pml2, *pml1 = NULL;
-        pml4 = vmm_get_pml_or_alloc(rootptr, info.lv5, flags);
-        pml3 = vmm_get_pml_or_alloc(pml4, info.lv4, flags);
-        pml2 = vmm_get_pml_or_alloc(pml3, info.lv3, flags);
-        pml1 = vmm_get_pml_or_alloc(pml2, info.lv2, flags);
+        pml4 = vmm_get_pml_or_alloc(kernel_pagemap, lv5, flags);
+        pml3 = vmm_get_pml_or_alloc(pml4, lv4, flags);
+        pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
+        pml1 = vmm_get_pml_or_alloc(pml2, lv2, flags);
 
-        if(pml1[info.lv1] != 0)
+        if(pml1[lv1] != 0 && panic_on_remap)
         {
             panic("Attempted to map a mapped page! [ virt: 0x%lX | phys: 0x%lX | pml1[%d]: 0x%lX ]",
-                vaddr, paddr, info.lv1, pml1[info.lv1]
+                vaddr, paddr, lv1, pml1[lv1]
             );
         }
 
-        pml1[info.lv1] = (paddr | flags);
+        pml1[lv1] = (paddr | flags);
     }
     else
     {
         uint64_t *pml3, *pml2, *pml1 = NULL;
-        pml3 = vmm_get_pml_or_alloc(rootptr, info.lv4, flags);
-        pml2 = vmm_get_pml_or_alloc(pml3, info.lv3, flags);
-        pml1 = vmm_get_pml_or_alloc(pml2, info.lv2, flags);
+        pml3 = vmm_get_pml_or_alloc(kernel_pagemap, lv4, flags);
+        pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
+        pml1 = vmm_get_pml_or_alloc(pml2, lv2, flags);
         
-        if (pml1[info.lv1] != 0)
+        if (pml1[lv1] != 0 && panic_on_remap)
         {
             panic("Attempted to map a mapped page! [ virt: 0x%lX | phys: 0x%lX | pml1[%d]: 0x%lX ]",
-                vaddr, paddr, info.lv1, pml1[info.lv1]
+                vaddr, paddr, lv1, pml1[lv1]
             );
         }
 
-        pml1[info.lv1] = (paddr | flags);
+        pml1[lv1] = (paddr | flags);
     }
     release_lock(&vmm_lock);
 }
@@ -121,33 +135,40 @@ void vmm_map(size_t vaddr, size_t paddr, int flags)
 void vmm_unmap(size_t vaddr)
 {
     acquire_lock(&vmm_lock);
-    page_info_t info = vmm_dissect_vaddr(vaddr);
+    uint64_t lv4 = index_of(vaddr, 4);
+    uint64_t lv3 = index_of(vaddr, 3);
+    uint64_t lv2 = index_of(vaddr, 2);
+    uint64_t lv1 = index_of(vaddr, 1);
 
     if (la57_enabled)
     {
+        uint64_t lv5 = index_of(vaddr, 5);
         uint64_t *pml4, *pml3, *pml2, *pml1 = NULL;
-        pml4 = vmm_get_pml(rootptr, info.lv5);
-        pml3 = vmm_get_pml(pml4, info.lv4);
-        pml2 = vmm_get_pml(pml3, info.lv3);
-        pml1 = vmm_get_pml(pml2, info.lv2);
-        pml1[info.lv1] = 0;
+        pml4 = vmm_get_pml(kernel_pagemap, lv5);
+        pml3 = vmm_get_pml(pml4, lv4);
+        pml2 = vmm_get_pml(pml3, lv3);
+        pml1 = vmm_get_pml(pml2, lv2);
+        pml1[lv1] = 0;
     }
     else
     {
         uint64_t *pml3, *pml2, *pml1 = NULL;
-        pml3 = vmm_get_pml(rootptr, info.lv4);
-        pml2 = vmm_get_pml(pml3, info.lv3);
-        pml1 = vmm_get_pml(pml2, info.lv2);
-        pml1[info.lv1] = 0;
+        pml3 = vmm_get_pml(kernel_pagemap, lv4);
+        pml2 = vmm_get_pml(pml3, lv3);
+        pml1 = vmm_get_pml(pml2, lv2);
+        pml1[lv1] = 0;
     }
-    TLB_FLUSH(vaddr);
+    invlpg(vaddr);
     acquire_lock(&vmm_lock);
 }
 
 void vmm_remap(size_t vaddr_old, size_t vaddr_new, int flags)
 {
     acquire_lock(&vmm_lock);
-    page_info_t info = vmm_dissect_vaddr(vaddr_old);
+    uint64_t lv4 = index_of(vaddr_old, 4);
+    uint64_t lv3 = index_of(vaddr_old, 3);
+    uint64_t lv2 = index_of(vaddr_old, 2);
+    uint64_t lv1 = index_of(vaddr_old, 1);
     size_t paddr = 0;
 
     /* Save the physical address `vaddr_old` was mapped to, purge that entry in the TLB
@@ -155,29 +176,62 @@ void vmm_remap(size_t vaddr_old, size_t vaddr_new, int flags)
     */
     if (la57_enabled)
     {
+        uint64_t lv5 = index_of(vaddr_old, 5);
         uint64_t *pml4, *pml3, *pml2, *pml1 = NULL;
-        pml4 = vmm_get_pml_or_alloc(rootptr, info.lv5, flags);
-        pml3 = vmm_get_pml_or_alloc(pml4, info.lv4, flags);
-        pml2 = vmm_get_pml_or_alloc(pml3, info.lv3, flags);
-        pml1 = vmm_get_pml_or_alloc(pml2, info.lv2, flags);
-        paddr = pml1[info.lv1] & ~(511);
-        pml1[info.lv1] = 0;
-        TLB_FLUSH(vaddr_old);
+        pml4 = vmm_get_pml_or_alloc(kernel_pagemap, lv5, flags);
+        pml3 = vmm_get_pml_or_alloc(pml4, lv4, flags);
+        pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
+        pml1 = vmm_get_pml_or_alloc(pml2, lv2, flags);
+        paddr = pml1[lv1] & ~(511);
+        pml1[lv1] = 0;
+        invlpg(vaddr_old);
     }
 
     else
     {
         uint64_t *pml3, *pml2, *pml1 = NULL;
-        pml3 = vmm_get_pml_or_alloc(rootptr, info.lv4, flags);
-        pml2 = vmm_get_pml_or_alloc(pml3, info.lv3, flags);
-        pml1 = vmm_get_pml_or_alloc(pml2, info.lv2, flags);
-        paddr = pml1[info.lv1] & ~(511);
-        pml1[info.lv1] = 0;
-        TLB_FLUSH(vaddr_old);
+        pml3 = vmm_get_pml_or_alloc(kernel_pagemap, lv4, flags);
+        pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
+        pml1 = vmm_get_pml_or_alloc(pml2, lv2, flags);
+        paddr = pml1[lv1] & ~(511);
+        pml1[lv1] = 0;
+        invlpg(vaddr_old);
+    }
+
+    lv4 = index_of(vaddr_new, 4);
+    lv3 = index_of(vaddr_new, 3);
+    lv2 = index_of(vaddr_new, 2);
+    lv1 = index_of(vaddr_new, 1);
+    if (la57_enabled)
+    {
+        uint64_t lv5 = index_of(vaddr_new, 5);
+        uint64_t *pml4, *pml3, *pml2, *pml1 = NULL;
+        pml4 = vmm_get_pml_or_alloc(kernel_pagemap, lv5, flags);
+        pml3 = vmm_get_pml_or_alloc(pml4, lv4, flags);
+        pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
+        pml1 = vmm_get_pml_or_alloc(pml2, lv2, flags);
+        pml1[lv1] = (paddr | flags);
+        invlpg(vaddr_new);
+    }
+    else
+    {
+        uint64_t *pml3, *pml2, *pml1 = NULL;
+        pml3 = vmm_get_pml_or_alloc(kernel_pagemap, lv4, flags);
+        pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
+        pml1 = vmm_get_pml_or_alloc(pml2, lv2, flags);
+        pml1[lv1] = (paddr | flags);
+        invlpg(vaddr_new);
     }
 
     release_lock(&vmm_lock);
-    vmm_map(vaddr_new, paddr, flags);
+}
+
+void vmm_map_range(range_t range, size_t offset, int flags)
+{
+    for (; range.base < range.limit; range.base += PAGE_SIZE)
+    {
+        vmm_map(range.base + offset, range.base, flags);
+    }
 }
 
 //Pagefault handler
@@ -185,7 +239,7 @@ void vmm_guess_and_map(uint64_t cr2, int error_code)
 {
     /* Non present page */
     if (error_code & 1)
-        vmm_map(cr2, cr2, (error_code & 2) ? (FLAGS_PR | FLAGS_RW) : FLAGS_PR);
+        vmm_map(cr2, cr2, (error_code & 2) ?  PG_RW : PG_PR);
 
     /* CPL = 3 */
     else if (error_code & 4)
@@ -196,29 +250,15 @@ void vmm_guess_and_map(uint64_t cr2, int error_code)
         ;
 
     else
-        vmm_map(cr2, cr2, FLAGS_PR | FLAGS_RW);
+        vmm_map(cr2, cr2, PG_RW);
 }
 
-page_info_t vmm_dissect_vaddr(uint64_t virt_addr)
+uint64_t *vmm_get_kernel_pagemap(void)
 {
-    page_info_t pg_info;
-    const int bitmask = 0x1FF;
+    return kernel_pagemap;
+}
 
-    virt_addr >>= 12;
-
-    pg_info.lv1 = virt_addr & bitmask;
-    virt_addr >>= 9;
-
-    pg_info.lv2 = virt_addr & bitmask;
-    virt_addr >>= 9;
-
-    pg_info.lv3 = virt_addr & bitmask;
-    virt_addr >>= 9;
-
-    pg_info.lv4 = virt_addr & bitmask;
-    virt_addr >>= 9;
-
-    pg_info.lv5 = virt_addr & bitmask;
-
-    return pg_info;
+uint64_t *vmm_create_new_pagemap(void)
+{
+    return (uint64_t*)from_higher_half((uintptr_t)pmm_alloc(), DATA);
 }

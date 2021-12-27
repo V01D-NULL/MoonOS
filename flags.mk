@@ -7,7 +7,7 @@ AS = @nasm
 
 EMU = qemu-system-x86_64
 EMU_OPTS = \
-        -M q35 -cpu qemu64 -m 256M \
+        -M q35 -cpu qemu64 -m 1G \
         -serial stdio -no-reboot -smp 4 \
         -no-shutdown -cdrom $(ISO_NAME)
 
@@ -23,8 +23,6 @@ OBJ		 := $(OBJ_C) $(OBJ_ASM)
 
 ISO_NAME	  = MoonOS.iso 
 
-FONT 	 := font/console.sfn
-
 # Kernel compiler / linker flags
 CFLAGS := 				 \
 	-I ../libs/			 \
@@ -37,20 +35,20 @@ CFLAGS := 				 \
 	-mno-80387           \
 	-mno-mmx             \
 	-mno-3dnow           \
-	-mcmodel=kernel      \
-	-fno-pie			 \
-	-fno-pic			 \
-	-no-pie				 \
+	-fpie				 \
 	-lgcc				 \
 	-mno-sse			 \
 	-mno-sse2			 \
 	-Wall				 \
 	-fno-omit-frame-pointer \
-	-fsanitize=undefined \
 	-mno-red-zone
 
 ASMFLAGS = -felf64 -g -F dwarf
 LDINTERNALFLAGS :=  \
 	-Tlinker.ld     \
 	-static         \
+	-pie			\
+	--no-dynamic-linker \
+	-ztext			\
+	-zmax-page-size=0x1000 \
 	-nostdlib      

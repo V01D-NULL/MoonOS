@@ -9,7 +9,10 @@ include ./flags.mk
 
 .PHONY: clean all run
 
-all: symlist quick_recompile $(KERNEL_HDD) ISO
+all: daemons symlist quick_recompile $(KERNEL_HDD) ISO
+
+daemons:
+	@$(MAKE) --no-print-directory -C daemon/init
 
 run: quick_recompile ISO
 ifeq ($(modern), yes)
@@ -52,6 +55,7 @@ clean:
 	@rm -f $(KERNEL_HDD)
 	@$(MAKE) --no-print-directory -C kernel clean
 	@$(MAKE) --no-print-directory -C libs   clean
+	@$(MAKE) --no-print-directory -C daemon/init   clean
 
 debugger_session: $(KERNEL_HDD)
 	$(DEBUG_TERMINAL) $(DEBUG_TERMINAL_OPTS) ./debug-util/debug.sh &
@@ -59,7 +63,7 @@ debugger_session: $(KERNEL_HDD)
 
 ISO: $(KERNEL_HDD)
 	mkdir iso/ || echo ""
-	@cp limine/BOOTIA32.EFI limine/BOOTX64.EFI limine/limine.sys limine/limine-cd.bin \
+	@cp -r limine/BOOTIA32.EFI limine/BOOTX64.EFI limine/limine.sys limine/limine-cd.bin \
 	limine/limine-eltorito-efi.bin limine/limine-pxe.bin boot/* $(KERNEL_ELF) iso/
 
 	xorriso -as mkisofs -b limine-cd.bin \
@@ -72,7 +76,9 @@ ISO: $(KERNEL_HDD)
 # Remove the HDD & elf file while saving all object files (fewer files will be recompiled)
 quick_recompile: symlist
 	@rm -f $(KERNEL_HDD) kernel/kernel.elf
-	@printf "\n";
+	@printf "\n"
+	@$(MAKE) --no-print-directory -C daemon/init
+	@printf "\n"
 	@$(MAKE) --no-print-directory -C libs
 	@printf "\n"
 	@$(MAKE) --no-print-directory -C kernel

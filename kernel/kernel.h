@@ -8,6 +8,6 @@
  * 
  * @param[in] bootvars Essential information passed to kmain() from the bootloader
  */
-void kmain(boot_info_t *bootvars);
+void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods);
 
 #endif // KERNEL_H
