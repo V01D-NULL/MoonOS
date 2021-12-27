@@ -88,5 +88,5 @@ Best of luck ~ V01D (Tim).
 # Finishing touch (resources I use)
 * https://www.cs.cmu.edu/~ralf/files.html
 * https://ethv.net/workshops/osdev/notes/notes-3.html
-* https://osdev.wiki  (barebones but up-to-date osdev wiki) (EDIT: This website has been taken down for reasons unknown to me)
+* https://osdev.wiki  (barebones but up-to-date osdev wiki)
 * https://wiki.osdev.org
