@@ -32,7 +32,6 @@ Kernel panic:
 - ACPI
 - FADT
 - MADT
-- XSDT
 - SMBIOS
 - Kernel heap
 - Userland support
