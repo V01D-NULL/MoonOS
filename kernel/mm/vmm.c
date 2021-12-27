@@ -65,7 +65,7 @@ void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap)
     debug(true, "Old PML4: %llx\n", cr_read(CR3)); // Bootloader pagemap
     wrcr3(GENERIC_CAST(uint64_t, kernel_pagemap));
     debug(true, "New PML4: %llx\n", cr_read(CR3)); // Kernel pagemap
-    vmm_should_panic(true);
+    // vmm_should_panic(true);
 }
 
 static uint64_t *vmm_get_pml_or_alloc(uint64_t *entry, size_t level, int flags)

@@ -60,6 +60,10 @@
 #include "panic.h"
 #include "printk.h"
 
+void test(void) {
+    panic("Test");
+}
+
 void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 {
     if (!cpu_has_msr()) {
@@ -69,20 +73,15 @@ void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
     printk("main", "Detected %d modules\n", mods->module_count);
     printk("main", "Module string: %s\n", mods->modules[0].string);
 
+    printk("elf", "%p\n", mods->modules[0].begin);
+    panic("bla");
     load_elf((const uint8_t*)mods->modules[0].begin, true);
     
-    uint64_t rsp = 0;
-    __asm__ ("mov %%rsp, %0" : "=r"(rsp));
-    strace_save_rsp(rsp);
-    panic("Test");
     // lapic_init(acpi_init(&bootvars->rsdp).apic);
     // smp_init(&bootvars->cpu);
 
-
     for (;;)
     {
-        printk("hi", "Hello\n");
-        printk("ih", "olleh\n");
-        // __asm__("hlt");
+        __asm__("hlt");
     }
 }

@@ -33,7 +33,6 @@ void printk(char *status, char *fmt, ...)
         return;
     }
 
-    // puts("\e[94m");
     puts("\033[0;37m");
     puts(status);
     puts("\033[1;30m" ": ");

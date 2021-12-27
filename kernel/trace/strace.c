@@ -6,15 +6,8 @@
 
 struct stackframe {
     struct stackframe *frame;
-    uint64_t rip;
+    uint64_t rsp;
 };
-
-// The function about to call strace() or panic() should preserve
-// the stackpointer in order to correctly dump the stacks contents
-static uint64_t faulty_rsp = 0;
-void strace_save_rsp(uint64_t rsp) {
-    faulty_rsp = rsp;
-}
 
 struct stacktrace_result backtrace_stack(int frames)
 {
@@ -40,7 +33,6 @@ struct stacktrace_result backtrace_stack(int frames)
     result.count = i - 1;
     result.caller_rbp = result.trace_results[1].address; // Save caller rbp to dump stack contents later. Since panic() is
                                                          // included in the stack trace, we use at index 1 instead of 0.
-    result.caller_frame_size = faulty_rsp - result.caller_rbp;
     
     return result;
 }

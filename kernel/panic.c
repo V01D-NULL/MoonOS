@@ -13,7 +13,8 @@
 #include <libgraphics/double-buffering.h>
 #include "printk.h"
 
-gnu_no_return panic(const char *fmt, ...)
+
+gnu_no_return _panic(uint64_t rbp, uint64_t rsp, const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
@@ -32,12 +33,17 @@ gnu_no_return panic(const char *fmt, ...)
 		backtrace_symbol(res.trace_results[i].address);
 	}
 
-	printk("stackdump", "\033[0;37mDumping %s's stackframe\nStackframe size: 0x%x\n", sym_lookup(res.trace_results[1].address).name, res.caller_frame_size);
+	size_t frame_size = rbp-rsp;
+	printk("stackdump", "\033[0;37mDumping %s's stackframe\nStackframe size: 0x%x\n", sym_lookup(res.trace_results[1].address).name, frame_size);
 	fmt_puts("\033[0;37m<addr>\t\t  <stack>\t   <stack+8>\n");
-	uint64_t rbp = res.caller_rbp;
-	for (uint64_t i = 0; i < 10; i++)
+	
+	// Dump stackframe of the function that called panic()
+	for (uint64_t i = 0; i < frame_size; i++)
 	{
-		fmt_puts("%lx: %p %p\n", rbp, *(long*)(rbp), *(long*)(rbp + sizeof(long)));
+		fmt_puts("%lx: %p %p\n",
+			rbp, *(long*)(rbp),
+			*(long*)(rbp + sizeof(long))
+		);
 		rbp += 16;
 	}
 
