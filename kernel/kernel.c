@@ -60,10 +60,6 @@
 #include "panic.h"
 #include "printk.h"
 
-void test(void) {
-    panic("Test");
-}
-
 void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 {
     if (!cpu_has_msr()) {
@@ -74,7 +70,6 @@ void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
     printk("main", "Module string: %s\n", mods->modules[0].string);
 
     printk("elf", "%p\n", mods->modules[0].begin);
-    panic("bla");
     load_elf((const uint8_t*)mods->modules[0].begin, true);
     
     // lapic_init(acpi_init(&bootvars->rsdp).apic);
