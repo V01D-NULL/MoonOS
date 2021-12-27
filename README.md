@@ -13,6 +13,9 @@ Bootsplash:
 Verbose boot:
 <img src="screenshot/verbose_boot.png">
 <br>
+Kernel panic:
+<img src="screenshot/kpanic.png">
+<br>
 
 # Features
 - Limine bootloader
