@@ -1,8 +1,8 @@
 #include "pat.h"
 #include <ctypes.h>
 #include <amd64/msr.h>
-#include <liballoc/bitmap.h>
 
+static uint64_t pat_value = 0;
 
 void configure_pat(void)
 {
@@ -20,7 +20,6 @@ void configure_pat(void)
 
 void set_pat(uint64_t pat)
 {
-    if (!cpu_supports_pat) return;
     pat_value = pat;
 }
 

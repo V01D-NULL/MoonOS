@@ -70,9 +70,7 @@ void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 
     printk("main", "Detected %d modules\n", mods->module_count);
     printk("main", "Module string: %s\n", mods->modules[0].string);
-    // TODO:
-    // 2. Figure out how to check index of PAT in PTE/PDE in paging.h
-    // 1. Check if PAT is supported via CPUID
+    
     auto entry = (void (*)()) load_elf((const uint8_t*)mods->modules[0].begin, true);
     entry();
     
