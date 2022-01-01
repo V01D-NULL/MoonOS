@@ -10,6 +10,8 @@
 #include <printk.h>
 #include <panic.h>
 #include <sys/smp/spinlock.h>
+#include <amd64/paging/memory/pat.h>
+#include <amd64/paging/paging.h>
 
 create_lock("vmm", vmm_lock);
 
@@ -29,6 +31,7 @@ void vmm_should_panic(bool b)
 
 void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap)
 {
+    configure_pat();
     la57_enabled = has_5_level_paging;
 
     kernel_pagemap = (uint64_t *)(from_higher_half((uintptr_t)pmm_alloc(), DATA));
@@ -44,12 +47,15 @@ void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap)
         size_t top = base + mmap->memmap[i].length;
         size_t type = mmap->memmap[i].type;
         
-        if (
-            type == STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE ||
-            type == STIVALE2_MMAP_FRAMEBUFFER
-        )
+        if (type == STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE)
         {
             vmm_map_range((range_t) {.base = base, .limit = top}, 0, PG_PR);
+        }
+        else if (type == STIVALE2_MMAP_FRAMEBUFFER)
+        {
+            set_pat(PA1_WC); // Map FB as WC
+            vmm_map_range((range_t) {.base = base, .limit = top}, 0, PG_PR);
+            set_pat(PA0_UC); // UC for other memory mappings
         }
     }
 
@@ -94,6 +100,7 @@ void vmm_map(size_t vaddr, size_t paddr, int flags)
     uint64_t lv3 = index_of(vaddr, 3);
     uint64_t lv2 = index_of(vaddr, 2);
     uint64_t lv1 = index_of(vaddr, 1);
+    int pat_attr = get_pat();
 
     if (la57_enabled)
     {
@@ -101,7 +108,13 @@ void vmm_map(size_t vaddr, size_t paddr, int flags)
         uint64_t *pml4, *pml3, *pml2, *pml1 = NULL;
         pml4 = vmm_get_pml_or_alloc(kernel_pagemap, lv5, flags);
         pml3 = vmm_get_pml_or_alloc(pml4, lv4, flags);
+
         pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
+        paging_cache_disable_set(pml2, lv2, pat_attr & PG_PCD);
+        paging_write_through_set(pml2, lv2, pat_attr & PG_PWT);
+        if (flags & (1 << 7)) // PS
+            paging_pat_set(pml2, lv2, pat_attr & PG_PAT);
+
         pml1 = vmm_get_pml_or_alloc(pml2, lv2, flags);
 
         if(pml1[lv1] != 0 && panic_on_remap)
@@ -112,12 +125,21 @@ void vmm_map(size_t vaddr, size_t paddr, int flags)
         }
 
         pml1[lv1] = (paddr | flags);
+        paging_cache_disable_set(pml1, lv1, pat_attr & PG_PCD);
+        paging_write_through_set(pml1, lv1, pat_attr & PG_PWT);
+        paging_pat_set(pml1, lv1, pat_attr & PG_PAT);
     }
     else
     {
         uint64_t *pml3, *pml2, *pml1 = NULL;
         pml3 = vmm_get_pml_or_alloc(kernel_pagemap, lv4, flags);
+        
         pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
+        paging_cache_disable_set(pml2, lv2, pat_attr & PG_PCD);
+        paging_write_through_set(pml2, lv2, pat_attr & PG_PWT);
+        if (flags & (1 << 7)) // PS
+            paging_pat_set(pml2, lv2, pat_attr & PG_PAT);
+
         pml1 = vmm_get_pml_or_alloc(pml2, lv2, flags);
         
         if (pml1[lv1] != 0 && panic_on_remap)
@@ -128,7 +150,12 @@ void vmm_map(size_t vaddr, size_t paddr, int flags)
         }
 
         pml1[lv1] = (paddr | flags);
+        paging_cache_disable_set(pml1, lv1, pat_attr & PG_PCD);
+        paging_write_through_set(pml1, lv1, pat_attr & PG_PWT);
+        paging_pat_set(pml1, lv1, pat_attr & PG_PAT);
     }
+    
+    invlpg(vaddr);
     release_lock(&vmm_lock);
 }
 
@@ -198,6 +225,7 @@ void vmm_remap(size_t vaddr_old, size_t vaddr_new, int flags)
         invlpg(vaddr_old);
     }
 
+    int pat_attr = get_pat();
     lv4 = index_of(vaddr_new, 4);
     lv3 = index_of(vaddr_new, 3);
     lv2 = index_of(vaddr_new, 2);
@@ -208,21 +236,38 @@ void vmm_remap(size_t vaddr_old, size_t vaddr_new, int flags)
         uint64_t *pml4, *pml3, *pml2, *pml1 = NULL;
         pml4 = vmm_get_pml_or_alloc(kernel_pagemap, lv5, flags);
         pml3 = vmm_get_pml_or_alloc(pml4, lv4, flags);
+        
         pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
+        paging_cache_disable_set(pml2, lv2, pat_attr & PG_PCD);
+        paging_write_through_set(pml2, lv2, pat_attr & PG_PWT);
+        if (flags & (1 << 7)) // PS
+            paging_pat_set(pml2, lv2, pat_attr & PG_PAT);
+        
         pml1 = vmm_get_pml_or_alloc(pml2, lv2, flags);
         pml1[lv1] = (paddr | flags);
-        invlpg(vaddr_new);
+        paging_cache_disable_set(pml1, lv1, pat_attr & PG_PCD);
+        paging_write_through_set(pml1, lv1, pat_attr & PG_PWT);
+        paging_pat_set(pml1, lv1, pat_attr & PG_PAT);
     }
     else
     {
         uint64_t *pml3, *pml2, *pml1 = NULL;
         pml3 = vmm_get_pml_or_alloc(kernel_pagemap, lv4, flags);
+        
         pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
+        paging_cache_disable_set(pml2, lv2, pat_attr & PG_PCD);
+        paging_write_through_set(pml2, lv2, pat_attr & PG_PWT);
+        if (flags & (1 << 7)) // PS
+            paging_pat_set(pml2, lv2, pat_attr & PG_PAT);
+
         pml1 = vmm_get_pml_or_alloc(pml2, lv2, flags);
         pml1[lv1] = (paddr | flags);
-        invlpg(vaddr_new);
+        paging_cache_disable_set(pml1, lv1, pat_attr & PG_PCD);
+        paging_write_through_set(pml1, lv1, pat_attr & PG_PWT);
+        paging_pat_set(pml1, lv1, pat_attr & PG_PAT);
     }
 
+    invlpg(vaddr_new);
     release_lock(&vmm_lock);
 }
 
