@@ -11,12 +11,14 @@
         "kstring.h": "c",
         "apic.h": "c",
         "userspace.h": "c",
-        "cstdio": "c"
+        "cstdio": "c",
+        "memdefs.h": "c",
+        "keyboard.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,
         "**/*.sym": true
     },
     "cSpell.enabled": false,
-    "C_Cpp.errorSquiggles": "Disabled"
+    "C_Cpp.errorSquiggles": "Enabled"
 }

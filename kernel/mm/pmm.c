@@ -8,7 +8,7 @@
 #include <liballoc/bitmap.h>
 #include <devices/serial/serial.h>
 #include "memdefs.h"
-#include <sys/smp/spinlock.h>
+#include <proc/smp/spinlock.h>
 
 create_lock("pmm", pmm_lock);
 
@@ -196,8 +196,6 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
         size_t page = PAGE_2_BIT(mmap[i].base);
         pfa_free_multiple(page, len);
     }
-
-    debug(true, "top: %lX\n", top);
 }
 
 /**

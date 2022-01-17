@@ -26,6 +26,8 @@
 #include <libgraphics/bootsplash.h>
 #include <drivers/keyboard/keyboard.h>
 #include <hal/pic/pic.h>
+#include <devices/term/fallback/fterm.h>
+#include <devices/fb/early_fb.h>
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id);
 
@@ -34,28 +36,21 @@ static gnu_section_align16 uint8_t stack[8192];
 struct stivale2_struct_tag_cmdline cmdline_tag = {
     .tag = {
         .identifier = STIVALE2_STRUCT_TAG_CMDLINE_ID,
-        .next = 0
-    }
-};
+        .next = 0}};
 
 struct stivale2_struct_tag_rsdp rsdp_tag = {
     .tag = {
         .identifier = STIVALE2_STRUCT_TAG_RSDP_ID,
-        .next = (uintptr_t)&cmdline_tag
-    }
-};
+        .next = (uintptr_t)&cmdline_tag}};
 
 struct stivale2_tag level5_paging_tag = {
     .identifier = STIVALE2_HEADER_TAG_5LV_PAGING_ID,
-    .next = (uintptr_t)&rsdp_tag
-};
+    .next = (uintptr_t)&rsdp_tag};
 
 struct stivale2_header_tag_smp smp_hdr_tag = {
     .tag = {
         .identifier = STIVALE2_HEADER_TAG_SMP_ID,
-        .next = (uintptr_t)&level5_paging_tag
-    }
-};
+        .next = (uintptr_t)&level5_paging_tag}};
 
 struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
     // All tags need to begin with an identifier and a pointer to the next tag.
@@ -64,23 +59,20 @@ struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
         .next = (uintptr_t)&smp_hdr_tag},
     .framebuffer_width = 0,
     .framebuffer_height = 0,
-    .framebuffer_bpp = 32
-};
+    .framebuffer_bpp = 32};
 
 static struct stivale2_header_tag_terminal terminal_hdr_tag = {
     .tag = {
         .identifier = STIVALE2_HEADER_TAG_TERMINAL_ID,
         .next = (uintptr_t)&framebuffer_hdr_tag},
-    .flags = 0
-};
+    .flags = 0};
 
 SECTION(".stivale2hdr")
 struct stivale2_header stivale_hdr = {
     .entry_point = 0,
     .stack = (uintptr_t)stack + sizeof(stack),
-    .flags = (1 << 1) | (1 << 2) | (1 << 4),
-    .tags = (uintptr_t)&terminal_hdr_tag
-};
+    .flags = (1 << 2) | (1 << 4),
+    .tags = (uintptr_t)&terminal_hdr_tag};
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id)
 {
@@ -132,6 +124,8 @@ void banner(bool serial_only)
     delay(200);
 }
 
+#include <libk/cmdline.h>
+#include <libgraphics/bootsplash_img.h>
 /**
  * @brief Kernel entry point
  * 
@@ -150,6 +144,15 @@ void kinit(struct stivale2_struct *bootloader_info)
     struct stivale2_struct_tag_firmware *fw = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FIRMWARE_ID);
     bootvars.is_uefi = !(fw->flags & STIVALE2_FIRMWARE_BIOS);
 
+    if (!term)
+    {
+        set_fterm_available(false);
+    }
+    else
+    {
+        fterm_init(term->term_write, term->cols, term->rows);
+    }
+
     if (fb != NULL)
     {
         bootvars.vesa.fb_addr = fb->framebuffer_addr;
@@ -160,40 +163,52 @@ void kinit(struct stivale2_struct *bootloader_info)
     }
     else
     {
-        for (;;);
+        for (;;)
+            ;
     }
-    
+
     if (mmap != NULL)
     {
+        fterm_write("boot: Reached target gdt and tss\n");
         init_gdt((uint64_t)stack + sizeof(stack));
 
         // Core#0 will remap the pic once.
         // After acpi_init the pic is disabled in favor of the apic
+        fterm_write("boot: Reached target pic and idt\n");
         pic_remap();
         init_idt();
 
+        fterm_write("boot: Reached target pmm\n");
         pmm_init(mmap->memmap, mmap->entries);
+
+        fterm_write("boot: Reached target vmm\n");
         vmm_init(check_la57(), mmap);
 
-        // Need heap...
-        // double_buffering_init(&bootvars);
-
         /* Is verbose boot specified in the command line? */
-        if (cmdline != NULL) {
-            /* Panic */
-            if (term == NULL)
-                for(;;);
-
-            if (strcmp((char*)cmdline->cmdline + 13, "NO") == 0)
-            {   
-                printk_init(false, term);
+        if (cmdline != NULL)
+        {
+            bool vm_tag_present = boot_cmdline_find_tag("vm", (const char *)cmdline->cmdline);
+            
+            if (!boot_cmdline_find_tag("verbose_boot", (const char *)cmdline->cmdline))
+            {
+                fterm_write("boot: Quiet boot flag set\n");
+                fterm_flush();
+                early_fb_init(bootvars);
+                fb_draw_image((bootvars.vesa.fb_width / 2) - (IMG_WIDTH / 2), (bootvars.vesa.fb_height / 2) - (IMG_HEIGHT / 2), IMG_WIDTH, IMG_HEIGHT, IMG_DATA, IMAGE_RGB);
+                printk_init(false, bootvars, vm_tag_present);
             }
             else
             {
-                printk_init(true, term);
+                fterm_write("boot: Verbose boot flag set\n");
+                fterm_flush();
+                printk_init(true, bootvars, vm_tag_present);
             }
         }
-        else { for(;;); }
+        else
+        {
+            for (;;)
+                ;
+        }
 
         banner(false);
         printk("pmm", "Initialized pmm\n");
@@ -201,12 +216,10 @@ void kinit(struct stivale2_struct *bootloader_info)
         /* vmm */
         if (check_la57())
         {
-            debug(true, "Using 5 level paging\n");
             printk("vmm", "pml5 resides at 0x%llx\n", cr_read(CR3));
         }
         else
         {
-            debug(true, "Using 4 level paging\n");
             printk("vmm", "pml4 resides at 0x%llx\n", cr_read(CR3));
         }
         printk("vmm", "Initialized vmm\n");
@@ -214,14 +227,7 @@ void kinit(struct stivale2_struct *bootloader_info)
     else
     {
         debug(false, "\n!Did not get a memory map from the bootloader!\n");
-        struct stivale2_struct_tag_terminal *term_str_tag;
-        term_str_tag = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_TERMINAL_ID);
-        if (term_str_tag != NULL)
-        {
-            void *term_write_ptr = (void *)term_str_tag->term_write;
-            void (*term_write)(const char *string, size_t length) = term_write_ptr;
-            term_write("Fatal: Cannot obtain a memory map from the bootloader", 53);
-        }
+        fterm_write("Fatal: Cannot obtain a memory map from the bootloader");
         for (;;)
             ;
     }

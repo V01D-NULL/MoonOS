@@ -44,36 +44,28 @@
 #include <mm/vmm.h>
 #include <mm/memdefs.h>
 #include <mm/heap/heap.h>
-#include <mm/linear/linear_alloc.h>
 
 #include <trace/strace.h>
 #include <hal/acpi/tables/rsdp.h>
 #include <hal/acpi/acpi.h>
 #include <hal/apic/apic.h>
 
-#include <sys/smp/smp.h>
-#include <sys/smp/spinlock.h>
-
-#include <uspace/userspace.h>
-#include <elf/elf.h>
-
-#include <amd64/paging/memory/pat.h>
+#include <proc/uspace/userspace.h>
+#include <proc/elf/elf.h>
 
 #include "panic.h"
 #include "printk.h"
 
 void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 {
-    if (!cpu_has_msr() && bootvars->is_uefi) {
-        panic("MSR's aren't supported on this cpu");
-    }
-
     printk("main", "Detected %d modules\n", mods->module_count);
     printk("main", "Module string: %s\n", mods->modules[0].string);
-    
-    auto entry = (void (*)()) load_elf((const uint8_t*)mods->modules[0].begin, true);
-    entry();
-    
+
+    task_t entry = load_elf((const uint8_t *)mods->modules[0].begin, true);
+    vmm_switch_pagemap(entry);
+    jump_to_user_address((void *)entry.entrypoint);
+    // ((void (*)()) entry.entrypoint)();
+
     // lapic_init(acpi_init(&bootvars->rsdp).apic);
     // smp_init(&bootvars->cpu);
 

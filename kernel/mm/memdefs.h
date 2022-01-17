@@ -7,6 +7,7 @@
 #include <mm/cpu/CR.h>
 #include <libk/kassert.h>
 
+static const uintptr_t VMEM_DIRECT_MAPPING = 0x0; // Identity mapping
 static const uintptr_t VMEM_LV5_BASE = 0xff00000000000000UL;
 static const uintptr_t VMEM_LV4_BASE = 0xffff800000000000UL;
 static const uintptr_t VMEM_CODE_BASE = 0xffffffff80000000;

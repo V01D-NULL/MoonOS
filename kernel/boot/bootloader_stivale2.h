@@ -57,7 +57,7 @@ typedef struct
     boot_vesa_t vesa;
     boot_rsdp_t rsdp;
     bool is_uefi;
-} boot_info_t gnu_section_align4k;
+} boot_info_t;
 
 
 #endif // BOOTLOADER_STIVALE2_INIT_H

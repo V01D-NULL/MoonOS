@@ -4,7 +4,7 @@
 #include "cpu.h"
 #include "moon.h"
 #include "bytes.h"
-#include <ctypes.h>
+#include <ktypes.h>
 
 #define IA32_APIC_BASE  0x1B
 #define PAT_MSR         0x277

@@ -14,6 +14,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 /**
  * @brief Copy *n* bytes from src to dest
@@ -100,7 +101,6 @@ uint64_t strlen(const char *s);
  */
 char *strrev(char *src);
 
-//Look for the first newline and return it's index
-size_t parse_string_until_newline(char *str);
+bool isdigit(int c);
 
 #endif // LIB_KERNEL_STRING_H

@@ -7,15 +7,16 @@
 #include <stdbool.h>
 #include <util/range.h>
 
-#define PAGE_SIZE   4096
+#define PAGE_SIZE 4096
 #define PMM_INVALID NULL
-#define PMM_FREE    0
-#define PMM_USED    1
-#define PMM_FULL    (-1)
+#define PMM_FREE 0
+#define PMM_USED 1
+#define PMM_FULL (-1)
 #define ALIGN_UP(__number) (((__number) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 #define ALIGN_DOWN(__number) ((__number) & ~(PAGE_SIZE - 1))
 
-enum {
+enum
+{
     BIT_CLEAR = 0x1,
     BIT_SET
 };
@@ -43,7 +44,7 @@ typedef struct
     uint64_t base;
     uint64_t length;
 
-    uint64_t abs_top; // The highest address specified in the mmap
+    uint64_t abs_top;  // The highest address specified in the mmap
     uint64_t abs_base; // The lowest address specified in the mmap
 } mmap_t;
 

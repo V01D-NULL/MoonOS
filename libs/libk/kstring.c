@@ -201,15 +201,7 @@ char *strrev(char *src)
     return src;
 }
 
-size_t parse_string_until_newline(char *str)
+bool isdigit(int c)
 {
-    size_t counter = 0;
-    for (size_t i = 0;; i++)
-    {
-        if (str[i] == '\n')
-            break;
-        counter++;
-    }
-
-    return counter + 1;
+    return (c >= '0' && c <= '9');
 }

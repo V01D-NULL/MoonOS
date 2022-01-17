@@ -16,7 +16,7 @@ typedef struct gfx_header
     uint32_t last_known_bg;
 } gfx_header_t;
 
-void double_buffering_init(boot_info_t *);
+void double_buffering_init(boot_info_t);
 void swap_buffers(uint32_t *custom_buffer);
 void buffer_pixel(int x, int y, int color);
 void flush_back_buffer(uint32_t *custom_buffer);

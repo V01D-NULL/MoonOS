@@ -43,4 +43,11 @@ SECTIONS
         *(.bss*)
     }
     kernel_end = .;
+
+    /* Hack in a small heap area for an early framebuffer console */
+    . += CONSTANT(MAXPAGESIZE);
+    . = . - 0xffffffff80200000;
+    __embedded_kheap_start = .;
+    . += 1920 * 1080 * 20;
+    __embedded_kheap_end = .;
 }

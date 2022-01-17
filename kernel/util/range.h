@@ -8,6 +8,4 @@ typedef struct {
     size_t limit;
 } range_t;
 
-
-
 #endif // RANGE_H
