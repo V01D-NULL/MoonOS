@@ -18,7 +18,6 @@ Kernel panic:
 <br>
 
 # Features
-- Limine bootloader
 - Support for 4 and 5 level paging
 - Stacktrace/symbol backtrace
 - ubsan
