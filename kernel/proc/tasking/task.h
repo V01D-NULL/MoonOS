@@ -20,6 +20,7 @@ typedef struct task_struct
     uint64_t *pagemap;
     Elf64_Addr entrypoint;
     enum task_type task_type;
+    size_t ustack;
 } task_t;
 
 task_t new_task(const char *descriptor, Elf64_Addr entrypoint);

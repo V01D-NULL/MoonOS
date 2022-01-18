@@ -20,11 +20,6 @@ static uint64_t *kernel_pagemap;
 static uint64_t *active_pagemap;
 static bool la57_enabled = false;
 
-STATIC_INLINE vmm_range_t vmm_as_range(size_t base, size_t top, size_t offset)
-{
-    return (vmm_range_t){.range = (range_t){.base = base, .limit = top}, .address_offset = offset};
-}
-
 STATIC_INLINE uint64_t index_of(uint64_t vaddr, int offset)
 {
     return vaddr >> (12 + 9 * (offset - 1)) & 0x1FF;
@@ -79,7 +74,12 @@ void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap)
 static uint64_t *vmm_get_pml_or_alloc(uint64_t *entry, size_t level, int flags)
 {
     if (entry[level] & 1)
+    {
+        if ((flags ^ entry[level]) != 0) // Are these new flags?
+            entry[level] |= flags;
+
         goto no_alloc;
+    }
 
     void *addr = NULL;
     assert((addr = pmm_alloc()) != NULL);
@@ -118,13 +118,11 @@ void vmm_map(uint64_t *pagemap, size_t vaddr, size_t paddr, int flags)
         if (flags & (1 << 7)) // PS
             paging_pat_set(pml4, lv4, pat_attr & (1 << 12));
 
-
         pml3 = vmm_get_pml_or_alloc(pml4, lv4, flags);
         paging_cache_disable_set(pml3, lv3, pat_attr & (1 << PG_PCD));
         paging_write_through_set(pml3, lv3, pat_attr & (1 << PG_PWT));
         if (flags & (1 << 7)) // PS
             paging_pat_set(pml3, lv3, pat_attr & (1 << 12));
-
 
         pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
         paging_cache_disable_set(pml2, lv2, pat_attr & PG_PCD);
@@ -197,7 +195,7 @@ void vmm_unmap(uint64_t *pagemap, size_t vaddr)
         pml1[lv1] = 0;
     }
     invlpg(vaddr);
-    acquire_lock(&vmm_lock);
+    release_lock(&vmm_lock);
 }
 
 void vmm_remap(uint64_t *pagemap, size_t vaddr_old, size_t vaddr_new, int flags)
@@ -254,13 +252,11 @@ void vmm_remap(uint64_t *pagemap, size_t vaddr_old, size_t vaddr_new, int flags)
         if (flags & (1 << 7)) // PS
             paging_pat_set(pml4, lv4, pat_attr & (1 << 12));
 
-
         pml3 = vmm_get_pml_or_alloc(pml4, lv4, flags);
         paging_cache_disable_set(pml3, lv3, pat_attr & (1 << PG_PCD));
         paging_write_through_set(pml3, lv3, pat_attr & (1 << PG_PWT));
         if (flags & (1 << 7)) // PS
             paging_pat_set(pml3, lv3, pat_attr & (1 << 12));
-
 
         pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
         paging_cache_disable_set(pml2, lv2, pat_attr & PG_PCD);
@@ -277,13 +273,12 @@ void vmm_remap(uint64_t *pagemap, size_t vaddr_old, size_t vaddr_new, int flags)
     else
     {
         uint64_t *pml3, *pml2, *pml1 = NULL;
-        
+
         pml3 = vmm_get_pml_or_alloc(kernel_pagemap, lv4, flags);
         paging_cache_disable_set(pml3, lv3, pat_attr & (1 << PG_PCD));
         paging_write_through_set(pml3, lv3, pat_attr & (1 << PG_PWT));
         if (flags & (1 << 7)) // PS
             paging_pat_set(pml3, lv3, pat_attr & (1 << 12));
-
 
         pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
         paging_cache_disable_set(pml2, lv2, pat_attr & PG_PCD);
@@ -343,7 +338,7 @@ uint64_t *vmm_create_new_pagemap(void)
 
 void vmm_copy_kernel_mappings(task_t task)
 {
-    memcpy64(task.pagemap, kernel_pagemap, 512);
+    memcpy64(task.pagemap, (const uint64_t*)kernel_pagemap, 512 * 8);
 }
 
 void vmm_switch_pagemap(task_t task)
@@ -352,7 +347,7 @@ void vmm_switch_pagemap(task_t task)
         task.pagemap == NULL && task.task_type == TASK_DAEMON,
         "The kernel daemon task '%s' attempted to switch to a NULL pagemap!", task.descriptor);
 
-    active_pagemap = task.pagemap;
+    memcpy((uint8_t *)active_pagemap, (const uint8_t *)task.pagemap, sizeof(task.pagemap));
     wrcr3(task.pagemap);
 }
 

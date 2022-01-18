@@ -42,6 +42,7 @@ static task_t elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, bool do_pani
     Elf64_Half phdr_entries = ehdr->e_phnum;
     Elf64_Phdr *phdr = (Elf64_Phdr *)(*elf + ehdr->e_phoff);
     task_t task = new_task("init daemon", ehdr->e_entry);
+    printk("elf", "task pagemap: %p\n", task.pagemap);
 
     bool found_ptload = false;
     vmm_copy_kernel_mappings(task);
@@ -58,8 +59,6 @@ static task_t elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, bool do_pani
             uintptr_t elf_base = (uintptr_t)heap_alloc(num_pages).base;
             for (uint64_t i = 0; i < num_pages; i++)
             {
-                // Todo: Create new pagemap for daemon (Requires scheduler, tasking, etc.
-                // Hence the usage of the kernel pagemap to keep it simple)
                 vmm_map(task.pagemap, phdr->p_vaddr + (i * PAGE_SIZE), elf_base + (i * PAGE_SIZE), MAP_USER);
             }
 
@@ -73,6 +72,7 @@ static task_t elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, bool do_pani
     if (!found_ptload && do_panic)
         panic("Could not find a PT_LOAD segment!");
 
+    vmm_map_range(vmm_as_range(task.ustack, task.ustack + 8192, VMEM_DIRECT_MAPPING), MAP_USER, task.pagemap);
     add_task(task);
     return task;
 }

@@ -33,6 +33,11 @@ typedef struct
 #define wrcr3(pml4) __asm__ volatile("mov %0, %%cr3\n" ::"r"(pml4) \
                                      : "memory")
 
+STATIC_INLINE vmm_range_t vmm_as_range(size_t base, size_t top, size_t offset)
+{
+    return (vmm_range_t){.range = (range_t){.base = base, .limit = top}, .address_offset = offset};
+}
+
 void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap);
 void vmm_map(uint64_t *pagemap, size_t vaddr, size_t paddr, int flags);
 void vmm_unmap(uint64_t *pagemap, size_t vaddr);
