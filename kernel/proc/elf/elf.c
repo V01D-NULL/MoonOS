@@ -4,7 +4,6 @@
 #include <devices/serial/serial.h>
 #include <mm/vmm.h>
 #include <mm/pmm.h>
-#include <mm/heap/heap.h>
 #include <mm/memdefs.h>
 
 static Elf64_Ehdr elf_verify_ehdr(const uint8_t **elf);
@@ -56,7 +55,7 @@ static task_t elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, bool do_pani
             printk("elf", "Found loadable segment\n");
             printk("elf", "Virtual mapping: 0x%lX (%d bytes | %d pages)\n", phdr->p_vaddr, phdr->p_memsz, num_pages);
 
-            uintptr_t elf_base = (uintptr_t)heap_alloc(num_pages).base;
+            uintptr_t elf_base = (uintptr_t)pmm_alloc_range(num_pages).base;
             for (uint64_t i = 0; i < num_pages; i++)
             {
                 vmm_map(task.pagemap, phdr->p_vaddr + (i * PAGE_SIZE), elf_base + (i * PAGE_SIZE), MAP_USER);

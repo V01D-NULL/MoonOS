@@ -43,7 +43,6 @@
 #include <mm/pmm.h>
 #include <mm/vmm.h>
 #include <mm/memdefs.h>
-#include <mm/heap/heap.h>
 
 #include <trace/strace.h>
 #include <hal/acpi/tables/rsdp.h>

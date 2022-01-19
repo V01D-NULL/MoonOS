@@ -1,6 +1,5 @@
 #include "double-buffering.h"
 #include <libk/kstring.h>
-#include <mm/heap/heap.h>
 #include <mm/memdefs.h>
 #include <util/font8x16.h>
 #include <devices/fb/early_fb.h>
@@ -45,7 +44,9 @@ void flush_back_buffer(uint32_t *custom_buffer)
     }
 }
 
+// Todo: Need Heap
 uint32_t *double_buffering_create_buffer(void)
 {
-    return (uint32_t *)heap_alloc(gfx_h.fb_width * gfx_h.fb_height * (gfx_h.fb_bpp / 8)).base;
+    // return (uint32_t *)heap_alloc(gfx_h.fb_width * gfx_h.fb_height * (gfx_h.fb_bpp / 8)).base;
+    return NULL;
 }

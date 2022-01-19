@@ -1,5 +1,4 @@
 #include "vtconsole.h"
-#include <mm/heap/heap.h>
 #include <libk/kstring.h>
 #include <devices/fb/early_fb.h>
 
