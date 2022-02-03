@@ -29,11 +29,11 @@ typedef struct
 // Represents a slab itself
 typedef struct slab
 {
-	const char *descriptor;
-	int free_objects;
-	int used_objects;
-	bool exhausted;
-	int size;
+    const char *descriptor;
+    int free_objects;
+    int used_objects;
+    bool exhausted;
+    int size;
     slab_object_t objects[MAX_OBJECTS];
 } slab_t;
 
