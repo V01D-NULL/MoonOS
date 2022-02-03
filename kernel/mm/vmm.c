@@ -75,9 +75,7 @@ static uint64_t *vmm_get_pml_or_alloc(uint64_t *entry, size_t level, int flags)
 {
     if (entry[level] & 1)
     {
-        if ((flags ^ entry[level]) != 0) // Are these new flags?
-            entry[level] |= flags;
-
+        entry[level] |= flags;
         goto no_alloc;
     }
 

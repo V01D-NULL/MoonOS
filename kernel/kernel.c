@@ -42,6 +42,7 @@
 
 #include <mm/pmm.h>
 #include <mm/vmm.h>
+#include <mm/slab.h>
 #include <mm/memdefs.h>
 
 #include <trace/strace.h>
