@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <panic.h>
 #include <printk.h>
-#include <mm/memdefs.h>
+#include <mm/mm.h>
 
 static bool has_xsdt = false;
 static struct RSDP rsdp;

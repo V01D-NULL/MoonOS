@@ -4,7 +4,7 @@
 #include <devices/serial/serial.h>
 #include <mm/vmm.h>
 #include <mm/pmm.h>
-#include <mm/memdefs.h>
+#include <mm/mm.h>
 
 static Elf64_Ehdr elf_verify_ehdr(const uint8_t **elf);
 static task_t elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, bool do_panic);

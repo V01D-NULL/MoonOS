@@ -17,7 +17,7 @@
 #include <kernel.h>
 #include <mm/pmm.h>
 #include <mm/vmm.h>
-#include <mm/memdefs.h>
+#include <mm/mm.h>
 #include <panic.h>
 #include <stdint.h>
 #include <printk.h>
@@ -28,6 +28,10 @@
 #include <hal/pic/pic.h>
 #include <devices/term/fallback/fterm.h>
 #include <devices/fb/early_fb.h>
+#include <libk/cmdline.h>
+#include <libgraphics/bootsplash_img.h>
+#include <mm/slab.h>
+#include <mm/buddy/buddy.h>
 
 void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id);
 
@@ -124,8 +128,6 @@ void banner(bool serial_only)
     delay(200);
 }
 
-#include <libk/cmdline.h>
-#include <libgraphics/bootsplash_img.h>
 /**
  * @brief Kernel entry point
  * 
@@ -180,6 +182,15 @@ void kinit(struct stivale2_struct *bootloader_info)
 
         fterm_write("boot: Reached target pmm\n");
         pmm_init(mmap->memmap, mmap->entries);
+
+		fterm_write("boot: Reached target slab\n");
+		slab_init();
+
+		fterm_write("boot: Buddy init..\n");
+		buddy_init(mmap->memmap, mmap->entries);
+		fterm_write("boot: After buddy init\n");
+		for(;;)
+			;
 
         fterm_write("boot: Reached target vmm\n");
         vmm_init(check_la57(), mmap);

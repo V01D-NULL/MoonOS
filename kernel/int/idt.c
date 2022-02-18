@@ -70,6 +70,9 @@ void init_idt(void)
     idt_set_entry(0x28, 0, 0x8E, GENERIC_CAST(uint64_t, isr46), 46);
     idt_set_entry(0x28, 0, 0x8E, GENERIC_CAST(uint64_t, isr47), 47);
 
+	// Syscall
+	idt_set_entry(0x28, 0, 0xEE, GENERIC_CAST(uint64_t, isr128), 128);
+	
     // Load IDT
     struct idtr _idtr = {
         .limit = 256 * sizeof(struct idt_desc) - 1,

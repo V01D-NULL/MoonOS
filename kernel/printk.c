@@ -6,7 +6,7 @@
 #include <devices/term/fallback/fterm.h>
 #include <devices/term/vt100/vtconsole.h>
 #include <util/font8x16.h>
-#include <mm/memdefs.h>
+#include <mm/mm.h>
 
 #define EARLY_CON_MAX_SCREEN_SIZE 1920 * 1080
 

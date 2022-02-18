@@ -3,7 +3,7 @@
 #include <devices/serial/serial.h>
 #include <hal/apic/apic.h>
 #include <hal/pic/pic.h>
-#include <mm/memdefs.h>
+#include <mm/mm.h>
 #include <printk.h>
 
 /* Entry types */

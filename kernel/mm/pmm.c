@@ -7,7 +7,7 @@
 #include <printk.h>
 #include <liballoc/bitmap.h>
 #include <devices/serial/serial.h>
-#include "memdefs.h"
+#include "mm.h"
 #include <proc/smp/spinlock.h>
 
 create_lock("pmm", pmm_lock);
@@ -98,28 +98,28 @@ const char *get_mmap_type(int entry)
     switch (entry)
     {
     case STIVALE2_MMAP_USABLE:
-        return "Stivale2 mmap usable";
+        return "RAM";
 
     case STIVALE2_MMAP_RESERVED:
-        return "Stivale2 mmap reserved";
+        return "Reserved";
 
     case STIVALE2_MMAP_ACPI_RECLAIMABLE:
-        return "Stivale2 mmap acpi reclaimable";
+        return "ACPI Reclaimable";
     
     case STIVALE2_MMAP_ACPI_NVS:
-        return "Stivale2 mmap acpi nvs";
+        return "ACPI NVS";
 
     case STIVALE2_MMAP_BAD_MEMORY:
-        return "Stivale2 mmap bad memory";
+        return "Bad Memory";
 
     case STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE:
-        return "Stivale2 bootloader reclaimable";
+        return "Bootloader Reclaimable";
 
     case STIVALE2_MMAP_KERNEL_AND_MODULES:
-        return "Stivale2 mmap kernel and modules";
+        return "Kernel And Modules";
 
     case STIVALE2_MMAP_FRAMEBUFFER:
-        return "Stivale2 mmap fb";
+        return "Framebuffer";
 
     default:
         return "???";

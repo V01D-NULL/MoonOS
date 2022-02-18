@@ -7,7 +7,7 @@
 #include <trace/strace.h>
 #include <trace/sym.h>
 #include <libk/kassert.h>
-#include <mm/memdefs.h>
+#include <mm/mm.h>
 #include <mm/vmm.h>
 #include <util/font8x16.h>
 #include <libgraphics/double-buffering.h>

@@ -110,4 +110,6 @@ gnu_export void isr45(void);
 gnu_export void isr46(void); 
 gnu_export void isr47(void);
 
+gnu_export void isr128(void);
+
 #endif // IDT_H

@@ -50,6 +50,7 @@ uint64_t *slab_alloc(int sz)
         if (idx == -1)
         {
             slabs[i].exhausted = true;
+			
         }
         else
         {

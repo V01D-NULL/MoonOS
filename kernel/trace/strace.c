@@ -9,6 +9,11 @@ struct stackframe {
     uint64_t rsp;
 };
 
+struct stackframe_list {
+	int value;
+	struct stackframe_list *next;
+};
+
 struct stacktrace_result backtrace_stack(int frames)
 {
     if (frames > UNWIND_MAX)
@@ -17,7 +22,7 @@ struct stacktrace_result backtrace_stack(int frames)
     }
 
     struct stacktrace_result result;
-    struct ds_default_list *stackframe;
+    struct stackframe_list *stackframe;
     __asm__("mov %%rbp, %0"
             : "=r"(stackframe));
 

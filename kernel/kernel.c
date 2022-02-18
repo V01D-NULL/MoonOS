@@ -5,9 +5,9 @@
  * @brief This is where all the magic happens :)
  * @version 0.1
  * @date 2021-04-15
- * 
+ *
  * @copyright Copyright (c) 2021
- * 
+ *
  */
 
 #include <stdint.h>
@@ -43,7 +43,8 @@
 #include <mm/pmm.h>
 #include <mm/vmm.h>
 #include <mm/slab.h>
-#include <mm/memdefs.h>
+#include <mm/mm.h>
+#include <mm/buddy/buddy.h>
 
 #include <trace/strace.h>
 #include <hal/acpi/tables/rsdp.h>
@@ -59,18 +60,18 @@
 void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 {
 	slab_init();
-    printk("main", "Detected %d modules\n", mods->module_count);
-    printk("main", "Module string: %s\n", mods->modules[0].string);
+	printk("main", "Detected %d modules\n", mods->module_count);
+	printk("main", "Module string: %s\n", mods->modules[0].string);
 
-    task_t task = load_elf((const uint8_t *)mods->modules[0].begin, true);
-    vmm_switch_pagemap(task);
-    jump_to_user_address((void*)task.entrypoint, task.ustack);
+	// task_t task = load_elf((const uint8_t *)mods->modules[0].begin, true);
+	// vmm_switch_pagemap(task);
+	// jump_to_user_address((void *)task.entrypoint, task.ustack);
 
-    // lapic_init(acpi_init(&bootvars->rsdp).apic);
-    // smp_init(&bootvars->cpu);
+	// lapic_init(acpi_init(&bootvars->rsdp).apic);
+	// smp_init(&bootvars->cpu);
 
-    for (;;)
-    {
-        __asm__("hlt");
-    }
+	for (;;)
+	{
+		__asm__("hlt");
+	}
 }

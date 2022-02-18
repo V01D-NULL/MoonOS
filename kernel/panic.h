@@ -23,8 +23,6 @@
                 : "=r"(rsp));                          \
         __asm__("mov %%rbp, %0"                        \
                 : "=r"(rbp));                          \
-        debug(1, "About to panic - rsp: %llX\n", rsp); \
-        debug(1, "About to panic - rbp: %llX\n", rbp); \
         _panic(rbp, rsp, __VA_ARGS__);                 \
     }
 

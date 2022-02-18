@@ -1,6 +1,6 @@
 #include "task.h"
 #include <printk.h>
-#include <mm/memdefs.h>
+#include <mm/mm.h>
 static task_t tasks[10];
 static int counter = 0;
 

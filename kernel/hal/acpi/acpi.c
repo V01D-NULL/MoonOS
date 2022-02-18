@@ -3,7 +3,7 @@
 #include <hal/acpi/tables/rsdt.h>
 #include <hal/acpi/tables/madt/madt.h>
 
-#include <mm/memdefs.h>
+#include <mm/mm.h>
 #include <devices/serial/serial.h>
 #include <libk/kstring.h>
 #include <printk.h>
