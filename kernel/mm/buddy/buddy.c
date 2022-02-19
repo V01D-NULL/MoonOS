@@ -78,15 +78,6 @@ static struct zone *init_zone(size_t base, size_t length, int zone_nr, int type)
 		return zone;
 
 	zone->num_buddy_zones = how_many_buddy_zones(zone->start, zone->len);
-
-	// typeof (memory_zones) tail = NULL;
-	// struct zone *zone = init_zone(base, length, zone_nr++, type);
-	// if (!tail)
-	// 	memory_zones = zone;
-	// else
-	// 	list_set_next(zone, list, tail);
-	// tail = zone;
-
 	struct BuddyZone *tail = NULL;
 
 	// Setup buddy zone(s)
@@ -116,7 +107,7 @@ static size_t how_many_buddy_zones(size_t base, size_t len)
 	size_t max_allocation_size = (1 << (MM_MAX_ORDER - 1)) * PAGE_SIZE;
 	size_t num_buddy_zones = 0;
 
-	for (int ptr = base; ptr < base + len; ptr += max_allocation_size)
+	for (size_t ptr = base; ptr < base + len; ptr += max_allocation_size)
 		num_buddy_zones++;
 
 	return num_buddy_zones;
