@@ -42,7 +42,10 @@ uint64_t *slab_alloc(int sz)
             continue;
 
         if (slabs[i].exhausted)
+		{
+			// panic("Exhausted slab of size %d!\n", sz);
             return NULL;
+		}
         
         uint64_t *ret = NULL;
 

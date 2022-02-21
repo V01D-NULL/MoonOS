@@ -7,7 +7,7 @@ AS = @nasm
 
 EMU = qemu-system-x86_64
 EMU_OPTS = \
-        -M q35 -cpu qemu64 -m 1G \
+        -M q35 -cpu qemu64 -m 4G \
         -serial stdio -no-reboot -smp 4 \
         -no-shutdown -cdrom $(ISO_NAME)
 

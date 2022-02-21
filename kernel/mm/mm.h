@@ -20,7 +20,7 @@ struct page
 
 struct BuddyZone
 {
-	long map;		   // Linearized binary tree
+	long *map;		   // Linearized binary tree
 	struct slist list; // A list of buddy zones to span the entire memory for a given zone
 };
 
