@@ -189,6 +189,10 @@ void kinit(struct stivale2_struct *bootloader_info)
 		fterm_write("boot: Buddy init..\n");
 		buddy_init(mmap->memmap, mmap->entries);
 		fterm_write("boot: After buddy init\n");
+
+		struct page *page = buddy_alloc(0);
+		fterm_write("1. buddy_alloc(0) => { order: %d, ptr: 0x%llX }\n", page->order, page->ptr);
+
 		for(;;)
 			;
 

@@ -11,15 +11,18 @@
 // Used by the buddy allocator
 #define MM_MAX_ORDER 10 // Largest allocation: 2^10-1 => 0x200000 => 2MiB
 #define PAGE_SIZE 4096
+#define ORDER_TO_SIZE(order) (0x200000UL / (order + 1)) // 0x200000 = largest allocation, order + 1 so that we don't divide by zero in the event of order=0. If it is an order zero node the division is just by 1, so the result is 0x200000.
 
 struct page
 {
 	int8_t order;
-	void *ptr;
+	uint64_t *ptr;
 };
 
 struct BuddyZone
 {
+	bool is_full;	   // True if the entire tree is full, or the root node is allocated which is essentially the same thing
+	size_t zone_nr;    // zone_nr denotes the offset/index of this buddy zone in the list of buddy zones
 	long *map;		   // Linearized binary tree
 	struct slist list; // A list of buddy zones to span the entire memory for a given zone
 };
