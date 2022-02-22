@@ -33,7 +33,7 @@ struct slist
 // [] member: Name of the list member in the struct 'input'.
 // [] input:  An instance of a struct.
 #define list_foreach(out, member, input) \
-	for (typeof(input) out = input; out != NULL; out = list_next(out, member))
+	for (typeof(input) out = input; out != NULL; out = (typeof(input))out->member.next)
 
 #define list_append(node, member, input) ({           \
 	__list_append(&(input)->member, &(node)->member); \
