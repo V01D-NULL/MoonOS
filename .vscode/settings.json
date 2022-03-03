@@ -14,7 +14,8 @@
 		"cstdio": "c",
 		"mm.h": "c",
 		"keyboard.h": "c",
-		"moon.h": "c"
+		"moon.h": "c",
+		"__stddef_max_align_t.h": "c"
 	},
     "files.exclude": {
         "**/*.o": true,

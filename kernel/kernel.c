@@ -59,7 +59,6 @@
 
 void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 {
-	slab_init();
 	printk("main", "Detected %d modules\n", mods->module_count);
 	printk("main", "Module string: %s\n", mods->modules[0].string);
 
@@ -72,6 +71,8 @@ void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 
 	for (;;)
 	{
-		__asm__("hlt");
+		printk("", "a\n");
+		printk("", "b\n");
+		// __asm__("hlt");
 	}
 }

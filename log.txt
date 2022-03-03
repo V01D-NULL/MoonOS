@@ -1,0 +1,82 @@
+
+Built init daemon
+
+(LIBS) Built all kernel archive libraries
+
+ LD  Linking object files
+python3 ../scripts/gensym.py kernel.elf
+[*] Wrote symbol table
+[*] Compiled symbol table
+
+\[^*^]/ Kernel compiled & linked successfully \[^*^]/ 
+
+make[1]: Nothing to be done for 'all'.
+make[1]: Nothing to be done for 'all'.
+5a637226-df01-4233-9fde-456b3440c1b0
+mkdir iso/ || echo ""
+
+xorriso -as mkisofs -b limine-cd.bin \
+-no-emul-boot -boot-load-size 4 -boot-info-table \
+--efi-boot limine-eltorito-efi.bin -efi-boot-part \
+--efi-boot-image --protective-msdos-label iso -o MoonOS.iso 
+limine/limine-install MoonOS.iso 
+qemu-system-x86_64 -M q35 -cpu qemu64 -m 1G -serial stdio -no-reboot -smp 4 -no-shutdown -cdrom MoonOS.iso  -enable-kvm -cpu host
+[32mmm/pmm.c:83[97m Full mmap dump:
+[32mmm/pmm.c:86[97m 0x1000 - 0x39fff [4096 - Bootloader Reclaimable]
+[32mmm/pmm.c:86[97m 0x3a000 - 0x9efff [1 - RAM]
+[32mmm/pmm.c:86[97m 0x9fc00 - 0x9ffff [2 - Reserved]
+[32mmm/pmm.c:86[97m 0xf0000 - 0xfffff [2 - Reserved]
+[32mmm/pmm.c:86[97m 0x100000 - 0x1fffff [1 - RAM]
+[32mmm/pmm.c:86[97m 0x200000 - 0x20fcbf [4097 - Kernel And Modules]
+[32mmm/pmm.c:86[97m 0x210000 - 0x25f680 [4097 - Kernel And Modules]
+[32mmm/pmm.c:86[97m 0x260000 - 0x3f9dafff [1 - RAM]
+[32mmm/pmm.c:86[97m 0x3f9db000 - 0x3f9f7fff [4096 - Bootloader Reclaimable]
+[32mmm/pmm.c:86[97m 0x3f9f8000 - 0x3f9fbfff [4097 - Kernel And Modules]
+[32mmm/pmm.c:86[97m 0x3f9fc000 - 0x3ffdefff [4096 - Bootloader Reclaimable]
+[32mmm/pmm.c:86[97m 0x3ffdf000 - 0x3fffffff [2 - Reserved]
+[32mmm/pmm.c:86[97m 0xb0000000 - 0xbfffffff [2 - Reserved]
+[32mmm/pmm.c:86[97m 0xfd000000 - 0xfd2fffff [4098 - Framebuffer]
+[32mmm/pmm.c:86[97m 0xfed1c000 - 0xfed1ffff [2 - Reserved]
+[32mmm/pmm.c:86[97m 0xfeffc000 - 0xfeffffff [2 - Reserved]
+[32mmm/pmm.c:86[97m 0xfffc0000 - 0xffffffff [2 - Reserved]
+
+[32mmm/pmm.c:153[97m bitmap_size_bytes: 32768
+[32mmm/pmm.c:163[97m Found a big enough block of memory to host the bitmap (size: 413696), size : 32KiB
+[32mmm/pmm.c:167[97m (phys) Bitmap stored at 3A000-9EFFF
+[32mmm/pmm.c:194[97m pmm_init: Freeing 42000-9efff | Pages: 159
+[32mmm/pmm.c:194[97m pmm_init: Freeing 100000-1fffff | Pages: 512
+[32mmm/pmm.c:194[97m pmm_init: Freeing 260000-3f9dafff | Pages: 260571
+[32mDEBUG: [39m[slab] Allocated 256 pages for the slab-heap
+[32mmm/buddy/buddy.c:35[97m Size of all binary trees: 31 KiB
+[32mDEBUG: [39m[init_zone] num bzones: 508
+[32mmm/buddy/buddy.c:55[97m Displaying memory zones...
+Zone #0 (Bootloader Reclaimable)
+Zone #1 (RAM)
+Zone #2 (RAM)
+Zone #3 (Kernel And Modules)
+Zone #4 (Kernel And Modules)
+Zone #5 (RAM) [508 buddy zones] -- [0x260000 - 0x3F9DB000]
+Zone #6 (Bootloader Reclaimable)
+Zone #7 (Kernel And Modules)
+Zone #8 (Bootloader Reclaimable)
+Zone #9 (Framebuffer)
+Zone #0 (Bootloader Reclaimable)
+Zone #1 (RAM)
+Zone #2 (RAM)
+Zone #3 (Kernel And Modules)
+Zone #4 (Kernel And Modules)
+Zone #5 (RAM)
+[32mmm/buddy/buddy.c:77[97m INIT: 1
+[32mmm/buddy/buddy.c:77[97m INIT: 2
+[32mmm/buddy/buddy.c:77[97m INIT: 3
+[32mmm/buddy/buddy.c:77[97m INIT: 4
+[32mmm/buddy/buddy.c:77[97m INIT: 5
+[32mmm/buddy/buddy.c:77[97m INIT: 6
+[32mmm/buddy/buddy.c:77[97m INIT: 7
+[32mmm/buddy/buddy.c:77[97m INIT: 8
+[32mmm/buddy/buddy.c:77[97m INIT: 9
+[32mmm/buddy/buddy.c:77[97m INIT: 10
+Zone #6 (Bootloader Reclaimable)
+Zone #7 (Kernel And Modules)
+Zone #8 (Bootloader Reclaimable)
+Zone #9 (Framebuffer)

@@ -3,7 +3,7 @@
 
 #include <amd64/moon.h>
 
-#define BUDDY_BITMAP_BLOCK_SIZE sizeof(long) * 8
+#define BUDDY_BITMAP_BLOCK_SIZE sizeof(int) * 8
 
 /*
 	https://www.wfbsoftware.de/a-buddy-system-memory-allocator-explained/

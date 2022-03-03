@@ -190,11 +190,24 @@ void kinit(struct stivale2_struct *bootloader_info)
 		buddy_init(mmap->memmap, mmap->entries);
 		fterm_write("boot: After buddy init\n");
 
+		// TEST //
 		struct page *page = buddy_alloc(0);
+		struct page *page1 = buddy_alloc(0);
+		struct page *page2 = buddy_alloc(0);
+		struct page *page3 = buddy_alloc(1);
+
 		fterm_write("1. buddy_alloc(0) => { order: %d, ptr: 0x%llX }\n", page->order, page->ptr);
+		fterm_write("2. buddy_alloc(0) => { order: %d, ptr: 0x%llX }\n", page1->order, page1->ptr);
+		fterm_write("3. buddy_alloc(0) => { order: %d, ptr: 0x%llX }\n", page2->order, page2->ptr);
+
+		if (page3 != NULL)
+			fterm_write("4. buddy_alloc(1) => { order: %d, ptr: 0x%llX }\n", page3->order, page3->ptr);
+		else
+			fterm_write("4. (Allocation Failure) buddy_alloc(1) => { order: N/A, ptr: NULL }\n");
 
 		for(;;)
 			;
+		// TEST //
 
         fterm_write("boot: Reached target vmm\n");
         vmm_init(check_la57(), mmap);
