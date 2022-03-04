@@ -11,7 +11,8 @@
 // Used by the buddy allocator
 #define MM_MAX_ORDER 10 // Largest allocation: 2^10-1 => 0x200000 => 2MiB
 #define PAGE_SIZE 4096
-#define ORDER_TO_SIZE(order) (0x200000UL / (order + 1)) // 0x200000 = largest allocation, order + 1 so that we don't divide by zero in the event of order=0.
+#define PAGE MM_MAX_ORDER - 1 // It's cleaner to write alloc(PAGE) than alloc(9) or alloc(MM_MAX_ORDER-1)
+#define ORDER_TO_SIZE(order) (4096 * (1 << (MM_MAX_ORDER - 1)-order)) // size = MINIMUM_SIZE * (2 ^ (MAXIMUM_ORDER - order)) (Thanks johnkaS)
 
 struct page
 {
