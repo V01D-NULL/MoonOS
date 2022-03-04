@@ -7,5 +7,6 @@
 void buddy_init(struct stivale2_mmap_entry *mmap, int entries);
 void buddy_free(struct page *page);
 struct page *buddy_alloc(int order);
+void foo();
 
 #endif // MM_BUDDY_H
