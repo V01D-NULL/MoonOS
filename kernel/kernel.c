@@ -71,8 +71,6 @@ void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 
 	for (;;)
 	{
-		printk("", "a\n");
-		printk("", "b\n");
-		// __asm__("hlt");
+		__asm__("hlt");
 	}
 }
