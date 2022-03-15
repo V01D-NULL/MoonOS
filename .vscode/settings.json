@@ -23,5 +23,6 @@
     },
     "cSpell.enabled": false,
 	"C_Cpp.errorSquiggles": "Enabled",
-	"editor.detectIndentation": false
+	"editor.detectIndentation": false,
+	"python.formatting.provider": "black"
 }

@@ -8,10 +8,24 @@
 #include <libk/kassert.h>
 #include <ds/linked_list.h>
 
+#define PAGE_SIZE 4096
+
 // Used by the buddy allocator
 #define MM_MAX_ORDER 10 // Largest allocation: 2^10-1 => 0x200000 => 2MiB
-#define PAGE_SIZE 4096
-#define PAGE MM_MAX_ORDER - 1 // It's cleaner to write alloc(PAGE) than alloc(9) or alloc(MM_MAX_ORDER-1)
+
+// Order -> words so that buddy_alloc(9) -> buddy_alloc(BUDDY_SIZE_4K)
+#define BUDDY_SIZE_4K 9
+#define BUDDY_SIZE_8K 8
+#define BUDDY_SIZE_16K 7
+#define BUDDY_SIZE_32K 6
+#define BUDDY_SIZE_64K 5
+#define BUDDY_SIZE_128K 4
+#define BUDDY_SIZE_256K 3
+#define BUDDY_SIZE_512K 2
+#define BUDDY_SIZE_512K 2
+#define BUDDY_SIZE_1MB 1
+#define BUDDY_SIZE_2MB 0
+
 #define ORDER_TO_SIZE(order) (4096 * (1 << (MM_MAX_ORDER - 1)-order)) // size = MINIMUM_SIZE * (2 ^ (MAXIMUM_ORDER - order)) (Thanks johnkaS)
 
 struct page
@@ -22,6 +36,7 @@ struct page
 
 struct BuddyZone
 {
+    size_t base_addr;
 	bool is_full;
 	long zone_nr;	   // zone_nr denotes the offset/index of this buddy zone in the list of buddy zones
 	long *alloc_map;   // Linearized binary tree (1 allocated, 0 not allocated)
@@ -46,7 +61,7 @@ struct zone
 static const uintptr_t VMEM_DIRECT_MAPPING = 0x0; // Identity mapping
 static const uintptr_t VMEM_LV5_BASE = 0xff00000000000000UL;
 static const uintptr_t VMEM_LV4_BASE = 0xffff800000000000UL;
-static const uintptr_t VMEM_CODE_BASE = 0xffffffff80000000;
+static const uintptr_t VMEM_CODE_BASE = 0xffffffff80000000UL;
 
 STATIC_INLINE bool check_la57(void) { return (cr_read(CR4) >> 12) & 1; }
 
