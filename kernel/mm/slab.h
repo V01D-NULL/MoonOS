@@ -16,7 +16,7 @@
 
 #define BUG(...) { fmt_puts("\033[31mBUG:\033[39m "); fmt_puts(__VA_ARGS__); }
 
-#define MAX_OBJECTS 128
+#define MAX_OBJECTS 512
 #define SLABCOUNT 10
 
 // Represents an object of a given slab

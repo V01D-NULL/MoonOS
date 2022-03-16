@@ -30,6 +30,7 @@ void pmm_free(void *page);
 bool in_range(void *_address);
 struct memtag_range pmm_find_tag(size_t tag, int retries);
 void dump_mmap(void);
+const char *get_mmap_type(int entry);
 
 struct memtag_range
 {

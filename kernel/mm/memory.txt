@@ -1,0 +1,19 @@
+------ Memory layout -------
+== Mappings ==
++ 0x0-0x40000000     - Anything, 4GiB mapped.
++ 
++ (4 level paging)
++ 0xffff800000000000 - Pointers, heaps, structures, etc, 2GiB mapped.
++ 
++ (5 level paging)
++ 0xff00000000000000 - Pointers, heaps, structures, etc, 2GiB mapped.
++ 
++ 0xffffffff80200000 - Kernel code, 2GiB mapped.
+== /Mappings ==
+
+== Allocators ==
++ 1: bitmap allocator, used as a generic allocator for one time or very few allocations  SIZE: Covers the entire memory map
++ 2: buddy allocator, used for performance critical allocations. uses the bitmap allocator for initialization.
++ 3: slab (heap) allocator, used primarly for cached, fine grained allocations based on powers of two (2).
++    Plays an important role of the initialization of zones and the buddy allocator. SIZE: 1MiB
+== /Allocators ==

@@ -50,6 +50,24 @@ void isr_handler(regs_t regs)
     /* CPU exceptions */
     if (regs.isr_number < 32)
     {
+		if (regs.cs == 0x43)
+		{
+			__asm__ volatile(
+				gnu_asm_flavor_intel
+				"mov ax, 0x30\n"
+				"mov ds, ax\n"
+				"mov fs, ax\n"
+				"mov gs, ax\n"
+				"mov ss, ax\n"
+				"mov es, ax\n"
+				gnu_asm_flavor_at_t
+			);
+			vmm_switch_to_kernel_pagemap();
+			panic(":p");
+			// printk("INT", "Todo: Terminate userprocess!");
+			// goto end;
+		}
+
         override_quiet_boot();
         serial_set_color(BASH_RED);
         printk("INT", "%s (err_code %ld)\n", exception_messages[regs.isr_number], regs.error_code);
@@ -57,10 +75,10 @@ void isr_handler(regs_t regs)
         if (regs.isr_number == 14)
         {
             printk("INT ~ #PF", "Faulting address: 0x%lx\n", cr_read(CR2));
-            
-            uint64_t cr2 = cr_read(CR2);
-            vmm_pagefault_handler(cr2, regs.error_code);
-            return;
+            for(;;);
+            // uint64_t cr2 = cr_read(CR2);
+            // vmm_pagefault_handler(cr2, regs.error_code);
+            // return;
         }
         else if (regs.isr_number == 6)
         {

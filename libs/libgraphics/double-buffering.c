@@ -1,6 +1,6 @@
 #include "double-buffering.h"
 #include <libk/kstring.h>
-#include <mm/memdefs.h>
+#include <mm/mm.h>
 #include <util/font8x16.h>
 #include <devices/fb/early_fb.h>
 

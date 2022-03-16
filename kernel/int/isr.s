@@ -76,8 +76,9 @@ isr_err 14
 %endrep
 
 ; User defined isrs
-%assign n 48
-%rep 208
-    isr n
-%assign n n+1
-%endrep
+isr 128
+;%assign n 48
+;%rep 208
+;    isr n
+;%assign n n+1
+;%endrep

@@ -1,6 +1,6 @@
 #include "early_fb.h"
 #include <amd64/moon.h>
-#include <mm/memdefs.h>
+#include <mm/mm.h>
 #define HEAP_SZ 1920 * 1080 * 20
 
 EXTERNAL(__embedded_kheap_start);

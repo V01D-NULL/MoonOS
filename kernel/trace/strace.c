@@ -4,9 +4,9 @@
 #include <ds/linked_list.h>
 #include "sym.h"
 
-struct stackframe {
-    struct stackframe *frame;
-    uint64_t rsp;
+struct stackframe_list {
+	struct stackframe_list *next;
+	size_t value;
 };
 
 struct stacktrace_result backtrace_stack(int frames)
@@ -17,14 +17,14 @@ struct stacktrace_result backtrace_stack(int frames)
     }
 
     struct stacktrace_result result;
-    struct ds_default_list *stackframe;
-    __asm__("mov %%rbp, %0"
-            : "=r"(stackframe));
+    struct stackframe_list *stackframe;
+    __asm__ volatile("mov %%rbp, %0"
+            : "=r"(stackframe) :: "memory");
 
     int i = 0;
     while (i < frames && stackframe)
     {
-        result.trace_results[i++].address = stackframe->value;
+		result.trace_results[i++].address = stackframe->value;
         stackframe = stackframe->next;
     }
 

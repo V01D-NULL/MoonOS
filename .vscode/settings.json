@@ -1,24 +1,28 @@
 {
     "files.associations": {
-        "printk.h": "c",
-        "cpu.h": "c",
-        "double-buffering.h": "c",
-        "font8x16.h": "c",
-        "tty.utils.h": "c",
-        "serial.h": "c",
-        "ctypes.h": "c",
-        "stddef.h": "c",
-        "kstring.h": "c",
-        "apic.h": "c",
-        "userspace.h": "c",
-        "cstdio": "c",
-        "memdefs.h": "c",
-        "keyboard.h": "c"
-    },
+		"printk.h": "c",
+		"cpu.h": "c",
+		"double-buffering.h": "c",
+		"font8x16.h": "c",
+		"tty.utils.h": "c",
+		"serial.h": "c",
+		"ctypes.h": "c",
+		"stddef.h": "c",
+		"kstring.h": "c",
+		"apic.h": "c",
+		"userspace.h": "c",
+		"cstdio": "c",
+		"mm.h": "c",
+		"keyboard.h": "c",
+		"moon.h": "c",
+		"__stddef_max_align_t.h": "c"
+	},
     "files.exclude": {
         "**/*.o": true,
         "**/*.sym": true
     },
     "cSpell.enabled": false,
-    "C_Cpp.errorSquiggles": "Enabled"
+	"C_Cpp.errorSquiggles": "Enabled",
+	"editor.detectIndentation": false,
+	"python.formatting.provider": "black"
 }

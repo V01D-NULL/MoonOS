@@ -6,7 +6,7 @@
 #include <devices/term/fallback/fterm.h>
 #include <devices/term/vt100/vtconsole.h>
 #include <util/font8x16.h>
-#include <mm/memdefs.h>
+#include <mm/mm.h>
 
 #define EARLY_CON_MAX_SCREEN_SIZE 1920 * 1080
 
@@ -18,7 +18,7 @@ int width = 0, height = 0;
 uint32_t *fb = NULL;
 vtconsole_t *vtc;
 
-void putc(char c, int x, int y);
+void putc(wchar_t c, int x, int y);
 
 void vt100_on_paint(vtconsole_t *vtc, vtcell_t *cell, int x, int y)
 {
@@ -102,7 +102,7 @@ void plot_pix_fb(uint32_t hex, int x, int y)
     fb[x + y * width] = hex;
 }
 
-void putc(char c, int x, int y)
+void putc(wchar_t c, int x, int y)
 {
     for (int _y = 0; _y < char_height; _y++)
     {
