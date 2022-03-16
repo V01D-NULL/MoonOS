@@ -75,15 +75,19 @@ void isr_handler(regs_t regs)
         if (regs.isr_number == 14)
         {
             printk("INT ~ #PF", "Faulting address: 0x%lx\n", cr_read(CR2));
-            for(;;);
-            // uint64_t cr2 = cr_read(CR2);
-            // vmm_pagefault_handler(cr2, regs.error_code);
-            // return;
+            uint64_t cr2 = cr_read(CR2);
+            vmm_pagefault_handler(cr2, regs.error_code);
+            return;
         }
         else if (regs.isr_number == 6)
         {
             printk("INT", "Faulting instruction is at: 0x%llx\n", regs.rip);
-            printk("INT", "Opcode: %x\n", byte_order_reverse_char8(regs.rip & 0xff));
+            uint16_t instruction = *(uint64_t*)regs.rip;
+            instruction = byte_order_reverse_short16(instruction);
+            printk("INT", "Opcode: %x\n", (instruction));
+            
+            if (instruction == 0x0F05 /* syscall */)
+                printk("INT", "TODO: Handle SYSCALL #UD and use int $0x80 instead!");
         }
 
         debug(true, "INT#%d - %s (err_code %ld)\n", regs.isr_number, exception_messages[regs.isr_number], regs.error_code);
