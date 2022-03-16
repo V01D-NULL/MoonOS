@@ -11,25 +11,22 @@
 #define NODE_FREE 1
 #define BUDDY_ZONE_TO_PTR(zone, buddy_zone, order) (zone->start + ORDER_TO_SIZE(order)) * buddy_zone->zone_nr
 
-static struct zone *memory_zones;
-
 static void traverse_and_patch_tree_on_init(struct BuddyZone *zone);
 static bool __can_alloc(int order, struct BuddyZone *zone, int *node_idx);
-static struct zone *init_zone(size_t base, size_t length, int zone_nr, int type);
+static struct zone *init_zone(size_t base, size_t length, int zone_nr, buddy_type_t type);
 static size_t how_many_buddy_zones(size_t base, size_t len);
 static void print_tree(struct BuddyZone *zone);
 
-void buddy_init(struct stivale2_mmap_entry *mmap, int entries)
+struct zone *buddy_init(struct buddy_range range, buddy_type_t type)
 {
-	// Step 1: Calculate the size of all binary trees
-	// TODO: Preallocate some memory of size 'tree_size' bytes and use that instead of pmm_alloc
-	size_t tree_size = 0;
-	for (int i = 0; i < entries; i++)
-	{
-		if (mmap[i].type != STIVALE2_MMAP_USABLE)
-			continue;
+    // TODO: create_slab("buddy"); Number of slab objects can be automatically determined given the range
+    struct zone *memory_zones = slab_alloc(sizeof(struct zone));
 
-		size_t num_trees_for_this_zone = how_many_buddy_zones(mmap[i].base, mmap[i].length);
+	// Step 1: Calculate the size of all binary trees
+	size_t tree_size = 0;
+	for (int i = 0; i < range.element_count; i++)
+	{
+		size_t num_trees_for_this_zone = how_many_buddy_zones(range.elements[i], ORDER_TO_SIZE(BUDDY_SIZE_2MB));
 		tree_size += num_trees_for_this_zone * (sizeof(long) * 8); // sizeof(long) * 8 to get the number of bits.
 	}
 	debug(true, "Size of all binary trees: %ld KiB\n", tree_size / 1024);
@@ -38,12 +35,9 @@ void buddy_init(struct stivale2_mmap_entry *mmap, int entries)
 	typeof(memory_zones) tail = NULL;
 	int zone_nr = 0;
 
-	for (int i = 0; i < entries; i++)
+	for (int i = 0; i < range.element_count; i++)
 	{
-		if (mmap[i].type == STIVALE2_MMAP_RESERVED)
-			continue;
-
-		struct zone *zone = init_zone(mmap[i].base, mmap[i].length, zone_nr++, mmap[i].type);
+		struct zone *zone = init_zone(range.elements[i], ORDER_TO_SIZE(BUDDY_SIZE_2MB), zone_nr++, type);
 
 		if (!tail)
 			memory_zones = zone;
@@ -78,15 +72,16 @@ void buddy_init(struct stivale2_mmap_entry *mmap, int entries)
 	// 			// print_tree(buddy_zone);
 	// 	}
 	// }
-	// for(;;);
+
+    return memory_zones;
 }
 
-void buddy_free(struct page *page)
+void buddy_free(struct page page)
 {
 }
 
 // TODO: Mark all pages used by the bitmap allocator (pmm) as allocated!
-struct page *buddy_alloc(int order)
+struct page buddy_alloc(int order, struct zone *memory_zones)
 {
 	// 1. Traverse every memory zone
 	list_foreach(zone, list, memory_zones)
@@ -99,12 +94,7 @@ struct page *buddy_alloc(int order)
 				int node_idx = 0;
 				// Is this allocation possible?
 				if (!__can_alloc(order, buddy_zone, &node_idx))
-				{
-					//debug(false, "order: %d cannot allocate zone %d, buddy zone: %d (is full: %s)\n", order, zone->zone_nr, buddy_zone->zone_nr, buddy_zone->is_full ? "true" : "false");
 					continue;
-				}
-
-				// debug(false, "Allocation is possible (node_idx = %d/%d)!\n", node_idx, 1 << order);
 
 				// Note: It is safe to check for is_full here because __can_alloc ensures that this
 				// buddy_zone safe to allocate from, so there is no need to worry about allocating the same memory.
@@ -118,9 +108,9 @@ struct page *buddy_alloc(int order)
 						  zone->start, zone->start + zone->len, zone->num_buddy_zones,
 						  buddy_zone->zone_nr);
 
-					struct page *page = (struct page *)(zone->start * buddy_zone->zone_nr);
-					page->order = order;
-					page->ptr = (uint64_t *)((zone->start * buddy_zone->zone_nr) + sizeof(struct page));
+					struct page page;
+					page.order = order;
+					page.ptr = (uint64_t *)((zone->start * buddy_zone->zone_nr) + sizeof(struct page));
 					return page;
 				}
 
@@ -136,13 +126,12 @@ struct page *buddy_alloc(int order)
 					//       zone->start, zone->start + zone->len, zone->num_buddy_zones,
 					//       buddy_zone->zone_nr,
 					//       (zone->start * buddy_zone->zone_nr), (zone->start * buddy_zone->zone_nr) + ORDER_TO_SIZE(BUDDY_SIZE_2MB));
+                    // debug(false, "node_idx: %d, sz: 0x%lX, zone#%ld, base_addr: 0x%llX\n", node_idx, sz, buddy_zone->zone_nr, buddy_zone->base_addr);
 
-					int sz = node_idx == 1 && buddy_zone->zone_nr > 1 ? 0 : ORDER_TO_SIZE(order); // Ensure that the base address is returned if it's the very first node (node_idx: 1) and not base_address + size
-					// debug(false, "node_idx: %d, sz: 0x%lX, zone#%ld, base_addr: 0x%llX\n", node_idx, sz, buddy_zone->zone_nr, buddy_zone->base_addr);
-					struct page *page = (struct page *)from_higher_half((uintptr_t)pmm_alloc(), DATA); // slab_alloc(sizeof(struct page)); // ((zone->start * buddy_zone->zone_nr) + (sz * node_idx));
-					panic_if(page == NULL, "BUDDY: page is null on allocation of size 0x%lX, order %d???", ORDER_TO_SIZE(order), order);
-					page->order = order;
-					page->ptr = (uint64_t *)((zone->start * buddy_zone->zone_nr) + (sz * node_idx));
+					int sz = node_idx == 1 && buddy_zone->zone_nr > 1 ? 0 : (ORDER_TO_SIZE(order)); // Ensure that the base address is returned if it's the very first node (node_idx: 1) and not base_address + size
+					struct page page;
+					page.order = order;
+					page.ptr = (uint64_t *)((zone->start * buddy_zone->zone_nr) + (sz * node_idx));
 
 					return page;
 				}
@@ -150,8 +139,7 @@ struct page *buddy_alloc(int order)
 		}
 	}
 
-	panic("OOM");
-	return NULL; // Failed to serve memory request.
+	return (struct page) { 0, NULL }; // Failed to serve memory request.
 }
 
 static struct zone *init_zone(size_t base, size_t length, int zone_nr, int type)
@@ -166,9 +154,7 @@ static struct zone *init_zone(size_t base, size_t length, int zone_nr, int type)
 	zone->page_count = (base + length) / PAGE_SIZE;
 	zone->num_buddy_zones = 0;
 
-	// Just focus on usable memory for now. I'll implement other things like kernel and module memory later.
-	if (type != STIVALE2_MMAP_USABLE)
-		return zone;
+	// if (is_kasan(type)) etc, etc.. (bitflags)
 
 	zone->num_buddy_zones = how_many_buddy_zones(zone->start, zone->len);
 	if (zone->num_buddy_zones == 0)
@@ -180,15 +166,11 @@ static struct zone *init_zone(size_t base, size_t length, int zone_nr, int type)
 	// Setup buddy zone(s)
 	for (size_t i = 0; i < zone->num_buddy_zones; i++)
 	{
-		// Note: The usage of pmm/slab_alloc is temporary, in the future I will likely modify
-		// Note: The highest order will be used since memory blocks have to be split as needed,
-		// there is no point in splitting them now for no reason
-		struct BuddyZone *buddy = (struct BuddyZone *)from_higher_half(pmm_alloc(), DATA);
+		struct BuddyZone *buddy = (struct BuddyZone *)slab_alloc(sizeof(struct BuddyZone));
 		if (buddy == NULL)
-			panic("OOM while initializing buddy");
+			return NULL; // Note: It's up to the caller to free all the memory passed to buddy_init()
 
-		buddy->alloc_map = slab_alloc(sizeof(int));
-        panic_if (buddy->alloc_map == NULL, "alloc map   = NULL");
+		buddy->alloc_map = (long*)slab_alloc(sizeof(long));
 		buddy->is_full = false;
 		buddy->zone_nr = i + 1; // Don't start counting at zero since we should not multiply anything by zero in the 'BUDDY_ZONE_TO_PTR' macro
 		buddy->base_addr = zone->start + (largest_allocation * (i + 1));
@@ -232,8 +214,8 @@ static void indent(int n)
 		debug(false, " ");
 }
 
-// Recursive preorder traversal
-static void print_tree(struct BuddyZone *zone)
+// Iterative preorder traversal
+gnu_unused static void print_tree(struct BuddyZone *zone)
 {
 	int parent_index = 0;
 	debug(false, "[0] %ld (Root)\n", __check_bit(zone->alloc_map, 0));
@@ -304,27 +286,6 @@ void print(struct BuddyZone *zone, int node_idx, int order)
 	print(zone, get_right_child_node(node_idx), order);
 }
 
-void foo()
-{
-	list_foreach(zone, list, memory_zones)
-	{
-		// debug(true, "zone#%d (%s) [%d buddy zones]\n", zone->zone_nr, zone->name, zone->num_buddy_zones);
-		// 2. Traverse every buddy zone in the current memory zone 'zone', if it exists.
-		if (zone->buddy_zones != NULL)
-		{
-			list_foreach(buddy_zone, list, zone->buddy_zones)
-			{
-				if (buddy_zone->zone_nr == 1)
-				{
-					print_tree(buddy_zone);
-					// print(buddy_zone, 0, 0);
-					return;
-				}
-			}
-		}
-	}
-}
-
 static bool __can_alloc(int order, struct BuddyZone *zone, int *node_idx)
 {
 	if (zone->is_full)
@@ -362,12 +323,6 @@ static bool __can_alloc(int order, struct BuddyZone *zone, int *node_idx)
 
 	bool go_right_from_root = false;
 	int current_order = 1;
-
-	// Test: Allocate all nodes at order 2.
-	// __set_bit(zone->alloc_map, 3);
-	// __set_bit(zone->alloc_map, 4);
-	// __set_bit(zone->alloc_map, 5);
-	// __set_bit(zone->alloc_map, 6);
 
 	// 1. Traverse the tree and find free nodes.
 	// Always prefer the left node, if that fails it'll try the right node of the root node.

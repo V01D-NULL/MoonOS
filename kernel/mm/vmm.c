@@ -33,9 +33,9 @@ void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap)
     // configure_pat();
     la57_enabled = has_5_level_paging;
 
-    struct page *page = buddy_alloc(BUDDY_SIZE_4K);
+    void *page = pmm_alloc();
     panic_if(page == NULL, "Cannot allocate kernel pagemap");
-    kernel_pagemap = (uint64_t *)page->ptr;
+    kernel_pagemap = (uint64_t *)page;
     debug(true, "kpagemap = %llx\n", kernel_pagemap);
 
     fterm_write("vmm: Mapping the framebuffer and bootloader reclaimable entries...\n");
@@ -85,12 +85,10 @@ static uint64_t *vmm_get_pml_or_alloc(uint64_t *entry, size_t level, int flags)
         goto no_alloc;
     }
 
-    struct page *page = buddy_alloc(BUDDY_SIZE_4K);
-    panic_if(page == NULL || page->ptr == NULL, "page == NULL!");
-    if (log)
-        debug(false, "PTR: %llX\n", page->ptr);
+    void *page = pmm_alloc();
+    panic_if(page == NULL, "page == NULL!");
 
-    entry[level] = (uintptr_t)page->ptr;
+    entry[level] = (uintptr_t)page;
     entry[level] |= flags;
 
 no_alloc:

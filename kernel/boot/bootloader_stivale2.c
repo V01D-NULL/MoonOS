@@ -186,53 +186,6 @@ void kinit(struct stivale2_struct *bootloader_info)
 		fterm_write("boot: Reached target slab\n");
 		slab_init();
 
-		fterm_write("boot: Buddy init..\n");
-		buddy_init(mmap->memmap, mmap->entries);
-		fterm_write("boot: After buddy init\n");
-
-		// TEST //
-		// struct page *page  = buddy_alloc(BUDDY_SIZE_1MB);
-		// struct page *page1 = buddy_alloc(BUDDY_SIZE_1MB);
-		// struct page *page2 = buddy_alloc(BUDDY_SIZE_4K);
-        // struct page *p = NULL;
-        
-        // for (int i = 0; i <= 8*512; i++)
-        // {
-        //     p = buddy_alloc(BUDDY_SIZE_4K);
-        //     if (p)
-        //     {
-        //         debug(false, "%d. buddy_alloc(4KiB) => { order: %d, ptr: 0x%llX }\n", i, p->order, p->ptr);
-        //     }
-        //     else
-        //     {
-        //         panic("%d. buddy_alloc(4KiB) => { ALLOCATION FAILURE }", i);
-        //     }
-        // }
-        // // foo();
-        // // buddy_alloc(BUDDY_SIZE_2MB);
-        // fterm_write("Test complete\n");
-
-		// if (page != NULL)
-		// 	fterm_write("1. buddy_alloc(1MB) => { order: %d, ptr: 0x%llX }\n", page->order, page->ptr);
-		// else
-		// 	fterm_write("1. (Allocation Failure) buddy_alloc(1MB) => { order: N/A, ptr: NULL }\n");
-
-		// if (page1 != NULL)
-		// 	fterm_write("2. buddy_alloc(1MB) => { order: %d, ptr: 0x%llX }\n", page1->order, page1->ptr);
-		// else
-		// 	fterm_write("2. (Allocation Failure) buddy_alloc(1MB) => { order: N/A, ptr: NULL }\n");
-
-		// if (page2 != NULL)
-		// 	fterm_write("3. buddy_alloc(4K) => { order: %d, ptr: 0x%llX }\n", page2->order, page2->ptr);
-		// else
-		// 	fterm_write("3. (Allocation Failure) buddy_alloc(4K) => { order: N/A, ptr: NULL }\n");
-
-		// foo();
-
-		// for (;;)
-		// 	;
-		// TEST //
-
 		fterm_write("boot: Reached target vmm\n");
 		vmm_init(check_la57(), mmap);
         fterm_write("boot: After init_vmm\n");
