@@ -9,7 +9,7 @@ include ./flags.mk
 
 .PHONY: clean all run
 
-all: daemons symlist quick_recompile $(KERNEL_HDD) ISO
+all: symlist quick_recompile $(KERNEL_HDD) ISO
 
 daemons:
 	@$(MAKE) --no-print-directory -C daemon/init
@@ -77,8 +77,8 @@ ISO: $(KERNEL_HDD)
 quick_recompile: symlist
 	@rm -f $(KERNEL_HDD) kernel/kernel.elf
 	@printf "\n"
-	@$(MAKE) --no-print-directory -C daemon/init
-	@printf "\n"
 	@$(MAKE) --no-print-directory -C libs
+	@printf "\n"
+	@$(MAKE) --no-print-directory -C daemon/init
 	@printf "\n"
 	@$(MAKE) --no-print-directory -C kernel

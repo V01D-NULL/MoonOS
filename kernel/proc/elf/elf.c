@@ -11,7 +11,6 @@ static task_t elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, bool do_pani
 
 task_t load_elf(const uint8_t *elf, bool do_panic)
 {
-    // elf = (const uint8_t *)from_higher_half((uintptr_t)elf, DATA);
     Elf64_Ehdr ehdr = elf_verify_ehdr(&elf);
 
     printk("elf", "Elf version: %d\n", ehdr.e_version);
@@ -23,6 +22,7 @@ task_t load_elf(const uint8_t *elf, bool do_panic)
 static Elf64_Ehdr elf_verify_ehdr(const uint8_t **elf)
 {
     Elf64_Ehdr ehdr = *(Elf64_Ehdr *)(*elf);
+    
     if (!IS_ELF(ehdr))
     {
         panic("Invalid ELF magic");

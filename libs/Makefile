@@ -1,6 +1,6 @@
 .PHONY: all clean
 
-all: libk.a liballoc.a ds.a libgraphics.a
+all: libk.a liballoc.a ds.a libgraphics.a userspace.a
 	@printf "(LIBS) Built all kernel archive libraries\n";
 
 libk.a:
@@ -19,6 +19,10 @@ ds.a:
 libgraphics.a:
 	@$(MAKE) --no-print-directory -C libgraphics all
 	@mv libgraphics/$@ .	
+
+userspace.a:
+	@$(MAKE) --no-print-directory -C userspace all
+	@mv userspace/$@ .
 
 clean:
 	@rm -f libk.a liballoc.a ds.a libgraphics.a

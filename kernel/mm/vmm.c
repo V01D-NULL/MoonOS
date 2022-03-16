@@ -13,7 +13,7 @@
 #include <amd64/paging/memory/pat.h>
 #include <amd64/paging/paging.h>
 #include <devices/term/fallback/fterm.h>
-#include <mm/buddy/buddy.h>
+
 #define WC (1 << 3) | (1 << 4) // pat0, pat1
 
 create_lock("vmm", vmm_lock);
@@ -27,10 +27,9 @@ STATIC_INLINE uint64_t index_of(uint64_t vaddr, int offset)
     return vaddr >> (12 + 9 * (offset - 1)) & 0x1FF;
 }
 
-static bool log = false;
 void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap)
 {
-    // configure_pat();
+    configure_pat();
     la57_enabled = has_5_level_paging;
 
     void *page = pmm_alloc();
@@ -60,9 +59,8 @@ void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap)
     }
 
     // Identity map 0-4GiB
-    log = true;
-    // fterm_write("vmm: Identity mapping 0-4GiB [Memory caching type: UC | Access flags Kernel+RW]\n");
-    // vmm_map_range(vmm_as_range(0, 4 * GB, VMEM_DIRECT_MAPPING), MAP_KERN, NULL);
+    fterm_write("vmm: Identity mapping 0-4GiB [Memory caching type: UC | Access flags Kernel+RW]\n");
+    vmm_map_range(vmm_as_range(0, 4 * GB, VMEM_DIRECT_MAPPING), MAP_KERN, NULL);
 
     // Map 2GiB of kernel data
     fterm_write("vmm: Mapping 2GiB of kernel data at offset 0x%s [Memory caching type: UC | Access flags Kernel+RW]\n", la57_enabled ? "FF0000..." : "FFFF80...");
@@ -337,7 +335,7 @@ uint64_t *vmm_get_kernel_pagemap(void)
 
 uint64_t *vmm_create_new_pagemap(void)
 {
-    return (uint64_t *)from_higher_half((uintptr_t)pmm_alloc(), DATA);
+    return (uint64_t *)pmm_alloc();
 }
 
 void vmm_copy_kernel_mappings(task_t task)

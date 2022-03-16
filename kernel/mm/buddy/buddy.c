@@ -144,7 +144,7 @@ struct page buddy_alloc(int order, struct zone *memory_zones)
 
 static struct zone *init_zone(size_t base, size_t length, int zone_nr, int type)
 {
-	struct zone *zone = (struct zone *)from_higher_half((uintptr_t)pmm_alloc(), DATA); // slab_alloc(sizeof(struct zone));
+	struct zone *zone = (struct zone *)slab_alloc(sizeof(struct zone));
 	panic_if(!zone, "Failed to allocate ~%ld bytes for a zone structure", sizeof(struct zone));
 
 	zone->start = base;

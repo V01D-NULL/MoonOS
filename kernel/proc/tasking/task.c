@@ -12,6 +12,6 @@ void add_task(task_t task)
 
 task_t new_task(const char *descriptor, Elf64_Addr entrypoint)
 {
-    size_t ustack = from_higher_half((uintptr_t)pmm_alloc(), DATA);
+    size_t ustack = (uintptr_t)pmm_alloc();
     return (task_t){.descriptor = descriptor, .pagemap = vmm_create_new_pagemap(), .entrypoint = entrypoint, .ustack = ustack};
 }

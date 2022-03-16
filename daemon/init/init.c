@@ -1,5 +1,7 @@
+#include <userspace/syscalls.h>
+
 void _start(void)
 {
-	__asm__ volatile("int $0x0");
+    // syscall_log("Hello, world!\n");
     for (;;) {}
 }

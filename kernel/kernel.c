@@ -62,9 +62,9 @@ void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 	printk("main", "Detected %d modules\n", mods->module_count);
 	printk("main", "Module string: %s\n", mods->modules[0].string);
 
-	// task_t task = load_elf((const uint8_t *)mods->modules[0].begin, true);
-	// vmm_switch_pagemap(task);
-	// jump_to_user_address((void *)task.entrypoint, task.ustack);
+	task_t task = load_elf((const uint8_t *)mods->modules[0].begin, true);
+	vmm_switch_pagemap(task);
+	jump_to_user_address((void *)task.entrypoint, task.ustack);
 
 	// lapic_init(acpi_init(&bootvars->rsdp).apic);
 	// smp_init(&bootvars->cpu);
