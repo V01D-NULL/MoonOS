@@ -26,6 +26,6 @@
         _panic(rbp, rsp, __VA_ARGS__);                 \
     }
 
-gnu_no_return _panic(uint64_t rbp, uint64_t rsp, const char* fmt, ...);
+gnu_no_return void _panic(uint64_t rbp, uint64_t rsp, const char* fmt, ...);
 
 #endif // PANIC_H

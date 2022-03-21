@@ -6,7 +6,7 @@
 // gnu_* refers to the gnu specific features such as alignature or plain C keywords
 #define gnu_export extern 
 #define gnu_no_optimize volatile
-#define gnu_no_return __attribute__((noreturn)) void
+#define gnu_no_return __attribute__((noreturn))
 #define gnu_section_align8 __attribute__((aligned (8)))
 #define gnu_section_align16  __attribute__((aligned (16)))
 #define gnu_section_align4k __attribute__((aligned (4096)))
