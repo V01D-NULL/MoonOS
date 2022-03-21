@@ -14,8 +14,6 @@
 #include <amd64/paging/paging.h>
 #include <devices/term/fallback/fterm.h>
 
-#define WC (1 << 3) | (1 << 4) // pat0, pat1
-
 create_lock("vmm", vmm_lock);
 
 static uint64_t *kernel_pagemap;
@@ -54,7 +52,7 @@ void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap)
         if (type == STIVALE2_MMAP_FRAMEBUFFER)
         {
             fterm_write("vmm: Identity mapping framebuffer (0x%lX-0x%lX) [Memory caching type: UC | Access flags: RO]\n", base, top);
-            vmm_map_range(vmm_as_range(base, top, VMEM_DIRECT_MAPPING), MAP_READONLY | WC, NULL);
+            vmm_map_range(vmm_as_range(base, top, VMEM_DIRECT_MAPPING), MAP_READONLY, NULL);
         }
     }
 
@@ -108,7 +106,6 @@ void vmm_map(uint64_t *pagemap, size_t vaddr, size_t paddr, int flags)
     uint64_t lv3 = index_of(vaddr, 3);
     uint64_t lv2 = index_of(vaddr, 2);
     uint64_t lv1 = index_of(vaddr, 1);
-    int pat_attr = get_pat();
 
     if (la57_enabled)
     {
@@ -116,51 +113,18 @@ void vmm_map(uint64_t *pagemap, size_t vaddr, size_t paddr, int flags)
         uint64_t *pml4, *pml3, *pml2, *pml1 = NULL;
 
         pml4 = vmm_get_pml_or_alloc(pagemap, lv5, flags);
-        paging_cache_disable_set(pml4, lv4, pat_attr & (1 << PG_PCD));
-        paging_write_through_set(pml4, lv4, pat_attr & (1 << PG_PWT));
-        if (flags & (1 << 7)) // PS
-            paging_pat_set(pml4, lv4, pat_attr & (1 << 12));
-
         pml3 = vmm_get_pml_or_alloc(pml4, lv4, flags);
-        paging_cache_disable_set(pml3, lv3, pat_attr & (1 << PG_PCD));
-        paging_write_through_set(pml3, lv3, pat_attr & (1 << PG_PWT));
-        if (flags & (1 << 7)) // PS
-            paging_pat_set(pml3, lv3, pat_attr & (1 << 12));
-
         pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
-        paging_cache_disable_set(pml2, lv2, pat_attr & PG_PCD);
-        paging_write_through_set(pml2, lv2, pat_attr & PG_PWT);
-        if (flags & (1 << 7)) // PS
-            paging_pat_set(pml2, lv2, pat_attr & PG_PAT);
-
         pml1 = vmm_get_pml_or_alloc(pml2, lv2, flags);
         pml1[lv1] = (paddr | flags);
-
-        paging_cache_disable_set(pml1, lv1, pat_attr & PG_PCD);
-        paging_write_through_set(pml1, lv1, pat_attr & PG_PWT);
-        paging_pat_set(pml1, lv1, pat_attr & PG_PAT);
     }
     else
     {
         uint64_t *pml3, *pml2, *pml1 = NULL;
         pml3 = vmm_get_pml_or_alloc(pagemap, lv4, flags);
-
-        paging_cache_disable_set(pml3, lv3, pat_attr & (1 << PG_PCD));
-        paging_write_through_set(pml3, lv3, pat_attr & (1 << PG_PWT));
-        if (flags & (1 << 7)) // PS
-            paging_pat_set(pml3, lv3, pat_attr & (1 << 12));
-
         pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
-        paging_cache_disable_set(pml2, lv2, pat_attr & PG_PCD);
-        paging_write_through_set(pml2, lv2, pat_attr & PG_PWT);
-        if (flags & (1 << 7)) // PS
-            paging_pat_set(pml2, lv2, pat_attr & (1 << 12));
-
         pml1 = vmm_get_pml_or_alloc(pml2, lv2, flags);
         pml1[lv1] = (paddr | flags);
-        paging_cache_disable_set(pml1, lv1, pat_attr & PG_PCD);
-        paging_write_through_set(pml1, lv1, pat_attr & PG_PWT);
-        paging_pat_set(pml1, lv1, pat_attr & (1 << 7));
     }
 
     invlpg(vaddr);
@@ -249,50 +213,19 @@ void vmm_remap(uint64_t *pagemap, size_t vaddr_old, size_t vaddr_new, int flags)
         uint64_t lv5 = index_of(vaddr_new, 5);
         uint64_t *pml4, *pml3, *pml2, *pml1 = NULL;
         pml4 = vmm_get_pml_or_alloc(kernel_pagemap, lv5, flags);
-        paging_cache_disable_set(pml4, lv4, pat_attr & (1 << PG_PCD));
-        paging_write_through_set(pml4, lv4, pat_attr & (1 << PG_PWT));
-        if (flags & (1 << 7)) // PS
-            paging_pat_set(pml4, lv4, pat_attr & (1 << 12));
-
         pml3 = vmm_get_pml_or_alloc(pml4, lv4, flags);
-        paging_cache_disable_set(pml3, lv3, pat_attr & (1 << PG_PCD));
-        paging_write_through_set(pml3, lv3, pat_attr & (1 << PG_PWT));
-        if (flags & (1 << 7)) // PS
-            paging_pat_set(pml3, lv3, pat_attr & (1 << 12));
-
         pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
-        paging_cache_disable_set(pml2, lv2, pat_attr & PG_PCD);
-        paging_write_through_set(pml2, lv2, pat_attr & PG_PWT);
-        if (flags & (1 << 7)) // PS
-            paging_pat_set(pml2, lv2, pat_attr & (1 << 12));
-
         pml1 = vmm_get_pml_or_alloc(pml2, lv2, flags);
         pml1[lv1] = (paddr | flags);
-        paging_cache_disable_set(pml1, lv1, pat_attr & PG_PCD);
-        paging_write_through_set(pml1, lv1, pat_attr & PG_PWT);
-        paging_pat_set(pml1, lv1, pat_attr & (1 << 7));
     }
     else
     {
         uint64_t *pml3, *pml2, *pml1 = NULL;
 
         pml3 = vmm_get_pml_or_alloc(kernel_pagemap, lv4, flags);
-        paging_cache_disable_set(pml3, lv3, pat_attr & (1 << PG_PCD));
-        paging_write_through_set(pml3, lv3, pat_attr & (1 << PG_PWT));
-        if (flags & (1 << 7)) // PS
-            paging_pat_set(pml3, lv3, pat_attr & (1 << 12));
-
         pml2 = vmm_get_pml_or_alloc(pml3, lv3, flags);
-        paging_cache_disable_set(pml2, lv2, pat_attr & PG_PCD);
-        paging_write_through_set(pml2, lv2, pat_attr & PG_PWT);
-        if (flags & (1 << 7)) // PS
-            paging_pat_set(pml2, lv2, pat_attr & (1 << 12));
-
         pml1 = vmm_get_pml_or_alloc(pml2, lv2, flags);
         pml1[lv1] = (paddr | flags);
-        paging_cache_disable_set(pml1, lv1, pat_attr & PG_PCD);
-        paging_write_through_set(pml1, lv1, pat_attr & PG_PWT);
-        paging_pat_set(pml1, lv1, pat_attr & (1 << 7));
     }
 
     invlpg(vaddr_new);
@@ -311,21 +244,11 @@ void vmm_map_range(vmm_range_t range, int flags, uint64_t *pagemap)
 
 void vmm_pagefault_handler(uint64_t cr2, int error_code)
 {
-    /* CPL = 3 */
-    if (error_code & 4)
-    {
-        printk("vmm", "TODO: Userspace pagefault must be handled!\n");
-        while (1)
-            ;
-    }
-
-    /* Non present page */
-    else if (!(error_code & 1))
-        vmm_map(NULL, cr2, cr2, (error_code & 2) ? MAP_KERN : MAP_READONLY);
-
-    /* Page fault generated by ab Instruction fetch, only when NX is enabled (Always will be because of limine) */
-    else if (error_code & 16)
-        ;
+#ifdef DEBUG_VMM
+    printk("vmm", "\033[93m%s pagefault @%p (error_code: %d)\033[39m\n", error_code & 4 ? "Userspace" : "KernelSpace", cr2, error_code);
+#endif
+    // Todo: Check if cr2 is a high vma and add the offset accordingly.
+    vmm_map(active_pagemap, cr2, cr2, error_code);
 }
 
 uint64_t *vmm_get_kernel_pagemap(void)
