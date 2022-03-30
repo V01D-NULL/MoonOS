@@ -1,51 +1,3 @@
-// void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap)
-// {
-//     configure_pat();
-//     la57_enabled = has_5_level_paging;
-
-//     void *page = pmm_alloc();
-//     panic_if(page == NULL, "Cannot allocate kernel pagemap");
-//     kernel_pagemap = (uint64_t *)page;
-//     debug(true, "kpagemap = %llx\n", kernel_pagemap);
-
-//     //fterm_write("vmm: Mapping the framebuffer and bootloader reclaimable entries...\n");
-
-//     // This mapping is required in order to use the stivale2 terminal
-//     for (size_t i = 0; i < mmap->entries; i++)
-//     {
-//         size_t base = mmap->memmap[i].base;
-//         size_t top = base + mmap->memmap[i].length;
-//         size_t type = mmap->memmap[i].type;
-
-//         if (type == STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE)
-//         {
-//             //fterm_write("vmm: Identity mapping BRE (0x%lX-0x%lX) [Memory caching type: UC | Access flags: RO]\n", base, top);
-//             vmm_map_range(vmm_as_range(base, top, VMEM_DIRECT_MAPPING), MAP_READONLY, NULL);
-//         }
-//         if (type == STIVALE2_MMAP_FRAMEBUFFER)
-//         {
-//             //fterm_write("vmm: Identity mapping framebuffer (0x%lX-0x%lX) [Memory caching type: UC | Access flags: RO]\n", base, top);
-//             vmm_map_range(vmm_as_range(base, top, VMEM_DIRECT_MAPPING), MAP_READONLY, NULL);
-//         }
-//     }
-
-//     // Identity map 0-4GiB
-//     //fterm_write("vmm: Identity mapping 0-4GiB [Memory caching type: UC | Access flags Kernel+RW]\n");
-//     vmm_map_range(vmm_as_range(0, 4 * GB, VMEM_DIRECT_MAPPING), MAP_KERN, NULL);
-
-//     // Map 2GiB of kernel data
-//     //fterm_write("vmm: Mapping 2GiB of kernel data at offset 0x%s [Memory caching type: UC | Access flags Kernel+RW]\n", la57_enabled ? "FF0000..." : "FFFF80...");
-//     vmm_map_range(vmm_as_range(0, 2 * GB, la57_enabled ? VMEM_LV5_BASE : VMEM_LV4_BASE), MAP_KERN, NULL);
-
-//     // Map 2GiB of kernel code
-//     //fterm_write("vmm: Mapping 2GiB of kernel code [Memory caching type: UC | Access flags: Kernel+RO]\n");
-//     vmm_map_range(vmm_as_range(0, 2 * GB, VMEM_CODE_BASE), MAP_READONLY, NULL);
-
-//     //fterm_write("vmm: Bootloader pagemap: 0x%lX\nvmm: Kernel pagemap: 0x%lX\n", cr_read(CR3), kernel_pagemap);
-//     wrcr3(GENERIC_CAST(uint64_t, kernel_pagemap));
-//     debug(true, "New PML4: %llx\n", cr_read(CR3)); // Kernel pagemap
-// }
-
 #include "vmm.h"
 
 #include <mm/pmm.h>
@@ -67,20 +19,18 @@ static struct Pml *vmm_pml_advance(
     size_t level, int flags
 );
 
-void vmm_init(struct stivale2_mmap_entry *mmap, int entries)
+void v_init(struct stivale2_mmap_entry *mmap, int entries)
 {
     assert((kernel_pagemap = pmm_alloc()) != NULL);
     
-    vmm_map_range(vmm_as_range(0, 4 * GB, $identity_vma), MAP_KERN, kernel_pagemap);
-    vmm_map_range(vmm_as_range(0, 2 * GB, $high_vma), MAP_KERN, kernel_pagemap);
-    vmm_map_range(vmm_as_range(0, 2 * GB, $high_vma_code), MAP_READONLY, kernel_pagemap);
+    v_map_range(as_vmm_range(0, 4 * GB, $identity_vma), MAP_KERN, kernel_pagemap);
+    v_map_range(as_vmm_range(0, 2 * GB, $high_vma), MAP_KERN, kernel_pagemap);
+    v_map_range(as_vmm_range(0, 2 * GB, $high_vma_code), MAP_READONLY, kernel_pagemap);
     
     debug(true, "Old PML4: 0x%llx\n", cr_read(CR3)); // Bootloader pml4
-    vmm_switch_to_kernel_pagemap();
+    switch_to_kernel_pagemap();
     debug(true, "New PML4: 0x%llx\n", cr_read(CR3)); // Kernel pml4
 }
-
-inline bool check_flag(int flags, int bit) { return (flags >> bit) & 1; }
 
 inline uint64_t index_of(uint64_t vaddr, int offset)
 {
@@ -98,11 +48,11 @@ static struct Pml *vmm_pml_advance(struct Pml *entry, size_t level, int flags)
 
     uint64_t addr = (uint64_t)pmm_alloc();
     panic_if(!addr, "Failed to allocate memory for a pagetable!");
-    entry->page_tables[level] = vmm_create_entry(addr, flags);
+    entry->page_tables[level] = paging_create_entry(addr, flags);
     return (struct Pml*)addr;
 }
 
-void vmm_map(struct Pml *pml4, size_t vaddr, size_t paddr, int flags)
+void v_map(struct Pml *pml4, size_t vaddr, size_t paddr, int flags)
 {
     if (!pml4 || !flags)
     {
@@ -117,11 +67,11 @@ void vmm_map(struct Pml *pml4, size_t vaddr, size_t paddr, int flags)
     pml2 = vmm_pml_advance(pml3, index_of(vaddr, 3), flags);
     pml1 = vmm_pml_advance(pml2, index_of(vaddr, 2), flags);
 
-    pml1->page_tables[index_of(vaddr, 1)] = vmm_create_entry(paddr, flags);
+    pml1->page_tables[index_of(vaddr, 1)] = paging_create_entry(paddr, flags);
     invlpg(vaddr);
 }
 
-void vmm_unmap(struct Pml *pml4, size_t vaddr)
+void v_unmap(struct Pml *pml4, size_t vaddr)
 {
     if (!pml4)
         return;
@@ -132,51 +82,29 @@ void vmm_unmap(struct Pml *pml4, size_t vaddr)
     pml1 = GET_PMLx(vaddr, pml2, 2);
 
     uint64_t addr = pml1->page_tables[index_of(vaddr, 1)].address;
-    pml1->page_tables[index_of(vaddr, 1)] = vmm_purge_entry();
+    pml1->page_tables[index_of(vaddr, 1)] = paging_purge_entry();
     
     invlpg(vaddr);
     pmm_free((void*)addr);
 }
 
-struct pte vmm_create_entry(uint64_t paddr, int flags)
-{
-    return (struct pte) {
-        .present = check_flag(flags, 0),
-        .readwrite = check_flag(flags, 1),
-        .supervisor = check_flag(flags, 2),
-        .writethrough = 0,
-        .cache_disabled = 0,
-        .accessed = 0,
-        .dirty = 0,
-        .ignore = 0,
-        .global = 0,
-        .avail = 0,
-        .address = paddr >> PAGE_SHIFT
-    };
-}
-
-struct pte vmm_purge_entry()
-{
-    return vmm_create_entry(0, 0);
-}
-
-void vmm_switch_to_kernel_pagemap(void)
+void switch_to_kernel_pagemap(void)
 {
     wrcr3(kernel_pagemap);
 }
 
-void vmm_map_range(VmmRange range, int flags, struct Pml *pagemap)
+void v_map_range(VmmRange range, int flags, struct Pml *pagemap)
 {
     uint64_t base = range.range.base, limit = range.range.limit;
     assert(base % 4096 == 0 && limit % 4096 == 0);
 
     for (; base != limit; base += PAGE_SIZE)
     {
-        vmm_map(pagemap, base + range.address_offset, base, flags);
+        v_map(pagemap, base + range.address_offset, base, flags);
     }
 }
 
-void vmm_pagefault_handler(uint64_t cr2, int error_code)
+void pagefault_handler(uint64_t cr2, int error_code)
 {
 #ifdef DEBUG_VMM
     printk("vmm", "\033[93m%s pagefault @%p (error_code: %d)\033[39m\n", error_code & 4 ? "Userspace" : "KernelSpace", cr2, error_code);
@@ -189,29 +117,29 @@ void vmm_pagefault_handler(uint64_t cr2, int error_code)
     // debug(true, "flags: %d | err: %d\n", flags, error_code);
 
     // Todo: Check if cr2 is a high vma and add the offset accordingly.
-    vmm_map(active_pagemap, cr2, cr2, error_code);
+    v_map(active_pagemap, cr2, cr2, error_code);
 }
 
-struct Pml *vmm_get_kernel_pagemap(void)
+struct Pml *get_kernel_pagemap(void)
 {
     return kernel_pagemap;
 }
 
-struct Pml *vmm_create_new_pagemap(void)
+struct Pml *create_new_pagemap(void)
 {
     return (struct Pml *)pmm_alloc();
 }
 
-void vmm_copy_kernel_mappings(task_t task)
+void copy_kernel_mappings(task_t task)
 {
     for (int i = 0; i < 256; i++)
-        task.pagemap->page_tables[i] = vmm_purge_entry();
+        task.pagemap->page_tables[i] = paging_purge_entry();
 
     for (int i = 256; i < 512; i++)
         task.pagemap->page_tables[i] = kernel_pagemap->page_tables[i];
 }
 
-void vmm_switch_pagemap(task_t task)
+void switch_pagemap(task_t task)
 {
     if (!task.pagemap)
     {
