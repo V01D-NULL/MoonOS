@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <printk.h>
 #include <panic.h>
+#include <proc/uspace/syscalls.h>
 
 isr_t isr_handler_array[255] = {0};
 bool canReturn = false;
@@ -52,32 +53,25 @@ void isr_handler(regs_t regs)
     {
 		if (regs.cs == 0x43)
 		{
-			__asm__ volatile(
-				gnu_asm_flavor_intel
-				"mov ax, 0x30\n"
-				"mov ds, ax\n"
-				"mov fs, ax\n"
-				"mov gs, ax\n"
-				"mov ss, ax\n"
-				"mov es, ax\n"
-				gnu_asm_flavor_at_t
-			);
-			vmm_switch_to_kernel_pagemap();
-			panic(":p");
-			// printk("INT", "Todo: Terminate userprocess!");
-			// goto end;
+            asm volatile("swapgs" ::: "memory");
+			// printk("INT", BASH_GREEN "Userprocess triggered an exception\n" BASH_GRAY);
+            debug(true, BASH_GREEN "Userprocess triggered an exception\n" BASH_GRAY);
+            vmm_switch_to_kernel_pagemap();
 		}
 
         override_quiet_boot();
         serial_set_color(BASH_RED);
-        printk("INT", "%s (err_code %ld)\n", exception_messages[regs.isr_number], regs.error_code);
+        debug(true, "ERROR: %s (err_code %ld)\n", exception_messages[regs.isr_number], regs.error_code);
+        // printk("INT", "%s (err_code %ld)\n", exception_messages[regs.isr_number], regs.error_code);
 
         if (regs.isr_number == 14)
         {
-            printk("INT ~ #PF", "Faulting address: 0x%lx\n", cr_read(CR2));
             uint64_t cr2 = cr_read(CR2);
-            vmm_pagefault_handler(cr2, regs.error_code);
-            return;
+            // printk("INT ~ #PF", "Faulting address: 0x%lx\n", cr2);
+            debug(true, "INT ~ #PF Faulting address: 0x%lx\n", cr2);
+            // vmm_pagefault_handler(cr2, regs.error_code);
+            for(;;);
+            goto exit_handler;
         }
         else if (regs.isr_number == 6)
         {
@@ -122,7 +116,7 @@ void isr_handler(regs_t regs)
         if (!canReturn)
         {
             for (;;)
-                __asm__("hlt");
+                asm("hlt");
         }
     }
 
@@ -132,6 +126,10 @@ void isr_handler(regs_t regs)
     if (regs.isr_number > 40)
         outb(0xA0, 0x20);
     outb(0x20, 0x20);
+
+exit_handler:
+    if (regs.cs == 0x43)
+        asm volatile("swapgs" ::: "memory");
 }
 
 void install_isr(uint8_t base, isr_t handler)

@@ -13,7 +13,7 @@ static void ap_startup(struct stivale2_smp_info *cpu)
     
     for(;;)
     {
-        __asm__("hlt");
+        asm("hlt");
     }
 }
 

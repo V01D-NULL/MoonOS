@@ -18,7 +18,8 @@
         "__stddef_max_align_t.h": "c",
         "msr.h": "c",
         "syscalls.h": "c",
-        "ktypes.h": "c"
+        "ktypes.h": "c",
+        "vmm.h": "c"
     },
     "files.exclude": {
         "**/*.o": true,
@@ -27,5 +28,6 @@
     "cSpell.enabled": false,
 	"C_Cpp.errorSquiggles": "Enabled",
 	"editor.detectIndentation": false,
-	"python.formatting.provider": "black"
+    "python.formatting.provider": "black",
+    "C_Cpp.default.compilerPath": "/usr/bin/clang"
 }

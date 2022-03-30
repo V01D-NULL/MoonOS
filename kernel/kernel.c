@@ -51,7 +51,9 @@
 #include <hal/acpi/acpi.h>
 #include <hal/apic/apic.h>
 
+#include <proc/daemon/load.h>
 #include <proc/uspace/userspace.h>
+#include <proc/uspace/syscalls.h>
 #include <proc/elf/elf.h>
 
 #include "panic.h"
@@ -59,18 +61,21 @@
 
 void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 {
+    uint64_t rbp = 0;
+    asm volatile("mov %%rbp, %0" : "=r"(rbp));
+    init_percpu(rbp);
+    init_syscalls();
+
 	printk("main", "Detected %d modules\n", mods->module_count);
 	printk("main", "Module string: %s\n", mods->modules[0].string);
 
-	task_t task = load_elf((const uint8_t *)mods->modules[0].begin, true);
-	vmm_switch_pagemap(task);
-	jump_to_user_address((void *)task.entrypoint, task.ustack);
+	load_daemon((const uint8_t*)mods->modules[0].begin, "(Daemon) init");
 
 	// lapic_init(acpi_init(&bootvars->rsdp).apic);
 	// smp_init(&bootvars->cpu);
 
-	for (;;)
+    for (;;)
 	{
-		__asm__("hlt");
+        asm("cli;hlt");
 	}
 }

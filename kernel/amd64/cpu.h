@@ -29,9 +29,11 @@ struct cpuid_regs_t
     int function;
 };
 
+// Todo: When smp is in question I'll make a cpu_ctx_t and pass that as an argument to init_percpu().
+// cpu_ctx_t will probably just derive from the stivale2 smp tag or something
+void init_percpu(uint64_t current_stack); // Initialize information for this CPU and store it in gs
 
 void cpuid(struct cpuid_regs_t *cpuid_regs);
-
 void log_cpuid_results(void);
 
 
@@ -63,5 +65,11 @@ typedef struct regs {
     int64_t rsp;
     int64_t ss;
 } regs_t;
+
+struct percpu
+{
+    uint64_t syscall_stack; // Temporary stack for the syscall handler.
+    uint64_t working_stack; // Denotes the stack that is usually used when a cpu is not in a syscall or anything else that may require a stack change.
+};
 
 #endif // CPU_H

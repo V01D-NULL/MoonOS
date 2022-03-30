@@ -7,25 +7,30 @@
 
 // panic if eval evaluates to true
 #define panic_if(eval, ...)     \
+    do                          \
     {                           \
-        if (eval) {             \
+        if (eval)               \
+        {                       \
             panic(__VA_ARGS__); \
-        } else {                \
+        }                       \
+        else                    \
+        {                       \
             (void)0;            \
         }                       \
-    }
+    } while (0)
 
-#define panic(...)                                     \
-    {                                                  \
-        uint64_t rsp = 0;                              \
-        uint64_t rbp = 0;                              \
-        __asm__("mov %%rsp, %0"                        \
-                : "=r"(rsp));                          \
-        __asm__("mov %%rbp, %0"                        \
-                : "=r"(rbp));                          \
-        _panic(rbp, rsp, __VA_ARGS__);                 \
-    }
+#define panic(...)                     \
+    do                                 \
+    {                                  \
+        uint64_t rsp = 0;              \
+        uint64_t rbp = 0;              \
+        asm("mov %%rsp, %0"            \
+            : "=r"(rsp));              \
+        asm("mov %%rbp, %0"            \
+            : "=r"(rbp));              \
+        _panic(rbp, rsp, __VA_ARGS__); \
+    } while (0)
 
-gnu_no_return void _panic(uint64_t rbp, uint64_t rsp, const char* fmt, ...);
+gnu_no_return void _panic(uint64_t rbp, uint64_t rsp, const char *fmt, ...);
 
 #endif // PANIC_H

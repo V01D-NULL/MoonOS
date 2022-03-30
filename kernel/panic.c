@@ -53,5 +53,5 @@ gnu_no_return void _panic(uint64_t rbp, uint64_t rsp, const char *fmt, ...)
 	}
 
 	for (;;)
-		__asm__("hlt");
+		asm("hlt");
 }

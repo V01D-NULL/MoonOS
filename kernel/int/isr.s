@@ -6,12 +6,10 @@ extern idt_set_entry
 _asm_isr_handler_stub:
     cld
     pusha64
-    
     call isr_handler   ; C interrupt handler routine
     popa64
     _cleanup_stack 16  ; Clean up pushed error code and interrupt number from stack
     iretq              ; Pop other flags and return to normal execution State
-
 
 global load_idt
 load_idt:

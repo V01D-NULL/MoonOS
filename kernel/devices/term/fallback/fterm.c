@@ -3,14 +3,19 @@
 #include <libk/kstring.h>
 #include <libk/kprintf.h>
 #include <stdarg.h>
+#include <mm/vmm.h>
+#include <devices/serial/serial.h>
 
 void (*term_write)(const char *string, size_t length);
+
+static uint64_t term_write_paddr = 0x0;
 static bool fterm_available = true;
 static int fterm_width = 0;
 static int fterm_height = 0;
 
 void fterm_init(uint64_t term_write_addr, int width, int height)
 {
+    term_write_paddr = term_write_addr;
     void *term_write_ptr = (void *)term_write_addr;
     term_write = term_write_ptr;
     fterm_width = width;
@@ -47,4 +52,10 @@ void fterm_flush(void)
         fterm_write(" ");
 
     fterm_write("\033[1;1H");
+}
+
+void fterm_map(void)
+{
+    debug(true, "Mapping fterm @ 0x%lX\n", term_write_paddr);
+    vmm_map(vmm_get_kernel_pagemap(), term_write_paddr, term_write_paddr, MAP_KERN);
 }

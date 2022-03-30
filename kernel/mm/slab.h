@@ -42,4 +42,6 @@ void slab_init(void);
 uint64_t *slab_alloc(int sz);
 void slab_free(uint64_t *ptr, int sz);
 
+void slab_panic(bool status);
+
 #endif // SLAB_H

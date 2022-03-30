@@ -3,6 +3,6 @@
 
 #include <amd64/moon.h>
 
-gnu_export void jump_to_user_address(void *addr, size_t ustack);
+gnu_no_return void enter_ring3(void *addr, size_t stack);
 
 #endif // USERSPACE_H

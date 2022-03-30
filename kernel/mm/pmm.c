@@ -126,6 +126,12 @@ const char *get_mmap_type(int entry)
     }
 }
 
+///////////////
+//
+// TODO: Modify this to use memory zones instead of one large bitmap!!
+//  That way memory allocations will be faster since unusable zones are excluded and it's easier to implement the buddy allocator here!!!
+//
+///////////////
 void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
 {
     phys_mmap.entries = entries;

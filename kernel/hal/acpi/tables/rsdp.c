@@ -14,7 +14,7 @@ void rsdp_verify_checksum(uint64_t rsdp_address);
 void rsdp_init(boot_rsdp_t *boot_rsdp_table)
 {
     rsdp_verify_checksum(boot_rsdp_table->rsdp_address);
-    printk("acpi-rsdp", "RSDP Table: %llX\n", to_higher_half(boot_rsdp_table->rsdp_address, DATA));
+    printk("acpi-rsdp", "RSDP Table: %llX\n", boot_rsdp_table->rsdp_address + $high_vma);
     
     rsdp = *(struct RSDP*) boot_rsdp_table->rsdp_address;
 
@@ -27,14 +27,14 @@ void rsdp_init(boot_rsdp_t *boot_rsdp_table)
     if (rsdp.revision >= 2)
     {
         printk("acpi-rsdp", "ACPI Version: 2.0+ (detection based on revision)\n");
-        printk("acpi-rsdp", "XSDT address: %llX\n", to_higher_half(rsdp.xsdt_address, DATA));
+        printk("acpi-rsdp", "XSDT address: %llX\n", rsdp.xsdt_address + $high_vma);
         has_xsdt = true;
     }
     /* RSDT */
     else
     {
         printk("acpi-rsdp", "Revision: %d (Assuming ACPI version 1.0)\n", rsdp.revision);
-        printk("acpi-rsdp", "RSDT address: %llX\n", to_higher_half(rsdp.rsdt_address, DATA));
+        printk("acpi-rsdp", "RSDT address: %llX\n", rsdp.rsdt_address + $high_vma);
     }
 }
 

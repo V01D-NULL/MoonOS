@@ -9,7 +9,7 @@ gfx_header_t gfx_h;
 
 void double_buffering_init(boot_info_t boot)
 {
-    gfx_h.fb_addr = from_higher_half(boot.vesa.fb_addr, DATA);
+    gfx_h.fb_addr = boot.vesa.fb_addr - $high_vma;
     gfx_h.fb_bpp = boot.vesa.fb_bpp;
     gfx_h.fb_height = boot.vesa.fb_height;
     gfx_h.fb_width = boot.vesa.fb_width;

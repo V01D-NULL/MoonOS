@@ -25,8 +25,9 @@ userspace.a:
 	@mv userspace/$@ .
 
 clean:
-	@rm -f libk.a liballoc.a ds.a libgraphics.a
+	@rm -f libk.a liballoc.a ds.a libgraphics.a userspace.a
 	@$(MAKE) --no-print-directory -C libk clean
 	@$(MAKE) --no-print-directory -C liballoc clean
 	@$(MAKE) --no-print-directory -C ds clean
 	@$(MAKE) --no-print-directory -C libgraphics clean
+	@$(MAKE) --no-print-directory -C userspace clean

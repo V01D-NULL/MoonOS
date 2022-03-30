@@ -76,7 +76,7 @@ void set_tss_entry(uint64_t base, uint8_t flags, uint8_t access);
 
 static inline void load_tss(uint16_t tss_selector)
 {
-    __asm__ volatile("ltr %%ax" :: "a"(0x48) : "memory");
+    asm volatile("ltr %%ax" :: "a"(0x48) : "memory");
 }
 
 #endif // GDT_H

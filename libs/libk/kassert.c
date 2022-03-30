@@ -9,5 +9,5 @@ void __assert_impl(const char *file, uint64_t line, const char *func, const char
     debug(true, "ASSERT", "%s:%d: %s: Assertion `%s' failed", (char *)file, line, func, desc);
     
     for (;;)
-        __asm__("hlt");
+        asm("hlt");
 }

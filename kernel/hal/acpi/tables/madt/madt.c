@@ -24,7 +24,7 @@ static void enumarate_apic_devices(madt_t **madt);
 
 struct apic_device_info madt_init(void *madt_base)
 {
-    madt_t *madt = (madt_t*)from_higher_half(GENERIC_CAST(uintptr_t, madt_base), DATA);
+    madt_t *madt = (madt_t*)((uintptr_t) madt_base - $high_vma);
     apic_dev.ioapics = pmm_alloc(); // TODO: Make this a heap allocation!
 
     // Strings aren't null terminated apparently, so we do it ourselves

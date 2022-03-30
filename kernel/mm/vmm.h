@@ -1,51 +1,68 @@
 #ifndef VMM_H
 #define VMM_H
 
+#include <amd64/paging/paging.h>
 #include <proc/tasking/task.h>
-#include <amd64/moon.h>
-#include <devices/serial/serial.h>
 #include <mm/cpu/CR.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stivale2.h>
 #include <util/range.h>
-#include <panic.h>
 
 #define GB 0x40000000UL
-
-// Flags
-enum vmm_mapping_protection
-{
-    MAP_READONLY = 1,        // Present/readonly, kernel only
-    MAP_KERN = 3,            // Read-write kernel only
-    MAP_USER = 7,            // User accessible page (R+W)
-};
 
 typedef struct task_struct task_t;
 typedef struct
 {
     range_t range;
-    size_t address_offset; // Can be VMEM_LV{4,5}_BASE, VMEM_CODE_BASE or VMEM_DIRECT_MAPPING
+    size_t address_offset; // Use one the the vma offsets (mm/mm.h)
     enum vmm_mapping_protection protection;
-} vmm_range_t;
+} VmmRange;
 
-#define invlpg(param_addr) __asm__ volatile("invlpg (%[addr])" ::[addr] "r"(param_addr))
-#define wrcr3(pml4) __asm__ volatile("mov %0, %%cr3\n" ::"r"(pml4) \
-                                     : "memory")
+#define PAGE_SHIFT 12
+#define GET_PMLx(vaddr, pml, level) (struct Pml*) ((uintptr_t)pml->page_tables[index_of(vaddr, level)].address << PAGE_SHIFT);
 
-STATIC_INLINE vmm_range_t vmm_as_range(size_t base, size_t top, size_t offset)
+#define invlpg(param_addr) asm volatile("invlpg (%[addr])" ::[addr] "r"(param_addr))
+#define wrcr3(pml4) asm volatile("mov %0, %%cr3\n" ::"r"(pml4) : "memory")
+
+STATIC_INLINE VmmRange vmm_as_range(size_t base, size_t top, size_t offset)
 {
-    return (vmm_range_t){.range = (range_t){.base = base, .limit = top}, .address_offset = offset};
+    return (VmmRange){.range = (range_t){.base = base, .limit = top}, .address_offset = offset};
 }
 
-void vmm_init(bool has_5_level_paging, struct stivale2_struct_tag_memmap *mmap);
-void vmm_map(uint64_t *pagemap, size_t vaddr, size_t paddr, int flags);
-void vmm_unmap(uint64_t *pagemap, size_t vaddr);
-void vmm_remap(uint64_t *pagemap, size_t vaddr_old, size_t vaddr_new, int flags);
-void vmm_map_range(vmm_range_t range, int flags, uint64_t *pagemap);
+struct pte
+{
+    uint8_t present : 1;
+    uint8_t readwrite : 1;
+    uint8_t supervisor : 1;
+    uint8_t writethrough : 1;
+    uint8_t cache_disabled : 1;
+    uint8_t accessed : 1;
+    uint8_t dirty : 1;
+    uint8_t ignore : 1;
+    uint8_t global : 1;
+    uint8_t avail : 3;
+    uint64_t address : 52;
+} gnu_pack_bytes;
 
-uint64_t *vmm_create_new_pagemap(void);
-uint64_t *vmm_get_kernel_pagemap(void);
+struct Pml
+{
+    struct pte page_tables[512];
+} gnu_pack_bytes;
+
+void vmm_init(struct stivale2_mmap_entry *mmap, int entries);
+void vmm_map(struct Pml *pml4, size_t vaddr, size_t paddr, int flags);
+void vmm_remap(struct Pml *pml4, size_t vaddr, size_t paddr, int flags);
+void vmm_unmap(struct Pml *pml4, size_t vaddr);
+
+struct pte vmm_create_entry(uint64_t paddr, int flags);
+struct pte vmm_purge_entry();
+
+void vmm_switch_to_kernel_pagemap(void);
+void vmm_map_range(VmmRange range, int flags, struct Pml *pagemap);
+
+struct Pml *vmm_create_new_pagemap(void);
+struct Pml *vmm_get_kernel_pagemap(void);
 void vmm_switch_pagemap(task_t task);
 void vmm_switch_to_kernel_pagemap(void);
 void vmm_copy_kernel_mappings(task_t task);

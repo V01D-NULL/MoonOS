@@ -171,24 +171,24 @@ void kinit(struct stivale2_struct *bootloader_info)
 
 	if (mmap != NULL)
 	{
-		fterm_write("boot: Reached target gdt and tss\n");
+		//fterm_write("boot: Reached target gdt and tss\n");
 		init_gdt((uint64_t)stack + sizeof(stack));
 
 		// Core#0 will remap the pic once.
 		// After acpi_init the pic is disabled in favor of the apic
-		fterm_write("boot: Reached target pic and idt\n");
+		//fterm_write("boot: Reached target pic and idt\n");
 		pic_remap();
 		init_idt();
 
-		fterm_write("boot: Reached target pmm\n");
+		//fterm_write("boot: Reached target pmm\n");
 		pmm_init(mmap->memmap, mmap->entries);
 
-		fterm_write("boot: Reached target slab\n");
+		//fterm_write("boot: Reached target slab\n");
 		slab_init();
 
-		fterm_write("boot: Reached target vmm\n");
-		vmm_init(check_la57(), mmap);
-        fterm_write("boot: After init_vmm\n");
+		//fterm_write("boot: Reached target vmm\n");
+		vmm_init(mmap->memmap, mmap->entries);// mmap is borked? a lot of zero entries and some missing ones?? not all BRE are mapped :think:
+        //fterm_write("boot: After init_vmm\n");
 
 		/* Is verbose boot specified in the command line? */
 		if (cmdline != NULL)
@@ -197,7 +197,7 @@ void kinit(struct stivale2_struct *bootloader_info)
 
 			if (!boot_cmdline_find_tag("verbose_boot", (const char *)cmdline->cmdline))
 			{
-				fterm_write("boot: Quiet boot flag set\n");
+				//fterm_write("boot: Quiet boot flag set\n");
 				fterm_flush();
 				early_fb_init(bootvars);
 				fb_draw_image((bootvars.vesa.fb_width / 2) - (IMG_WIDTH / 2), (bootvars.vesa.fb_height / 2) - (IMG_HEIGHT / 2), IMG_WIDTH, IMG_HEIGHT, IMG_DATA, IMAGE_RGB);
@@ -205,7 +205,7 @@ void kinit(struct stivale2_struct *bootloader_info)
 			}
 			else
 			{
-				fterm_write("boot: Verbose boot flag set\n");
+				//fterm_write("boot: Verbose boot flag set\n");
 				fterm_flush();
 				printk_init(true, bootvars, vm_tag_present);
 			}
@@ -220,20 +220,13 @@ void kinit(struct stivale2_struct *bootloader_info)
 		printk("pmm", "Initialized pmm\n");
 
 		/* vmm */
-		if (check_la57())
-		{
-			printk("vmm", "pml5 resides at 0x%llx\n", cr_read(CR3));
-		}
-		else
-		{
-			printk("vmm", "pml4 resides at 0x%llx\n", cr_read(CR3));
-		}
+		printk("vmm", "pml4 resides at 0x%llx\n", cr_read(CR3));
 		printk("vmm", "Initialized vmm\n");
 	}
 	else
 	{
 		debug(false, "\n!Did not get a memory map from the bootloader!\n");
-		fterm_write("Fatal: Cannot obtain a memory map from the bootloader");
+		//fterm_write("Fatal: Cannot obtain a memory map from the bootloader");
 		for (;;)
 			;
 	}

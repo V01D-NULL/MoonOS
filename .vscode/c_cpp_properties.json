@@ -7,7 +7,7 @@
                 "${workspaceFolder}/kernel",
                 "${workspaceFolder}/libs"
             ],
-            "compilerPath": "/usr/bin/clang",
+            "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++14",
             "intelliSenseMode": "linux-clang-x64"
