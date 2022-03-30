@@ -141,7 +141,7 @@ void vmm_pagefault_handler(uint64_t cr2, int error_code)
     // debug(true, "flags: %d | err: %d\n", flags, error_code);
 
     // Todo: Check if cr2 is a high vma and add the offset accordingly.
-    vmm_map(active_pagemap, cr2, cr2, error_code);
+    vmm_map(active_pagemap, cr2, cr2, error_code); // This is just a hack but should cover generic faults. I don't feel like fixing this just yet.
 }
 
 struct Pml *vmm_get_kernel_pagemap(void)
