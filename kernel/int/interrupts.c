@@ -56,7 +56,7 @@ void isr_handler(regs_t regs)
             asm volatile("swapgs" ::: "memory");
 			// printk("INT", BASH_GREEN "Userprocess triggered an exception\n" BASH_GRAY);
             debug(true, BASH_GREEN "Userprocess triggered an exception\n" BASH_GRAY);
-            vmm_switch_to_kernel_pagemap();
+            switch_to_kernel_pagemap();
 		}
 
         override_quiet_boot();
@@ -69,7 +69,7 @@ void isr_handler(regs_t regs)
             uint64_t cr2 = cr_read(CR2);
             // printk("INT ~ #PF", "Faulting address: 0x%lx\n", cr2);
             debug(true, "INT ~ #PF Faulting address: 0x%lx\n", cr2);
-            // vmm_pagefault_handler(cr2, regs.error_code);
+            // pagefault_handler(cr2, regs.error_code);
             for(;;);
             goto exit_handler;
         }

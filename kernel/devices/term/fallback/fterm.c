@@ -53,9 +53,3 @@ void fterm_flush(void)
 
     fterm_write("\033[1;1H");
 }
-
-void fterm_map(void)
-{
-    debug(true, "Mapping fterm @ 0x%lX\n", term_write_paddr);
-    vmm_map(vmm_get_kernel_pagemap(), term_write_paddr, term_write_paddr, MAP_KERN);
-}

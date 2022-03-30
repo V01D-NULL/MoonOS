@@ -39,7 +39,7 @@ static task_t elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, struct elf_l
     task_t task = new_task(args.descriptor, ehdr->e_entry);
 
     bool found_ptload = false;
-    vmm_copy_kernel_mappings(task);
+    copy_kernel_mappings(task);
 
     for (Elf64_Half i = 0; i < phdr_entries; i++)
     {
@@ -54,7 +54,7 @@ static task_t elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, struct elf_l
             size_t elf_base = args.identity_map ? phdr->p_vaddr : pmm_alloc_range(num_pages).base; // Todo: Check if p_vaddr is really a physical address and not a higher half one. (Or just remove all this garbage when threads and scheduling are implemented)
             for (uint64_t i = 0; i < num_pages; i++)
             {
-                vmm_map(task.pagemap, phdr->p_vaddr + (i * PAGE_SIZE), elf_base + (i * PAGE_SIZE), MAP_USER_RO);
+                v_map(task.pagemap, phdr->p_vaddr + (i * PAGE_SIZE), elf_base + (i * PAGE_SIZE), MAP_USER_RO);
             }
 
             if (args.identity_map)
@@ -74,6 +74,6 @@ static task_t elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, struct elf_l
         return (task_t){};
     }
 
-    vmm_map_range(vmm_as_range(task.ustack, task.ustack + 8192, $identity_vma), MAP_USER_RW, task.pagemap);
+    v_map_range(as_vmm_range(task.ustack, task.ustack + 8192, $identity_vma), MAP_USER_RW, task.pagemap);
     return task;
 }

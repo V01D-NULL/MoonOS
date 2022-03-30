@@ -10,6 +10,6 @@ void load_daemon(const uint8_t *elf, const char *name)
     if (!task.entrypoint)
         panic("Failed to load ELF; Cannot start kernel daemon!");
     
-	vmm_switch_pagemap(task);
+	switch_pagemap(task);
 	enter_ring3((void *)task.entrypoint, task.ustack);
 }

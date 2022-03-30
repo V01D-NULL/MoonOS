@@ -9,6 +9,5 @@ void fterm_write(const char *fmt, ...);
 void set_fterm_available(bool availability);
 bool is_fterm_available(void);
 void fterm_flush(void);
-void fterm_map(void);
 
 #endif // FALLBACK_TERM_H

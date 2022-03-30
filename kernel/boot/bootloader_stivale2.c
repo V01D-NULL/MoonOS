@@ -187,7 +187,7 @@ void kinit(struct stivale2_struct *bootloader_info)
 		slab_init();
 
 		//fterm_write("boot: Reached target vmm\n");
-		vmm_init(mmap->memmap, mmap->entries);// mmap is borked? a lot of zero entries and some missing ones?? not all BRE are mapped :think:
+		v_init(mmap->memmap, mmap->entries);// mmap is borked? a lot of zero entries and some missing ones?? not all BRE are mapped :think:
         //fterm_write("boot: After init_vmm\n");
 
 		/* Is verbose boot specified in the command line? */

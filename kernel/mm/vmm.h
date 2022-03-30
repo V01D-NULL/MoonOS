@@ -11,6 +11,7 @@
 
 #define GB 0x40000000UL
 
+typedef struct task_struct task_t;
 typedef struct
 {
     range_t range;
