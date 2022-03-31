@@ -5,7 +5,6 @@ section .text
 
 global enter_ring3_sysret
 enter_ring3_sysret:
-    swapgs
     mov rsp, rsi  ; new rsp
     add rsi, 8192 ; 8kib of stack space
     mov rbp, rsi
