@@ -27,6 +27,6 @@ void init_syscalls(void)
 
 void syscall_handler(uint64_t current_stack)
 {
-    printk("syscall", "Syscall handler (stack: %llX)\n", current_stack);
+    debug(true, "Syscall handler (stack: %llX)\n", current_stack);
     for(;;);
 }
