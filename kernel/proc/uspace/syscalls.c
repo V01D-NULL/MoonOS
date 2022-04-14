@@ -12,7 +12,8 @@ void init_syscalls(void)
     wrmsr(LSTAR, (uint64_t)&x86_syscall_handler);
 }
 
-void syscall_handler(uint64_t current_stack)
+void syscall_handler(gp_registers_t reg)
 {
-    debug(true, "Syscall handler (stack: %llX)\n", current_stack);
+    debug(true, "Syscall handler\n");
+    for(;;);
 }

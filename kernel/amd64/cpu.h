@@ -57,14 +57,7 @@ typedef struct regs {
     int64_t rcx;
     int64_t rbx;
     int64_t rax;
-    int64_t isr_number;
-    int64_t error_code;
-    int64_t rip;
-    int64_t cs; 
-    int64_t rflags; 
-    int64_t rsp;
-    int64_t ss;
-} regs_t;
+} gp_registers_t;
 
 struct percpu
 {

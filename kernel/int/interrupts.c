@@ -46,7 +46,7 @@ static const char *exception_messages[] = {
     "Type: (NONE) Reserved",
     "Type: (NONE) Reserved"};
 
-void isr_handler(regs_t regs)
+void isr_handler(struct iframe regs)
 {
     /* CPU exceptions */
     if (regs.isr_number < 32)
@@ -90,26 +90,26 @@ void isr_handler(regs_t regs)
                      "rip %p | cs  %p | ss  %p | rflags %p\n"
                      "r8  %p | r9  %p | r10 %p | r11    %p\n"
                      "r12 %p | r13 %p | r14 %p | r15    %p\n",
-              regs.rax,
-              regs.rbx,
-              regs.rcx,
-              regs.rdx,
-              regs.rbp,
+              regs.gpr.rax,
+              regs.gpr.rbx,
+              regs.gpr.rcx,
+              regs.gpr.rdx,
+              regs.gpr.rbp,
               regs.rsp,
-              regs.rdi,
-              regs.rsi,
+              regs.gpr.rdi,
+              regs.gpr.rsi,
               regs.rip,
               regs.cs,
               regs.ss,
               regs.rflags,
-              regs.r8,
-              regs.r9,
-              regs.r10,
-              regs.r11,
-              regs.r12,
-              regs.r13,
-              regs.r14,
-              regs.r15);
+              regs.gpr.r8,
+              regs.gpr.r9,
+              regs.gpr.r10,
+              regs.gpr.r11,
+              regs.gpr.r12,
+              regs.gpr.r13,
+              regs.gpr.r14,
+              regs.gpr.r15);
 
         if (!canReturn)
         {
