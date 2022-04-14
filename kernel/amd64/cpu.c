@@ -8,7 +8,7 @@ void init_percpu(uint64_t current_stack)
 {
     slab_panic(true);
     struct percpu *pcpu = (struct percpu *)slab_alloc(sizeof(struct percpu));
-    pcpu->syscall_stack = /* TODO */ 0;
+    pcpu->syscall_stack = /* TODO */ 0x123;
 
     pcpu->working_stack = current_stack;
     slab_panic(false);
