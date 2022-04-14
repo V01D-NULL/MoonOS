@@ -3,7 +3,7 @@
 
 gnu_export void load_gdt(uint64_t gdtr);
 
-static struct gdt_table gdt;
+static struct __attribute__((align(64))) gdt_table gdt;
 
 void set_tss_entry(uint64_t base, uint8_t flags, uint8_t access)
 {
@@ -21,20 +21,20 @@ static tss_t tss;
 void init_tss(uint64_t stack)
 {
     set_tss_entry((uintptr_t)&tss, 0x20, 0x89);
-    memset((void*)&tss, 0, sizeof(tss_t));
+    memset((void *)&tss, 0, sizeof(tss_t));
 
     tss.RSP0 = stack;
-    tss.IST1 = 0; //Disable IST
+    tss.IST1 = 0; // Disable IST
 }
 
 void init_gdt(uint64_t stack)
 {
-    //Null descriptor
-    gdt.gdt_table_memory_segments[0].limit     = 0;
-    gdt.gdt_table_memory_segments[0].base_low  = 0;
-    gdt.gdt_table_memory_segments[0].base_mid  = 0;
-    gdt.gdt_table_memory_segments[0].access    = 0;
-    gdt.gdt_table_memory_segments[0].gran      = 0;
+    // Null descriptor
+    gdt.gdt_table_memory_segments[0].limit = 0;
+    gdt.gdt_table_memory_segments[0].base_low = 0;
+    gdt.gdt_table_memory_segments[0].base_mid = 0;
+    gdt.gdt_table_memory_segments[0].access = 0;
+    gdt.gdt_table_memory_segments[0].gran = 0;
     gdt.gdt_table_memory_segments[0].base_high = 0;
 
     // These GDT descriptors are mandatory in order to use the stivale2 terminal
@@ -44,7 +44,7 @@ void init_gdt(uint64_t stack)
     gdt.gdt_table_memory_segments[1].base_low = 0;
     gdt.gdt_table_memory_segments[1].base_mid = 0;
     gdt.gdt_table_memory_segments[1].access = 0x9A;
-    gdt.gdt_table_memory_segments[1].gran   = 0x80;
+    gdt.gdt_table_memory_segments[1].gran = 0x80;
     gdt.gdt_table_memory_segments[1].base_high = 0;
 
     // 16 bit kernel DS
@@ -78,7 +78,7 @@ void init_gdt(uint64_t stack)
     gdt.gdt_table_memory_segments[5].access = 0x9A;
     gdt.gdt_table_memory_segments[5].gran = 0xA2;
     gdt.gdt_table_memory_segments[5].base_high = 0;
-    
+
     // 64 bit kernel DS
     gdt.gdt_table_memory_segments[6].limit = 0;
     gdt.gdt_table_memory_segments[6].base_low = 0;
@@ -101,6 +101,7 @@ void init_gdt(uint64_t stack)
     gdt.gdt_table_memory_segments[8].base_mid = 0;
     gdt.gdt_table_memory_segments[8].access = 0xFA;
     gdt.gdt_table_memory_segments[8].gran = 0x20;
+    gdt.gdt_table_memory_segments[8].base_high = 0;
 
     init_tss(stack);
 

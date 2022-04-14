@@ -15,6 +15,11 @@
 #include <util/common.h>
 #include <amd64/moon.h>
 
+#define KRNL_CS64 0x28UL
+#define KRNL_DS64 0x30UL
+#define USER_CS64 0x38UL
+#define USER_DS64 0x40UL
+
 typedef struct
 {
     uint16_t size;
