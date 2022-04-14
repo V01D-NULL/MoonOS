@@ -5,10 +5,12 @@ section .text
 
 global enter_ring3_sysret
 enter_ring3_sysret:
-    mov rsp, rsi  ; new rsp
-    add rsi, 8192 ; 8kib of stack space
+    ; Setup user stack..
+    add rsi, 8192
     mov rbp, rsi
+    mov rsp, rbp
 
+    ; Enter ring3
     mov rcx, rdi   ; RIP
     mov r11, 0x202 ; RFLAGS
     o64 sysret
