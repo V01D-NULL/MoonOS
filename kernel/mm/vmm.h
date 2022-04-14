@@ -26,8 +26,10 @@ STATIC_INLINE VmmRange as_vmm_range(size_t base, size_t top, size_t offset)
 
 void v_init(struct stivale2_mmap_entry *mmap, int entries);
 void v_map(struct Pml *pml4, size_t vaddr, size_t paddr, int flags);
+void v_map_fast(struct Pml *pml4, size_t vaddr, size_t paddr, int flags);
 void v_unmap(struct Pml *pml4, size_t vaddr);
 void v_map_range(VmmRange range, int flags, struct Pml *pagemap);
+void v_map_range_fast(VmmRange range, int flags, struct Pml *pagemap);
 
 struct Pml *create_new_pagemap(void);
 struct Pml *get_kernel_pagemap(void);

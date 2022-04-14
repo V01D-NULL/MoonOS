@@ -1,5 +1,4 @@
 #include "vmm.h"
-
 #include <mm/pmm.h>
 #include <mm/mm.h>
 #include <libk/kassert.h>
@@ -12,21 +11,20 @@
 
 // create_lock("vmm", vmm_lock);
 
-static struct Pml *kernel_pagemap, *active_pagemap;
+static struct Pml *kernel_pagemap;
 
 static struct Pml *vmm_pml_advance(
     struct Pml *entry,
-    size_t level, int flags
-);
+    size_t level, int flags);
 
 void v_init(struct stivale2_mmap_entry *mmap, int entries)
 {
     assert((kernel_pagemap = pmm_alloc()) != NULL);
-    
-    v_map_range(as_vmm_range(0, 4 * GB, $identity_vma), MAP_KERN, kernel_pagemap);
-    v_map_range(as_vmm_range(0, 2 * GB, $high_vma), MAP_KERN, kernel_pagemap);
-    v_map_range(as_vmm_range(0, 2 * GB, $high_vma_code), MAP_READONLY, kernel_pagemap);
-    
+
+    v_map_range_fast(as_vmm_range(0, 4 * GB, $identity_vma), MAP_KERN, kernel_pagemap);
+    v_map_range_fast(as_vmm_range(0, 2 * GB, $high_vma), MAP_KERN, kernel_pagemap);
+    v_map_range_fast(as_vmm_range(0, 2 * GB, $high_vma_code), MAP_READONLY, kernel_pagemap);
+
     debug(true, "Old PML4: 0x%llx\n", cr_read(CR3)); // Bootloader pml4
     switch_to_kernel_pagemap();
     debug(true, "New PML4: 0x%llx\n", cr_read(CR3)); // Kernel pml4
@@ -43,13 +41,13 @@ static struct Pml *vmm_pml_advance(struct Pml *entry, size_t level, int flags)
     auto pte = entry->page_tables[level];
     if (pte.present)
     {
-        return (struct Pml*)((uintptr_t)pte.address << PAGE_SHIFT);
+        return (struct Pml *)((uintptr_t)pte.address << PAGE_SHIFT);
     }
 
     uint64_t addr = (uint64_t)pmm_alloc();
     panic_if(!addr, "Failed to allocate memory for a pagetable!");
     entry->page_tables[level] = paging_create_entry(addr, flags);
-    return (struct Pml*)addr;
+    return (struct Pml *)addr;
 }
 
 void v_map(struct Pml *pml4, size_t vaddr, size_t paddr, int flags)
@@ -62,6 +60,22 @@ void v_map(struct Pml *pml4, size_t vaddr, size_t paddr, int flags)
         return;
     }
 
+    struct Pml *pml3, *pml2, *pml1 = NULL;
+    pml3 = vmm_pml_advance(pml4, index_of(vaddr, 4), flags);
+    pml2 = vmm_pml_advance(pml3, index_of(vaddr, 3), flags);
+    pml1 = vmm_pml_advance(pml2, index_of(vaddr, 2), flags);
+
+    struct pte *L1 = &pml1->page_tables[index_of(vaddr, 1)];
+    if (L1->address != 0)
+        return;
+
+    *L1 = paging_create_entry(paddr, flags);
+    invlpg(vaddr);
+}
+
+// It's v_map, but without checks or comparisons to save cpu cycles
+void v_map_fast(struct Pml *pml4, size_t vaddr, size_t paddr, int flags)
+{
     struct Pml *pml3, *pml2, *pml1 = NULL;
     pml3 = vmm_pml_advance(pml4, index_of(vaddr, 4), flags);
     pml2 = vmm_pml_advance(pml3, index_of(vaddr, 3), flags);
@@ -83,9 +97,9 @@ void v_unmap(struct Pml *pml4, size_t vaddr)
 
     uint64_t addr = pml1->page_tables[index_of(vaddr, 1)].address;
     pml1->page_tables[index_of(vaddr, 1)] = paging_purge_entry();
-    
+
     invlpg(vaddr);
-    pmm_free((void*)addr);
+    pmm_free((void *)addr);
 }
 
 void switch_to_kernel_pagemap(void)
@@ -104,20 +118,53 @@ void v_map_range(VmmRange range, int flags, struct Pml *pagemap)
     }
 }
 
+// Same as v_map_range except that it uses v_map_fast and does not perform any alignment checks
+void v_map_range_fast(VmmRange range, int flags, struct Pml *pagemap)
+{
+    uint64_t base = range.range.base, limit = range.range.limit;
+    for (; base != limit; base += PAGE_SIZE)
+    {
+        v_map_fast(pagemap, base + range.address_offset, base, flags);
+    }
+}
+
+
 void pagefault_handler(uint64_t cr2, int error_code)
 {
+    struct Pagefault pf = paging_get_pagefault_flags(error_code, true);
+
 #ifdef DEBUG_VMM
-    printk("vmm", "\033[93m%s pagefault @%p (error_code: %d)\033[39m\n", error_code & 4 ? "Userspace" : "KernelSpace", cr2, error_code);
+    printk("vmm", "\033[93m%s pagefault @%p (error_code: %d)\033[39m\n", (error_code >> 4) & 1 ? "Userspace" : "KernelSpace", cr2, error_code);
+    printk("vmm", "-- Pagefault flags: {\n"
+                  "-- Present:           %d\n"
+                  "-- Write:             %d\n"
+                  "-- User:              %d\n"
+                  "-- Instruction fetch: %d\n"
+                  "-- Protection key:    %d\n"
+                  "-- Shadow stack:      %d\n"
+                  "}\n",
+           pf.present, pf.write, pf.user,
+           pf.instruction_fetch,
+           pf.protection_key, pf.shadow_stack);
 #endif
 
-    // int flags = check_flag(error_code, 0); // Present
-    // flags |= check_flag(error_code, 1); // Write
-    // flags |= check_flag(error_code, 2); // User (CPL=3)
-    
-    // debug(true, "flags: %d | err: %d\n", flags, error_code);
+    panic_if(pf.panic_on_unhandled, "Pagefault panic: Did not implement at least one of these:\n"
+            "-- Pagefault flags: {\n"
+                  "-- Present:           %d\n"
+                  "-- Write:             %d\n"
+                  "-- User:              %d\n"
+                  "-- Instruction fetch: %d\n"
+                  "-- Protection key:    %d\n"
+                  "-- Shadow stack:      %d\n"
+                  "}\n",
+           pf.present, pf.write, pf.user,
+           pf.instruction_fetch,
+           pf.protection_key, pf.shadow_stack
+    );
 
-    // Todo: Check if cr2 is a high vma and add the offset accordingly.
-    v_map(active_pagemap, cr2, cr2, error_code); // This is just a hack but should cover generic faults. I don't feel like fixing this just yet.
+
+    // Todo: Check if cr2 is a high vma and verify flags accordingly (Don't want a user accessing kernel data structures :p)
+    v_map((struct Pml*)cr_read(CR3), cr2, cr2, pf.flags);
 }
 
 struct Pml *get_kernel_pagemap(void)
