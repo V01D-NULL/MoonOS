@@ -12,11 +12,5 @@ void add_task(task_t task)
 
 task_t new_task(const char *descriptor, Elf64_Addr entrypoint)
 {
-    size_t ustack = (uintptr_t)pmm_alloc();
-    return (task_t){.descriptor = descriptor, .pagemap = create_new_pagemap(), .entrypoint = entrypoint, .ustack = ustack};
-}
-
-task_t task_creation_failure(void)
-{
-    return (task_t){};
+    return (task_t){.descriptor = descriptor, .pagemap = create_new_pagemap(), .entrypoint = entrypoint, .ustack = 0}; // The ustack resides next to the ELF mappings (example: ELF: 0x400000-0x401000 | ustack: 0x401000-0x403000)
 }
