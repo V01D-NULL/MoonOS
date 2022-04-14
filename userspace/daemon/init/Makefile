@@ -7,7 +7,6 @@ OBJ    := $(CFILE_DEPS:.c=.o) $(CFILES:.c=.o)
 .PHONY: all clean
 
 CFLAGS = -ffreestanding -O2 -std=gnu11 \
-	-pipe -fno-pie -fno-pic -no-pie \
 	-mno-sse -mno-sse2 -Wall -I../../ \
 
 all: $(TARGET)
@@ -20,6 +19,7 @@ $(TARGET): $(OBJ)
 %.o: %.c
 	@printf " CC  $<\n";
 	$(CC) $(CFLAGS) -c $< -o $@
+#	nasm -f elf64 entry.s -o test.o
 
 clean:
 	@rm -rf $(TARGET) $(OBJ)
