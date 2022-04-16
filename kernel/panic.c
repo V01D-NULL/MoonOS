@@ -24,7 +24,7 @@ gnu_no_return void _panic(uint64_t rbp, uint64_t rsp, const char *fmt, ...)
 
 	override_quiet_boot();
 
-	printk("panic", "\n\033[0;37mA kernel panic has occurred\n");
+	printk("panic", "\n" BASH_RED "A kernel panic has occurred\n" BASH_WHITE);
 	fmt_puts("*** Reason: %s***\n", panic_buff);
 	debug(false, "A kernel panic has occurred\n*** Reason: %s ***\n", panic_buff);
 	
@@ -35,7 +35,7 @@ gnu_no_return void _panic(uint64_t rbp, uint64_t rsp, const char *fmt, ...)
 	}
 
 	size_t frame_size = rbp-rsp;
-	printk("stackdump", "\033[0;37mDumping %s's stackframe\nStackframe size: 0x%x\n", sym_lookup(res.trace_results[1].address).name, frame_size);
+	printk("stackdump", "Dumping %s's stackframe\nStackframe size: 0x%x\n", sym_lookup(res.trace_results[1].address).name, frame_size);
 	fmt_puts("<addr>\t\t  <stack>\t   <stack+8>\n");
 
 	// The larger the stackframe the less likely the chance of seeing messages

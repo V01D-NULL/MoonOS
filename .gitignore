@@ -9,7 +9,7 @@ MoonOS.hdd
 MoonOS.iso
 
 # Limine related
-*.bin
+limine/*.bin
 *.sys
 
 # VSCode extension
