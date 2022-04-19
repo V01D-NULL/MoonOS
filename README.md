@@ -25,16 +25,16 @@ Kernel panic:
 - Set verbose or quiet boot in the bootloader config file (limine.cfg).
 - Elf loader
 - bitmap, buddy and slab allocators.
+- System calls via the `syscall` instruction (The regular int 0x80 is not supported)
 
 # Future features:
+- IPC
+- Threads
 - kasan
 - APIC
 - ACPI
-- FADT
-- MADT
 - SMBIOS
 - Kernel heap
-- Userland support
 - Multitasking
 - Many hardware drivers including but not limited to:
 	- Network cards
@@ -45,13 +45,11 @@ Kernel panic:
 
 # This is currently being working on:
 - Scheduler
-- Syscalls
-- Threads
+- Porting mlibc
 
 # Directory walkthrough:
-- libs/   	  --  Here you will find kernel libs.
+- libs/   	  --  Here you will find kernel libs in the form of archives.
 - kernel/ 	  --  Kernel source code, this is most likely all you really care about
-- build-util/ --  3rd party tools needed to build the Moon kernel + makefile flags
 - debug-util/ --  Files needed for debugging Moon.
 - boot/		  --  Everything Moon needs in order to boot 
 
