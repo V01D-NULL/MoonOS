@@ -8,11 +8,11 @@ void init_percpu(uint64_t current_stack)
 {
     slab_panic(true);
     struct percpu *pcpu = (struct percpu *)slab_alloc(sizeof(struct percpu));
-    pcpu->syscall_stack = /* TODO */ 0x123;
-
-    pcpu->working_stack = current_stack;
+    
+    pcpu->syscall_stack = current_stack;
+    pcpu->working_stack = 0; // Set by the syscall handler
+    
     slab_panic(false);
-
     printk("percpu", "pcpu: 0x%p | pcpu->syscall_stack: 0x%p\n", pcpu, pcpu->syscall_stack);
     wrmsr(GS_BASE, (uint64_t)pcpu);
 }

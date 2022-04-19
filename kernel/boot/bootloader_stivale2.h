@@ -57,6 +57,7 @@ typedef struct
     boot_vesa_t vesa;
     boot_rsdp_t rsdp;
     bool is_uefi;
+    uint64_t rbp;
 } boot_info_t;
 
 

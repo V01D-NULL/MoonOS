@@ -61,9 +61,7 @@
 
 void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 {
-    uint64_t rbp = 0;
-    asm volatile("mov %%rbp, %0" : "=r"(rbp));
-    init_percpu(rbp);
+    init_percpu(bootvars->rbp); // Every logical core (which each calls init_percpu) shares it's stack with the syscall handler
     init_syscalls();
 
 	printk("main", "Detected %d modules\n", mods->module_count);
@@ -74,8 +72,10 @@ void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
 	// lapic_init(acpi_init(&bootvars->rsdp).apic);
 	// smp_init(&bootvars->cpu);
 
+    int i = 0;
     for (;;)
 	{
-        asm("cli;hlt");
+        printk("log", "%d\n", i++);
+        // asm("cli;hlt");
 	}
 }
