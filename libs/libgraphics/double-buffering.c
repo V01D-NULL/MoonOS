@@ -1,19 +1,18 @@
 #include "double-buffering.h"
 #include <libk/kstring.h>
 #include <mm/mm.h>
-#include <util/font8x16.h>
 #include <devices/fb/early_fb.h>
 
 static uint32_t *buffer;
 gfx_header_t gfx_h;
 
-void double_buffering_init(boot_info_t boot)
+void double_buffering_init(BootContext boot)
 {
-    gfx_h.fb_addr = from_higher_half(boot.vesa.fb_addr, DATA);
-    gfx_h.fb_bpp = boot.vesa.fb_bpp;
-    gfx_h.fb_height = boot.vesa.fb_height;
-    gfx_h.fb_width = boot.vesa.fb_width;
-    gfx_h.fb_pitch = boot.vesa.fb_pitch;
+    gfx_h.fb_addr = boot.fb.fb_addr - $high_vma;
+    gfx_h.fb_bpp = boot.fb.fb_bpp;
+    gfx_h.fb_height = boot.fb.fb_height;
+    gfx_h.fb_width = boot.fb.fb_width;
+    gfx_h.fb_pitch = boot.fb.fb_pitch;
 
     buffer = (uint32_t *)fb_1080x1920_screen_malloc(gfx_h.fb_width * gfx_h.fb_height * (gfx_h.fb_bpp / 8));
     flush_back_buffer(NULL);

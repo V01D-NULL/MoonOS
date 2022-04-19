@@ -17,7 +17,7 @@ enum task_type
 typedef struct task_struct
 {
     const char *descriptor;
-    uint64_t *pagemap;
+    struct Pml *pagemap;
     Elf64_Addr entrypoint;
     enum task_type task_type;
     size_t ustack;

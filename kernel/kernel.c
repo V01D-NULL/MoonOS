@@ -14,7 +14,7 @@
 #include <stddef.h>
 
 #include <stivale2.h>
-#include <boot/bootloader_stivale2.h>
+#include <boot/boot.h>
 
 #include <amd64/cpu.h>
 #include <amd64/moon.h>
@@ -38,7 +38,6 @@
 #include <libgraphics/draw.h>
 
 #include <util/common.h>
-#include <util/ptr.h>
 
 #include <mm/pmm.h>
 #include <mm/vmm.h>
@@ -51,26 +50,31 @@
 #include <hal/acpi/acpi.h>
 #include <hal/apic/apic.h>
 
+#include <proc/daemon/load.h>
 #include <proc/uspace/userspace.h>
+#include <proc/uspace/syscalls.h>
 #include <proc/elf/elf.h>
 
 #include "panic.h"
 #include "printk.h"
 
-void kmain(boot_info_t *bootvars, struct stivale2_struct_tag_modules *mods)
+void kmain(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
 {
+    init_percpu(bootvars->rbp); // Every logical core (which each calls init_percpu) shares it's stack with the syscall handler
+    init_syscalls();
+
 	printk("main", "Detected %d modules\n", mods->module_count);
 	printk("main", "Module string: %s\n", mods->modules[0].string);
+    
+    printk("main", "0x%lx\n", BootContextGet().rbp);
 
-	// task_t task = load_elf((const uint8_t *)mods->modules[0].begin, true);
-	// vmm_switch_pagemap(task);
-	// jump_to_user_address((void *)task.entrypoint, task.ustack);
+	lapic_init(acpi_init().apic);
+    load_daemon((const uint8_t*)mods->modules[0].begin, mods->modules[0].string);
+	
+    // smp_init(&bootvars->cpu);
 
-	// lapic_init(acpi_init(&bootvars->rsdp).apic);
-	// smp_init(&bootvars->cpu);
-
-	for (;;)
+    for (;;)
 	{
-		__asm__("hlt");
+        asm("cli;hlt");
 	}
 }

@@ -12,11 +12,11 @@
 
 bool acpi_validate_sdt_checksum(struct SDT *sdt);
 
-struct acpi_table_result acpi_init(boot_rsdp_t *boot_rsdp_table)
+struct acpi_table_result acpi_init(void)
 {
     struct acpi_table_result result;
 
-    rsdp_init(boot_rsdp_table);
+    rsdp_init();
     
     acpi_table_t madt;
     if ((madt = acpi_find_table("APIC")) != NULL)
@@ -44,7 +44,7 @@ acpi_table_t acpi_find_table(const char *identifier)
         
         if (!strncmp(sdt->signature, (char*)identifier, 4) && acpi_validate_sdt_checksum(sdt))
         {
-            return (acpi_table_t) to_higher_half((uintptr_t)sdt, DATA);
+            return (acpi_table_t) ((uintptr_t)sdt + $high_vma);
         }
     }
 

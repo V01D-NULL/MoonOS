@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <printk.h>
-#include <boot/bootloader_stivale2.h>
+#include <boot/boot.h>
 
 #define LOG(...) printk("slab-log", __VA_ARGS__)
 #ifdef LOG_VERBOSE
@@ -41,5 +41,7 @@ typedef struct slab
 void slab_init(void);
 uint64_t *slab_alloc(int sz);
 void slab_free(uint64_t *ptr, int sz);
+
+void slab_panic(bool status);
 
 #endif // SLAB_H

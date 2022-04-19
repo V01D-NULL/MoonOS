@@ -3,10 +3,17 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <int/interrupts.h>
+#include <boot/boot.h>
+
+#define TODO(x, ...)                    \
+    do                                  \
+    {                                   \
+        printk("TODO", x, __VA_ARGS__); \
+        debug(true, x, __VA_ARGS__);    \
+    } while (0)
 
 void printk(char *status, char *fmt, ...);
-void printk_init(bool verbose_boot, boot_info_t term_info, bool is_vm);
+void printk_init(bool verbose_boot, BootContext term_info);
 void fmt_puts(const char *fmt, ...);
 void puts(const char *s);
 

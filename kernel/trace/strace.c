@@ -18,7 +18,7 @@ struct stacktrace_result backtrace_stack(int frames)
 
     struct stacktrace_result result;
     struct stackframe_list *stackframe;
-    __asm__ volatile("mov %%rbp, %0"
+    asm volatile("mov %%rbp, %0"
             : "=r"(stackframe) :: "memory");
 
     int i = 0;

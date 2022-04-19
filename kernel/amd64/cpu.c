@@ -1,5 +1,21 @@
 #include "cpu.h"
+#include "msr.h"
 #include <printk.h>
+#include <mm/slab.h>
+#include <mm/mm.h>
+
+void init_percpu(uint64_t current_stack)
+{
+    slab_panic(true);
+    struct percpu *pcpu = (struct percpu *)slab_alloc(sizeof(struct percpu));
+    
+    pcpu->syscall_stack = current_stack;
+    pcpu->working_stack = 0; // Set by the syscall handler
+    
+    slab_panic(false);
+    printk("percpu", "pcpu: 0x%p | pcpu->syscall_stack: 0x%p\n", pcpu, pcpu->syscall_stack);
+    wrmsr(GS_BASE, (uint64_t)pcpu);
+}
 
 void log_cpuid_results(void)
 {
@@ -9,17 +25,9 @@ void log_cpuid_results(void)
 
 void cpuid(struct cpuid_regs_t *cpuid_regs)
 {
-    __asm__ volatile(
-        gnu_asm_flavor_intel
-        "mov eax, %0\n"
-        "cpuid\n"
-        "mov %0, eax\n"
-        "mov %1, ebx\n"
-        "mov %2, ecx\n"
-        "mov %3, edx\n"
-        gnu_asm_flavor_at_t
-        : "=r"(cpuid_regs->eax), "=r"(cpuid_regs->ebx), "=r"(cpuid_regs->ecx), "=r"(cpuid_regs->edx)
-        : "g"(cpuid_regs->function)
-        : "eax", "ebx", "ecx", "edx"
+    asm(
+        "cpuid"
+        : "=a"(cpuid_regs->eax), "=b"(cpuid_regs->ebx), "=c"(cpuid_regs->ecx), "=d"(cpuid_regs->edx)
+        : "a"(cpuid_regs->function)
     );
 }

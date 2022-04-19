@@ -1,22 +1,24 @@
 #include "rsdp.h"
 #include <devices/serial/serial.h>
-#include <util/ptr.h>
+#include <boot/boot.h>
 #include <stdbool.h>
 #include <panic.h>
 #include <printk.h>
 #include <mm/mm.h>
+#include <ktypes.h>
 
 static bool has_xsdt = false;
 static struct RSDP rsdp;
 
 void rsdp_verify_checksum(uint64_t rsdp_address);
 
-void rsdp_init(boot_rsdp_t *boot_rsdp_table)
+void rsdp_init(void)
 {
-    rsdp_verify_checksum(boot_rsdp_table->rsdp_address);
-    printk("acpi-rsdp", "RSDP Table: %llX\n", to_higher_half(boot_rsdp_table->rsdp_address, DATA));
+    auto rsdp_addr = BootContextGet().rsdp.rsdp_address;
+    rsdp_verify_checksum(rsdp_addr);
+    printk("acpi-rsdp", "RSDP Table: %llX\n", rsdp_addr + $high_vma);
     
-    rsdp = *(struct RSDP*) boot_rsdp_table->rsdp_address;
+    rsdp = *(struct RSDP*) rsdp_addr;
 
     // If this is omitted this member might print more than 6 bytes due to a missing terminator.
     // Is there really no specification to use a NULL terminating character in the entirety of ACPI?
@@ -27,14 +29,14 @@ void rsdp_init(boot_rsdp_t *boot_rsdp_table)
     if (rsdp.revision >= 2)
     {
         printk("acpi-rsdp", "ACPI Version: 2.0+ (detection based on revision)\n");
-        printk("acpi-rsdp", "XSDT address: %llX\n", to_higher_half(rsdp.xsdt_address, DATA));
+        printk("acpi-rsdp", "XSDT address: %llX\n", rsdp.xsdt_address + $high_vma);
         has_xsdt = true;
     }
     /* RSDT */
     else
     {
         printk("acpi-rsdp", "Revision: %d (Assuming ACPI version 1.0)\n", rsdp.revision);
-        printk("acpi-rsdp", "RSDT address: %llX\n", to_higher_half(rsdp.rsdt_address, DATA));
+        printk("acpi-rsdp", "RSDT address: %llX\n", rsdp.rsdt_address + $high_vma);
     }
 }
 

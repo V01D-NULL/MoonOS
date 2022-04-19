@@ -1,5 +1,4 @@
 #include "keyboard.h"
-#include <util/ptr.h>
 #include <int/isr_list.h>
 #include <printk.h>
 

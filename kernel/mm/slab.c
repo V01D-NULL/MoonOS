@@ -3,7 +3,7 @@
 #include <libk/kstring.h>
 #include <panic.h>
 #include <mm/pmm.h>
-#include <devices/term/fallback/fterm.h>
+#include <mm/mm.h>
 
 /* Utility functions */
 bool is_power_of_two(int n);
@@ -14,6 +14,7 @@ static int32_t slab_align(int sz);
 
 static slab_t slabs[10];
 static int numpages = 0;
+static bool panic_on_failure = false;
 
 /* Core functions */
 void slab_init(void)
@@ -43,7 +44,7 @@ uint64_t *slab_alloc(int sz)
 
         if (slabs[i].exhausted)
 		{
-			panic("Exhausted slab of size %d!\n", sz);
+			panic_if(panic_on_failure, "Exhausted slab of size %ld (0x%lX)!\n", sz, sz);
             return NULL;
 		}
         
@@ -61,11 +62,14 @@ uint64_t *slab_alloc(int sz)
             slabs[i].free_objects--;
             slabs[i].used_objects++;
         }
-        panic_if(!ret, "Return NULL");
+
+        if (ret)
+            ret = va((uint64_t)ret);
+        
         return ret;
     }
     
-    panic("slab would return NULL");
+    panic_if(panic_on_failure, "Failed to allocate memory");
     return NULL;
 }
 
@@ -91,6 +95,11 @@ void slab_free(uint64_t *ptr, int sz)
         slabs[i].free_objects++;
         slabs[i].used_objects--;
     }
+}
+
+void slab_panic(bool status)
+{
+    panic_on_failure = status;
 }
 
 bool is_power_of_two(int n)

@@ -9,10 +9,10 @@ include ./flags.mk
 
 .PHONY: clean all run
 
-all: daemons symlist quick_recompile $(KERNEL_HDD) ISO
+all: symlist quick_recompile $(KERNEL_HDD) ISO
 
 daemons:
-	@$(MAKE) --no-print-directory -C daemon/init
+	@$(MAKE) --no-print-directory -C userspace/daemon/init
 
 run: quick_recompile ISO
 ifeq ($(modern), yes)
@@ -55,7 +55,7 @@ clean:
 	@rm -f $(KERNEL_HDD)
 	@$(MAKE) --no-print-directory -C kernel clean
 	@$(MAKE) --no-print-directory -C libs   clean
-	@$(MAKE) --no-print-directory -C daemon/init   clean
+	@$(MAKE) --no-print-directory -C userspace/daemon/init   clean
 
 debugger_session: $(KERNEL_HDD)
 	$(DEBUG_TERMINAL) $(DEBUG_TERMINAL_OPTS) ./debug-util/debug.sh &
@@ -77,8 +77,8 @@ ISO: $(KERNEL_HDD)
 quick_recompile: symlist
 	@rm -f $(KERNEL_HDD) kernel/kernel.elf
 	@printf "\n"
-	@$(MAKE) --no-print-directory -C daemon/init
-	@printf "\n"
 	@$(MAKE) --no-print-directory -C libs
+	@printf "\n"
+	@$(MAKE) --no-print-directory -C userspace/daemon/init
 	@printf "\n"
 	@$(MAKE) --no-print-directory -C kernel

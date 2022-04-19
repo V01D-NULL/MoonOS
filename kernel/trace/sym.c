@@ -1,5 +1,4 @@
 #include "sym.h"
-#include <util/ptr.h>
 #include <printk.h>
 #include <stddef.h>
 #include <libk/kstring.h>
@@ -41,7 +40,7 @@ int64_t find_symbol_by_name(char *name)
 {
     for (size_t i = 0;; i++)
     {
-        char *symname = GENERIC_CAST(char *, symbol_table[i].name);
+        const char *symname = symbol_table[i].name;
 
         if (strcmp(name, symname) == 0)
         {
@@ -58,6 +57,6 @@ int64_t find_symbol_by_name(char *name)
 void backtrace_symbol(uint64_t address)
 {
     sym_table_t sym = sym_lookup(address);
-    printk("backtrace", "\033[0;37m%llx - %s\n", sym.addr, sym.name);
+    printk("backtrace", "%llx - %s\n", sym.addr, sym.name);
     debug(false, "%llx - %s\n", sym.addr, sym.name);
 }

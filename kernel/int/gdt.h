@@ -15,6 +15,11 @@
 #include <util/common.h>
 #include <amd64/moon.h>
 
+#define KRNL_CS64 0x28UL
+#define KRNL_DS64 0x30UL
+#define USER_CS64 0x38UL
+#define USER_DS64 0x40UL
+
 typedef struct
 {
     uint16_t size;
@@ -76,7 +81,7 @@ void set_tss_entry(uint64_t base, uint8_t flags, uint8_t access);
 
 static inline void load_tss(uint16_t tss_selector)
 {
-    __asm__ volatile("ltr %%ax" :: "a"(0x48) : "memory");
+    asm volatile("ltr %%ax" :: "a"(0x48) : "memory");
 }
 
 #endif // GDT_H

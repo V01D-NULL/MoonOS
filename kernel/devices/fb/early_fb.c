@@ -11,11 +11,11 @@ static uint64_t heap_ptr = 0;
 static uint32_t *fb = NULL;
 static uint16_t fb_width, fb_height;
 
-void early_fb_init(boot_info_t boot)
+void early_fb_init(BootContext boot)
 {
-    fb = (uint32_t*)boot.vesa.fb_addr;
-    fb_width = boot.vesa.fb_width;
-    fb_height = boot.vesa.fb_height;
+    fb = (uint32_t*)boot.fb.fb_addr;
+    fb_width = boot.fb.fb_width;
+    fb_height = boot.fb.fb_height;
 }
 
 void *fb_1080x1920_screen_malloc(uint64_t size)

@@ -37,7 +37,7 @@ void serial_write(char chr)
 
 void serial_write_str(const char *str)
 {
-    for (int i = 0; i < strlen(str); i++)
+    for (uint64_t i = 0; i < strlen(str); i++)
     {
         serial_write(str[i]);
     }

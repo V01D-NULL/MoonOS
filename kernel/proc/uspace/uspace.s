@@ -3,29 +3,22 @@ section .text
 
 %include "asm/defs.inc"
 
-global jump_to_user_address
+global enter_ring3_sysret
+enter_ring3_sysret:
+    ; Setup user stack..
+    add rsi, 8192
+    mov rbp, rsi
+    mov rsp, rbp
 
-; rdi = entry point
-; rsi = rsp (stack size is fixed to 8kib for now)
-jump_to_user_address:
-    mov ax, (7 * 8) | 3 ; ring 3 data with bottom 2 bits set for ring 3
-	mov ds, ax
-	mov es, ax 
-	mov fs, ax 
-	mov gs, ax ; SS is handled by iret
+    ; NOTE: I'm not setting SS or CS as these are automatically set by sysret
+    ; Set user segment selectors
+    mov ax, 0x3B
+    mov ds, ax
+    mov fs, ax
+    mov gs, ax
+    mov es, ax
 
-	
-    ; mov rax, rsi ; User stack
-    pusha64
-	push (7 * 8) | 3 ; data selector
-
-    ; Setup bp & sp
-    mov rbx, rsi
-    add rbx, 8192 ; 8kib of stack space
-	push rsi  ; new rsp
-    mov rbp, rbx
-    
-	pushf ; rflags
-	push (8 * 8) | 3 ; code selector (ring 3 code with bottom 2 bits set for ring 3)
-	push rdi ; New RIP
-    iretq
+    ; Enter ring3
+    mov rcx, rdi   ; RIP
+    mov r11, 0x202 ; RFLAGS
+    o64 sysret

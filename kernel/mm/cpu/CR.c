@@ -3,7 +3,7 @@
 static inline int64_t cr0_read(void)
 {
     int64_t cr;
-    __asm__ volatile(
+    asm volatile(
         "mov %%cr0, %0\n\t"
         : "=r"(cr)
         :
@@ -15,7 +15,7 @@ static inline int64_t cr0_read(void)
 static inline int64_t cr1_read(void)
 {
     int64_t cr;
-    __asm__ volatile(
+    asm volatile(
         "mov %%cr1, %0\n\t"
         : "=r"(cr)
         :
@@ -27,7 +27,7 @@ static inline int64_t cr1_read(void)
 static inline int64_t cr2_read(void)
 {
     int64_t cr;
-    __asm__ volatile(
+    asm volatile(
         "mov %%cr2, %0\n\t"
         : "=r"(cr)
         :
@@ -39,7 +39,7 @@ static inline int64_t cr2_read(void)
 static inline int64_t cr3_read(void)
 {
     int64_t cr;
-    __asm__ volatile(
+    asm volatile(
         "mov %%cr3, %0\n\t"
         : "=r"(cr)
         :
@@ -51,7 +51,7 @@ static inline int64_t cr3_read(void)
 static inline int64_t cr4_read(void)
 {
     int64_t cr;
-    __asm__ volatile(
+    asm volatile(
         "mov %%cr4, %0\n\t"
         : "=r"(cr)
         :
