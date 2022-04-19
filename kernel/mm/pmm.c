@@ -1,6 +1,5 @@
 #include "pmm.h"
 #include <stdint.h>
-#include <util/ptr.h>
 #include <util/iterator.h>
 #include <libk/kassert.h>
 #include <panic.h>
@@ -28,12 +27,12 @@ static inline bool pfa_alloc_allowed(void *addr)
     if (!in_range(addr))
         return false;
 
-    return btest(GENERIC_CAST(uintptr_t, PAGE_2_BIT(addr))) == 0;
+    return btest((uintptr_t) PAGE_2_BIT(addr)) == 0;
 }
 
 static inline void pfa_alloc(void *addr)
 {
-    uintptr_t index = GENERIC_CAST(uintptr_t, PAGE_2_BIT(addr));
+    uintptr_t index = (uintptr_t) PAGE_2_BIT(addr);
 
     if (!pfa_alloc_allowed(addr))
         return;
@@ -43,7 +42,7 @@ static inline void pfa_alloc(void *addr)
 
 static inline void pfa_free(void *addr)
 {
-    uintptr_t index = GENERIC_CAST(uintptr_t, PAGE_2_BIT(addr));
+    uintptr_t index = (uintptr_t) PAGE_2_BIT(addr);
     bset(index, BIT_CLEAR);
 }
 
@@ -59,7 +58,7 @@ static inline void pfa_free_multiple(size_t address_base, size_t n)
 
 bool in_range(void *_address)
 {
-    uint64_t address = GENERIC_CAST(uint64_t, _address);
+    uint64_t address = (uint64_t) _address;
 
     for (int i = 0; i < phys_mmap.entries; i++)
     {
@@ -168,7 +167,7 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
         {
             debug(true, "Found a big enough block of memory to host the bitmap (size: %ld), size : %ldKiB\n", mmap[i].length, bitmap_size_bytes / 1024);
 
-            bitmap = GENERIC_CAST(bitmap_size_type *, mmap[i].base);
+            bitmap = (bitmap_size_type *) mmap[i].base;
 
             debug(true, "(phys) Bitmap stored at %lX-%lX\n", mmap[i].base, mmap[i].base + mmap[i].length - 1);
             memset((void *)bitmap, PMM_FULL, bitmap_size_bytes);
@@ -181,7 +180,7 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
     }
 
     // Sanity check, if this fails then there isn't enough memory to store the bitmap
-    if (bitmap == GENERIC_CAST(bitmap_size_type *, PMM_FREE))
+    if (bitmap == (bitmap_size_type *) PMM_FREE)
     {
         panic("Couldn't store bitmap");
     }
@@ -217,15 +216,6 @@ void *pmm_alloc(void)
     if (block == PMM_INVALID)
         return NULL;
 
-    if (!in_range(block))
-    {
-        debug(true, "Physical address 0x%llx is out of bounds! Memory map spans from 0x%llx - 0x%llx\n",
-              GENERIC_CAST(size_t, block),
-              phys_mmap.abs_base,
-              phys_mmap.abs_top);
-        return NULL;
-    }
-
     memset(block, 0, PAGE_SIZE);
     pfa_alloc(block);
 
@@ -242,7 +232,7 @@ void *pmm_alloc_any(void *addr)
         return NULL;
 
     /* pfa_alloc() checks if the memory is marked as usable, for that reason it isn't used here */
-    uintptr_t index = GENERIC_CAST(uintptr_t, PAGE_2_BIT(addr));
+    uintptr_t index = (uintptr_t) PAGE_2_BIT(addr);
     bset(index, BIT_SET);
 
     release_lock(&pmm_lock);

@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <printk.h>
-#include <boot/bootloader_stivale2.h>
+#include <boot/boot.h>
 
 #define LOG(...) printk("slab-log", __VA_ARGS__)
 #ifdef LOG_VERBOSE

@@ -25,14 +25,15 @@ void fterm_init(uint64_t term_write_addr, int width, int height)
 static char buffer[512];
 void fterm_write(const char *fmt, ...)
 {
-    if (!fterm_available) return;
+    if (!fterm_available)
+        return;
 
     va_list arg;
     va_start(arg, fmt);
     vsnprintf((char *)&buffer, (size_t)-1, fmt, arg);
     va_end(arg);
 
-    term_write((char*)&buffer, strlen(buffer));
+    term_write((char *)&buffer, strlen(buffer));
 }
 
 void set_fterm_available(bool availability)
@@ -47,9 +48,6 @@ bool is_fterm_available(void)
 
 void fterm_flush(void)
 {
-    fterm_write("\033[1;1H");
-    for (int i = 0; i < fterm_width * fterm_height; i++)
-        fterm_write(" ");
-
-    fterm_write("\033[1;1H");
+    fterm_write("\033[2J");   // Clear screen
+    fterm_write("\033[1;1H"); // Reset cursor
 }

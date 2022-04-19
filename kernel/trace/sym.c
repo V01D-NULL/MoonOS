@@ -1,5 +1,4 @@
 #include "sym.h"
-#include <util/ptr.h>
 #include <printk.h>
 #include <stddef.h>
 #include <libk/kstring.h>
@@ -41,7 +40,7 @@ int64_t find_symbol_by_name(char *name)
 {
     for (size_t i = 0;; i++)
     {
-        char *symname = GENERIC_CAST(char *, symbol_table[i].name);
+        const char *symname = symbol_table[i].name;
 
         if (strcmp(name, symname) == 0)
         {

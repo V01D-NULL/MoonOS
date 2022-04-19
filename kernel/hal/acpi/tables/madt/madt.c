@@ -29,11 +29,11 @@ struct apic_device_info madt_init(void *madt_base)
 
     // Strings aren't null terminated apparently, so we do it ourselves
     uint8_t oem_str[7];
-    memcpy(GENERIC_CAST(uint8_t*, oem_str), GENERIC_CAST(uint8_t*, madt->sdt.oem_string), 6);
+    memcpy((uint8_t*) oem_str, (uint8_t*) madt->sdt.oem_string, 6);
     oem_str[6] = '\0';
 
     uint8_t oem_table_id[9];
-    memcpy(GENERIC_CAST(uint8_t*, oem_table_id), GENERIC_CAST(uint8_t*, madt->sdt.oem_table_id), 8);
+    memcpy((uint8_t*) oem_table_id, (uint8_t*) madt->sdt.oem_table_id, 8);
     oem_table_id[8] = '\0';
 
     apic_dev.lapic_addr = madt->local_apic_addr;
@@ -47,10 +47,11 @@ struct apic_device_info madt_init(void *madt_base)
     return apic_dev;
 }
 
+
 static void enumarate_apic_devices(madt_t** madt)
 {
-    uint8_t* madt_interrupt_devices = (uint8_t*)GENERIC_CAST(uintptr_t, *madt + 0x2c);
-    uintptr_t iterations_required = GENERIC_CAST(uintptr_t, *madt) + (*madt)->sdt.length;
+    uint8_t* madt_interrupt_devices = (uint8_t*)((uintptr_t) *madt + 0x2c);
+    uintptr_t iterations_required = ((uintptr_t) *madt) + (*madt)->sdt.length;
 
     do {
         switch (*madt_interrupt_devices) {
@@ -62,7 +63,7 @@ static void enumarate_apic_devices(madt_t** madt)
             }
 
             if (*madt_interrupt_devices == IOAPIC) {
-                apic_dev.ioapics[apic_dev.usable_ioapics++] = GENERIC_CAST(struct ioapic_dev*, madt_interrupt_devices);
+                apic_dev.ioapics[apic_dev.usable_ioapics++] = ((struct ioapic_dev*) madt_interrupt_devices);
             }
 
             madt_interrupt_devices += madt_interrupt_devices[1];
@@ -79,5 +80,5 @@ static void enumarate_apic_devices(madt_t** madt)
             madt_interrupt_devices += madt_interrupt_devices[1];
             break;
         }
-    } while (GENERIC_CAST(uintptr_t, madt_interrupt_devices) < iterations_required);
+    } while (((uintptr_t) madt_interrupt_devices) < iterations_required);
 }

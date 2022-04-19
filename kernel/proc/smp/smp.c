@@ -17,7 +17,7 @@ static void ap_startup(struct stivale2_smp_info *cpu)
     }
 }
 
-void smp_init(boot_cpu_t *smp)
+void smp_init(BootContextSmp *smp)
 {
     if (smp->processor_count == 1)
     {

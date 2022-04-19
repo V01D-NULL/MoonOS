@@ -12,11 +12,11 @@
 
 bool acpi_validate_sdt_checksum(struct SDT *sdt);
 
-struct acpi_table_result acpi_init(boot_rsdp_t *boot_rsdp_table)
+struct acpi_table_result acpi_init(void)
 {
     struct acpi_table_result result;
 
-    rsdp_init(boot_rsdp_table);
+    rsdp_init();
     
     acpi_table_t madt;
     if ((madt = acpi_find_table("APIC")) != NULL)

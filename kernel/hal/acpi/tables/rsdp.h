@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <amd64/moon.h>
-#include <boot/bootloader_stivale2.h>
+#include <boot/boot.h>
 #include <hal/acpi/acpi.h>
 #include <stdbool.h>
 
@@ -23,7 +23,7 @@ struct RSDP
     uint8_t reserved[3];
 } gnu_pack_bytes;
 
-void rsdp_init(boot_rsdp_t *boot_rsdp_table);
+void rsdp_init(void);
 struct RSDP get_rsdp(void);
 bool use_xsdt(void);
 

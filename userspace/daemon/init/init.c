@@ -2,6 +2,6 @@
 
 void _start(void)
 {
-    syscall_log("Hi");
+    syscall_log("init: Started init daemon\n", 27);
     for (;;) {}
 }

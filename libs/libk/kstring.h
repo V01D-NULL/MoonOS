@@ -64,8 +64,8 @@ void *memmove(void *dst, const void *src, size_t n);
  * @param str2 Second string
  * @return int -1 if strings are not equal in length, 0 if string are the same, 1 if strings are not equal to eachother
  */
-int strcmp(char *str1, char *str2);
-int strncmp(char *str1, char *str2, size_t n);
+int strcmp(const char *str1, const char *str2);
+int strncmp(const char *str1, const char *str2, size_t n);
 
 /**
  * @brief Copy the NULL-terminated string 'src' into 'dest'

@@ -8,96 +8,24 @@
  * @copyright Copyright (c) 2021
  *
  */
-#include "bootloader_stivale2.h"
+#include "boot.h"
+#include <boot/proto/proto-stivale2.h>
 #include <devices/serial/serial.h>
+#include <devices/fb/early_fb.h>
 #include <amd64/moon.h>
 #include <stivale2.h>
 #include <int/idt.h>
 #include <int/gdt.h>
 #include <kernel.h>
-#include <mm/pmm.h>
-#include <mm/vmm.h>
-#include <mm/mm.h>
-#include <panic.h>
-#include <stdint.h>
-#include <printk.h>
-#include <libgraphics/double-buffering.h>
 #include <libgraphics/draw.h>
-#include <libgraphics/bootsplash.h>
-#include <drivers/keyboard/keyboard.h>
 #include <hal/pic/pic.h>
 #include <devices/term/fallback/fterm.h>
-#include <devices/fb/early_fb.h>
 #include <libk/cmdline.h>
 #include <libgraphics/bootsplash_img.h>
 #include <mm/slab.h>
-#include <mm/buddy/buddy.h>
-
-void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id);
-
-static gnu_section_align16 uint8_t stack[8192];
-
-struct stivale2_struct_tag_cmdline cmdline_tag = {
-    .tag = {
-        .identifier = STIVALE2_STRUCT_TAG_CMDLINE_ID,
-        .next = 0}};
-
-struct stivale2_struct_tag_rsdp rsdp_tag = {
-    .tag = {
-        .identifier = STIVALE2_STRUCT_TAG_RSDP_ID,
-        .next = (uintptr_t)&cmdline_tag}};
-
-struct stivale2_tag level5_paging_tag = {
-    .identifier = STIVALE2_HEADER_TAG_5LV_PAGING_ID,
-    .next = (uintptr_t)&rsdp_tag};
-
-struct stivale2_header_tag_smp smp_hdr_tag = {
-    .tag = {
-        .identifier = STIVALE2_HEADER_TAG_SMP_ID,
-        .next = (uintptr_t)&level5_paging_tag}};
-
-struct stivale2_header_tag_framebuffer framebuffer_hdr_tag = {
-    // All tags need to begin with an identifier and a pointer to the next tag.
-    .tag = {
-        .identifier = STIVALE2_HEADER_TAG_FRAMEBUFFER_ID,
-        .next = (uintptr_t)&smp_hdr_tag},
-    .framebuffer_width = 0,
-    .framebuffer_height = 0,
-    .framebuffer_bpp = 32};
-
-static struct stivale2_header_tag_terminal terminal_hdr_tag = {
-    .tag = {
-        .identifier = STIVALE2_HEADER_TAG_TERMINAL_ID,
-        .next = (uintptr_t)&framebuffer_hdr_tag},
-    .flags = 0};
-
-SECTION(".stivale2hdr")
-struct stivale2_header stivale_hdr = {
-    .entry_point = 0,
-    .stack = (uintptr_t)stack + sizeof(stack),
-    .flags = (1 << 2) | (1 << 4),
-    .tags = (uintptr_t)&terminal_hdr_tag};
-
-void *stivale2_get_tag(struct stivale2_struct *stivale2_struct, uint64_t id)
-{
-    struct stivale2_tag *current_tag = (void *)stivale2_struct->tags;
-    for (;;)
-    {
-
-        if (current_tag == NULL)
-        {
-            return NULL;
-        }
-
-        if (current_tag->identifier == id)
-        {
-            return current_tag;
-        }
-
-        // Get a pointer to the next tag in the linked list and repeat.
-        current_tag = (void *)current_tag->next;
-    }
-}
+#include <mm/pmm.h>
+#include <mm/vmm.h>
+#include <mm/mm.h>
 
 const char serial_message[] = {
     "███╗   ███╗ ██████╗  ██████╗ ███╗   ██╗ ██████╗ ███████╗ \n"
@@ -128,24 +56,21 @@ void banner(bool serial_only)
     delay(200);
 }
 
-/**
- * @brief Kernel entry point
- *
- * @param[in] bootloader_info Various information from the limine bootloader
- */
+extern uint8_t stack[];
+static BootContext ctx;
+
 void kinit(struct stivale2_struct *bootloader_info)
 {
-    boot_info_t bootvars;
-    bootvars.rbp = (uint64_t)stack;
+    ctx.rbp = (uint64_t)stack;
+    struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
     struct stivale2_struct_tag_terminal *term = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_TERMINAL_ID);
     struct stivale2_struct_tag_memmap *mmap = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
-    struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
     struct stivale2_struct_tag_smp *smp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_SMP_ID);
     struct stivale2_struct_tag_rsdp *rsdp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_RSDP_ID);
     struct stivale2_struct_tag_cmdline *cmdline = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_CMDLINE_ID);
     struct stivale2_struct_tag_modules *modules = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_MODULES_ID);
     struct stivale2_struct_tag_firmware *fw = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FIRMWARE_ID);
-    bootvars.is_uefi = !(fw->flags & STIVALE2_FIRMWARE_BIOS);
+    ctx.is_uefi = !(fw->flags & STIVALE2_FIRMWARE_BIOS);
 
     if (!term)
     {
@@ -156,24 +81,26 @@ void kinit(struct stivale2_struct *bootloader_info)
         fterm_init(term->term_write, term->cols, term->rows);
     }
 
-    if (fb != NULL)
+    // Can't work under these circumstances
+    if (!fb)
     {
-        bootvars.vesa.fb_addr = fb->framebuffer_addr;
-        bootvars.vesa.fb_width = fb->framebuffer_width;
-        bootvars.vesa.fb_height = fb->framebuffer_height;
-        bootvars.vesa.fb_bpp = fb->framebuffer_bpp;
-        bootvars.vesa.fb_pitch = fb->framebuffer_pitch;
-    }
-    else
-    {
+        debug(false, BASH_RED "WARNING: " BASH_DEFAULT "MoonOS was NOT provided with a framebuffer. Refusing to boot.");
         for (;;)
             ;
     }
+    ctx.fb.fb_addr = fb->framebuffer_addr;
+    ctx.fb.fb_width = fb->framebuffer_width;
+    ctx.fb.fb_height = fb->framebuffer_height;
+    ctx.fb.fb_bpp = fb->framebuffer_bpp;
+    ctx.fb.fb_pitch = fb->framebuffer_pitch;
 
     if (mmap != NULL)
     {
+        fterm_write("boot: Copying memory map to boot context");
+        memcpy((uint8_t*)ctx.mmap, (uint8_t*)mmap, sizeof(struct stivale2_struct_tag_memmap) * mmap->entries);
+        
         fterm_write("boot: Reached target gdt and tss\n");
-        init_gdt((uint64_t)stack + sizeof(stack));
+        init_gdt((uint64_t)stack + sizeof((uint64_t)stack));
 
         // Core#0 will remap the pic once.
         // After acpi_init the pic is disabled in favor of the apic
@@ -193,21 +120,19 @@ void kinit(struct stivale2_struct *bootloader_info)
         /* Is verbose boot specified in the command line? */
         if (cmdline != NULL)
         {
-            bool vm_tag_present = boot_cmdline_find_tag("vm", (const char *)cmdline->cmdline);
-
             if (!boot_cmdline_find_tag("verbose_boot", (const char *)cmdline->cmdline))
             {
                 fterm_write("boot: Quiet boot flag set\n");
                 fterm_flush();
-                early_fb_init(bootvars);
-                fb_draw_image((bootvars.vesa.fb_width / 2) - (IMG_WIDTH / 2), (bootvars.vesa.fb_height / 2) - (IMG_HEIGHT / 2), IMG_WIDTH, IMG_HEIGHT, IMG_DATA, IMAGE_RGB);
-                printk_init(false, bootvars, vm_tag_present);
+                early_fb_init(ctx);
+                fb_draw_image((ctx.fb.fb_width / 2) - (IMG_WIDTH / 2), (ctx.fb.fb_height / 2) - (IMG_HEIGHT / 2), IMG_WIDTH, IMG_HEIGHT, IMG_DATA, IMAGE_RGB);
+                printk_init(false, ctx);
             }
             else
             {
                 fterm_write("boot: Verbose boot flag set\n");
                 fterm_flush();
-                printk_init(true, bootvars, vm_tag_present);
+                printk_init(true, ctx);
             }
         }
         else
@@ -226,25 +151,30 @@ void kinit(struct stivale2_struct *bootloader_info)
     else
     {
         debug(false, "\n!Did not get a memory map from the bootloader!\n");
-        // fterm_write("Fatal: Cannot obtain a memory map from the bootloader");
+        fterm_write("Fatal: Cannot obtain a memory map from the bootloader");
         for (;;)
             ;
     }
 
     if (smp != NULL)
     {
-        bootvars.cpu.processor_count = smp->cpu_count;
-        bootvars.cpu.bootstrap_processor_lapic_id = smp->bsp_lapic_id;
-        bootvars.cpu.acpi_processor_uid = smp->smp_info->processor_id;
-        bootvars.cpu.lapic_id = smp->smp_info->lapic_id;
-        bootvars.cpu.smp_info = smp->smp_info;
+        ctx.cpu.processor_count = smp->cpu_count;
+        ctx.cpu.bootstrap_processor_lapic_id = smp->bsp_lapic_id;
+        ctx.cpu.acpi_processor_uid = smp->smp_info->processor_id;
+        ctx.cpu.lapic_id = smp->smp_info->lapic_id;
+        ctx.cpu.smp_info = smp->smp_info;
     }
 
     if (rsdp != NULL)
     {
-        bootvars.rsdp.rsdp_address = rsdp->rsdp;
+        ctx.rsdp.rsdp_address = rsdp->rsdp;
     }
 
     log_cpuid_results();
-    kmain(&bootvars, modules);
+    kmain(&ctx, modules);
+}
+
+BootContext BootContextGet(void)
+{
+    return ctx;
 }

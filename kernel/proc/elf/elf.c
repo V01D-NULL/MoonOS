@@ -5,6 +5,7 @@
 #include <mm/vmm.h>
 #include <mm/pmm.h>
 #include <mm/mm.h>
+#include <ktypes.h>
 
 static Elf64_Ehdr elf_verify_ehdr(const uint8_t **elf);
 static task_t elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, struct elf_loader_args args);
@@ -41,7 +42,7 @@ static task_t elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, struct elf_l
     size_t elf_mapping_offset = phdr->p_vaddr;
     bool found_ptload = false;
     copy_kernel_mappings(task);
-    
+
     for (Elf64_Half i = 0; i < phdr_entries; i++)
     {
         if (phdr->p_type == PT_LOAD)
@@ -49,7 +50,7 @@ static task_t elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, struct elf_l
             found_ptload = true;
             size_t num_pages = ALIGN_UP(phdr->p_memsz) / 4096;
 
-            printk("elf", "Virtual mapping: 0x%lX (%d bytes | %d pages)\n", phdr->p_vaddr, phdr->p_memsz, num_pages);
+            // printk("elf", "Virtual mapping: 0x%lX (%d bytes | %d pages)\n", phdr->p_vaddr, phdr->p_memsz, num_pages);
 
             for (uint64_t i = 0; i < num_pages; i++)
             {
@@ -57,7 +58,7 @@ static task_t elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, struct elf_l
                 v_map(task.pagemap, elf_mapping_offset, elf_mapping_offset, MAP_USER_RW);
             }
 
-            memcpy((uint8_t *)phdr->p_vaddr, (const uint8_t *)*elf + phdr->p_offset, phdr->p_filesz);            
+            memcpy((uint8_t *)phdr->p_vaddr, (const uint8_t *)*elf + phdr->p_offset, phdr->p_filesz);
             memset((void *)phdr->p_vaddr + phdr->p_filesz, 0, phdr->p_filesz - phdr->p_memsz);
         }
 
@@ -74,10 +75,13 @@ static task_t elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, struct elf_l
     task.ustack = elf_mapping_offset;
     for (size_t i = 0; i <= 2; i++)
     {
-        auto addr = i * PAGE_SIZE + task.ustack;
-        v_map(task.pagemap, addr, addr, MAP_USER_RW);
+        auto addr = elf_mapping_offset = i * PAGE_SIZE + task.ustack;
+        v_map_fast(task.pagemap, addr, addr, MAP_USER_RW);
     }
     // Todo: Shadow stack page
+
+    v_map_range_fast(as_vmm_range(0x0, 0x400000, $identity_vma), MAP_KERN, task.pagemap);
+    v_map_range_fast(as_vmm_range(elf_mapping_offset, (4 * GB) - elf_mapping_offset, $identity_vma), MAP_KERN, task.pagemap);
 
     return task;
 }

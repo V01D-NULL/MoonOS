@@ -1,9 +1,8 @@
 #ifndef MEMDEFS_H
 #define MEMDEFS_H
 
-#include <stdint.h>
 #include "pmm.h"
-#include <util/ptr.h>
+#include <stdint.h>
 #include <mm/cpu/CR.h>
 #include <libk/kassert.h>
 #include <ds/linked_list.h>
@@ -78,7 +77,7 @@ STATIC_INLINE uint64_t *pa(size_t vaddr)
     return (uint64_t*) (vaddr - ($high_vma));
 }
 
-STATIC_INLINE bool is_page_aligned(void *addr) { return GENERIC_CAST(size_t, addr) % PAGE_SIZE == 0; }
+STATIC_INLINE bool is_page_aligned(void *addr) { return ((size_t)addr) % PAGE_SIZE == 0; }
 STATIC_INLINE size_t get_page_count(void *addr, size_t n)
 {
     size_t pagecount = 0;

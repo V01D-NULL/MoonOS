@@ -4,7 +4,6 @@
 #include <mm/cpu/CR.h>
 #include <mm/vmm.h>
 #include <amd64/bytes.h>
-#include <util/ptr.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <printk.h>
@@ -68,6 +67,7 @@ void isr_handler(struct iframe regs)
             uint64_t cr2 = cr_read(CR2);
             // printk("INT ~ #PF", "Faulting address: 0x%lx\n", cr2);
             debug(true, "INT ~ #PF Faulting address: 0x%lx\n", cr2);
+            for(;;);
             pagefault_handler(cr2, regs.error_code);
             goto exit_handler;
         }

@@ -32,7 +32,7 @@ static inline bool IS_IRQ(int vector) { return (vector <= IRQ15 && vector >= IRQ
     {                                                                                              \
         if (isr_handler_array[regs.isr_number] != 0)                                               \
         {                                                                                          \
-            isr_handler_array[regs.isr_number] GENERIC_CAST(struct iframe *, &regs);               \
+            isr_handler_array[regs.isr_number]((struct iframe *) &regs);               \
         }                                                                                          \
         else                                                                                       \
         {                                                                                          \

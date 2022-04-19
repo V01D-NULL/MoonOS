@@ -1,6 +1,9 @@
-#ifndef LIB_USER_SYSCALLS_H
-#define LIB_USER_SYSCALLS_H
+#ifndef USER_SYSCALLS_H
+#define USER_SYSCALLS_H
 
-void syscall_log(const char *msg);
+#include <stdint.h>
+#include <stddef.h>
 
-#endif // LIB_USER_SYSCALLS_H
+void syscall_log(const char *buff, size_t len);
+
+#endif // USER_SYSCALLS_H

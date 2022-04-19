@@ -101,7 +101,7 @@ void *memmove(void *dst, const void *src, size_t n)
       0 if str1 == str2
       1 otherwise
 */
-int strcmp (char *str1, char *str2)
+int strcmp (const char *str1, const char *str2)
 {
 	int i = 0;
 	int failed = 0;
@@ -128,15 +128,12 @@ int strcmp (char *str1, char *str2)
 	return failed;
 }
 
-int strncmp(char *str1, char *str2, size_t n)
+int strncmp(const char *str1, const char *str2, size_t n)
 {
-	for (size_t i = 0; i < n; i++)
+	for (size_t i = 0; i < n && str1; i++)
 	{
 		if (str1[i] != str2[i])
 			return -1;
-		
-		if (str1[i] == '\0')
-			return 0;
 	}
 	return 0;
 }

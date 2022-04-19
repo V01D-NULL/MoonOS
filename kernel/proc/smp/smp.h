@@ -1,8 +1,8 @@
 #ifndef SMP_H
 #define SMP_H
 
-#include <boot/bootloader_stivale2.h>
+#include <boot/boot.h>
 
-void smp_init(boot_cpu_t *smp);
+void smp_init(BootContextSmp *smp);
 
 #endif // SMP_H

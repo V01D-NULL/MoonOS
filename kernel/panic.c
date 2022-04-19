@@ -1,16 +1,12 @@
 #include "panic.h"
-#include <util/ptr.h>
 #include <devices/serial/serial.h>
 #include <amd64/moon.h>
 #include <stdarg.h>
 #include <libk/kprintf.h>
 #include <trace/strace.h>
 #include <trace/sym.h>
-#include <libk/kassert.h>
 #include <mm/mm.h>
 #include <mm/vmm.h>
-#include <util/font8x16.h>
-#include <libgraphics/double-buffering.h>
 #include "printk.h"
 
 
@@ -19,7 +15,7 @@ gnu_no_return void _panic(uint64_t rbp, uint64_t rsp, const char *fmt, ...)
 	va_list ap;
 	va_start(ap, fmt);
 	char panic_buff[512];
-	vsnprintf(GENERIC_CAST(char *, &panic_buff), GENERIC_CAST(size_t, -1), fmt, ap);
+	vsnprintf((char *) &panic_buff, (size_t) -1, fmt, ap);
 	va_end(ap);
 
 	override_quiet_boot();
