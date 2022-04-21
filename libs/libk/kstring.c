@@ -14,14 +14,6 @@ void memcpy (uint8_t *dest, const uint8_t *src, uint64_t len)
 
 void memcpy32(uint32_t *dest, const uint32_t *src, uint64_t len)
 {
-	// asm volatile(
-	// 	"mov %0, %%rsi\n"
-	// 	"mov %1, %%rdi\n"
-	// 	"mov %2, %%rcx\n"
-	// 	"rep movsd\n"
-	// 	:: "r"(dest), "r"(src), "r"(len)
-	// 	: "rsi", "rdi", "rcx", "memory"
-	// );
 	for (; len != 0; len--)
 	{
 		*dest = *src;

@@ -20,6 +20,7 @@
 #include <libgraphics/draw.h>
 #include <hal/pic/pic.h>
 #include <devices/term/fallback/fterm.h>
+#include <devices/term/limine-port/term.h>
 #include <libk/cmdline.h>
 #include <libgraphics/bootsplash_img.h>
 #include <mm/slab.h>
@@ -81,7 +82,7 @@ void kinit(struct stivale2_struct *bootloader_info)
         fterm_init(term->term_write, term->cols, term->rows);
     }
 
-    // Can't work under these circumstances
+    // Can't work under these conditions
     if (!fb)
     {
         debug(false, BASH_RED "WARNING: " BASH_DEFAULT "MoonOS was NOT provided with a framebuffer. Refusing to boot.");
@@ -94,11 +95,26 @@ void kinit(struct stivale2_struct *bootloader_info)
     ctx.fb.fb_bpp = fb->framebuffer_bpp;
     ctx.fb.fb_pitch = fb->framebuffer_pitch;
 
+    if (smp != NULL)
+    {
+        ctx.cpu.processor_count = smp->cpu_count;
+        ctx.cpu.bootstrap_processor_lapic_id = smp->bsp_lapic_id;
+        ctx.cpu.acpi_processor_uid = smp->smp_info->processor_id;
+        ctx.cpu.lapic_id = smp->smp_info->lapic_id;
+        ctx.cpu.smp_info = smp->smp_info;
+    }
+
+    if (rsdp != NULL)
+    {
+        ctx.rsdp.rsdp_address = rsdp->rsdp;
+    }
+
     if (mmap != NULL)
     {
-        fterm_write("boot: Copying memory map to boot context");
-        memcpy((uint8_t*)ctx.mmap, (uint8_t*)mmap, sizeof(struct stivale2_struct_tag_memmap) * mmap->entries);
+        fterm_write("boot: Copying memory map to boot context\n");
+        memcpy((uint8_t *)ctx.mmap, (uint8_t *)mmap, sizeof(struct stivale2_struct_tag_memmap) * mmap->entries);
         
+
         fterm_write("boot: Reached target gdt and tss\n");
         init_gdt((uint64_t)stack + sizeof((uint64_t)stack));
 
@@ -116,6 +132,9 @@ void kinit(struct stivale2_struct *bootloader_info)
 
         fterm_write("boot: Reached target vmm\n");
         v_init(mmap->memmap, mmap->entries);
+
+        // Prepare the terminal
+        term_prepare(fb, mmap);
 
         /* Is verbose boot specified in the command line? */
         if (cmdline != NULL)
@@ -154,20 +173,6 @@ void kinit(struct stivale2_struct *bootloader_info)
         fterm_write("Fatal: Cannot obtain a memory map from the bootloader");
         for (;;)
             ;
-    }
-
-    if (smp != NULL)
-    {
-        ctx.cpu.processor_count = smp->cpu_count;
-        ctx.cpu.bootstrap_processor_lapic_id = smp->bsp_lapic_id;
-        ctx.cpu.acpi_processor_uid = smp->smp_info->processor_id;
-        ctx.cpu.lapic_id = smp->smp_info->lapic_id;
-        ctx.cpu.smp_info = smp->smp_info;
-    }
-
-    if (rsdp != NULL)
-    {
-        ctx.rsdp.rsdp_address = rsdp->rsdp;
     }
 
     log_cpuid_results();
