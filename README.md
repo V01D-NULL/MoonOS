@@ -44,6 +44,7 @@ Kernel panic:
 - A libc for the userland
 
 # This is currently being working on:
+- Kernel heap
 - Scheduler
 - Porting mlibc
 
