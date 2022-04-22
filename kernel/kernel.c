@@ -17,35 +17,8 @@
 #include <boot/boot.h>
 
 #include <amd64/cpu.h>
-#include <amd64/moon.h>
-#include <amd64/bytes.h>
-#include <amd64/msr.h>
+#include <mm/dynamic/kmalloc.h>
 
-#include <int/gdt.h>
-#include <int/idt.h>
-#include <int/interrupts.h>
-
-#include <devices/serial/serial.h>
-#include <drivers/keyboard/keyboard.h>
-
-#include <asm/x86/x86.h>
-
-#include <libk/kstring.h>
-#include <libk/kprintf.h>
-#include <libk/kassert.h>
-#include <liballoc/bitmap.h>
-#include <libgraphics/double-buffering.h>
-#include <libgraphics/draw.h>
-
-#include <util/common.h>
-
-#include <mm/pmm.h>
-#include <mm/vmm.h>
-#include <mm/slab.h>
-#include <mm/mm.h>
-#include <mm/buddy/buddy.h>
-
-#include <trace/strace.h>
 #include <hal/acpi/tables/rsdp.h>
 #include <hal/acpi/acpi.h>
 #include <hal/apic/apic.h>
@@ -53,7 +26,8 @@
 #include <proc/daemon/load.h>
 #include <proc/uspace/userspace.h>
 #include <proc/uspace/syscalls.h>
-#include <proc/elf/elf.h>
+
+#include <devices/serial/serial.h>
 
 #include "panic.h"
 #include "printk.h"
@@ -66,10 +40,16 @@ void kmain(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
 	printk("main", "Detected %d modules\n", mods->module_count);
 	printk("main", "Module string: %s\n", mods->modules[0].string);
     
-    printk("main", "0x%lx\n", BootContextGet().rbp);
+    auto cache = kmem_cache_create("foo", 512, 0);
+    
+    debug(true, "Dumping foo slab bufctl freelist...\n");
+    list_foreach(out, next, cache->nodes->freelist)
+    {
+        debug(true, "out->vma_ptr: %lx\n", out->vma_ptr);
+    }
 
-	lapic_init(acpi_init().apic);
-    load_daemon((const uint8_t*)mods->modules[0].begin, mods->modules[0].string);
+	// lapic_init(acpi_init().apic);
+    // load_daemon((const uint8_t*)mods->modules[0].begin, mods->modules[0].string);
 	
     // smp_init(&bootvars->cpu);
 
