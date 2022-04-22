@@ -237,14 +237,14 @@ static uint64_t context_size(void) {
 }
 
 static void context_save(uint64_t ptr) {
-    memcpy64(ptr, (uint64_t)(uintptr_t)&term_context, sizeof(struct term_context));
+    memcpy64((uint64_t*)ptr, (uint64_t*)(uintptr_t)&term_context, sizeof(struct term_context));
     ptr += sizeof(struct term_context);
 
     term_context_save(ptr);
 }
 
 static void context_restore(uint64_t ptr) {
-    memcpy64((uint64_t)(uintptr_t)&term_context, ptr, sizeof(struct term_context));
+    memcpy64((uint64_t*)(uintptr_t)&term_context, (uint64_t*)ptr, sizeof(struct term_context));
     ptr += sizeof(struct term_context);
 
     term_context_restore(ptr);
@@ -257,15 +257,15 @@ void _term_write(const char *buf, uint64_t count) {
     switch (count) {
         case TERM_CTX_SIZE: {
             uint64_t ret = context_size();
-            memcpy64(buf, (uint64_t)(uintptr_t)&ret, sizeof(uint64_t));
+            memcpy64((uint64_t*)buf, (uint64_t*)(uintptr_t)&ret, sizeof(uint64_t));
             return;
         }
         case TERM_CTX_SAVE: {
-            context_save(buf);
+            context_save((uint64_t)buf);
             return;
         }
         case TERM_CTX_RESTORE: {
-            context_restore(buf);
+            context_restore((uint64_t)buf);
             return;
         }
         case TERM_FULL_REFRESH: {

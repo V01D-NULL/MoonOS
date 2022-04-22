@@ -15,14 +15,16 @@
     This code was taken from: https://github.com/V01D-NULL/limine-terminal-port
     which is a freestanding port of the limine terminal: https://github.com/limine-bootloader/limine
 */
+
+#include <libk/kstring.h>
 #include <boot/boot.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <ktypes.h>
+#include <mm/mm.h>
 #include "gterm.h"
 #include "term.h"
-#include <mm/mm.h>
 
 typedef char symbol[];
 
@@ -504,10 +506,9 @@ bool gterm_prepare(size_t *_rows, size_t *_cols, struct stivale2_struct_tag_fram
     gterm_pitch       = fb->framebuffer_pitch;
     
     vga_font_width = DEFAULT_FONT_WIDTH, vga_font_height = DEFAULT_FONT_HEIGHT;
-    size_t font_bytes = (vga_font_width * vga_font_height * VGA_FONT_GLYPHS) / 8;
-
+    
     vga_font_bits = bump(VGA_FONT_MAX, mmap);
-    memcpy64(vga_font_bits, (void *)_binary____font_bin_start, VGA_FONT_MAX);
+    memcpy64((uint64_t*)vga_font_bits, (uint64_t*)_binary____font_bin_start, VGA_FONT_MAX);
 
     size_t font_spacing = 1;
     vga_font_width += font_spacing;
@@ -589,17 +590,17 @@ uint64_t gterm_context_size(void) {
 }
 
 void gterm_context_save(uint64_t ptr) {
-    memcpy64(ptr, (uint64_t)(uintptr_t)&context, sizeof(struct context));
+    memcpy64((uint64_t*)ptr, (uint64_t*)(uintptr_t)&context, sizeof(struct context));
     ptr += sizeof(struct context);
 
-    memcpy64(ptr, (uint64_t)(uintptr_t)grid, grid_size);
+    memcpy64((uint64_t*)ptr, (uint64_t*)(uintptr_t)grid, grid_size);
 }
 
 void gterm_context_restore(uint64_t ptr) {
-    memcpy64((uint64_t)(uintptr_t)&context, ptr, sizeof(struct context));
+    memcpy64((uint64_t*)(uintptr_t)&context, (uint64_t*)ptr, sizeof(struct context));
     ptr += sizeof(struct context);
 
-    memcpy64((uint64_t)(uintptr_t)grid, ptr, grid_size);
+    memcpy64((uint64_t*)(uintptr_t)grid, (uint64_t*)ptr, grid_size);
 
     for (size_t i = 0; i < (size_t)rows * cols; i++) {
         size_t x = i % cols;
