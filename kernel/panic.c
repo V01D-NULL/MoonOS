@@ -20,7 +20,7 @@ gnu_no_return void _panic(uint64_t rbp, uint64_t rsp, const char *fmt, ...)
 
 	override_quiet_boot();
 
-	printk("panic", "\n" BASH_RED "A kernel panic has occurred\n" BASH_WHITE);
+	printk("panic", "\nA kernel panic has occurred\n");
 	fmt_puts("*** Reason: %s***\n", panic_buff);
 	debug(false, "A kernel panic has occurred\n*** Reason: %s ***\n", panic_buff);
 	
