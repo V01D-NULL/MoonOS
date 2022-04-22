@@ -43,6 +43,6 @@ struct Pagefault paging_get_pagefault_flags(int error_code, bool do_panic)
         .protection_key = prot_key,
         .shadow_stack = shadow_stack,
         .panic_on_unhandled = do_panic && (ins_fetch || prot_key || shadow_stack),
-        .flags = (user << 2) | (write << 1) | (present << 0)
+        .flags = (user << 2) | (write << 1) | (1 << 0)
     };
 }
