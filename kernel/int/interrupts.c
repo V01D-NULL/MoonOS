@@ -62,15 +62,15 @@ void isr_handler(struct iframe regs)
         debug(true, "ERROR: %s (err_code %ld)\n", exception_messages[regs.isr_number], regs.error_code);
         // printk("INT", "%s (err_code %ld)\n", exception_messages[regs.isr_number], regs.error_code);
 
-        // if (regs.isr_number == 14)
-        // {
-        //     uint64_t cr2 = cr_read(CR2);
-        //     // printk("INT ~ #PF", "Faulting address: 0x%lx\n", cr2);
-        //     debug(true, "INT ~ #PF Faulting address: 0x%lx\n", cr2);
-        //     for(;;);
-        //     pagefault_handler(cr2, regs.error_code);
-        //     goto exit_handler;
-        // }
+        if (regs.isr_number == 14)
+        {
+            uint64_t cr2 = cr_read(CR2);
+            // printk("INT ~ #PF", "Faulting address: 0x%lx\n", cr2);
+            debug(true, "INT ~ #PF Faulting address: 0x%lx\n", cr2);
+            // for(;;);
+            pagefault_handler(cr2, regs.error_code);
+            goto exit_handler;
+        }
          if (regs.isr_number == 6)
         {
             printk("INT", "Faulting instruction is at: 0x%llx\n", regs.rip);

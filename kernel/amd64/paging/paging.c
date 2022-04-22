@@ -27,7 +27,6 @@ struct pte paging_purge_entry(void)
 
 struct Pagefault paging_get_pagefault_flags(int error_code, bool do_panic)
 {
-    auto present = check_flag(error_code, 0);
     auto write = check_flag(error_code, 1);
     auto user = check_flag(error_code, 2);
     auto ins_fetch = check_flag(error_code, 4);
@@ -36,7 +35,7 @@ struct Pagefault paging_get_pagefault_flags(int error_code, bool do_panic)
 
     return (struct Pagefault)
     {
-        .present = present,
+        .present = 1,
         .write = write,
         .user = user,
         .reserved = 0,
