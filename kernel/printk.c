@@ -2,7 +2,7 @@
 #include <libk/kprintf.h>
 #include "printk.h"
 #include <devices/serial/serial.h>
-#include <devices/term/fallback/fterm.h>
+#include <devices/term/early/early_term.h>
 #include <devices/term/limine-port/term.h>
 #include <mm/mm.h>
 
@@ -11,6 +11,7 @@ static bool is_verbose_boot = false;
 
 void printk_init(bool verbose_boot, BootContext term_info)
 {
+    set_boot_term_available(false);
     is_verbose_boot = verbose_boot;
     term_init();
 }

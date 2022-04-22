@@ -7,7 +7,6 @@
 #include <printk.h>
 #include <devices/serial/serial.h>
 #include <panic.h>
-#include <devices/term/fallback/fterm.h>
 
 // create_lock("vmm", vmm_lock);
 

@@ -19,7 +19,7 @@
 #include <kernel.h>
 #include <libgraphics/draw.h>
 #include <hal/pic/pic.h>
-#include <devices/term/fallback/fterm.h>
+#include <devices/term/early/early_term.h>
 #include <devices/term/limine-port/term.h>
 #include <libk/cmdline.h>
 #include <libgraphics/bootsplash_img.h>
@@ -75,11 +75,11 @@ void kinit(struct stivale2_struct *bootloader_info)
 
     if (!term)
     {
-        set_fterm_available(false);
+        set_boot_term_available(false);
     }
     else
     {
-        fterm_init(term->term_write, term->cols, term->rows);
+        boot_term_init(term->term_write, term->cols, term->rows);
     }
 
     // Can't work under these conditions
@@ -111,28 +111,28 @@ void kinit(struct stivale2_struct *bootloader_info)
 
     if (mmap != NULL)
     {
-        fterm_write("boot: Copying memory map to boot context\n");
+        boot_term_write("boot: Copying memory map to boot context\n");
         memcpy((uint8_t *)ctx.mmap, (uint8_t *)mmap, sizeof(struct stivale2_struct_tag_memmap) * mmap->entries);
 
-        fterm_write("boot: Reached target gdt and tss\n");
+        boot_term_write("boot: Reached target gdt and tss\n");
         init_gdt((uint64_t)stack + sizeof((uint64_t)stack));
 
         // Core#0 will remap the pic once.
         // After acpi_init the pic is disabled in favor of the apic
-        fterm_write("boot: Reached target pic and idt\n");
+        boot_term_write("boot: Reached target pic and idt\n");
         pic_remap();
         init_idt();
 
         // Prepare the terminal
         term_prepare(fb, mmap);
         
-        fterm_write("boot: Reached target pmm\n");
+        boot_term_write("boot: Reached target pmm\n");
         pmm_init(mmap->memmap, mmap->entries);
 
-        fterm_write("boot: Reached target slab\n");
+        boot_term_write("boot: Reached target slab\n");
         slab_init();
 
-        fterm_write("boot: Reached target vmm\n");
+        boot_term_write("boot: Reached target vmm\n");
         v_init(mmap->memmap, mmap->entries);
 
 
@@ -141,15 +141,14 @@ void kinit(struct stivale2_struct *bootloader_info)
         {
             if (!boot_cmdline_find_tag("verbose_boot", (const char *)cmdline->cmdline))
             {
-                fterm_write("boot: Quiet boot flag set\n");
-                fterm_flush();
+                boot_term_write("boot: Quiet boot flag set\n");
                 early_fb_init(ctx);
                 fb_draw_image((ctx.fb.fb_width / 2) - (IMG_WIDTH / 2), (ctx.fb.fb_height / 2) - (IMG_HEIGHT / 2), IMG_WIDTH, IMG_HEIGHT, IMG_DATA, IMAGE_RGB);
                 printk_init(false, ctx);
             }
             else
             {
-                fterm_write("boot: Verbose boot flag set\n");
+                boot_term_write("boot: Verbose boot flag set\n");
                 printk_init(true, ctx);
             }
         }
@@ -169,7 +168,7 @@ void kinit(struct stivale2_struct *bootloader_info)
     else
     {
         debug(false, "\n!Did not get a memory map from the bootloader!\n");
-        fterm_write("Fatal: Cannot obtain a memory map from the bootloader");
+        boot_term_write("Fatal: Cannot obtain a memory map from the bootloader");
         for (;;)
             ;
     }

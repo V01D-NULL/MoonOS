@@ -1,10 +1,8 @@
-#include "fterm.h"
-#include <stddef.h>
+#include "early_term.h"
+#include <devices/serial/serial.h>
 #include <libk/kstring.h>
 #include <libk/kprintf.h>
 #include <stdarg.h>
-#include <mm/vmm.h>
-#include <devices/serial/serial.h>
 
 void (*term_write)(const char *string, size_t length);
 
@@ -13,7 +11,7 @@ static bool fterm_available = true;
 static int fterm_width = 0;
 static int fterm_height = 0;
 
-void fterm_init(uint64_t term_write_addr, int width, int height)
+void boot_term_init(uint64_t term_write_addr, int width, int height)
 {
     term_write_paddr = term_write_addr;
     void *term_write_ptr = (void *)term_write_addr;
@@ -23,7 +21,7 @@ void fterm_init(uint64_t term_write_addr, int width, int height)
 }
 
 static char buffer[512];
-void fterm_write(const char *fmt, ...)
+void boot_term_write(const char *fmt, ...)
 {
     if (!fterm_available)
         return;
@@ -33,21 +31,15 @@ void fterm_write(const char *fmt, ...)
     vsnprintf((char *)&buffer, (size_t)-1, fmt, arg);
     va_end(arg);
 
-    term_write((char *)&buffer, strlen(buffer));
+    term_write((const char *)&buffer, strlen(buffer));
 }
 
-void set_fterm_available(bool availability)
+void set_boot_term_available(bool availability)
 {
     fterm_available = availability;
 }
 
-bool is_fterm_available(void)
+bool is_boot_term_available(void)
 {
     return fterm_available;
-}
-
-void fterm_flush(void)
-{
-    fterm_write("\033[2J");   // Clear screen
-    fterm_write("\033[1;1H"); // Reset cursor
 }
