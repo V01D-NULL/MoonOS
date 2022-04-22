@@ -22,7 +22,7 @@
 #include <ktypes.h>
 #include "gterm.h"
 #include "term.h"
-#include "../../serial/serial.h"
+#include <mm/mm.h>
 
 typedef char symbol[];
 
@@ -39,12 +39,10 @@ void *bump(size_t bytes, struct stivale2_struct_tag_memmap *mmap) {
             continue;
 
         auto base = mmap_entry[i].base;
-        
         mmap_entry[i].base += bytes;
         mmap_entry[i].length -= bytes;
 
-        debug(true, "base: %p\n", base);
-        return (void*)base;
+        return (void*)(base + $high_vma);
     }
     return NULL;
 }
@@ -172,10 +170,9 @@ static inline void gterm_plot_px(size_t x, size_t y, uint32_t hex) {
 }
 
 static void gterm_generate_canvas(void) {
-    debug(true, "%p\n", bg_canvas);
     for (size_t y = 0; y < gterm_height; y++) {
         for (size_t x = 0; x < gterm_width; x++) {
-            bg_canvas[y * gterm_width + x] = default_bg; // Alters my page tables, because bg_canvas is a pmm_alloced address. Write a Q&D valloc kernel heap ig
+            bg_canvas[y * gterm_width + x] = default_bg;
             gterm_plot_px(x, y, default_bg);
         }
     }
@@ -485,10 +482,7 @@ void gterm_putchar(uint8_t c) {
 
 // --------
 // NOTE: This terminal port is still a WIP, I'm using a bump allocator because I have no real heap yet.
-// The usage of bump() is temporary, it may interfere with pagetables since it takes memory from the mmap without the page frame allocator knowing.
-// The terminal may or may not cause GPF or PF's.
 //
-#include <mm/pmm.h>
 bool gterm_prepare(size_t *_rows, size_t *_cols, struct stivale2_struct_tag_framebuffer *fb, struct stivale2_struct_tag_memmap *mmap) {
     cursor_status = true;
     scroll_enabled = true;
@@ -573,7 +567,7 @@ bool gterm_prepare(size_t *_rows, size_t *_cols, struct stivale2_struct_tag_fram
     map = bump(map_size, mmap);
     
     bg_canvas_size = gterm_width * gterm_height * sizeof(uint32_t);
-    bg_canvas = pmm_alloc_range((bg_canvas_size/4096) + 1).base;//bump(bg_canvas_size, mmap);
+    bg_canvas = bump(bg_canvas_size, mmap); //pmm_alloc_range((bg_canvas_size/4096) + 1).base;
     
     return true;
 }

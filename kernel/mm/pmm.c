@@ -174,6 +174,12 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
 
             mmap[i].base += bitmap_size_bytes;
             mmap[i].length -= bitmap_size_bytes;
+            if (get_page_count(mmap[i].base, mmap[i].length) == 0)
+            {
+                size_t len = mmap[i].length - 1;
+                mmap[i].base += len;
+                mmap[i].length = 0;
+            }
 
             break;
         }
@@ -195,7 +201,7 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
 
         mem_lo = mmap[i].base;
         mem_hi = mmap[i].base + mmap[i].length - 1;
-
+    
         debug(true, "pmm_init: Freeing %lx-%lx | Pages: %ld\n", mem_lo, mem_hi, get_page_count((void *)mem_lo, mem_hi));
         size_t len = PAGE_2_BIT(mmap[i].length);
         size_t page = PAGE_2_BIT(mmap[i].base);

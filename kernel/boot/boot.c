@@ -113,7 +113,6 @@ void kinit(struct stivale2_struct *bootloader_info)
     {
         fterm_write("boot: Copying memory map to boot context\n");
         memcpy((uint8_t *)ctx.mmap, (uint8_t *)mmap, sizeof(struct stivale2_struct_tag_memmap) * mmap->entries);
-        
 
         fterm_write("boot: Reached target gdt and tss\n");
         init_gdt((uint64_t)stack + sizeof((uint64_t)stack));
@@ -124,6 +123,9 @@ void kinit(struct stivale2_struct *bootloader_info)
         pic_remap();
         init_idt();
 
+        // Prepare the terminal
+        term_prepare(fb, mmap);
+        
         fterm_write("boot: Reached target pmm\n");
         pmm_init(mmap->memmap, mmap->entries);
 
@@ -133,8 +135,6 @@ void kinit(struct stivale2_struct *bootloader_info)
         fterm_write("boot: Reached target vmm\n");
         v_init(mmap->memmap, mmap->entries);
 
-        // Prepare the terminal
-        term_prepare(fb, mmap);
 
         /* Is verbose boot specified in the command line? */
         if (cmdline != NULL)
@@ -150,7 +150,6 @@ void kinit(struct stivale2_struct *bootloader_info)
             else
             {
                 fterm_write("boot: Verbose boot flag set\n");
-                fterm_flush();
                 printk_init(true, ctx);
             }
         }
