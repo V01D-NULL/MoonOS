@@ -2,7 +2,7 @@
 #include <mm/buddy/buddy_utils.h>
 #include <devices/serial/serial.h>
 #include <mm/pmm.h>
-#include <mm/slab.h>
+#include <mm/phys_slab.h>
 #include <util/common.h>
 #include <printk.h>
 #include <stdint.h>

@@ -23,7 +23,7 @@
 #include <devices/term/limine-port/term.h>
 #include <libk/cmdline.h>
 #include <libgraphics/bootsplash_img.h>
-#include <mm/slab.h>
+#include <mm/phys_slab.h>
 #include <mm/pmm.h>
 #include <mm/vmm.h>
 #include <mm/mm.h>

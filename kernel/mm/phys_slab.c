@@ -1,4 +1,4 @@
-#include "slab.h"
+#include "phys_slab.h"
 #include <stdbool.h>
 #include <libk/kstring.h>
 #include <panic.h>

@@ -1,7 +1,7 @@
 #include "cpu.h"
 #include "msr.h"
 #include <printk.h>
-#include <mm/slab.h>
+#include <mm/phys_slab.h>
 #include <mm/mm.h>
 
 void init_percpu(uint64_t current_stack)

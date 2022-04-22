@@ -7,15 +7,6 @@
 #include <printk.h>
 #include <boot/boot.h>
 
-#define LOG(...) printk("slab-log", __VA_ARGS__)
-#ifdef LOG_VERBOSE
-#define LOGV(...) fmt_puts("\e[1;34m"); fmt_puts(__VA_ARGS__); fmt_puts("\e[0m")
-#else
-#define LOGV(...)
-#endif
-
-#define BUG(...) { fmt_puts("\033[31mBUG:\033[39m "); fmt_puts(__VA_ARGS__); }
-
 #define MAX_OBJECTS 512
 #define SLABCOUNT 10
 
