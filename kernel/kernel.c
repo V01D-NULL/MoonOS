@@ -42,10 +42,14 @@ void kmain(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
     
     auto cache = kmem_cache_create("foo", 512, 0);
     
-    debug(true, "Dumping foo slab bufctl freelist...\n");
-    list_foreach(out, next, cache->nodes->freelist)
+    debug(true, "Dumping bufctl freelists...\n");
+    list_foreach(slab, next, cache->nodes)
     {
-        debug(true, "out->vma_ptr: %lx\n", out->vma_ptr);
+        debug(true, "Found slab at %p\n", slab);
+        list_foreach(out, next, slab->freelist)
+        {
+            debug(true, "out->pa_ptr: %lx\n", out->pa_ptr);
+        }
     }
 
 	// lapic_init(acpi_init().apic);

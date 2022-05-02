@@ -12,20 +12,21 @@
 struct kmem_bufctl
 {
     struct slist next;
-    struct kmem_slab *parent_slab; // Owner or parent of this bufctl
-    void *vma_ptr; // Virtual memory address for this slab object
+    void *pa_ptr; // Memory address of this slab object
+    struct kmem_slab *parent_slab; // Owner / parent of this bufctl
 };
 
 struct kmem_slab
 {
     struct slist next, prev;
     struct kmem_bufctl *freelist;
-    size_t refcount;
+    int refcount;
 };
 
 struct kmem_cache
 {
-    size_t bufctl_object_size;
+    int size;
+    int bufctl_object_size;
     const char *descriptor;
     struct kmem_slab *nodes;
 };

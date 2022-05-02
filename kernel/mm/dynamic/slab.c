@@ -1,77 +1,99 @@
+#include <devices/serial/serial.h>
 #include <libk/kstring.h>
 #include <util/common.h>
 #include <stdbool.h>
-#include <panic.h>
 #include <mm/mm.h>
-#include <devices/serial/serial.h>
+#include <panic.h>
 #include "slab.h"
 
-static bool is_power_of_two(int n);
-static int32_t slab_align(int sz);
+static struct kmem_slab *__kmem_create_slab(struct kmem_cache *cachep, bool small_slab);
 
-static size_t heap_loc = $high_vma_heap;
+void kmem_cache_grow(struct kmem_cache *cachep, int count)
+{
+    for (int i = 0; i < count; i++)
+    {
+        /* Prepare bufctl */
+        struct kmem_slab *slab = __kmem_create_slab(cachep, true);
+        struct kmem_bufctl *buf = slab->freelist;
+
+        /* Initialize the bufctl freelist */
+        int elements = cachep->bufctl_object_size / cachep->size;
+        struct kmem_bufctl *tail = buf;
+            
+        for (int i = 0; i < elements; i++)
+        {
+            uintptr_t offset = ((uintptr_t)buf) + (cachep->size * i);
+            struct kmem_bufctl *new = offset;
+            new->parent_slab = slab;
+            new->pa_ptr = (offset);
+
+            if (!tail)
+                buf = new;
+            else
+                list_set_next(new, next, tail);
+
+            tail = new;
+        }
+
+        tail->next = (struct slist) {};
+    }
+}
 
 struct kmem_cache *__kmem_cache_new(const char *name, size_t size, int alignment)
 {
-    if (!is_power_of_two(size))
-        size = slab_align(size);
+    if (size % alignment != 0)
+        size = align(size, alignment);
 
     if (!SMALL_SLAB(size))
         panic("Large slabs are not supported yet");
 
     /* Note: This entire code works only for small slabs */
-    struct kmem_cache *cache = (struct kmem_cache *)heap_loc;
+    struct kmem_cache *cache = (struct kmem_cache *)pmm_alloc();//heap_loc;
+    cache->size = size;
     cache->descriptor = name;
-    cache->bufctl_object_size = (alignment * ((size-1)/alignment + 1));
-
-    /* Prepare bufctl */
-    struct kmem_bufctl *buf = (struct kmem_bufctl *)heap_loc;
-    int len = PAGE_SIZE - sizeof(struct kmem_slab);
+    // cache->small_slab = true;
+    // cache->alignment = alignment;
+    cache->bufctl_object_size = PAGE_SIZE - sizeof(struct kmem_cache);
+    cache->nodes = NULL;
     
-    /* Offset for the small cache structure + memory for the small slab itself */
-    heap_loc += align(sizeof(struct kmem_cache), alignment) + PAGE_SIZE;
-
-    /* Position slab at the end of the page */
-    struct kmem_slab *slab = (struct kmem_slab *)(((uintptr_t)buf + PAGE_SIZE) - sizeof(struct kmem_slab));
-    slab->next = slab->prev = (struct slist) {};
-    slab->refcount = 0;
-    slab->freelist = buf;
-
-    /* Initialize this slab's freelist */
-    int elements = len / size;
-    struct kmem_bufctl *tail = NULL;
-
-    for (int i = 0; i < elements; i++)
-    {
-        uintptr_t offset = ((uint8_t*)buf) + (size * i);
-        struct kmem_bufctl *new = (struct kmem_bufctl *)(offset);
-        new->parent_slab = slab;
-        new->vma_ptr = (void*)(offset);
-
-        if (!tail)
-            buf = new;
-        else
-            list_set_next(new, next, tail);
-
-        tail = new;
-    }
-    list_set_next((struct kmem_bufctl*)NULL, next, tail);
+    /* Initialize the bufctl freelist */
+    kmem_cache_grow(cache, 1);
 
     return cache;
 }
 
-static bool is_power_of_two(int n)
+static struct kmem_slab *__kmem_create_slab(struct kmem_cache *cachep, bool small_slab)
 {
-    return (n > 0) && ((n & (n - 1)) == 0);
-}
+    if (!small_slab)
+    {
+        debug(true, "__kmem_create_slab: '%s' is a large slab. They aren't supported yet.\n", cachep->descriptor);
+        return NULL;
+    }
 
-static int32_t slab_align(int sz)
-{
-    sz--;
-    sz |= sz >> 1;
-    sz |= sz >> 2;
-    sz |= sz >> 4;
-    sz |= sz >> 8;
-    sz |= sz >> 16;
-    return ++sz;
+    /* Prepare bufctl */
+    struct kmem_bufctl *buf = (struct kmem_bufctl *)pmm_alloc();//heap_loc;
+    buf->next = (struct slist) {};
+
+    /* Position slab at the end of the page */
+    struct kmem_slab *slab = (struct kmem_slab *)(((uintptr_t)buf + PAGE_SIZE) - sizeof(struct kmem_slab));
+    slab->next = (struct slist) {};
+    slab->refcount = 0;
+    slab->freelist = buf;
+
+    /* Append the slab to the cache */
+    if (!cachep->nodes)
+    {
+        cachep->nodes = slab;
+    }
+    else
+    {
+        struct kmem_slab *tail = NULL;
+    
+        list_foreach(out, next, cachep->nodes)
+            tail = out;
+    
+        list_set_next(slab, next, tail);
+    }
+
+    return slab;
 }
