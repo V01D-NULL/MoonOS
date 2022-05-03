@@ -65,8 +65,7 @@ struct buddy_range
 
 static const size_t $identity_vma    = 0x0;                /* Regular, physical memory offset   */
 static const size_t $high_vma        = 0xffff800000000000; /* Kernel data structures offset     */
-static const size_t $high_vma_valloc = 0xffffd00000000000; /* Kernel vmalloc heap offset (1GiB) */
-static const size_t $high_vma_heap   = 0xffffd00040000000; /* Kernel heap area offset           */
+static const size_t $high_vma_heap   = 0xffffd00000000000; /* Kernel heap area offset           */
 static const size_t $high_vma_code   = 0xffffffff80000000; /* Kernel code offset                */
 
 STATIC_INLINE uint64_t *va(size_t paddr)
