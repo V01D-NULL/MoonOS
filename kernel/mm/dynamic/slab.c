@@ -6,6 +6,7 @@
 #include <panic.h>
 #include "slab.h"
 
+static size_t heap_loc = $high_vma_heap;
 static struct kmem_slab *__kmem_create_slab(struct kmem_cache *cachep, bool small_slab);
 
 void kmem_cache_grow(struct kmem_cache *cachep, int count)
@@ -25,7 +26,7 @@ void kmem_cache_grow(struct kmem_cache *cachep, int count)
             uintptr_t offset = ((uintptr_t)buf) + (cachep->size * i);
             struct kmem_bufctl *new = offset;
             new->parent_slab = slab;
-            new->pa_ptr = (offset);
+            new->va_ptr = (offset);
 
             if (!tail)
                 buf = new;
@@ -48,11 +49,11 @@ struct kmem_cache *__kmem_cache_new(const char *name, size_t size, int alignment
         panic("Large slabs are not supported yet");
 
     /* Note: This entire code works only for small slabs */
-    struct kmem_cache *cache = (struct kmem_cache *)pmm_alloc();//heap_loc;
+    struct kmem_cache *cache = (struct kmem_cache *)heap_loc;
+    heap_loc += sizeof(struct kmem_cache);
+
     cache->size = size;
     cache->descriptor = name;
-    // cache->small_slab = true;
-    // cache->alignment = alignment;
     cache->bufctl_object_size = PAGE_SIZE - sizeof(struct kmem_cache);
     cache->nodes = NULL;
     
@@ -71,7 +72,8 @@ static struct kmem_slab *__kmem_create_slab(struct kmem_cache *cachep, bool smal
     }
 
     /* Prepare bufctl */
-    struct kmem_bufctl *buf = (struct kmem_bufctl *)pmm_alloc();//heap_loc;
+    struct kmem_bufctl *buf = (struct kmem_bufctl *)heap_loc;
+    heap_loc += PAGE_SIZE;
     buf->next = (struct slist) {};
 
     /* Position slab at the end of the page */

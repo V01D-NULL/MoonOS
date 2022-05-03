@@ -37,28 +37,28 @@ void kmain(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
     init_percpu(bootvars->rbp); // Every logical core (which each calls init_percpu) shares it's stack with the syscall handler
     init_syscalls();
 
-	printk("main", "Detected %d modules\n", mods->module_count);
-	printk("main", "Module string: %s\n", mods->modules[0].string);
-    
+    printk("main", "Detected %d modules\n", mods->module_count);
+    printk("main", "Module string: %s\n", mods->modules[0].string);
+
     auto cache = kmem_cache_create("foo", 512, 0);
-    
+
     debug(true, "Dumping bufctl freelists...\n");
     list_foreach(slab, next, cache->nodes)
     {
         debug(true, "Found slab at %p\n", slab);
         list_foreach(out, next, slab->freelist)
         {
-            debug(true, "out->pa_ptr: %lx\n", out->pa_ptr);
+            debug(true, "out->va_ptr: %lx\n", out->va_ptr);
         }
     }
 
-	// lapic_init(acpi_init().apic);
-    // load_daemon((const uint8_t*)mods->modules[0].begin, mods->modules[0].string);
-	
+    lapic_init(acpi_init().apic);
+    load_daemon((const uint8_t *)mods->modules[0].begin, mods->modules[0].string);
+
     // smp_init(&bootvars->cpu);
 
     for (;;)
-	{
+    {
         asm("cli;hlt");
-	}
+    }
 }
