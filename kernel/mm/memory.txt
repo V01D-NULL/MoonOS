@@ -1,13 +1,12 @@
 ------ Memory layout -------
 == Mappings ==
-+ 0x0-0x40000000     - Anything, 4GiB mapped.
++ 0x0-0x100000000    - Anything, 4GiB mapped.
 + 
 + (4 level paging)
-+ 0xffff800000000000 - Pointers, heaps, structures, etc, 2GiB mapped.
++ 0xffff800000000000 - Pointers (example: RSDP, gterm variables), 2GiB mapped.
 + 
-+ (5 level paging)
-+ 0xff00000000000000 - Pointers, heaps, structures, etc, 2GiB mapped.
-+ 
++ 0xffffd00000000000 - Kernel heap, 4GiB mapped.
++
 + 0xffffffff80200000 - Kernel code, 2GiB mapped.
 == /Mappings ==
 
