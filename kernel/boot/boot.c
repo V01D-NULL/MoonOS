@@ -124,7 +124,7 @@ void kinit(struct stivale2_struct *bootloader_info)
         init_idt();
 
         // Prepare the terminal
-        term_prepare(fb, mmap);
+        term_prepare(fb, mmap); // Somehow doesn't work on vmware UEFI but it's fine on qemu BIOS+UEFI and real hardware UEFI? Idk, this is temporary with it's bump allocator anyway.
         
         boot_term_write("boot: Reached target pmm\n");
         pmm_init(mmap->memmap, mmap->entries);
@@ -134,8 +134,7 @@ void kinit(struct stivale2_struct *bootloader_info)
 
         boot_term_write("boot: Reached target vmm\n");
         v_init(mmap->memmap, mmap->entries);
-
-
+        
         /* Is verbose boot specified in the command line? */
         if (cmdline != NULL)
         {

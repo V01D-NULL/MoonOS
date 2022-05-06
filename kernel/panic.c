@@ -1,14 +1,14 @@
-#include "panic.h"
+#include <devices/term/early/early_term.h>
 #include <devices/serial/serial.h>
-#include <amd64/moon.h>
-#include <stdarg.h>
 #include <libk/kprintf.h>
 #include <trace/strace.h>
+#include <amd64/moon.h>
 #include <trace/sym.h>
-#include <mm/mm.h>
+#include <stdarg.h>
 #include <mm/vmm.h>
+#include <mm/mm.h>
 #include "printk.h"
-
+#include "panic.h"
 
 gnu_no_return void _panic(uint64_t rbp, uint64_t rsp, const char *fmt, ...)
 {
@@ -19,9 +19,12 @@ gnu_no_return void _panic(uint64_t rbp, uint64_t rsp, const char *fmt, ...)
 	va_end(ap);
 
 	override_quiet_boot();
-
-	printk("panic", "\nA kernel panic has occurred\n");
-	fmt_puts("*** Reason: %s***\n", panic_buff);
+    
+    if (is_boot_term_available())
+        boot_term_write("\nA kernel panic has occurred\n*** Reason: %s ***\n", panic_buff);
+	
+    printk("panic", "\nA kernel panic has occurred\n");
+	fmt_puts("*** Reason: %s ***\n", panic_buff);
 	debug(false, "A kernel panic has occurred\n*** Reason: %s ***\n", panic_buff);
 	
 	struct stacktrace_result res = backtrace_stack(10);

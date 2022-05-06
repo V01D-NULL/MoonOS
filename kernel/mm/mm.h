@@ -46,8 +46,8 @@ struct zone
 {
     // Vital information
     struct slist list;             // A pointer to the next zone
-    struct BuddyZone *buddy_zones; // A buddy zone is what stores the linear binary tree
-
+    uint8_t *bitmap;
+    
     // Statistics
     size_t start;           // Base address for this zone
     size_t len;             // Length of this zone in bytes.
@@ -55,6 +55,8 @@ struct zone
     size_t num_buddy_zones; // Number of buddy zones for this zone
     int zone_nr;            // Note: zone.list->next will be 'zone_nr + 1'
     const char *name;
+
+    // struct page *freelist[MM_MAX_ORDER];
 };
 
 struct buddy_range
@@ -79,19 +81,5 @@ STATIC_INLINE uint64_t *pa(size_t vaddr)
 }
 
 STATIC_INLINE bool is_page_aligned(void *addr) { return ((size_t)addr) % PAGE_SIZE == 0; }
-STATIC_INLINE size_t get_page_count(void *addr, size_t n)
-{
-    size_t pagecount = 0;
-
-    for (size_t i = 0; i < n; i += PAGE_SIZE)
-    {
-        if (is_page_aligned(addr))
-        {
-            pagecount++;
-        }
-    }
-
-    return pagecount;
-}
 
 #endif // MEMDEFS_H

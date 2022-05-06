@@ -47,6 +47,7 @@ static struct Pml *vmm_pml_advance(struct Pml *entry, size_t level, int flags)
 
     uint64_t addr = (uint64_t)pmm_alloc();
     panic_if(!addr, "Failed to allocate memory for a pagetable!");
+
     entry->page_tables[level] = paging_create_entry(addr, flags);
     return (struct Pml *)addr;
 }

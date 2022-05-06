@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <libk/kstring.h>
 #include <devices/serial/serial.h>
+#include <devices/term/early/early_term.h>
 
 extern sym_table_t symbol_table[];
 
@@ -57,6 +58,15 @@ int64_t find_symbol_by_name(char *name)
 void backtrace_symbol(uint64_t address)
 {
     sym_table_t sym = sym_lookup(address);
-    printk("backtrace", "%llx - %s\n", sym.addr, sym.name);
+
+    if (is_boot_term_available())
+    {
+        boot_term_write("%llx - %s\n", sym.addr, sym.name);
+    }
+    else
+    {
+        printk("backtrace", "%llx - %s\n", sym.addr, sym.name);
+    }
+
     debug(false, "%llx - %s\n", sym.addr, sym.name);
 }
