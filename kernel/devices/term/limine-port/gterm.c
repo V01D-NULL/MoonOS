@@ -25,24 +25,25 @@
 #include <mm/mm.h>
 #include "gterm.h"
 #include "term.h"
-
+#include <devices/serial/serial.h>
 typedef char symbol[];
 
 // A simple "bump" allocator that steals some memory from the mmap
-void *bump(size_t bytes, struct stivale2_struct_tag_memmap *mmap) {
+void *bump(size_t bytes, struct stivale2_struct_tag_memmap *mmap) {    
     auto mmap_entry = mmap->memmap;
     auto entries = mmap->entries;
     for (size_t i = 0; i < entries; i++)
     {
         if (mmap_entry[i].type != STIVALE2_MMAP_USABLE)
             continue;
-        
+
         if (mmap_entry[i].length < bytes)
             continue;
 
         auto base = mmap_entry[i].base;
-        mmap_entry[i].base += bytes;
-        mmap_entry[i].length -= bytes;
+        
+        mmap_entry[i].base = ALIGN_UP(mmap_entry[i].base + bytes);
+        mmap_entry[i].length = ALIGN_DOWN(mmap_entry[i].length - bytes);
 
         return (void*)(base + $high_vma);
     }
