@@ -14,19 +14,6 @@
 
 #include <stdint.h>
 
-#define CHECK_BIT(variable, bit_index)      (((variable)>>(bit_index)) & 1)
-#define SET_BIT(variable, bit_index, value) (((variable)>>bit_index) | value)
-
-//Get the lower or upper 32 bits of a 64 bit data type
-#define LOWER_32(variable) (variable & 0xffffffff)
-#define UPPER_32(variable) (variable << 32)
-#define DATATYPE_SZ(variable) ( sizeof(variable) * 8 )
-
-#define BASE_2  2
-#define BASE_8  8
-#define BASE_10 10
-#define BASE_16 16
-
 inline void outb(uint16_t port, uint8_t val)
 {
     asm volatile ( "outb %0, %1" : : "a"(val), "Nd"(port) );
