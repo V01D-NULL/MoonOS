@@ -6,15 +6,15 @@
 #include <panic.h>
 #include "slab.h"
 
-static size_t heap_loc = $high_vma_heap;
 static struct kmem_slab *__kmem_create_slab(struct kmem_cache *cachep, bool small_slab);
 
-void kmem_cache_grow(struct kmem_cache *cachep, int count)
+bool kmem_cache_grow(struct kmem_cache *cachep, int count)
 {
     for (int i = 0; i < count; i++)
     {
         /* Prepare bufctl */
         struct kmem_slab *slab = __kmem_create_slab(cachep, true);
+        if (!slab) return false;
         struct kmem_bufctl *buf = slab->freelist;
 
         /* Initialize the bufctl freelist */
@@ -26,7 +26,7 @@ void kmem_cache_grow(struct kmem_cache *cachep, int count)
             uintptr_t offset = ((uintptr_t)buf) + (cachep->size * i);
             struct kmem_bufctl *new = offset;
             new->parent_slab = slab;
-            new->va_ptr = (offset);
+            new->ptr = offset;
 
             if (!tail)
                 buf = new;
@@ -40,7 +40,7 @@ void kmem_cache_grow(struct kmem_cache *cachep, int count)
     }
 }
 
-struct kmem_cache *__kmem_cache_new(const char *name, size_t size, int alignment)
+struct kmem_cache *kmem_cache_new(const char *name, size_t size, int alignment)
 {
     if (size % alignment != 0)
         size = align(size, alignment);
@@ -49,8 +49,9 @@ struct kmem_cache *__kmem_cache_new(const char *name, size_t size, int alignment
         panic("Large slabs are not supported yet");
 
     /* Note: This entire code works only for small slabs */
-    struct kmem_cache *cache = (struct kmem_cache *)heap_loc;
-    heap_loc += sizeof(struct kmem_cache);
+    struct kmem_cache *cache = (struct kmem_cache *)pmm_alloc();
+    if (!cache)
+        return NULL;
 
     cache->size = size;
     cache->descriptor = name;
@@ -67,13 +68,15 @@ static struct kmem_slab *__kmem_create_slab(struct kmem_cache *cachep, bool smal
 {
     if (!small_slab)
     {
-        debug(true, "__kmem_create_slab: '%s' is a large slab. They aren't supported yet.\n", cachep->descriptor);
+        printk("slab", "__kmem_create_slab: '%s' is a large slab. They aren't supported yet.\n", cachep->descriptor);
         return NULL;
     }
 
     /* Prepare bufctl */
-    struct kmem_bufctl *buf = (struct kmem_bufctl *)heap_loc;
-    heap_loc += PAGE_SIZE;
+    struct kmem_bufctl *buf = (struct kmem_bufctl *)pmm_alloc();
+    if (!buf)
+        return NULL;
+
     buf->next = (struct slist) {};
 
     /* Position slab at the end of the page */

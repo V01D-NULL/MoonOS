@@ -3,7 +3,20 @@
 
 #include "slab.h"
 
+enum
+{
+#if defined(DEBUG_MM) || defined(DEBUG_KMALLOC)
+    KMEM_VERBOSE_ALLOC(1 << 0), // Adds debug logging, but it butchers performance and is thus only enabled when debugging the mm
+#endif
+
+    KMEM_PANIC = (1 << 1),    // Kernel panic if something goes wrong instead of returning NULL
+    KMEM_HIGH_VMA = (1 << 2), // Add $high_vma to the value returned by a kmem allocation routine
+    KMEM_NO_GROW = (1 << 3)   // Don't automatically grow the cache if it's OOM
+};
+
+typedef int kmem_flags_t;
+
 struct kmem_cache *kmem_cache_create(const char *name, size_t size, int alignment);
-void *kmem_cache_alloc(struct kmem_cache *cachep, int flags);
+void *kmem_cache_alloc(struct kmem_cache *cachep, kmem_flags_t flags);
 
 #endif // KMALLOC_H

@@ -11,6 +11,6 @@
 #include <boot/boot.h>
 #include "slab_defs.h"
 
-struct kmem_cache *__kmem_cache_new(const char *name, size_t size, int alignment);
+bool kmem_cache_grow(struct kmem_cache *cachep, int count);
 
 #endif // SLAB_H

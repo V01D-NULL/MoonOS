@@ -12,7 +12,7 @@
 struct kmem_bufctl
 {
     struct slist next;
-    void *va_ptr; // Memory address of this slab object (virtual address)
+    void *ptr; // Memory address of this slab object
     struct kmem_slab *parent_slab; // Owner / parent of this bufctl
 };
 
