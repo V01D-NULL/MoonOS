@@ -1,3 +1,5 @@
+#define PR_MODULE "slab"
+
 #include <devices/serial/serial.h>
 #include <libk/kstring.h>
 #include <util/common.h>
@@ -14,18 +16,19 @@ bool kmem_cache_grow(struct kmem_cache *cachep, int count)
     {
         /* Prepare bufctl */
         struct kmem_slab *slab = __kmem_create_slab(cachep, true);
-        if (!slab) return false;
+        if (!slab)
+            return false;
         struct kmem_bufctl *buf = slab->freelist;
 
         /* Initialize the bufctl freelist */
         int elements = cachep->bufctl_object_size / cachep->size;
         struct kmem_bufctl *tail = buf;
-            
+
         for (int i = 0; i < elements; i++)
         {
             uintptr_t offset = ((uintptr_t)buf) + (cachep->size * i);
             struct kmem_bufctl *new = offset;
-            new->parent_slab = slab;
+            memcpy(new->parent_slab, slab, sizeof(struct kmem_slab));
             new->ptr = offset;
 
             if (!tail)
@@ -36,7 +39,7 @@ bool kmem_cache_grow(struct kmem_cache *cachep, int count)
             tail = new;
         }
 
-        tail->next = (struct slist) {};
+        tail->next = (struct slist){};
     }
 }
 
@@ -57,7 +60,7 @@ struct kmem_cache *kmem_cache_new(const char *name, size_t size, int alignment)
     cache->descriptor = name;
     cache->bufctl_object_size = PAGE_SIZE - sizeof(struct kmem_cache);
     cache->nodes = NULL;
-    
+
     /* Initialize the bufctl freelist */
     kmem_cache_grow(cache, 1);
 
@@ -68,7 +71,7 @@ static struct kmem_slab *__kmem_create_slab(struct kmem_cache *cachep, bool smal
 {
     if (!small_slab)
     {
-        printk("slab", "__kmem_create_slab: '%s' is a large slab. They aren't supported yet.\n", cachep->descriptor);
+        pr_info("__kmem_create_slab: '%s' is a large slab. They aren't supported yet.\n", cachep->descriptor);
         return NULL;
     }
 
@@ -77,7 +80,7 @@ static struct kmem_slab *__kmem_create_slab(struct kmem_cache *cachep, bool smal
     if (!buf)
         return NULL;
 
-    buf->next = (struct slist) {};
+    buf->next = (struct slist){};
 
     /* Position slab at the end of the page */
     struct kmem_slab *slab = (struct kmem_slab *)(((uintptr_t)buf + PAGE_SIZE) - sizeof(struct kmem_slab));
@@ -93,11 +96,12 @@ static struct kmem_slab *__kmem_create_slab(struct kmem_cache *cachep, bool smal
     else
     {
         struct kmem_slab *tail = NULL;
-    
+
         list_foreach(out, next, cachep->nodes)
             tail = out;
-    
+
         list_set_next(slab, next, tail);
+        tail->next = (struct slist){};
     }
 
     return slab;

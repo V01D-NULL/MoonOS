@@ -18,5 +18,8 @@ typedef int kmem_flags_t;
 
 struct kmem_cache *kmem_cache_create(const char *name, size_t size, int alignment);
 void *kmem_cache_alloc(struct kmem_cache *cachep, kmem_flags_t flags);
+void kmem_cache_free(struct kmem_cache *cachep, void *ptr);
+void kmem_cache_dump(struct kmem_cache *cachep, int n);
+void kmem_cache_destroy(struct kmem_cache *cachep);
 
 #endif // KMALLOC_H

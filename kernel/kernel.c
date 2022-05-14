@@ -42,28 +42,23 @@ void kmain(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
     pr_info("Detected %d modules\n", mods->module_count);
     pr_info("Module string: %s\n", mods->modules[0].string);
 
-    pr_info("\nkmem_cache_alloc test:\n");
+    printk("\n" PR_MODULE,"kmem_cache_alloc test:\n");
     auto cache = kmem_cache_create("foo", 512, 0);
 
     if (cache != NULL)
     {
-        // Allocate all memory from one slab
-        pr_info("kmem_cache_alloc: 0x%p\n", kmem_cache_alloc(cache, KMEM_PANIC | KMEM_HIGH_VMA));
-        pr_info("kmem_cache_alloc: 0x%p\n", kmem_cache_alloc(cache, KMEM_PANIC | KMEM_HIGH_VMA));
-        pr_info("kmem_cache_alloc: 0x%p\n", kmem_cache_alloc(cache, KMEM_PANIC | KMEM_HIGH_VMA));
-        pr_info("kmem_cache_alloc: 0x%p\n", kmem_cache_alloc(cache, KMEM_PANIC | KMEM_HIGH_VMA));
-        pr_info("kmem_cache_alloc: 0x%p\n", kmem_cache_alloc(cache, KMEM_PANIC | KMEM_HIGH_VMA));
-        pr_info("kmem_cache_alloc: 0x%p\n", kmem_cache_alloc(cache, KMEM_PANIC | KMEM_HIGH_VMA));
-        pr_info("kmem_cache_alloc: 0x%p\n", kmem_cache_alloc(cache, KMEM_PANIC | KMEM_HIGH_VMA));
+        auto ptr = kmem_cache_alloc(cache, KMEM_PANIC | KMEM_HIGH_VMA | KMEM_NO_GROW);
         
-        // All memory in one slab has been allocated, but the slab will grow automatically.
-        pr_info("(New slab creation here) kmem_cache_alloc: 0x%p\n", kmem_cache_alloc(cache, KMEM_PANIC | KMEM_HIGH_VMA));
+        pr_info("Allocated memory via kmem_cache_alloc: 0x%p\n", ptr);
+        kmem_cache_free(cache, ptr);
+        kmem_cache_dump(cache, -1);
+
+        kmem_cache_destroy(cache);
+        // kmem_cache_alloc(cache, KMEM_PANIC); // Attempted to allocate after destroying the cache and set the panic flag - this should fail and panic.
     }
 
-    pr_info("Ref count: %d\n", cache->nodes->refcount);
-
-    // lapic_init(acpi_init().apic);
-    // load_daemon((const uint8_t *)mods->modules[0].begin, mods->modules[0].string);
+    lapic_init(acpi_init().apic);
+    load_daemon((const uint8_t *)mods->modules[0].begin, mods->modules[0].string);
 
     // smp_init(&bootvars->cpu);
 
