@@ -1,3 +1,5 @@
+#define PR_MODULE "cpu"
+
 #include "cpu.h"
 #include "msr.h"
 #include <printk.h>
@@ -13,7 +15,7 @@ void init_percpu(uint64_t current_stack)
     pcpu->working_stack = 0; // Set by the syscall handler
     
     slab_panic(false);
-    printk("percpu", "pcpu: 0x%p | pcpu->syscall_stack: 0x%p\n", pcpu, pcpu->syscall_stack);
+    pr_info("pcpu: 0x%p | pcpu->syscall_stack: 0x%p\n", pcpu, pcpu->syscall_stack);
     wrmsr(GS_BASE, (uint64_t)pcpu);
 }
 

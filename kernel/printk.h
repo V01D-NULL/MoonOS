@@ -5,12 +5,18 @@
 #include <stdbool.h>
 #include <boot/boot.h>
 
+#ifndef PR_MODULE
+#define PR_MODULE "anonymous"
+#endif
+
 #define TODO(x, ...)                    \
     do                                  \
     {                                   \
         printk("TODO", x, __VA_ARGS__); \
         debug(true, x, __VA_ARGS__);    \
     } while (0)
+
+#define pr_info(...) printk(PR_MODULE, __VA_ARGS__)
 
 void printk(char *status, char *fmt, ...);
 void printk_init(bool verbose_boot, BootContext term_info);
