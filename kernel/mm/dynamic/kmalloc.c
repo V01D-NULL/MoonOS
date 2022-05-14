@@ -5,8 +5,20 @@
 #include <panic.h>
 
 // Defined in slab.c
-// This function is only needed in kmalloc so it's not placed in slab.h in order to discourage it's usage elsewhere.
+// This function is only needed in kmalloc so it's not placed in slab.h in order to
+// discourage it's usage elsewhere since it's confusingly similar to kmem_cache_create.
 extern struct kmem_cache *kmem_cache_new(const char *name, size_t size, int alignment);
+
+struct kmem_cache *kmem_cache_create(const char *name, size_t size, int alignment)
+{
+    if (!alignment)
+        alignment = 8;
+
+    if (!size)
+        return NULL;
+
+    return kmem_cache_new(name, size, alignment);
+}
 
 void *kmem_cache_alloc(struct kmem_cache *cachep, kmem_flags_t flags)
 {
@@ -38,6 +50,7 @@ void *kmem_cache_alloc(struct kmem_cache *cachep, kmem_flags_t flags)
         if (flags & KMEM_HIGH_VMA)
             ptr += $high_vma;
 
+        slab->refcount++;
         return ptr;
     }
 
@@ -57,13 +70,7 @@ void *kmem_cache_alloc(struct kmem_cache *cachep, kmem_flags_t flags)
     return kmem_cache_alloc(cachep, flags);
 }
 
-struct kmem_cache *kmem_cache_create(const char *name, size_t size, int alignment)
+void kmem_cache_free(struct kmem_cache *cachep)
 {
-    if (!alignment)
-        alignment = 8;
 
-    if (!size)
-        return NULL;
-
-    return kmem_cache_new(name, size, alignment);
 }

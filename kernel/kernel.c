@@ -60,6 +60,8 @@ void kmain(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
         pr_info("(New slab creation here) kmem_cache_alloc: 0x%p\n", kmem_cache_alloc(cache, KMEM_PANIC | KMEM_HIGH_VMA));
     }
 
+    pr_info("Ref count: %d\n", cache->nodes->refcount);
+
     // lapic_init(acpi_init().apic);
     // load_daemon((const uint8_t *)mods->modules[0].begin, mods->modules[0].string);
 
