@@ -69,11 +69,6 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
         zone->start += bitmap_size_bytes;
         zone->len -= bitmap_size_bytes;
     }
-
-    list_foreach(out, list, zone_list)
-        debug(true, "ZONE %d\n", out->zone_nr);
-        
-    // for(;;);
 }
 
 void *pmm_alloc(void)
@@ -92,15 +87,30 @@ void *pmm_alloc(void)
 
 range_t pmm_alloc_range(size_t pages)
 {
-
     return (range_t){};
 }
 
 void pmm_free(void *page)
 {
+    // Don't try to acquire a spin lock if the page is NULL
+    if (!page)
+        return;
+
     acquire_lock(&pmm_lock);
-    memset(page, 0, PAGE_SIZE);
-    // pfa_free(page);
+
+    list_foreach(zone, list, zone_list)
+    {
+        auto zone_sz = zone->start + zone->len;
+        auto addr = (uintptr_t) page;
+
+        if (addr > zone_sz)
+            continue;
+
+        addr -= zone->start;
+        auto bit = (addr / 4096);
+        __clear_bit(zone->bitmap, bit);
+    }
+
     release_lock(&pmm_lock);
 }
 
@@ -113,6 +123,7 @@ static void *find_first_free_block(void)
             if (!__check_bit(zone->bitmap, i))
             {
                 __set_bit(zone->bitmap, i);
+                // debug(true, "bit: %d\n", i);
                 // debug(true, "Zone#%d returning: 0x%lX\n", zone->zone_nr, zone->start + (i * PAGE_SIZE));
                 return (void *)(zone->start + (i * PAGE_SIZE));
             }
