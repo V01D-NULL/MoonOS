@@ -24,15 +24,6 @@ typedef struct
     uint32_t edx;
 } msr_t;
 
-STATIC_INLINE bool cpu_has_msr()
-{
-    /* The presence of MSRs on your processor is indicated by CPUID.01h:EDX[bit 5]. */
-    struct cpuid_regs_t regs;
-    regs.eax = 0x01;
-    cpuid(&regs);
-    return regs.edx & (1 << 5);
-}
-
 STATIC_INLINE uint64_t rdmsr(uint32_t msr)
 {
     uint32_t eax, edx = 0;
