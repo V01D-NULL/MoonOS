@@ -1,3 +1,5 @@
+#define PR_MODULE "smp"
+
 #include "smp.h"
 #include <printk.h>
 
@@ -7,7 +9,7 @@ static volatile int cpu_up = 0;
 
 static void ap_startup(struct stivale2_smp_info *cpu)
 {
-    printk("smp", "Started CPU#%d\n", cpu->lapic_id);
+    pr_info("Started CPU#%d\n", cpu->lapic_id);
 
     cpu_up = 1;
     
@@ -21,12 +23,12 @@ void smp_init(BootContextSmp *smp)
 {
     if (smp->processor_count == 1)
     {
-        printk("smp-init", "Failed to init smp; there is only 1 cpu\n");
+        pr_info("Failed to init smp; there is only 1 cpu\n");
         return;
     }
     
-    printk("smp-init", "Total CPU's: %d\n", smp->processor_count);
-    printk("smp-init", "Starting %d other %s\n", smp->processor_count - 1, smp->processor_count > 2 ? "cpu's" : "cpu");
+    pr_info("Total CPUs: %d\n", smp->processor_count);
+    pr_info("Starting %d other %s\n", smp->processor_count - 1, smp->processor_count > 2 ? "cpus" : "cpu");
     
     for (int i = 0; i < smp->processor_count; i++)
     {
@@ -39,5 +41,5 @@ void smp_init(BootContextSmp *smp)
             cpu_up = 0;
         }
     }
-    printk("smp-init", "Initialized all cores\n");
+    pr_info("Initialized all cores\n");
 }
