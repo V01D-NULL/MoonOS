@@ -1,7 +1,7 @@
 CC = @gcc
 TARGET := init.elf
 CFILES	 := $(shell find ./ -type f -name '*.c')
-CFILE_DEPS := $(shell find ../../krnl_interface -type f -name '*.c') # Grab krnl_interface/ files
+CFILE_DEPS := $(shell find ../../abi -type f -name '*.c') # Grab abi/ files
 OBJ    := $(CFILE_DEPS:.c=.o) $(CFILES:.c=.o)
 
 .PHONY: all clean
