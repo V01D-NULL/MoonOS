@@ -37,6 +37,8 @@
 
 void kmain(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
 {
+    kmalloc_init();
+
     init_percpu(bootvars->rbp); // Every logical core (which each calls init_percpu) shares it's stack with the syscall handler
     init_syscalls();
 
@@ -49,10 +51,9 @@ void kmain(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
 
     auto version = reg & 0xff;
     pr_info("LAPIC is %s APIC\n", (version >= 0x10 && version <= 0x15) ? "an integrated" : "a 82489DX discrete");
+
     // smp_init(&bootvars->cpu);
     load_daemon((const uint8_t *)mods->modules[0].begin, mods->modules[0].string);
-
-    // Note: For a zoned buddy allocator every zone must be 2 MiB (max allocation for one buddy tree)
 
     for (;;)
     {

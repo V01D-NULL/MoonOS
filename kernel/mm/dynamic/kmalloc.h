@@ -11,10 +11,15 @@ enum
 
     KMEM_PANIC = (1 << 1),    // Kernel panic if something goes wrong instead of returning NULL
     KMEM_HIGH_VMA = (1 << 2), // Add $high_vma to the value returned by a kmem allocation routine
-    KMEM_NO_GROW = (1 << 3)   // Don't automatically grow the cache if it's OOM
+    KMEM_NO_GROW = (1 << 3),  // Don't automatically grow the cache if it's OOM
+    KMEM_NO_FLAGS = (1 << 20) // Arbitrary shift count so that this flag won't collide with others
 };
 
 typedef int kmem_flags_t;
+
+void kmalloc_init(void);
+void *kmalloc(int sz, kmem_flags_t flags);
+void kfree(void *ptr, int sz);
 
 struct kmem_cache *kmem_cache_create(const char *name, size_t size, int alignment);
 void *kmem_cache_alloc(struct kmem_cache *cachep, kmem_flags_t flags);

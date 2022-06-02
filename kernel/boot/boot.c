@@ -18,7 +18,6 @@
 #include <hal/acpi/acpi.h>
 #include <hal/apic/apic.h>
 #include <libk/cmdline.h>
-#include <mm/phys_slab.h>
 #include <hal/pic/pic.h>
 #include <amd64/moon.h>
 #include <stivale2.h>
@@ -129,9 +128,6 @@ void kinit(struct stivale2_struct *bootloader_info)
         
         boot_term_write("boot: Reached target pmm\n");
         pmm_init(mmap->memmap, mmap->entries);
-
-        boot_term_write("boot: Reached target slab\n");
-        slab_init();
 
         boot_term_write("boot: Reached target vmm\n");
         v_init(mmap->memmap, mmap->entries);
