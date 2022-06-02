@@ -8,25 +8,27 @@
  * @copyright Copyright (c) 2021
  *
  */
-#include "boot.h"
+#include <devices/term/early/early_term.h>
+#include <devices/term/limine-port/term.h>
+#include <libgraphics/bootsplash_img.h>
 #include <boot/proto/proto-stivale2.h>
 #include <devices/serial/serial.h>
 #include <devices/fb/early_fb.h>
+#include <libgraphics/draw.h>
+#include <hal/acpi/acpi.h>
+#include <hal/apic/apic.h>
+#include <libk/cmdline.h>
+#include <mm/phys_slab.h>
+#include <hal/pic/pic.h>
 #include <amd64/moon.h>
 #include <stivale2.h>
 #include <int/idt.h>
 #include <int/gdt.h>
 #include <kernel.h>
-#include <libgraphics/draw.h>
-#include <hal/pic/pic.h>
-#include <devices/term/early/early_term.h>
-#include <devices/term/limine-port/term.h>
-#include <libk/cmdline.h>
-#include <libgraphics/bootsplash_img.h>
-#include <mm/phys_slab.h>
 #include <mm/pmm.h>
 #include <mm/vmm.h>
 #include <mm/mm.h>
+#include "boot.h"
 
 const char serial_message[] = {
     "███╗   ███╗ ██████╗  ██████╗ ███╗   ██╗ ██████╗ ███████╗ \n"
@@ -52,9 +54,8 @@ void banner(bool serial_only)
         return;
     }
 
-    printk("main", "Welcome to MoonOS\n");
-    printk("banner", "%s", fb_message);
-    delay(200);
+    fmt_puts("Welcome to MoonOS\n");
+    fmt_puts("%s", fb_message);
 }
 
 extern uint8_t stack[];
@@ -158,11 +159,10 @@ void kinit(struct stivale2_struct *bootloader_info)
         }
 
         banner(false);
-        printk("pmm", "Initialized pmm\n");
 
-        /* vmm */
-        printk("vmm", "pml4 resides at 0x%llx\n", cr_read(CR3));
-        printk("vmm", "Initialized vmm\n");
+        // printk() requires the apic id of the cpu for printing the apic id of the cpu.
+        // So before we can use it we need to init the lapic as early as possible.
+        lapic_init(acpi_init().apic);
     }
     else
     {

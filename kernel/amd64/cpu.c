@@ -3,8 +3,9 @@
 #include "cpu.h"
 #include "msr.h"
 #include <printk.h>
-#include <mm/phys_slab.h>
 #include <mm/mm.h>
+#include <mm/phys_slab.h>
+#include <hal/apic/apic.h>
 
 void init_percpu(uint64_t current_stack)
 {
@@ -15,7 +16,7 @@ void init_percpu(uint64_t current_stack)
     pcpu->working_stack = 0; // Set by the syscall handler
     
     slab_panic(false);
-    pr_info("pcpu: 0x%p | pcpu->syscall_stack: 0x%p\n", pcpu, pcpu->syscall_stack);
+    printk("pcpu", "0x%p | pcpu->syscall_stack: 0x%p\n", pcpu, pcpu->syscall_stack);
     wrmsr(GS_BASE, (uint64_t)pcpu);
 }
 
@@ -32,4 +33,12 @@ void cpuid(struct cpuid_regs_t *cpuid_regs)
         : "=a"(cpuid_regs->eax), "=b"(cpuid_regs->ebx), "=c"(cpuid_regs->ecx), "=d"(cpuid_regs->edx)
         : "a"(cpuid_regs->function)
     );
+}
+
+// Return the apic id of the
+// processor executing this code.
+int current_cpu(void)
+{
+    // TODO: Add support for x2APIC mode.
+    return lapic_read(0x20) >> 24;
 }

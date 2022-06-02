@@ -28,6 +28,7 @@
 #include <proc/daemon/load.h>
 #include <proc/uspace/userspace.h>
 #include <proc/uspace/syscalls.h>
+#include <proc/smp/smp.h>
 
 #include <devices/serial/serial.h>
 
@@ -42,25 +43,16 @@ void kmain(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
     pr_info("Detected %d modules\n", mods->module_count);
     pr_info("Module string: %s\n", mods->modules[0].string);
 
-    printk("\n" PR_MODULE,"kmem_cache_alloc test:\n");
-    auto cache = kmem_cache_create("foo", 512, 0);
+    pr_info("LAPIC Version register: %x\n", lapic_read(0x30));
+    auto reg = lapic_read(0x30);
+    pr_info("version: 0x%x, max LVT entry: %x\n", reg & 0xFF, reg >> 16);
 
-    if (cache != NULL)
-    {
-        auto ptr = kmem_cache_alloc(cache, KMEM_PANIC | KMEM_HIGH_VMA | KMEM_NO_GROW);
-        
-        pr_info("Allocated memory via kmem_cache_alloc: 0x%p\n", ptr);
-        kmem_cache_free(cache, ptr);
-        kmem_cache_dump(cache, -1);
-
-        kmem_cache_destroy(cache);
-        // kmem_cache_alloc(cache, KMEM_PANIC); // Attempted to allocate after destroying the cache and set the panic flag - this should fail and panic.
-    }
-
-    lapic_init(acpi_init().apic);
+    auto version = reg & 0xff;
+    pr_info("LAPIC is %s APIC\n", (version >= 0x10 && version <= 0x15) ? "an integrated" : "a 82489DX discrete");
+    // smp_init(&bootvars->cpu);
     load_daemon((const uint8_t *)mods->modules[0].begin, mods->modules[0].string);
 
-    // smp_init(&bootvars->cpu);
+    // Note: For a zoned buddy allocator every zone must be 2 MiB (max allocation for one buddy tree)
 
     for (;;)
     {

@@ -1,10 +1,11 @@
-#include <libk/kstring.h>
-#include <libk/kprintf.h>
-#include "printk.h"
-#include <devices/serial/serial.h>
 #include <devices/term/early/early_term.h>
 #include <devices/term/limine-port/term.h>
+#include <devices/serial/serial.h>
+#include <libk/kstring.h>
+#include <libk/kprintf.h>
+#include <amd64/cpu.h>
 #include <mm/mm.h>
+#include "printk.h"
 
 static bool is_verbose_boot = false;
 
@@ -23,17 +24,7 @@ void printk(char *status, char *fmt, ...)
     vsnprintf((char *)&buffer, (size_t)-1, fmt, arg);
     va_end(arg);
 
-    if (!is_verbose_boot)
-    {
-        serial_set_color(BASH_GREEN);
-        debug(false, "DEBUG: ");
-        serial_set_color(BASH_DEFAULT);
-        debug(false, "[%s] %s", status, (const char *)&buffer);
-        return;
-    }
-
-
-    fmt_puts("%s: %s", status, buffer);
+    fmt_puts("[core#%d] %s: %s", current_cpu(), status, buffer);
 }
 
 void fmt_puts(const char *fmt, ...)
@@ -43,6 +34,12 @@ void fmt_puts(const char *fmt, ...)
     va_start(arg, fmt);
     vsnprintf((char *)&buffer, (size_t)-1, fmt, arg);
     va_end(arg);
+
+    if (!is_verbose_boot)
+    {
+        debug(false, BASH_GREEN "DEBUG: " BASH_DEFAULT "%s", (const char *)&buffer);
+        return;
+    }
 
     _term_write((const char *)&buffer, strlen(buffer));
 }

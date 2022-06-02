@@ -495,7 +495,7 @@ bool gterm_prepare(size_t *_rows, size_t *_cols, struct stivale2_struct_tag_fram
     margin_gradient = 0;
 
     default_bg = 0x00000000; // background (black)
-    default_fg = 0x00FFFFFF; // foreground (white) For gray use: 00aaaaaa
+    default_fg = 0x00aaaaaa; // foreground (white) For gray use: 00aaaaaa
 
     text_fg = default_fg;
     text_bg = 0xffffffff;

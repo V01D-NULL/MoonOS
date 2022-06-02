@@ -6,7 +6,7 @@
 #include <boot/boot.h>
 
 #ifndef PR_MODULE
-#define PR_MODULE "anonymous"
+#define PR_MODULE __FILE__
 #endif
 
 #define TODO(x, ...)                    \

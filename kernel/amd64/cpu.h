@@ -36,6 +36,7 @@ void init_percpu(uint64_t current_stack); // Initialize information for this CPU
 void cpuid(struct cpuid_regs_t *cpuid_regs);
 void log_cpuid_results(void);
 
+int current_cpu(void);
 
 /**
  * @brief A list of registers preserved by the interupt stack frame
