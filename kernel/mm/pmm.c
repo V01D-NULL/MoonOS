@@ -64,7 +64,7 @@ void pmm_init(struct stivale2_mmap_entry *mmap, int entries)
         zone->bitmap = (uint8_t *)zone->start;
 
         debug(true, "Zone#%d: Bitmap stored at %lX-%lX | size: %ldKiB\n", zone->zone_nr, zone->start, zone->start + zone->len - 1, bitmap_size_bytes / 1024);
-        memset((void *)zone->bitmap, PMM_FREE, bitmap_size_bytes);
+        memset((void *)zone->bitmap, PMM_FREE, zone->len);
 
         zone->start += bitmap_size_bytes;
         zone->len -= bitmap_size_bytes;
