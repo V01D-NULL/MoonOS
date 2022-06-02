@@ -15,7 +15,6 @@ void kmalloc_init(void)
     for (int i = 0, shift_offset = 3; i < KMLIST_SIZE; i++, shift_offset++)
     {
         kmlist[i] = kmem_cache_create("kmalloc", 1 << shift_offset, 0);
-        debug(true, "kmlist[%d]: %d|%s\n", i, kmlist[i]->size, kmlist[i]->descriptor);
     }
 }
 
