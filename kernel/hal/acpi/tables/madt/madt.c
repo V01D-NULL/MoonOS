@@ -1,3 +1,5 @@
+#define PR_MODULE "madt"
+
 #include "madt.h"
 #include <hal/acpi/acpi.h>
 #include <devices/serial/serial.h>
@@ -41,8 +43,8 @@ struct apic_device_info madt_init(void *madt_base)
     pic_disable();
     enumarate_apic_devices(&madt);
 
-    printk("madt", "OEM String: '%s'\n", oem_str);
-    printk("madt", "OEM Table ID: '%s'\n", oem_table_id);
+    // pr_info("OEM String: '%s'\n", oem_str);
+    // pr_info("OEM Table ID: '%s'\n", oem_table_id);
 
     return apic_dev;
 }
@@ -56,7 +58,7 @@ static void enumarate_apic_devices(madt_t** madt)
     do {
         switch (*madt_interrupt_devices) {
         case 0 ... 5: {
-            printk("madt", "Detected %s\n", interrupt_device_id_map[*madt_interrupt_devices]);
+            // pr_info("Detected %s\n", interrupt_device_id_map[*madt_interrupt_devices]);
 
             if (*madt_interrupt_devices == LAPIC_ADDR_OVERRIDE) {
                 apic_dev.lapic_addr = (uint64_t)madt_interrupt_devices+4;
@@ -76,7 +78,7 @@ static void enumarate_apic_devices(madt_t** madt)
             break;
 
         default:
-            debug(true, "Invalid interrupt device detected, got %d, expected 0-5 or 9\n", *madt_interrupt_devices);
+            pr_info("Invalid interrupt device detected, got %d, expected 0-5 or 9\n", *madt_interrupt_devices);
             madt_interrupt_devices += madt_interrupt_devices[1];
             break;
         }

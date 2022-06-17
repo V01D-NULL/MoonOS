@@ -21,7 +21,7 @@ struct ioapic_dev
     uint8_t io_apic_id;
     uint8_t reserved;
     uint32_t address;
-    uint32_t gsib; 
+    uint32_t gsib;
 } gnu_pack_bytes;
 
 struct apic_device_info

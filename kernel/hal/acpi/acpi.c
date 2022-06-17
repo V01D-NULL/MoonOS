@@ -12,7 +12,7 @@
 
 bool acpi_validate_sdt_checksum(struct SDT *sdt);
 
-struct acpi_table_result acpi_init(void)
+void acpi_init(void)
 {
     struct acpi_table_result result;
 
@@ -29,7 +29,7 @@ struct acpi_table_result acpi_init(void)
         panic("No MADT table, no APIC - Refusing to boot");
     }
 
-    return result;
+    // return result;
 }
 
 acpi_table_t acpi_find_table(const char *identifier)

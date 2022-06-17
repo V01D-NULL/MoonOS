@@ -155,10 +155,6 @@ void kinit(struct stivale2_struct *bootloader_info)
         }
 
         banner(false);
-
-        // printk() requires the apic id of the cpu for printing the apic id of the cpu.
-        // So before we can use it we need to init the lapic as early as possible.
-        lapic_init(acpi_init().apic);
     }
     else
     {

@@ -60,4 +60,6 @@ void install_isr(uint8_t base, isr_t handler);
  */
 void uninstall_isr(uint8_t base);
 
+bool is_isr_registered(uint8_t isr);
+
 #endif // INTERRUPTS_H

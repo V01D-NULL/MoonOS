@@ -10,7 +10,7 @@ struct acpi_table_result
 };
 
 typedef void* acpi_table_t;
-struct acpi_table_result acpi_init(void);
+void acpi_init(void);
 acpi_table_t acpi_find_table(const char *identifier);
 
 #endif // ACPI_H

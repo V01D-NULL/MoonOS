@@ -3,6 +3,7 @@
 #include "smp.h"
 #include <printk.h>
 #include <hal/apic/apic.h>
+#include <amd64/cpu.h>
 
 typedef uint8_t stack[4096];
 static stack stacks[64] = {0};
@@ -11,7 +12,7 @@ static volatile int cpu_up = 0;
 static void ap_startup(struct stivale2_smp_info *cpu)
 {
     pr_info("Started CPU#%d\n", lapic_read(0x20) >> 24);
-
+    init_percpu(cpu->target_stack);
     cpu_up = 1;
     
     for(;;)

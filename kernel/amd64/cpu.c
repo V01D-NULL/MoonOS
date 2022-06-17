@@ -2,13 +2,16 @@
 
 #include "cpu.h"
 #include "msr.h"
-#include <printk.h>
 #include <mm/mm.h>
-#include <mm/dynamic/kmalloc.h>
+#include <printk.h>
 #include <hal/apic/apic.h>
+#include <mm/dynamic/kmalloc.h>
+#include <hal/acpi/tables/hpet/hpet.h>
+#include <hal/acpi/acpi.h>
 
 void init_percpu(uint64_t current_stack)
 {
+    // NOTE: Every logical core (which each calls init_percpu) shares it's stack with the syscall handler
     struct percpu *pcpu = (struct percpu *)kmalloc(sizeof(struct percpu), KMEM_PANIC | KMEM_HIGH_VMA);
 
     pcpu->syscall_stack = current_stack;
@@ -16,6 +19,8 @@ void init_percpu(uint64_t current_stack)
 
     printk("pcpu", "0x%p | pcpu->syscall_stack: 0x%p\n", pcpu, pcpu->syscall_stack);
     wrmsr(GS_BASE, (uint64_t)pcpu);
+
+    lapic_init();
 }
 
 void log_cpuid_results(void)

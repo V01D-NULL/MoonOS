@@ -29,7 +29,6 @@ void *kmalloc(int sz, kmem_flags_t flags)
 
     for (int i = KMLIST_SIZE-1; i != 0; i--)
     {
-        debug(true, "sz: %d | kmlist.size: %d\n", sz, kmlist[i]->size);
         if (sz <= kmlist[i]->size)
         {
             return kmem_cache_alloc(kmlist[i], flags);

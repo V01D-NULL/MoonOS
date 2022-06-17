@@ -69,6 +69,8 @@ void init_idt(void)
     idt_set_entry(0x28, 0, 0x8E, (uint64_t) isr46, 46);
     idt_set_entry(0x28, 0, 0x8E, (uint64_t) isr47, 47);
 
+    idt_set_entry(0x28, 0, 0x8E, (uint64_t) isr49, 49);
+
 	// Syscall
 	idt_set_entry(0x28, 0, 0xEE, (uint64_t) isr128, 128);
 	

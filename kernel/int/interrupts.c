@@ -10,7 +10,7 @@
 #include <panic.h>
 #include <proc/uspace/syscalls.h>
 
-isr_t isr_handler_array[255] = {0};
+isr_t isr_handler_array[256] = {0};
 bool canReturn = false;
 
 static const char *exception_messages[] = {
@@ -138,4 +138,9 @@ void install_isr(uint8_t base, isr_t handler)
     }
     else
         printk("INT", "The interrupt ( %d ) has already been registered!\n", base);
+}
+
+bool is_isr_registered(uint8_t isr)
+{
+    return isr_handler_array[isr] != 0;
 }

@@ -11,6 +11,7 @@ enum
     IA32_APIC_BASE = 0x1B,
     IA32_EFER = 0xC0000080,
     IA32_KERNEL_GS_BASE = 0xC0000102,
+    IA32_TSC_DEADLINE = 0x6E0,
     GS_BASE = 0xC0000101,
     PAT_MSR = 0x277,
     STAR = 0xC0000081,
@@ -40,6 +41,13 @@ STATIC_INLINE void wrmsr(uint32_t msr, uint64_t in)
     uint32_t edx = in >> 32;
     asm volatile("wrmsr" ::"a"(eax), "d"(edx), "c"(msr)
                      : "memory");
+}
+
+STATIC_INLINE uint64_t rdtsc(void)
+{
+    uint32_t eax, edx;
+    asm volatile("rdtsc" : "=a"(eax), "=d"(edx));
+    return concat64(eax, edx);
 }
 
 #endif // MSR_H
