@@ -5,6 +5,7 @@
 #include <printk.h>
 #include <ktypes.h>
 #include <mm/mm.h>
+#include <panic.h>
 
 #define HPET_ADDR_OFFSET 44 // 'address' offset in the hpet table. (Moon only uses the hpet to calibrate
                             // the lapic timer, so a HPET table struct seemed like overkill)
@@ -34,7 +35,7 @@ void hpet_init(void)
 {
     auto hpet = acpi_find_table("HPET");
     if (!hpet)
-        return;
+        panic("No HPET detected, cannot calibrate lapic timer!");
 
     auto hpet_addr = *(uint64_t *)(hpet + HPET_ADDR_OFFSET);
 

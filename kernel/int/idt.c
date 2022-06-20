@@ -16,7 +16,7 @@ void idt_set_entry(uint16_t selector, uint8_t ist, uint8_t type_attr, uint64_t o
     idt[idx].zero = 0;
 }
 
-gnu_export void load_idt(uint64_t idtr);
+extern void load_idt(uint64_t idtr);
 
 void init_idt(void)
 {

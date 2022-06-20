@@ -9,8 +9,6 @@
 
 #define PMM_FREE 0
 #define PMM_USED 1
-#define ALIGN_UP(__number) (((__number) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
-#define ALIGN_DOWN(__number) ((__number) & ~(PAGE_SIZE - 1))
 
 void pmm_init(struct stivale2_mmap_entry *mmap, int entries);
 void *pmm_alloc(void);

@@ -27,6 +27,7 @@
 #include <mm/pmm.h>
 #include <mm/vmm.h>
 #include <mm/mm.h>
+#include <printk.h>
 #include "boot.h"
 
 const char serial_message[] = {

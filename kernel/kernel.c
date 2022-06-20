@@ -21,17 +21,13 @@
 #include <amd64/cpu.h>
 #include <mm/dynamic/kmalloc.h>
 
-#include <hal/acpi/tables/rsdp.h>
 #include <hal/acpi/tables/hpet/hpet.h>
 #include <hal/acpi/acpi.h>
-#include <hal/apic/apic.h>
 
 #include <proc/daemon/load.h>
 #include <proc/uspace/userspace.h>
 #include <proc/uspace/syscalls.h>
 #include <proc/smp/smp.h>
-
-#include <devices/serial/serial.h>
 
 #include "panic.h"
 #include "printk.h"
@@ -53,6 +49,6 @@ void kmain(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
 
     for (;;)
     {
-        // asm("cli;hlt");
+        asm("cli;hlt");
     }
 }

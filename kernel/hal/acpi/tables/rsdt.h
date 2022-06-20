@@ -9,4 +9,10 @@ struct RSDT
     uint32_t next[];
 } gnu_pack_bytes;
 
+struct XSDT
+{
+    struct SDT header;
+    uint64_t next[];
+} gnu_pack_bytes;
+
 #endif // RSDT_H

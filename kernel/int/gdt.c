@@ -1,7 +1,7 @@
 #include "gdt.h"
 #include <libk/kstring.h>
 
-gnu_export void load_gdt(uint64_t gdtr);
+extern void load_gdt(uint64_t gdtr);
 
 static struct __attribute__((align(64))) gdt_table gdt;
 

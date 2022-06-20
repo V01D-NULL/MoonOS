@@ -14,33 +14,43 @@ bool acpi_validate_sdt_checksum(struct SDT *sdt);
 
 void acpi_init(void)
 {
-    struct acpi_table_result result;
-
     rsdp_init();
     
     acpi_table_t madt;
     if ((madt = acpi_find_table("APIC")) != NULL)
     {
         printk("acpi", "Found MADT table @ %p\n", madt);
-        result.apic = madt_init(madt);
     }
     else
     {
         panic("No MADT table, no APIC - Refusing to boot");
     }
-
-    // return result;
 }
 
 acpi_table_t acpi_find_table(const char *identifier)
 {
     struct RSDP rsdp = get_rsdp();
-    struct RSDT *rsdt = (struct RSDT*) (uintptr_t) rsdp.rsdt_address;
+
+    struct RSDT *rsdt = (struct RSDT*)rsdp.xsdt_address;
+    struct XSDT *xsdt = NULL;
+    struct SDT header;
+
+    if (use_xsdt())
+    {
+        xsdt = (struct XSDT*) (rsdp.xsdt_address);
+        header = xsdt->header;
+    }
+    else
+    {
+        rsdt = (struct RSDT*) (rsdp.rsdt_address);
+        header = rsdt->header;
+    }
+
     size_t entries = (rsdt->header.length - sizeof(rsdt->header)) / (use_xsdt() ? 8 : 4);
     
     for (size_t i = 0; i < entries; i++)
     {
-        struct SDT *sdt = (struct SDT*) (uintptr_t)rsdt->next[i];
+        struct SDT *sdt = (struct SDT*) (use_xsdt() ? xsdt->next[i] : rsdt->next[i]);
         
         if (!strncmp(sdt->signature, (char*)identifier, 4) && acpi_validate_sdt_checksum(sdt))
         {

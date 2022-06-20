@@ -6,7 +6,7 @@
 enum
 {
 #if defined(DEBUG_MM) || defined(DEBUG_KMALLOC)
-    KMEM_VERBOSE_ALLOC(1 << 0), // Adds debug logging, but it butchers performance and is thus only enabled when debugging the mm
+    KMEM_VERBOSE_ALLOC = (1 << 0), // Adds debug logging, but it butchers performance and is thus only enabled when debugging the mm
 #endif
 
     KMEM_PANIC = (1 << 1),    // Kernel panic if something goes wrong instead of returning NULL

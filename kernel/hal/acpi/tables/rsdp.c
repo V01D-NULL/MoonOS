@@ -8,6 +8,7 @@
 #include <printk.h>
 #include <mm/mm.h>
 #include <ktypes.h>
+#include <stdalign.h>
 
 static bool has_xsdt = false;
 static struct RSDP rsdp;

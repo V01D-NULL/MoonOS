@@ -41,6 +41,8 @@ bool kmem_cache_grow(struct kmem_cache *cachep, int count)
 
         tail->next = (struct slist){};
     }
+
+    return true;
 }
 
 struct kmem_cache *kmem_cache_new(const char *name, size_t size, int alignment)
