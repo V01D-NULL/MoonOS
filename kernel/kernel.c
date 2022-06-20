@@ -21,7 +21,7 @@
 #include <amd64/cpu.h>
 #include <mm/dynamic/kmalloc.h>
 
-#include <hal/acpi/tables/hpet/hpet.h>
+#include <hal/time/sleep.h>
 #include <hal/acpi/acpi.h>
 
 #include <proc/daemon/load.h>
@@ -36,7 +36,7 @@ void kmain(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
 {
     kmalloc_init();
     acpi_init();
-    hpet_init();
+    sleep_init();
 
     init_percpu(bootvars->rbp);
     init_syscalls();

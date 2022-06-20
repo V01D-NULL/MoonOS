@@ -7,7 +7,7 @@
 #include <stddef.h>
 #include <int/interrupts.h>
 #include <hal/acpi/acpi.h>
-#include <hal/acpi/tables/hpet/hpet.h>
+#include <hal/time/sleep.h>
 #include <panic.h>
 
 static uint32_t lapic_base = 0x0;
@@ -78,7 +78,7 @@ uint32_t lapic_calibrate_timer(uint64_t usec)
     lapic_write(LAPIC_TIMER_DIVIDE_CONFIG_REGISTER, 3);
     lapic_write(LAPIC_TIMER_INITIAL_COUNT, ~0);
 
-    hpet_usleep(usec);
+    usleep(usec);
 
     lapic_write(LAPIC_LVT_TIMER_REGISTER, LAPIC_TIMER_MASK);
     auto ticks = ~0 - lapic_read(LAPIC_TIMER_CURRENT_COUNT);
