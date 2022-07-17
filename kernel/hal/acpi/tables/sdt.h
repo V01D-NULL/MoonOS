@@ -2,6 +2,7 @@
 #define SDT_H
 
 #include <stdint.h>
+#include <amd64/moon.h>
 
 struct SDT
 {
