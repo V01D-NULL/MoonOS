@@ -9,6 +9,8 @@
 #include <printk.h>
 #include <panic.h>
 #include <proc/uspace/syscalls.h>
+#include <hal/pic/pic.h>
+#include <hal/apic/apic.h>
 
 isr_t isr_handler_array[256] = {0};
 bool canReturn = false;
@@ -47,15 +49,26 @@ static const char *exception_messages[] = {
 
 void isr_handler(struct iframe regs)
 {
+    if (regs.cs == 0x43 && regs.isr_number == 39)
+    {
+        asm volatile("swapgs" ::
+                         : "memory");
+        // printk("INT", BASH_GREEN "Userprocess triggered an exception\n" BASH_GRAY);
+        // switch_to_kernel_pagemap();
+        debug(true, "Userprocess triggered an exception %d\n", regs.isr_number);
+    }
+
     /* CPU exceptions */
     if (regs.isr_number < 32)
     {
-		if (regs.cs == 0x43)
-		{
-            asm volatile("swapgs" ::: "memory");
-			// printk("INT", BASH_GREEN "Userprocess triggered an exception\n" BASH_GRAY);
+        if (regs.cs == 0x43)
+        {
+            asm volatile("swapgs" ::
+                             : "memory");
+            // printk("INT", BASH_GREEN "Userprocess triggered an exception\n" BASH_GRAY);
+            switch_to_kernel_pagemap();
             debug(true, BASH_GREEN "Userprocess triggered an exception\n" BASH_GRAY);
-		}
+        }
 
         override_quiet_boot();
         serial_set_color(BASH_RED);
@@ -65,19 +78,22 @@ void isr_handler(struct iframe regs)
         if (regs.isr_number == 14)
         {
             uint64_t cr2 = cr_read(CR2);
+            switch_to_kernel_pagemap();
+            uninstall_isr(32);
             // printk("INT ~ #PF", "Faulting address: 0x%lx\n", cr2);
             debug(true, "INT ~ #PF Faulting address: 0x%lx\n", cr2);
-            for(;;);
-            pagefault_handler(cr2, regs.error_code);
-            goto exit_handler;
+            for (;;)
+                ;
+            // pagefault_handler(cr2, regs.error_code);
+            // goto exit_handler;
         }
-         if (regs.isr_number == 6)
+        if (regs.isr_number == 6)
         {
             printk("INT", "Faulting instruction is at: 0x%llx\n", regs.rip);
-            uint16_t instruction = *(uint64_t*)regs.rip;
+            uint16_t instruction = *(uint64_t *)regs.rip;
             instruction = byte_order_reverse_short16(instruction);
             printk("INT", "Opcode: %x\n", (instruction));
-            
+
             if (instruction == 0x0F05 /* syscall */)
                 printk("INT", "TODO: Handle SYSCALL #UD and use int $0x80 instead!");
         }
@@ -120,14 +136,16 @@ void isr_handler(struct iframe regs)
 
     TRY_EXEC_HANDLER(regs.isr_number);
 
-    //Signal EOI
-    if (regs.isr_number > 40)
-        outb(0xA0, 0x20);
-    outb(0x20, 0x20);
+    // Signal EOI
+    if (pic_enabled())
+        pic_eoi(regs.isr_number);
+    else
+        lapic_eoi();
 
 exit_handler:
     if (regs.cs == 0x43)
-        asm volatile("swapgs" ::: "memory");
+        asm volatile("swapgs" ::
+                         : "memory");
 }
 
 void install_isr(uint8_t base, isr_t handler)
@@ -138,6 +156,11 @@ void install_isr(uint8_t base, isr_t handler)
     }
     else
         printk("INT", "The interrupt ( %d ) has already been registered!\n", base);
+}
+
+void uninstall_isr(uint8_t base)
+{
+    isr_handler_array[base] = 0;
 }
 
 bool is_isr_registered(uint8_t isr)

@@ -8,7 +8,10 @@
 #include <int/interrupts.h>
 #include <hal/acpi/acpi.h>
 #include <hal/time/sleep.h>
+#include <mm/addr.h>
 #include <panic.h>
+#include <mm/cpu/CR.h>
+#include <amd64/paging/paging.h>
 
 static uint32_t lapic_base = 0x0;
 
@@ -24,9 +27,17 @@ enum
 static int ticks_for_quantum = 0;
 
 // Dummy isr for testing ig.
-void timer_tick(isr_t isr)
+void timer_tick(struct iframe *isr)
 {
-    (void)isr;
+	auto cr3 = cr_read(CR3);
+    if (isr->cs == 0x43 && isr->isr_number == 32)
+    {
+        switch_to_kernel_pagemap();
+        debug(true, "Userprocess triggered an exception %d\n", isr->isr_number);
+        // return;
+    }
+
+    debug(true, "Tick %d 0x%x\n", isr->isr_number, isr->cs);
     lapic_eoi();
     lapic_oneshot_timer(ticks_for_quantum);
 }
@@ -46,13 +57,15 @@ void lapic_init(void)
     else
         panic("No MADT table, no APIC - Refusing to boot");
 
-    lapic_base = apic.lapic_addr;
+    lapic_base = apic.lapic_addr + $high_vma;
     lapic_enable();
+    pr_info("lapic_base = %p (msrbase: %p)\n", lapic_base, rdmsr(IA32_APIC_BASE));
 
-    if (!is_isr_registered(49))
-        install_isr(49, &timer_tick);
+    if (!is_isr_registered(32))
+        install_isr(32, (isr_t)&timer_tick);
 
-    ticks_for_quantum = lapic_calibrate_timer(2000); // Timer triggers INT 49 after 20 usec
+    ticks_for_quantum = lapic_calibrate_timer(10); // Timer triggers INT 32 after 20 usec
+    lapic_oneshot_timer(ticks_for_quantum);
 }
 
 uint32_t lapic_read(uint32_t offset)
@@ -76,14 +89,14 @@ void lapic_eoi(void)
 uint32_t lapic_calibrate_timer(uint64_t usec)
 {
     lapic_write(LAPIC_TIMER_DIVIDE_CONFIG_REGISTER, 3);
-    lapic_write(LAPIC_TIMER_INITIAL_COUNT, ~0);
+    lapic_write(LAPIC_TIMER_INITIAL_COUNT, ~0U);
 
     usleep(usec);
 
     lapic_write(LAPIC_LVT_TIMER_REGISTER, LAPIC_TIMER_MASK);
-    auto ticks = ~0 - lapic_read(LAPIC_TIMER_CURRENT_COUNT);
+    auto ticks = ~0U - lapic_read(LAPIC_TIMER_CURRENT_COUNT);
 
-    lapic_write(LAPIC_LVT_TIMER_REGISTER, (0 << 16) | (0 << 17) | 49);
+    lapic_write(LAPIC_LVT_TIMER_REGISTER, (0 << 16) | (0 << 17) | 32);
     return ticks;
 }
 

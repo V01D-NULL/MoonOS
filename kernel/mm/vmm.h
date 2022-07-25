@@ -2,7 +2,7 @@
 #define VMM_H
 
 #include <amd64/paging/paging.h>
-#include <proc/tasking/task.h>
+#include <proc/sched/task.h>
 #include <mm/cpu/CR.h>
 #include <stdint.h>
 #include <stdbool.h>

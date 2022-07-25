@@ -60,7 +60,8 @@ static void enumarate_apic_devices(madt_t** madt)
         case 0 ... 5: {
             // pr_info("Detected %s\n", interrupt_device_id_map[*madt_interrupt_devices]);
 
-            if (*madt_interrupt_devices == LAPIC_ADDR_OVERRIDE) {
+            if (*madt_interrupt_devices == LAPIC_ADDR_OVERRIDE){
+		debug(true, "apic_dev.lapic_addr: %p", apic_dev.lapic_addr);
                 apic_dev.lapic_addr = (uint64_t)madt_interrupt_devices+4;
             }
 

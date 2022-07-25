@@ -14,7 +14,7 @@ void syscall(uint64_t selector, uint64_t arg0, uint64_t arg1, uint64_t arg2, uin
         "push rcx \n"
         "push r11 \n"
         
-        /* There is not input constraint for any specific register (r8-r15) in gcc... */
+        /* There is no input constraint for any specific register ranging from (r8-r15) in gcc... */
         "mov r10, %4\n"
         "mov r8,  %5\n"
         "mov r9,  %6\n"

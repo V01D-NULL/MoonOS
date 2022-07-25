@@ -3,9 +3,7 @@
 
 #include <stddef.h>
 
-// gnu_* refers to the gnu specific features such as alignment or plain C keywords
-// #define extern extern 
-// #define volatile volatile
+// gnu_* refers to the gnu specific features
 #define gnu_no_return __attribute__((noreturn))
 #define gnu_section_align8 __attribute__((aligned (8)))
 #define gnu_section_align16  __attribute__((aligned (16)))

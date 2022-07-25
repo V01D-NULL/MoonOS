@@ -29,7 +29,6 @@ Kernel panic:
 - Physical kernel heap (small slabs (i.e. max of 512 bytes per cache))
 
 # Future features:
-- IPC
 - Threads
 - kasan
 - APIC
@@ -46,6 +45,7 @@ Kernel panic:
 
 # This is currently being working on:
 - Scheduler
+- IPC
 - Porting mlibc
 
 # Directory walkthrough:

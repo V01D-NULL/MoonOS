@@ -14,7 +14,7 @@ uint16_t byte_order_reverse_short16(uint16_t byte);
 uint32_t byte_order_reverse_int32(uint32_t byte);
 uint64_t byte_order_reverse_long64(uint64_t byte);
 
-STATIC_INLINE uint64_t concat64(uint32_t a, uint32_t b)
+inline uint64_t concat64(uint32_t a, uint32_t b)
 {
     return ((uint64_t)b << 32) | a;
 }
