@@ -10,8 +10,7 @@
 
 #define GB 0x40000000UL
 
-typedef struct __task_t task_t;
-// $fwd_decl_struct(task_t);
+$fwd_decl_struct(task_t);
 
 $struct(VmmRange, {
 	range_t range;
