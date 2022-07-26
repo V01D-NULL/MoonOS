@@ -6,7 +6,7 @@
 
 #define KiB(x) 1024 * x
 #define MiB(x) (1024 * 1024) * x
-#define GiB(x) (1024 * 1024 * 1024) * x
+#define GiB(x) (1024LL * 1024LL * 1024LL) * x
 
 typedef uint64_t virt_t, phys_t;
 

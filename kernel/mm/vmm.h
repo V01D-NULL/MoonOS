@@ -8,8 +8,6 @@
 #include <stivale2.h>
 #include <util/range.h>
 
-#define GB 0x40000000UL
-
 $fwd_decl_struct(task_t);
 
 $struct(VmmRange, {

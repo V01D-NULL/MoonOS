@@ -20,11 +20,11 @@ void v_init(struct stivale2_mmap_entry *mmap, int entries)
 {
     assert((kernel_pagemap = pmm_alloc()) != NULL);
 
-    v_map_range_fast(as_vm_range(0, 4 * GB, $identity_vma), MAP_KERN, kernel_pagemap);
+    v_map_range_fast(as_vm_range(0, GiB(4), $identity_vma), MAP_KERN, kernel_pagemap);
         
-    v_map_range_fast(as_vm_range(0, 4 * GB, $high_vma), MAP_KERN, kernel_pagemap);
-    v_map_range_fast(as_vm_range(0, 4 * GB, $high_vma_heap), MAP_KERN, kernel_pagemap);
-    v_map_range_fast(as_vm_range(0, 2 * GB, $high_vma_code), MAP_READONLY, kernel_pagemap);
+    v_map_range_fast(as_vm_range(0, GiB(4), $high_vma), MAP_KERN, kernel_pagemap);
+    v_map_range_fast(as_vm_range(0, GiB(4), $high_vma_heap), MAP_KERN, kernel_pagemap);
+    v_map_range_fast(as_vm_range(0, GiB(2), $high_vma_code), MAP_READONLY, kernel_pagemap);
 
     debug(true, "Old PML4: 0x%llx\n", cr_read(CR3)); // Bootloader pml4
     switch_to_kernel_pagemap();
