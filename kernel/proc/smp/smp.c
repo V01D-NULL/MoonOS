@@ -11,7 +11,7 @@ static volatile int cpu_up = 0;
 
 static void ap_startup(struct stivale2_smp_info *cpu)
 {
-    pr_info("Started CPU#%d\n", lapic_read(0x20) >> 24);
+    trace("Started CPU#%d\n", lapic_read(0x20) >> 24);
     init_percpu(cpu->target_stack);
     cpu_up = 1;
     
@@ -25,12 +25,12 @@ void smp_init(BootContextSmp *smp)
 {
     if (smp->processor_count == 1)
     {
-        pr_info("Failed to init smp; there is only 1 cpu\n");
+        trace("Failed to init smp; there is only 1 cpu\n");
         return;
     }
     
-    pr_info("Total CPUs: %d\n", smp->processor_count);
-    pr_info("Starting %d other %s\n", smp->processor_count - 1, smp->processor_count > 2 ? "cpus" : "cpu");
+    trace("Total CPUs: %d\n", smp->processor_count);
+    trace("Starting %d other %s\n", smp->processor_count - 1, smp->processor_count > 2 ? "cpus" : "cpu");
     
     for (int i = 0; i < smp->processor_count; i++)
     {
@@ -43,5 +43,5 @@ void smp_init(BootContextSmp *smp)
             cpu_up = 0;
         }
     }
-    pr_info("Initialized all cores\n");
+    trace("Initialized all cores\n");
 }

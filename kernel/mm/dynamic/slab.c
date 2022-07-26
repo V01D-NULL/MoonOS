@@ -74,7 +74,7 @@ static struct kmem_slab *__kmem_create_slab(struct kmem_cache *cachep, bool smal
 {
     if (!small_slab)
     {
-        pr_info("__kmem_create_slab: '%s' is a large slab. They aren't supported yet.\n", cachep->descriptor);
+        trace("__kmem_create_slab: '%s' is a large slab. They aren't supported yet.\n", cachep->descriptor);
         return NULL;
     }
 

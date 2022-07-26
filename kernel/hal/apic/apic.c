@@ -41,7 +41,7 @@ void lapic_init(void)
 
     lapic_base = apic.lapic_addr + $high_vma;
     lapic_enable();
-    pr_info("lapic_base = %p (msrbase: %p)\n", lapic_base, rdmsr(IA32_APIC_BASE));
+    trace("lapic_base = %p (msrbase: %p)\n", lapic_base, rdmsr(IA32_APIC_BASE));
 }
 
 uint32_t lapic_read(uint32_t offset)

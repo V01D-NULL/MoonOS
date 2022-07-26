@@ -3,19 +3,24 @@
 
 #include <ktypes.h>
 #include <boot/boot.h>
+#include <devices/serial/serial.h>
 
 #ifndef PR_MODULE
 #define PR_MODULE __FILE__
 #endif
 
 #define TODO(x, ...)                    \
-    do                                  \
-    {                                   \
-        printk("TODO", x, __VA_ARGS__); \
-        debug(true, x, __VA_ARGS__);    \
-    } while (0)
+	do                                  \
+	{                                   \
+		printk("TODO", x, __VA_ARGS__); \
+		debug(true, x, __VA_ARGS__);    \
+	} while (0)
 
-#define pr_info(...) printk(PR_MODULE, __VA_ARGS__)
+#define trace(...)                      \
+	do                                  \
+	{                                   \
+		printk(PR_MODULE, __VA_ARGS__); \
+	} while (0)
 
 void printk(string status, string fmt, ...);
 void printk_init(bool verbose_boot, BootContext term_info);

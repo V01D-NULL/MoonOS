@@ -12,4 +12,7 @@
 #define EXTERNAL(linker_symbol) extern size_t linker_symbol[];
 #define SECTION(_section) __attribute__((section(_section)))
 
+#define likely(x) __builtin_expect(!!(x), 1)
+#define unlikely(x) __builtin_expect(!!(x), 0)
+
 #endif // MOON_DEFS_H

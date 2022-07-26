@@ -8,7 +8,7 @@
 
 void load_daemon(const uint8_t *elf, string_view name)
 {
-    pr_info("Loading %s...\n", name);
+    trace("Loading %s...\n", name);
     
     // Note: identity_map = true basically assumes that the load address of the ELF is free, this might be removed in the future.
     task_t task = load_elf(elf, (struct elf_loader_args){.do_panic = true, .identity_map = true, .descriptor = name});
@@ -17,7 +17,7 @@ void load_daemon(const uint8_t *elf, string_view name)
     if (!task.entrypoint)
         panic("Failed to load ELF; Cannot start kernel daemon!");
 
-    pr_info("Successfully loaded %s daemon\n", name);
+    trace("Successfully loaded %s daemon\n", name);
     // asm volatile("swapgs" ::: "memory");
     // switch_pagemap(task);
     // enter_ring3((void *)task.entrypoint, task.ustack);

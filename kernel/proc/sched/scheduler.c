@@ -61,7 +61,7 @@ void sched_yield(void)
 	auto new = tasks[current_task_idx];
 	// current_task = &new;
 	
-	// pr_info("sched_yield(): Giving task '%s' quantum\n", new.descriptor);
+	// trace("sched_yield(): Giving task '%s' quantum\n", new.descriptor);
 	// v_map_fast(new.pagemap, 0, 0, 7);
 	// v_map_fast(new.pagemap, 0xfee00000, 0xfee00000, MAP_KERN);
 

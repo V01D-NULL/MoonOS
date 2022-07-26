@@ -40,7 +40,7 @@ void hpet_init(void)
     auto hpet_addr = *(uint64_t *)(hpet + HPET_ADDR_OFFSET);
 
     hpet_dev = (struct hpet_device *)(hpet_addr);
-    pr_info("HPET Address: %p\n", hpet_addr);
+    trace("HPET Address: %p\n", hpet_addr);
 
     counter_tick_period = (hpet_dev->general_capabilities >> 32);
     

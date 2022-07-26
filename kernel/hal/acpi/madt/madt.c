@@ -44,8 +44,8 @@ struct apic_device_info madt_init(void *madt_base)
     pic_disable();
     enumarate_apic_devices(&madt);
 
-    // pr_info("OEM String: '%s'\n", oem_str);
-    // pr_info("OEM Table ID: '%s'\n", oem_table_id);
+    // trace("OEM String: '%s'\n", oem_str);
+    // trace("OEM Table ID: '%s'\n", oem_table_id);
 
     return apic_dev;
 }
@@ -59,7 +59,7 @@ static void enumarate_apic_devices(madt_t** madt)
     do {
         switch (*madt_interrupt_devices) {
         case 0 ... 5: {
-            pr_info("Detected %s\n", interrupt_device_id_map[*madt_interrupt_devices]);
+            trace("Detected %s\n", interrupt_device_id_map[*madt_interrupt_devices]);
 
             if (*madt_interrupt_devices == LAPIC_ADDR_OVERRIDE){
 		debug(true, "apic_dev.lapic_addr: %p", apic_dev.lapic_addr);
@@ -80,7 +80,7 @@ static void enumarate_apic_devices(madt_t** madt)
             break;
 
         default:
-            pr_info("Invalid interrupt device detected, got %d, expected 0-5 or 9\n", *madt_interrupt_devices);
+            trace("Invalid interrupt device detected, got %d, expected 0-5 or 9\n", *madt_interrupt_devices);
             madt_interrupt_devices += madt_interrupt_devices[1];
             break;
         }
