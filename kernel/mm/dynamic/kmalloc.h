@@ -21,7 +21,7 @@ void kmalloc_init(void);
 void *kmalloc(int sz, kmem_flags_t flags);
 void kfree(void *ptr, int sz);
 
-struct kmem_cache *kmem_cache_create(const char *name, size_t size, int alignment);
+struct kmem_cache *kmem_cache_create(string_view name, size_t size, int alignment);
 void *kmem_cache_alloc(struct kmem_cache *cachep, kmem_flags_t flags);
 void kmem_cache_free(struct kmem_cache *cachep, void *ptr);
 void kmem_cache_dump(struct kmem_cache *cachep, int n);

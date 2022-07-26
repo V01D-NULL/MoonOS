@@ -19,11 +19,10 @@ enum
     CSTAR = 0xC0000083
 };
 
-typedef struct
-{
+$struct(msr_t, {
     uint32_t eax;
     uint32_t edx;
-} msr_t;
+});
 
 inline uint64_t rdmsr(uint32_t msr)
 {

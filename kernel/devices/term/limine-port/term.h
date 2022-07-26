@@ -18,9 +18,7 @@
 #ifndef __LIB__TERM_H__
 #define __LIB__TERM_H__
 
-#include <stddef.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include <ktypes.h>
 #include "stivale2.h"
 
 #define TERM_TABSIZE (8)
@@ -69,7 +67,7 @@ void term_init(void);
 void term_prepare(struct stivale2_struct_tag_framebuffer *fb, struct stivale2_struct_tag_memmap *mmap);
 void term_notready(void);
 void term_putchar(uint8_t c);
-void _term_write(const char* buf, uint64_t count);
+void _term_write(string_view buf, uint64_t count);
 
 extern void (*raw_putchar)(uint8_t c);
 extern void (*clear)(bool move);

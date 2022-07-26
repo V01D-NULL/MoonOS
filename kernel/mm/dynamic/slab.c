@@ -3,7 +3,7 @@
 #include <devices/serial/serial.h>
 #include <libk/kstring.h>
 #include <util/common.h>
-#include <stdbool.h>
+#include <ktypes.h>
 #include <mm/pmm.h>
 #include <mm/mm.h>
 #include <panic.h>
@@ -46,7 +46,7 @@ bool kmem_cache_grow(struct kmem_cache *cachep, int count)
     return true;
 }
 
-struct kmem_cache *kmem_cache_new(const char *name, size_t size, int alignment)
+struct kmem_cache *kmem_cache_new(string_view name, size_t size, int alignment)
 {
     if (size % alignment != 0)
         size = align(size, alignment);

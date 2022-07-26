@@ -27,7 +27,7 @@ struct kmem_cache
 {
     int size;
     int bufctl_object_size;
-    const char *descriptor;
+    string_view descriptor;
     struct kmem_slab *nodes;
 };
 

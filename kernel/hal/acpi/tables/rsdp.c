@@ -3,7 +3,6 @@
 #include "rsdp.h"
 #include <devices/serial/serial.h>
 #include <boot/boot.h>
-#include <stdbool.h>
 #include <panic.h>
 #include <printk.h>
 #include <mm/mm.h>

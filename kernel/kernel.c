@@ -1,8 +1,5 @@
 #define PR_MODULE "main"
 
-#include <stdint.h>
-#include <stddef.h>
-
 #include <stivale2.h>
 #include <boot/boot.h>
 
@@ -12,6 +9,7 @@
 #include <hal/time/sleep.h>
 #include <hal/acpi/acpi.h>
 
+#include <proc/sched/scheduler.h>
 #include <proc/daemon/load.h>
 #include <proc/uspace/userspace.h>
 #include <proc/uspace/syscalls.h>
@@ -33,9 +31,10 @@ void kmain(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
     pr_info("Module string: %s\n", mods->modules[0].string);
 
     load_daemon((const uint8_t *)mods->modules[0].begin, mods->modules[0].string);
+	sched_init();
 
     for (;;)
     {
-        asm("cli;hlt");
+        asm("hlt");
     }
 }

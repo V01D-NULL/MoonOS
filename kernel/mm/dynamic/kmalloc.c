@@ -57,9 +57,9 @@ void kfree(void *ptr, int sz)
 // Defined in slab.c
 // This function is only needed in kmalloc so it's not placed in slab.h in order to
 // discourage it's usage elsewhere since it's confusingly similar to kmem_cache_create.
-extern struct kmem_cache *kmem_cache_new(const char *name, size_t size, int alignment);
+extern struct kmem_cache *kmem_cache_new(string_view name, size_t size, int alignment);
 
-struct kmem_cache *kmem_cache_create(const char *name, size_t size, int alignment)
+struct kmem_cache *kmem_cache_create(string_view name, size_t size, int alignment)
 {
     if (!alignment)
         alignment = 8;

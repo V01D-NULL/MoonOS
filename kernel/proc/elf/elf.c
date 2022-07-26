@@ -80,8 +80,8 @@ static task_t elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, struct elf_l
     }
     // Todo: Shadow stack page
 
-    // v_map_range_fast(as_vmm_range(0x0, 0x400000, $identity_vma), MAP_KERN, task.pagemap);
-    // v_map_range_fast(as_vmm_range(elf_mapping_offset, (4 * GB) - elf_mapping_offset, $identity_vma), MAP_KERN, task.pagemap);
+    // v_map_range_fast(as_vm_range(0x0, 0x400000, $identity_vma), MAP_KERN, task.pagemap);
+    // v_map_range_fast(as_vm_range(elf_mapping_offset, (4 * GB) - elf_mapping_offset, $identity_vma), MAP_KERN, task.pagemap);
 
     return task;
 }

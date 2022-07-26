@@ -1,11 +1,11 @@
 #ifndef RANGE_H
 #define RANGE_H
 
-#include <stddef.h>
+#include <ktypes.h>
 
-typedef struct {
-    size_t base;
-    size_t limit;
-} range_t;
+$struct(range_t, {
+	size_t base;
+	size_t limit;
+});
 
 #endif // RANGE_H

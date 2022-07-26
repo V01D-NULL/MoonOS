@@ -1,5 +1,5 @@
 #include "strace.h"
-#include <stdbool.h>
+#include <ktypes.h>
 #include <devices/serial/serial.h>
 #include "sym.h"
 

@@ -1,8 +1,7 @@
 #ifndef STRACE_H
 #define STRACE_H
 
-#include <stdint.h>
-#include <stddef.h>
+#include <ktypes.h>
 
 #define UNWIND_MAX 20 /* Unwind up to twenty stack frames */
 

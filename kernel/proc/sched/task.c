@@ -10,7 +10,7 @@ void add_task(task_t task)
     tasks[counter++] = task;
 }
 
-task_t new_task(const char *descriptor, Elf64_Addr entrypoint)
+task_t new_task(string_view descriptor, Elf64_Addr entrypoint)
 {
     return (task_t){.descriptor = descriptor, .pagemap = create_new_pagemap(), .entrypoint = entrypoint, .ustack = 0}; // The ustack resides next to the ELF mappings (example: ELF: 0x400000-0x401000 | ustack: 0x401000-0x403000)
 }

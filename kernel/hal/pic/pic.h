@@ -1,7 +1,7 @@
 #ifndef LEGACY_PIC_H
 #define LEGACY_PIC_H
 
-#include <stdbool.h>
+#include <ktypes.h>
 
 void pic_eoi(int isr_nr);
 bool pic_enabled(void);

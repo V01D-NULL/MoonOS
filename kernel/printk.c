@@ -16,32 +16,32 @@ void printk_init(bool verbose_boot, BootContext term_info)
     term_init();
 }
 
-void printk(char *status, char *fmt, ...)
+void printk(string status, string fmt, ...)
 {
     char buffer[512];
     va_list arg;
     va_start(arg, fmt);
-    vsnprintf((char *)&buffer, (size_t)-1, fmt, arg);
+    vsnprintf((string )&buffer, (size_t)-1, fmt, arg);
     va_end(arg);
 
     fmt_puts("[core#%d] %s: %s", current_cpu(), status, buffer);
 }
 
-void fmt_puts(const char *fmt, ...)
+void fmt_puts(string_view fmt, ...)
 {
     char buffer[512];
     va_list arg;
     va_start(arg, fmt);
-    vsnprintf((char *)&buffer, (size_t)-1, fmt, arg);
+    vsnprintf((string )&buffer, (size_t)-1, fmt, arg);
     va_end(arg);
 
     if (!is_verbose_boot)
     {
-        debug(false, BASH_GREEN "DEBUG: " BASH_DEFAULT "%s", (const char *)&buffer);
+        debug(false, BASH_GREEN "DEBUG: " BASH_DEFAULT "%s", (string_view)&buffer);
         return;
     }
 
-    _term_write((const char *)&buffer, strlen(buffer));
+    _term_write((string_view)&buffer, strlen(buffer));
 }
 
 // Note: This should only be called when information

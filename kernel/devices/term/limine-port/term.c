@@ -16,9 +16,7 @@
     which is a freestanding port of the limine terminal: https://github.com/limine-bootloader/limine
 */
 #include <libk/kstring.h>
-#include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
+#include <ktypes.h>
 #include "term.h"
 #include "gterm.h"
 
@@ -250,7 +248,7 @@ static void context_restore(uint64_t ptr) {
     term_context_restore(ptr);
 }
 
-void _term_write(const char *buf, uint64_t count) {
+void _term_write(string_view buf, uint64_t count) {
     if (term_backend == NOT_READY)
         return;
 
@@ -277,7 +275,7 @@ void _term_write(const char *buf, uint64_t count) {
     bool native = true;
 
     if (!term_runtime || native) {
-        // const char *s = (const char *)(uintptr_t)buf;
+        // string_view s = (string_view )(uintptr_t)buf;
 
         for (size_t i = 0; i < count; i++)
             term_putchar(buf[i]);

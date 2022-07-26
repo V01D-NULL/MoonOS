@@ -4,7 +4,6 @@
 #include <libk/kprintf.h>
 #include <libk/kstring.h>
 #include <util/common.h>
-#include <stdint.h>
 
 #define COM1 0x3F8
 #define COM2 0x2F8
@@ -22,13 +21,13 @@
 
 void serial_write(char chr);
 char serial_read(void);
-void serial_write_str(const char* str);
-void serial_set_color(const char* color_code);
+void serial_write_str(string_view str);
+void serial_set_color(string_view color_code);
 
 #define debug(log_verbose, ...) if (log_verbose) impl_verbose_debug(__FILE__, __LINE__, __VA_ARGS__); else impl_quiet_debug(__VA_ARGS__);
 
 /// Output a formatted string to the serial port
-void impl_verbose_debug(char *file, int line, char* fmt, ...);
-void impl_quiet_debug(char *fmt, ...);
+void impl_verbose_debug(string file, int line, string  fmt, ...);
+void impl_quiet_debug(string fmt, ...);
 
 #endif

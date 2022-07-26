@@ -3,7 +3,6 @@
 #include <proc/smp/spinlock.h>
 #include <libk/kassert.h>
 #include <ds/bitmap.h>
-#include <stdint.h>
 #include <printk.h>
 #include <ktypes.h>
 #include <panic.h>
@@ -13,7 +12,7 @@
 create_lock("pmm", pmm_lock);
 
 static void *find_first_free_block(void);
-static const char *get_mmap_type(int entry);
+static string_view get_mmap_type(int entry);
 static void dump_mmap(int entries, struct stivale2_mmap_entry *map);
 
 static struct zone *init_zone(uint64_t base, uint64_t len, int nr)
@@ -134,7 +133,7 @@ static void *find_first_free_block(void)
     return NULL;
 }
 
-static const char *get_mmap_type(int entry)
+static string_view get_mmap_type(int entry)
 {
     switch (entry)
     {

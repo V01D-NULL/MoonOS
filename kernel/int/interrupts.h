@@ -13,7 +13,7 @@
 
 #include "idt.h"
 #include "isr_list.h"
-#include <stdbool.h>
+#include <ktypes.h>
 
 struct iframe {
     general_registers gpr;
@@ -32,7 +32,7 @@ struct iframe {
     {                                                                                              \
         if (isr_handler_array[regs.isr_number] != 0)                                               \
         {                                                                                          \
-            isr_handler_array[regs.isr_number]((struct iframe *) &regs);               \
+            isr_handler_array[regs.isr_number]((struct iframe *) &regs);			               \
         }                                                                                          \
         else                                                                                       \
         {                                                                                          \

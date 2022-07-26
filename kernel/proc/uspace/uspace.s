@@ -5,6 +5,10 @@ section .text
 
 global enter_ring3_sysret
 enter_ring3_sysret:
+	; Swap out the kernel gs
+	swapgs
+	cli
+	
     ; Setup user stack..
     add rsi, 8192
     mov rbp, rsi
@@ -12,7 +16,7 @@ enter_ring3_sysret:
 
     ; NOTE: I'm not setting SS or CS as these are automatically set by sysret
     ; Set user segment selectors
-    mov ax, 0x3B
+    mov ax, 0x1B
     mov ds, ax
     mov fs, ax
     mov gs, ax

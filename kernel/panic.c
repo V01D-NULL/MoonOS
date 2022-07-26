@@ -10,12 +10,12 @@
 #include "printk.h"
 #include "panic.h"
 
-NORETURN void _panic(uint64_t rbp, uint64_t rsp, const char *fmt, ...)
+NORETURN void _panic(uint64_t rbp, uint64_t rsp, string_view fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
 	char panic_buff[512];
-	vsnprintf((char *) &panic_buff, (size_t) -1, fmt, ap);
+	vsnprintf((string ) &panic_buff, (size_t) -1, fmt, ap);
 	va_end(ap);
 
 	override_quiet_boot();

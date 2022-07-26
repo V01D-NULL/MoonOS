@@ -1,8 +1,7 @@
 #ifndef IDT_H
 #define IDT_H
 
-#include <stdint.h>
-#include <stddef.h>
+#include <ktypes.h>
 #include <util/common.h>
 #include <amd64/cpu.h>
 #include <amd64/moon.h>

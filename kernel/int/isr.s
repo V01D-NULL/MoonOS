@@ -3,13 +3,23 @@
 extern isr_handler
 extern idt_set_entry
 
+%macro isr_swapgs 1
+	cmp [rsp+24], dword 8 ; Compare kernel CS with the CS on the interrupt stack
+
+	je .%1
+    swapgs
+	.%1:
+%endmacro
+
 _asm_isr_handler_stub:
     cld
+	isr_swapgs swapgs_entry
     pusha64
     call isr_handler   ; C interrupt handler routine
     popa64
-    _cleanup_stack 16  ; Clean up pushed error code and interrupt number from stack
-    iretq              ; Pop other flags and return to normal execution State
+	isr_swapgs swapgs_exit
+    add rsp, 16 	 ; Clean up pushed error code and interrupt number from stack
+    iretq            ; Pop other flags and return to normal execution State
 
 global load_idt
 load_idt:

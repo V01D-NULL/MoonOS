@@ -4,9 +4,7 @@
 /*
  *  slab.c and slab.h are allocator backends for kmalloc.c and kmalloc.h
 */
-#include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
+#include <ktypes.h>
 #include <printk.h>
 #include <boot/boot.h>
 #include "slab_defs.h"

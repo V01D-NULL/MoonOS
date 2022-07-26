@@ -1,4 +1,5 @@
 #include "serial.h"
+#include <ktypes.h>
 
 #define PRINT_LINE_NUM(file, line_buff)  { \
         serial_set_color(BASH_GREEN);      \
@@ -35,7 +36,7 @@ void serial_write(char chr)
     outb(COM1, chr);
 }
 
-void serial_write_str(const char *str)
+void serial_write_str(string_view str)
 {
     for (uint64_t i = 0; i < strlen(str); i++)
     {
@@ -44,33 +45,33 @@ void serial_write_str(const char *str)
 }
 
 //Writes a bash color code which will change the color of the output
-void serial_set_color(const char *color_code)
+void serial_set_color(string_view color_code)
 {
     serial_write_str(color_code);
 }
 
 char serial_buff[512];
-void impl_verbose_debug(char *file, int line, char *fmt, ...)
+void impl_verbose_debug(string file, int line, string fmt, ...)
 {
     va_list arg;
     va_start(arg, fmt);
-    vsnprintf((char *)&serial_buff, (size_t)-1, fmt, arg);
+    vsnprintf((string )&serial_buff, (size_t)-1, fmt, arg);
     va_end(arg);
 
     char line_buff[7];
     sprintf(line_buff, "%d", line);
     PRINT_LINE_NUM(file, line_buff);
 
-    serial_write_str((char *)&serial_buff);
+    serial_write_str((string )&serial_buff);
 }
 
 char serial_q_buff[512];
-void impl_quiet_debug(char *fmt, ...)
+void impl_quiet_debug(string fmt, ...)
 {
     va_list arg;
     va_start(arg, fmt);
-    vsnprintf((char *)&serial_q_buff, (size_t)-1, fmt, arg);
+    vsnprintf((string )&serial_q_buff, (size_t)-1, fmt, arg);
     va_end(arg);
 
-    serial_write_str((char *)&serial_q_buff);
+    serial_write_str((string )&serial_q_buff);
 }

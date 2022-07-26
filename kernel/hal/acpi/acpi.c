@@ -7,8 +7,8 @@
 #include <devices/serial/serial.h>
 #include <libk/kstring.h>
 #include <printk.h>
-#include <stdbool.h>
 #include <panic.h>
+#include <ktypes.h>
 
 bool acpi_validate_sdt_checksum(struct SDT *sdt);
 
@@ -17,7 +17,7 @@ void acpi_init(void)
     rsdp_init();
 }
 
-acpi_table_t acpi_find_table(const char *identifier)
+acpi_table_t acpi_find_table(string_view identifier)
 {
     struct RSDP rsdp = get_rsdp();
 
@@ -42,7 +42,7 @@ acpi_table_t acpi_find_table(const char *identifier)
     {
         struct SDT *sdt = (struct SDT*) (use_xsdt() ? xsdt->next[i] : rsdt->next[i]);
         
-        if (!strncmp(sdt->signature, (char*)identifier, 4) && acpi_validate_sdt_checksum(sdt))
+        if (!strncmp(sdt->signature, (string )identifier, 4) && acpi_validate_sdt_checksum(sdt))
         {
             return (acpi_table_t) ((uintptr_t)sdt + $high_vma);
         }

@@ -92,7 +92,7 @@ void *memmove(void *dst, const void *src, size_t n)
       0 if str1 == str2
       1 otherwise
 */
-int strcmp (const char *str1, const char *str2)
+int strcmp (string_view str1, string_view str2)
 {
 	int i = 0;
 	int failed = 0;
@@ -119,7 +119,7 @@ int strcmp (const char *str1, const char *str2)
 	return failed;
 }
 
-int strncmp(const char *str1, const char *str2, size_t n)
+int strncmp(string_view str1, string_view str2, size_t n)
 {
 	for (size_t i = 0; i < n && str1; i++)
 	{
@@ -130,7 +130,7 @@ int strncmp(const char *str1, const char *str2, size_t n)
 }
 
 // Copy the NULL-terminated string src into dest, and return dest
-char* strcpy (char *dest, const char *src)
+char* strcpy (char *dest, string_view src)
 {
     int n = -1;
     int len = strlen(src);
@@ -158,7 +158,7 @@ char* strcat(char* a, char* b)
 
 
 // Get the string length
-uint64_t strlen (const char *s)
+uint64_t strlen (string_view s)
 {
 	uint64_t len = 0;
 

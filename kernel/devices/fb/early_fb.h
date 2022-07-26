@@ -1,7 +1,7 @@
 #ifndef EARLY_FB_H
 #define EARLY_FB_H
 
-#include <stdint.h>
+#include <ktypes.h>
 #include <boot/boot.h>
 #include <libgraphics/draw.h>
 

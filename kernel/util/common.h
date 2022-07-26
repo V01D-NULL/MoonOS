@@ -1,7 +1,7 @@
 #ifndef COMMON_UTIL_H
 #define COMMON_UTIL_H
 
-#include <stdint.h>
+#include <ktypes.h>
 
 inline void outb(uint16_t port, uint8_t val)
 {

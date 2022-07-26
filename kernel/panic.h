@@ -2,7 +2,6 @@
 #define PANIC_H
 
 #include <amd64/moon.h>
-#include <stdint.h>
 #include <trace/strace.h>
 
 // panic if eval evaluates to true
@@ -31,6 +30,6 @@
         _panic(rbp, rsp, __VA_ARGS__); \
     } while (0)
 
-NORETURN void _panic(uint64_t rbp, uint64_t rsp, const char *fmt, ...);
+NORETURN void _panic(uint64_t rbp, uint64_t rsp, string_view fmt, ...);
 
 #endif // PANIC_H

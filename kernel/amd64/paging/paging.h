@@ -1,7 +1,6 @@
 #ifndef PAGING_H
 #define PAGING_H
 
-#include <stdint.h>
 #include <amd64/moon.h>
 #include <ktypes.h>
 

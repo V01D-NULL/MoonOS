@@ -30,7 +30,7 @@
 
 struct tu_source_location
 {
-    const char *file;
+    string_view file;
     uint32_t line;
     uint32_t column;
 };
@@ -103,7 +103,7 @@ struct tu_invalid_builtin_data
     unsigned char kind;
 };
 
-static void tu_print_location(char *message, struct tu_source_location loc)
+static void tu_print_location(string message, struct tu_source_location loc)
 {
     debug(0, "tinyubsan: %s at file %s, line %d, column %d\n", message, loc.file, loc.line, loc.column);
 }

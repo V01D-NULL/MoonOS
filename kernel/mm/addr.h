@@ -1,8 +1,7 @@
 #ifndef ADDR_H
 #define ADDR_H
 
-#include <stdint.h>
-#include <stddef.h>
+#include <ktypes.h>
 #include <amd64/moon.h>
 
 #define KiB(x) 1024 * x

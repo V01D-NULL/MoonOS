@@ -1,7 +1,7 @@
 #include "userspace.h"
 #include "syscalls.h"
 #include <amd64/msr.h>
-#include <stddef.h>
+#include <ktypes.h>
 
 extern void enter_ring3_sysret(void *addr, size_t ustack);
 

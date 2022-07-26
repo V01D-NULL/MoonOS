@@ -1,7 +1,6 @@
 #include "idt.h"
 #include "gdt.h"
-#include <stddef.h>
-#include <stdint.h>
+#include <ktypes.h>
 #include <amd64/moon.h>
 
 static struct idt_desc idt[256];

@@ -1,6 +1,6 @@
 #include "spinlock.h"
 #include <amd64/moon.h>
-#include <stdbool.h>
+#include <ktypes.h>
 
 void acquire_lock(lock_t *lock)
 {

@@ -42,7 +42,7 @@ struct slist
     __list_append(&(input)->member, &(node)->member); \
 })
 
-STATIC_INLINE void __list_append(struct slist *head, struct slist *node)
+inline void __list_append(struct slist *head, struct slist *node)
 {
     struct slist *prev = head;
     while (head)

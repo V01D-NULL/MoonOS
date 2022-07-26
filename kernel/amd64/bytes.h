@@ -1,8 +1,7 @@
 #ifndef BYTES_H
 #define BYTES_H
 
-#include <stdint.h>
-#include <stddef.h>
+#include <ktypes.h>
 #include <devices/serial/serial.h>
 #include "moon.h"
 

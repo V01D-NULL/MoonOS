@@ -1,6 +1,6 @@
 #include "sym.h"
 #include <printk.h>
-#include <stddef.h>
+#include <ktypes.h>
 #include <libk/kstring.h>
 #include <devices/serial/serial.h>
 #include <devices/term/early/early_term.h>
@@ -37,11 +37,11 @@ sym_table_t sym_lookup(uint64_t address)
     }
 }
 
-int64_t find_symbol_by_name(char *name)
+int64_t find_symbol_by_name(string name)
 {
     for (size_t i = 0;; i++)
     {
-        const char *symname = symbol_table[i].name;
+        string_view symname = symbol_table[i].name;
 
         if (strcmp(name, symname) == 0)
         {

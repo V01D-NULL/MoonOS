@@ -1,11 +1,10 @@
 #ifndef RSDP_H
 #define RSDP_H
 
-#include <stdint.h>
+#include <ktypes.h>
 #include <amd64/moon.h>
 #include <boot/boot.h>
 #include <hal/acpi/acpi.h>
-#include <stdbool.h>
 
 struct RSDP
 {

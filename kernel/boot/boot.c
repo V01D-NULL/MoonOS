@@ -125,7 +125,7 @@ void kinit(struct stivale2_struct *bootloader_info)
         /* Is verbose boot specified in the command line? */
         if (cmdline != NULL)
         {
-            if (!boot_cmdline_find_tag("verbose_boot", (const char *)cmdline->cmdline))
+            if (!boot_cmdline_find_tag("verbose_boot", (string_view)cmdline->cmdline))
             {
                 early_fb_init(ctx);
                 fb_draw_image((ctx.fb.fb_width / 2) - (IMG_WIDTH / 2), (ctx.fb.fb_height / 2) - (IMG_HEIGHT / 2), IMG_WIDTH, IMG_HEIGHT, IMG_DATA, IMAGE_RGB);

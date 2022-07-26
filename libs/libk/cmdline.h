@@ -1,7 +1,8 @@
 #ifndef CMDLINE_PARSER_H
 #define CMDLINE_PARSER_H
 
-#include <stdbool.h>
-bool boot_cmdline_find_tag(const char *tag, const char *cmdline);
+#include <ktypes.h>
+
+bool boot_cmdline_find_tag(string_view tag, string_view cmdline);
 
 #endif // CMDLINE_PARSER_H

@@ -35,7 +35,3 @@ bits 64
     pop rbx
     pop rax
 %endmacro
-
-%macro _cleanup_stack 1
-    add rsp, %1
-%endmacro

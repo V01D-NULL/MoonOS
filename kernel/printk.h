@@ -1,8 +1,7 @@
 #ifndef FMT_PRINTK_H
 #define FMT_PRINTK_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <ktypes.h>
 #include <boot/boot.h>
 
 #ifndef PR_MODULE
@@ -18,10 +17,10 @@
 
 #define pr_info(...) printk(PR_MODULE, __VA_ARGS__)
 
-void printk(char *status, char *fmt, ...);
+void printk(string status, string fmt, ...);
 void printk_init(bool verbose_boot, BootContext term_info);
-void fmt_puts(const char *fmt, ...);
-void puts(const char *s);
+void fmt_puts(string_view fmt, ...);
+void puts(string_view s);
 
 // Note: This should only be called when information
 // must be shown, a kernel panic for example

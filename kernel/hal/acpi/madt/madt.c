@@ -13,7 +13,7 @@
 #define LAPIC_ADDR_OVERRIDE 5 // Entry type 5 in the madt is the lapic address override
 #define IOAPIC              1
 
-static const char* interrupt_device_id_map[6] = {
+static string_view interrupt_device_id_map[6] = {
     "LAPIC",
     "I/O APIC",
     "I/O APIC Interrupt source override",
@@ -59,7 +59,7 @@ static void enumarate_apic_devices(madt_t** madt)
     do {
         switch (*madt_interrupt_devices) {
         case 0 ... 5: {
-            // pr_info("Detected %s\n", interrupt_device_id_map[*madt_interrupt_devices]);
+            pr_info("Detected %s\n", interrupt_device_id_map[*madt_interrupt_devices]);
 
             if (*madt_interrupt_devices == LAPIC_ADDR_OVERRIDE){
 		debug(true, "apic_dev.lapic_addr: %p", apic_dev.lapic_addr);

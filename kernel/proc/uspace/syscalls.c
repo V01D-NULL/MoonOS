@@ -26,7 +26,7 @@ int sys_log(Type fd, Type buff, Type len, ignore, ignore, ignore)
 {
     (void)fd;
 
-    const char *ptr = (const char *)buff;
+    string_view ptr = (string_view )buff;
     for (auto i = 0; i < len; i++)
         fmt_puts("%c", ptr[i]);
 

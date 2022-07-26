@@ -2,7 +2,7 @@
 #include "kstring.h"
 #include <devices/serial/serial.h>
 
-bool boot_cmdline_find_tag(const char *tag, const char *cmdline)
+bool boot_cmdline_find_tag(string_view tag, string_view cmdline)
 {
     size_t len = strlen(cmdline);
     if (!tag || !cmdline)

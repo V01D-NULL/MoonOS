@@ -1,7 +1,7 @@
 #ifndef SDT_H
 #define SDT_H
 
-#include <stdint.h>
+#include <ktypes.h>
 
 struct SDT
 {

@@ -3,6 +3,7 @@
 
 #include <boot/boot.h>
 #include <hal/acpi/madt/madt.h>
+#include <ktypes.h>
 
 struct acpi_table_result
 {
@@ -11,6 +12,6 @@ struct acpi_table_result
 
 typedef void* acpi_table_t;
 void acpi_init(void);
-acpi_table_t acpi_find_table(const char *identifier);
+acpi_table_t acpi_find_table(string_view identifier);
 
 #endif // ACPI_H

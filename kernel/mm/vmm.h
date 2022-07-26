@@ -4,24 +4,24 @@
 #include <amd64/paging/paging.h>
 #include <proc/sched/task.h>
 #include <mm/cpu/CR.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include <ktypes.h>
 #include <stivale2.h>
 #include <util/range.h>
 
 #define GB 0x40000000UL
 
-typedef struct task_struct task_t;
-typedef struct
-{
-    range_t range;
-    size_t address_offset; // Use one the the vma offsets (mm/mm.h)
-    enum vmm_mapping_protection protection;
-} VmmRange;
+typedef struct __task_t task_t;
+// $fwd_decl_struct(task_t);
 
-STATIC_INLINE VmmRange as_vmm_range(size_t base, size_t top, size_t offset)
+$struct(VmmRange, {
+	range_t range;
+	size_t address_offset; // Use one the the vma offsets (mm/mm.h)
+	enum vmm_mapping_protection protection;
+});
+
+inline VmmRange as_vm_range(size_t base, size_t top, size_t offset)
 {
-    return (VmmRange){.range = (range_t){.base = base, .limit = top}, .address_offset = offset};
+	return (VmmRange){.range = (range_t){.base = base, .limit = top}, .address_offset = offset};
 }
 
 void v_init(struct stivale2_mmap_entry *mmap, int entries);

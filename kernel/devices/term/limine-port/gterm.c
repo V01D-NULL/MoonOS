@@ -18,9 +18,6 @@
 
 #include <libk/kstring.h>
 #include <boot/boot.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stddef.h>
 #include <ktypes.h>
 #include <mm/mm.h>
 #include "gterm.h"
