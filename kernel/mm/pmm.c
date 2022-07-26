@@ -1,3 +1,4 @@
+#include <devices/term/early/early_term.h>
 #include <devices/serial/serial.h>
 #include <proc/smp/spinlock.h>
 #include <libk/kassert.h>
@@ -17,7 +18,7 @@ static void dump_mmap(int entries, struct stivale2_mmap_entry *map);
 
 static struct zone *init_zone(uint64_t base, uint64_t len, int nr)
 {
-    struct zone *zone = base;
+    struct zone *zone = (struct zone*)base;
 
     base = ALIGN_UP(base + sizeof(struct zone));
     len -= PAGE_SIZE;

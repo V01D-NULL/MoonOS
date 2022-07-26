@@ -6,7 +6,7 @@
 #include <printk.h>
 #include <hal/apic/apic.h>
 #include <mm/dynamic/kmalloc.h>
-#include <hal/acpi/tables/hpet/hpet.h>
+#include <hal/acpi/hpet/hpet.h>
 #include <hal/acpi/acpi.h>
 
 void init_percpu(uint64_t current_stack)
@@ -23,18 +23,12 @@ void init_percpu(uint64_t current_stack)
     lapic_init();
 }
 
-void log_cpuid_results(void)
-{
-    // The vendor string itself will do for now
-    ASM_x86_cpuid_vendor_string();
-}
-
-void cpuid(struct cpuid_regs_t *cpuid_regs)
+void cpuid(struct cpuid_context *cpuid_context)
 {
     asm(
         "cpuid"
-        : "=a"(cpuid_regs->eax), "=b"(cpuid_regs->ebx), "=c"(cpuid_regs->ecx), "=d"(cpuid_regs->edx)
-        : "a"(cpuid_regs->function));
+        : "=a"(cpuid_context->eax), "=b"(cpuid_context->ebx), "=c"(cpuid_context->ecx), "=d"(cpuid_context->edx)
+        : "a"(cpuid_context->function));
 }
 
 // Return the apic id of the

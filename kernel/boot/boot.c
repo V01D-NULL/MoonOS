@@ -1,13 +1,3 @@
-/**
- * @file bootloader_stivale2.c
- * @author Tim (V01D)
- * @brief Handles information from the bootloader
- * @version 0.1
- * @date 2021-04-15
- *
- * @copyright Copyright (c) 2021
- *
- */
 #include <devices/term/early/early_term.h>
 #include <devices/term/limine-port/term.h>
 #include <libgraphics/bootsplash_img.h>
@@ -58,7 +48,7 @@ void banner(bool serial_only)
     fmt_puts("%s", fb_message);
 }
 
-extern uint8_t stack[];
+EXTERNAL(stack);
 static BootContext ctx;
 
 void kinit(struct stivale2_struct *bootloader_info)
@@ -115,15 +105,6 @@ void kinit(struct stivale2_struct *bootloader_info)
         boot_term_write("boot: Copying memory map to boot context\n");
         memcpy((uint8_t *)ctx.mmap, (uint8_t *)mmap, sizeof(struct stivale2_struct_tag_memmap) * mmap->entries);
 
-        boot_term_write("boot: Reached target gdt and tss\n");
-        init_gdt((uint64_t)stack + sizeof((uint64_t)stack));
-
-        // Core#0 will remap the pic once.
-        // After acpi_init the pic is disabled in favor of the apic
-        boot_term_write("boot: Reached target pic and idt\n");
-        pic_remap();
-        init_idt();
-
         // Prepare the terminal
         term_prepare(fb, mmap);
         
@@ -133,19 +114,25 @@ void kinit(struct stivale2_struct *bootloader_info)
         boot_term_write("boot: Reached target vmm\n");
         v_init(mmap->memmap, mmap->entries);
         
+		boot_term_write("boot: Reached target gdt and tss\n");
+        init_gdt((uint64_t)stack + sizeof((uint64_t)stack)); // Note: boot_term_write is unusable now
+
+        // Core#0 will remap the pic once.
+        // After acpi_init the pic is disabled in favor of the apic
+        pic_remap();
+        init_idt();
+
         /* Is verbose boot specified in the command line? */
         if (cmdline != NULL)
         {
             if (!boot_cmdline_find_tag("verbose_boot", (const char *)cmdline->cmdline))
             {
-                boot_term_write("boot: Quiet boot flag set\n");
                 early_fb_init(ctx);
                 fb_draw_image((ctx.fb.fb_width / 2) - (IMG_WIDTH / 2), (ctx.fb.fb_height / 2) - (IMG_HEIGHT / 2), IMG_WIDTH, IMG_HEIGHT, IMG_DATA, IMAGE_RGB);
                 printk_init(false, ctx);
             }
             else
             {
-                boot_term_write("boot: Verbose boot flag set\n");
                 printk_init(true, ctx);
             }
         }
@@ -165,7 +152,6 @@ void kinit(struct stivale2_struct *bootloader_info)
             ;
     }
 
-    log_cpuid_results();
     kmain(&ctx, modules);
 }
 

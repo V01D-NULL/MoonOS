@@ -2,7 +2,7 @@
 #define ACPI_H
 
 #include <boot/boot.h>
-#include <hal/acpi/tables/madt/madt.h>
+#include <hal/acpi/madt/madt.h>
 
 struct acpi_table_result
 {

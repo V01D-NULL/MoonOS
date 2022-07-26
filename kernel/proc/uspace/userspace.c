@@ -5,7 +5,7 @@
 
 extern void enter_ring3_sysret(void *addr, size_t ustack);
 
-gnu_no_return void enter_ring3(void *addr, size_t stack)
+NORETURN void enter_ring3(void *addr, size_t stack)
 {
     enter_ring3_sysret(addr, stack);
     __builtin_unreachable();

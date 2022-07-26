@@ -3,7 +3,7 @@
 + 0x0-0x100000000    - Anything, 4GiB mapped.
 + 
 + (4 level paging)
-+ 0xffff800000000000 - Pointers (example: RSDP, gterm variables), 2GiB mapped.
++ 0xffff800000000000 - Kernel data structures (example: RSDP, gterm variables), 2GiB mapped.
 + 
 + 0xffffd00000000000 - Kernel heap, 4GiB mapped.
 +

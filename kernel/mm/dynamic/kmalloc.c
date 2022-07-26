@@ -1,6 +1,7 @@
 #define PR_MODULE "kmalloc"
 
 #include "kmalloc.h"
+#include <mm/pmm.h>
 #include <devices/serial/serial.h>
 #include <ds/linked_list.h>
 #include <ktypes.h>

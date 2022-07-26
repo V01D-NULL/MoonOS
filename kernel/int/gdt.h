@@ -1,13 +1,3 @@
-/**
- * @file gdt.h
- * @author Tim (V01D)
- * @brief Global Descriptor Table
- * @version 0.1
- * @date 2021-04-16
- * 
- * @copyright Copyright (c) 2021
- * 
- */
 #ifndef GDT_H
 #define GDT_H
 
@@ -15,10 +5,10 @@
 #include <util/common.h>
 #include <amd64/moon.h>
 
-#define KRNL_CS64 0x28UL
-#define KRNL_DS64 0x30UL
-#define USER_CS64 0x38UL
-#define USER_DS64 0x40UL
+#define KRNL_CS64 0x08UL
+#define KRNL_DS64 0x10UL
+#define USER_CS64 0x18UL
+#define USER_DS64 0x20UL
 
 typedef struct
 {
@@ -30,7 +20,7 @@ typedef struct
     uint8_t  base2;
     uint32_t base3;
     uint32_t reserved;
-} gnu_pack_bytes tss_descriptor;
+} PACKED tss_descriptor;
 
 typedef struct {
     uint32_t reserved0;
@@ -53,7 +43,7 @@ typedef struct {
     uint32_t reserved4;
 
     uint16_t IOBP;
-} gnu_pack_bytes tss_t;
+} PACKED tss_t;
 
 struct memory_segment {
     uint16_t limit;
@@ -62,26 +52,26 @@ struct memory_segment {
     uint8_t  access;
     uint8_t  gran;
     uint8_t  base_high;
-} gnu_pack_bytes;
+} PACKED;
 
 struct gdtr {
     uint16_t limit;
     uint64_t offset;
-} gnu_pack_bytes;
+} PACKED;
 
 struct gdt_table {
-    struct memory_segment gdt_table_memory_segments[9];
+    struct memory_segment gdt_table_memory_segments[5];
     tss_descriptor tssd;
     struct gdtr gdtr;
-} gnu_pack_bytes;
+} PACKED;
 
 void init_gdt(uint64_t stack);
 void init_tss(uint64_t stack);
 void set_tss_entry(uint64_t base, uint8_t flags, uint8_t access);
 
-static inline void load_tss(uint16_t tss_selector)
+inline void load_tss(uint16_t tss_selector)
 {
-    asm volatile("ltr %%ax" :: "a"(0x48) : "memory");
+    asm volatile("ltr %%ax" :: "a"(tss_selector) : "memory");
 }
 
 #endif // GDT_H

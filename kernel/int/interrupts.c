@@ -13,7 +13,7 @@
 #include <hal/apic/apic.h>
 
 isr_t isr_handler_array[256] = {0};
-bool canReturn = false;
+bool can_return = false;
 
 static const char *exception_messages[] = {
     "Type: (#DE) Division Exception",
@@ -127,7 +127,7 @@ void isr_handler(struct iframe regs)
               regs.gpr.r14,
               regs.gpr.r15);
 
-        if (!canReturn)
+        if (!can_return)
         {
             for (;;)
                 asm("hlt");

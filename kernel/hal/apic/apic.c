@@ -29,7 +29,7 @@ static int ticks_for_quantum = 0;
 // Dummy isr for testing ig.
 void timer_tick(struct iframe *isr)
 {
-	auto cr3 = cr_read(CR3);
+	// auto cr3 = cr_read(CR3);
     if (isr->cs == 0x43 && isr->isr_number == 32)
     {
         switch_to_kernel_pagemap();

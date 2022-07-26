@@ -7,6 +7,7 @@
 #include <hal/pic/pic.h>
 #include <mm/mm.h>
 #include <printk.h>
+#include <mm/pmm.h>
 
 /* Entry types */
 #define LAPIC_ADDR_OVERRIDE 5 // Entry type 5 in the madt is the lapic address override
@@ -27,7 +28,7 @@ static void enumarate_apic_devices(madt_t **madt);
 struct apic_device_info madt_init(void *madt_base)
 {
     madt_t *madt = (madt_t*)((uintptr_t) madt_base - $high_vma);
-    apic_dev.ioapics = pmm_alloc(); // TODO: Make this a heap allocation!
+    apic_dev.ioapics = (struct ioapic_dev**)pmm_alloc(); // TODO: Make this a heap allocation!
 
     // Strings aren't null terminated apparently, so we do it ourselves
     uint8_t oem_str[7];

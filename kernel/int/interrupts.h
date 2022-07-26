@@ -12,11 +12,11 @@
 #define INTERRUPTS_H
 
 #include "idt.h"
-#include <stdbool.h>
 #include "isr_list.h"
+#include <stdbool.h>
 
 struct iframe {
-    gp_registers_t gpr;
+    general_registers gpr;
     int64_t isr_number;
     int64_t error_code;
     int64_t rip;
@@ -26,7 +26,7 @@ struct iframe {
     int64_t ss;
 };
 
-static inline bool IS_IRQ(int vector) { return (vector <= IRQ15 && vector >= IRQ0); }
+#define IS_IRQ(vector) (vector <= IRQ15 && vector >= IRQ0)
 
 #define TRY_EXEC_HANDLER(base)                                                                     \
     {                                                                                              \

@@ -21,7 +21,7 @@ struct RSDP
     uint64_t xsdt_address;
     uint8_t ext_checksum;
     uint8_t reserved[3];
-} gnu_pack_bytes;
+} PACKED;
 
 void rsdp_init(void);
 struct RSDP get_rsdp(void);

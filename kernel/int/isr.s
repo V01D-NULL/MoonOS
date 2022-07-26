@@ -15,12 +15,12 @@ global load_idt
 load_idt:
     lidt [rdi]
 
-    push 0x28
+    push 0x08
     lea rax, [rel .reload]
     push rax
     retfq
     .reload:
-       mov ax, 0x30
+       mov ax, 0x10
        mov ds, ax
        mov fs, ax
        mov gs, ax

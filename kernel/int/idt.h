@@ -1,14 +1,3 @@
-/**
- * @file idt.h
- * @author Tim (V01D)
- * @brief Interrupt Descriptor Table
- * @version 0.1
- * @date 2021-04-16
- *
- * @copyright Copyright (c) 2021
- *
- */
-
 #ifndef IDT_H
 #define IDT_H
 
@@ -18,10 +7,6 @@
 #include <amd64/cpu.h>
 #include <amd64/moon.h>
 
-/**
- * @brief Defines an IDT entry
- *
- */
 struct idt_desc
 {
     uint16_t offset_low;  // offset bits 0..15
@@ -31,33 +16,15 @@ struct idt_desc
     uint16_t offset_mid;  // offset bits 16..31
     uint32_t offset_high; // offset bits 32..63
     uint32_t zero;        // reserved
-} gnu_pack_bytes;
+} PACKED;
 
-/**
- * @brief The values used to load the IDT into memory using 'lidt'
- *
- */
 struct idtr
 {
     uint16_t limit;
     uint64_t offset;
-} gnu_pack_bytes;
+} PACKED;
 
-/**
- * @brief Set an IDT entry
- *
- * @param selector  Code segment
- * @param ist       Interrupt stack table offset
- * @param type_attr Types and attributes
- * @param offset    Low, mid, and high offset
- * @param idx       IDT entry index
- */
 void idt_set_entry(uint16_t selector, uint8_t ist, uint8_t type_attr, uint64_t offset, uint8_t idx);
-
-/**
- * @brief Setup and load IDT
- *
- */
 void init_idt(void);
 
 // CPU exceptions

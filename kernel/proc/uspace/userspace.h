@@ -3,6 +3,6 @@
 
 #include <amd64/moon.h>
 
-gnu_no_return void enter_ring3(void *addr, size_t stack);
+NORETURN void enter_ring3(void *addr, size_t stack);
 
 #endif // USERSPACE_H

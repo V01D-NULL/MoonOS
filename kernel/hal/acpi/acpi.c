@@ -1,7 +1,7 @@
 #include "acpi.h"
 #include <hal/acpi/tables/rsdp.h>
 #include <hal/acpi/tables/rsdt.h>
-#include <hal/acpi/tables/madt/madt.h>
+#include <hal/acpi/madt/madt.h>
 
 #include <mm/mm.h>
 #include <devices/serial/serial.h>
@@ -27,16 +27,16 @@ acpi_table_t acpi_find_table(const char *identifier)
 
     if (use_xsdt())
     {
-        xsdt = (struct XSDT*) (rsdp.xsdt_address);
+        xsdt = (struct XSDT*)rsdp.xsdt_address;
         header = xsdt->header;
     }
     else
     {
-        rsdt = (struct RSDT*) (rsdp.rsdt_address);
+        rsdt = (struct RSDT*)rsdp.rsdt_address;
         header = rsdt->header;
     }
 
-    size_t entries = (rsdt->header.length - sizeof(rsdt->header)) / (use_xsdt() ? 8 : 4);
+    size_t entries = (header.length - sizeof(header)) / (use_xsdt() ? 8 : 4);
     
     for (size_t i = 0; i < entries; i++)
     {

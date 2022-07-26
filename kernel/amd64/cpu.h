@@ -1,26 +1,10 @@
-/**
- * @file cpu.h
- * @author Tim (V01D)
- * @brief Manages anything directly CPU related
- * @version 0.1
- * @date 2021-04-15
- * 
- * @copyright Copyright (c) 2021
- * 
- */
 #ifndef CPU_H
 #define CPU_H
 
-/*
-    While the folder may say amd64/ this OS is fine when working with Intel CPU's aswell.
-    I just refer to the AMD manual rather than the Intel manual and a cpu/ folder that doesn't hold gdt/idt seemed kinda lame so I went the AMD/
-*/
-
 #include <stdint.h>
-#include <asm/x86/x86.h>
 #include <boot/boot.h>
 
-struct cpuid_regs_t
+struct cpuid_context
 {
     int eax;
     int ebx;
@@ -33,14 +17,11 @@ struct cpuid_regs_t
 // cpu_ctx_t will probably just derive from the stivale2 smp tag or something
 void init_percpu(uint64_t current_stack); // Initialize information for this CPU and store it in gs
 
-void cpuid(struct cpuid_regs_t *cpuid_regs);
-void log_cpuid_results(void);
-
+void cpuid(struct cpuid_context *cpuid_context);
 int current_cpu(void);
 
 /**
- * @brief A list of registers preserved by the interupt stack frame
- * 
+ * A list of general purpose registers.
  */
 typedef struct regs {
     int64_t r15;
@@ -58,7 +39,7 @@ typedef struct regs {
     int64_t rcx;
     int64_t rbx;
     int64_t rax;
-} gp_registers_t;
+} general_registers;
 
 struct percpu
 {

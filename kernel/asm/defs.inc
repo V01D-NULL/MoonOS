@@ -1,9 +1,4 @@
-[bits 64]
-
-global _load_bin
-
-%define KRNL_CS 0x8
-%define KRNL_DS 0x10
+bits 64
 
 %macro pusha64 0
     push rax
@@ -43,23 +38,4 @@ global _load_bin
 
 %macro _cleanup_stack 1
     add rsp, %1
-%endmacro
-
-
-;
-; USAGE:
-;
-; asm:
-;   _load_bin reference_for_C_code, "filename.bmp/tga/txt/whatever"
-; C:
-; extern const char reference_for_C_code[];
-; printf(reference_for_C_code);
-;
-%macro _load_bin 2
-    section .rodata
-    global %1
-%1:
-    incbin %2
-    db 0
-    sizeof_%1: db sizeof_%1 - %1
 %endmacro

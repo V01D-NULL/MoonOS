@@ -1,13 +1,3 @@
-/**
- * @file serial.h
- * @author Tim (V01D)
- * @brief Reading and writing to the serial port
- * @version 0.1
- * @date 2021-04-16
- * 
- * @copyright Copyright (c) 2021
- * 
- */
 #ifndef SERIAL_H
 #define SERIAL_H
 

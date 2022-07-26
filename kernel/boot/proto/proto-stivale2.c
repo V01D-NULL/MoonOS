@@ -1,7 +1,7 @@
 #include "proto-stivale2.h"
 #include <amd64/moon.h>
 
- gnu_section_align16 uint8_t stack[8192];
+ALIGN_SECTION(16) uint8_t stack[8192];
 
 struct stivale2_struct_tag_cmdline cmdline_tag = {
     .tag = {

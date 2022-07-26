@@ -1,15 +1,3 @@
-/**
- * @mainpage
- * @file kernel.c
- * @author Tim (V01D)
- * @brief This is where all the magic happens :)
- * @version 0.1
- * @date 2021-04-15
- *
- * @copyright Copyright (c) 2021
- *
- */
-
 #define PR_MODULE "main"
 
 #include <stdint.h>

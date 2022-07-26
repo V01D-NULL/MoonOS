@@ -1,6 +1,5 @@
 #include "kstring.h"
 
-// Copy len bytes from src to dest
 void memcpy (uint8_t *dest, const uint8_t *src, uint64_t len)
 {
 	for (; len != 0; len--)
@@ -88,7 +87,7 @@ void *memmove(void *dst, const void *src, size_t n)
 }
 
 // Compare two strings.
-/* Should return,
+/* Returns:
      -1 if ( len(str1) > len(str2) ) or ( len(str2) > len(str1) )
       0 if str1 == str2
       1 otherwise

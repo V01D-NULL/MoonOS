@@ -49,7 +49,7 @@ void hpet_init(void)
     hpet_dev->general_configuration = 1; // Enable the HPET
 }
 
-inline uint64_t hpet_counter_value(void)
+static uint64_t hpet_counter_value(void)
 {
     return hpet_dev->main_counter_value;
 }

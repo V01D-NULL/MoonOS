@@ -31,6 +31,6 @@
         _panic(rbp, rsp, __VA_ARGS__); \
     } while (0)
 
-gnu_no_return void _panic(uint64_t rbp, uint64_t rsp, const char *fmt, ...);
+NORETURN void _panic(uint64_t rbp, uint64_t rsp, const char *fmt, ...);
 
 #endif // PANIC_H

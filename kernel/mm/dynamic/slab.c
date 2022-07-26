@@ -4,6 +4,7 @@
 #include <libk/kstring.h>
 #include <util/common.h>
 #include <stdbool.h>
+#include <mm/pmm.h>
 #include <mm/mm.h>
 #include <panic.h>
 #include "slab.h"
@@ -27,9 +28,9 @@ bool kmem_cache_grow(struct kmem_cache *cachep, int count)
         for (int i = 0; i < elements; i++)
         {
             uintptr_t offset = ((uintptr_t)buf) + (cachep->size * i);
-            struct kmem_bufctl *new = offset;
+            struct kmem_bufctl *new = (struct kmem_bufctl*)offset;
             memcpy(new->parent_slab, slab, sizeof(struct kmem_slab));
-            new->ptr = offset;
+            new->ptr = (void*)offset;
 
             if (!tail)
                 buf = new;

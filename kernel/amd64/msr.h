@@ -25,7 +25,7 @@ typedef struct
     uint32_t edx;
 } msr_t;
 
-STATIC_INLINE uint64_t rdmsr(uint32_t msr)
+inline uint64_t rdmsr(uint32_t msr)
 {
     uint32_t eax, edx = 0;
     asm volatile("rdmsr"
@@ -35,7 +35,7 @@ STATIC_INLINE uint64_t rdmsr(uint32_t msr)
     return concat64(eax, edx);
 }
 
-STATIC_INLINE void wrmsr(uint32_t msr, uint64_t in)
+inline void wrmsr(uint32_t msr, uint64_t in)
 {
     uint32_t eax = in;
     uint32_t edx = in >> 32;
@@ -43,7 +43,7 @@ STATIC_INLINE void wrmsr(uint32_t msr, uint64_t in)
                      : "memory");
 }
 
-STATIC_INLINE uint64_t rdtsc(void)
+inline uint64_t rdtsc(void)
 {
     uint32_t eax, edx;
     asm volatile("rdtsc" : "=a"(eax), "=d"(edx));

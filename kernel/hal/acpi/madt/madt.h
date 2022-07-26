@@ -9,7 +9,7 @@ typedef struct
     struct SDT sdt;
     uint32_t local_apic_addr;
     uint32_t local_apic_flags;
-} gnu_pack_bytes madt_t;
+} PACKED madt_t;
 
 struct ioapic_dev
 {
@@ -22,7 +22,7 @@ struct ioapic_dev
     uint8_t reserved;
     uint32_t address;
     uint32_t gsib;
-} gnu_pack_bytes;
+} PACKED;
 
 struct apic_device_info
 {

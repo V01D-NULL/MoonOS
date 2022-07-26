@@ -24,12 +24,12 @@ struct pte
     uint8_t global : 1;
     uint8_t avail : 3;
     uint64_t address : 52;
-} gnu_pack_bytes;
+} PACKED;
 
 struct Pml
 {
     struct pte page_tables[512];
-} gnu_pack_bytes;
+} PACKED;
 
 struct Pagefault
 {

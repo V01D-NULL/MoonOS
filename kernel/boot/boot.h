@@ -7,7 +7,7 @@
 #include <stivale2.h>
 
 /**
- * Note: BootContext* does not follow the traditional naming convention of snakecase and _t's.
+ * Note: BootContext* does not follow the traditional naming convention.
  *       This is an attempt to completely isolate it from the kernel since all it does is provide information from the bootloader.
  *       In other words, I have almost nothing to do with getting this information. As such it should be clearly distinct from the kernel.
  * 

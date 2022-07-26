@@ -10,7 +10,7 @@
 #include "printk.h"
 #include "panic.h"
 
-gnu_no_return void _panic(uint64_t rbp, uint64_t rsp, const char *fmt, ...)
+NORETURN void _panic(uint64_t rbp, uint64_t rsp, const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);

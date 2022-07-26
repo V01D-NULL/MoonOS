@@ -1,4 +1,4 @@
-#include <hal/acpi/tables/hpet/hpet.h>
+#include <hal/acpi/hpet/hpet.h>
 
 // TODO: Add more timers
 

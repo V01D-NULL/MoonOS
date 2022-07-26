@@ -38,7 +38,7 @@ syscall_routine syscall_list[] = {
     sys_log,
 };
 
-void syscall_handler(gp_registers_t reg)
+void syscall_handler(general_registers reg)
 {
     debug(true, "\nSyscall handler\n");
     debug(false, "{\n"

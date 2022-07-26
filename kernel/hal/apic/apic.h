@@ -2,7 +2,7 @@
 #define APIC_H
 
 #include <ktypes.h>
-#include <hal/acpi/tables/madt/madt.h>
+#include <hal/acpi/madt/madt.h>
 
 void lapic_init();
 uint32_t lapic_read(uint32_t offset);
