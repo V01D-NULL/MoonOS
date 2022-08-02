@@ -1,13 +1,3 @@
-/**
- * @file interrupts.h
- * @author Tim (V01D)
- * @brief Interrupt handler
- * @version 0.1
- * @date 2021-04-16
- *
- * @copyright Copyright (c) 2021
- *
- */
 #ifndef INTERRUPTS_H
 #define INTERRUPTS_H
 

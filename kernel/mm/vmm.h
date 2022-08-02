@@ -8,17 +8,17 @@
 #include <stivale2.h>
 #include <util/range.h>
 
-$fwd_decl_struct(task_t);
+$fwd_decl_struct(Task);
 
 $struct(VmmRange, {
-	range_t range;
+	Range range;
 	size_t address_offset; // Use one the the vma offsets (mm/mm.h)
 	enum vmm_mapping_protection protection;
 });
 
 inline VmmRange as_vm_range(size_t base, size_t top, size_t offset)
 {
-	return (VmmRange){.range = (range_t){.base = base, .limit = top}, .address_offset = offset};
+	return (VmmRange){.range = (Range){.base = base, .limit = top}, .address_offset = offset};
 }
 
 void v_init(struct stivale2_mmap_entry *mmap, int entries);
@@ -30,9 +30,9 @@ void v_map_range_fast(VmmRange range, int flags, struct Pml *pagemap);
 
 struct Pml *create_new_pagemap(void);
 struct Pml *get_kernel_pagemap(void);
-void switch_pagemap(task_t task);
+void switch_pagemap(Task task);
 void switch_to_kernel_pagemap(void);
-void copy_kernel_mappings(task_t task);
+void copy_kernel_mappings(Task task);
 
 void pagefault_handler(uint64_t cr2, int error_code);
 

@@ -18,6 +18,7 @@ void init_percpu(uint64_t current_stack)
     pcpu->working_stack = 0; // Set by the syscall handler
 
     printk("pcpu", "0x%p | pcpu->syscall_stack: 0x%p\n", pcpu, pcpu->syscall_stack);
+	wrmsr(IA32_KERNEL_GS_BASE, (uint64_t)pcpu);
     wrmsr(GS_BASE, (uint64_t)pcpu);
 
     lapic_init();

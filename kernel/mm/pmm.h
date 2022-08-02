@@ -12,6 +12,6 @@
 void pmm_init(struct stivale2_mmap_entry *mmap, int entries);
 void *pmm_alloc(void);
 void pmm_free(void *page);
-range_t pmm_alloc_range(size_t pages);
+Range pmm_alloc_range(size_t pages);
 
 #endif // BITMAP_PMM_H

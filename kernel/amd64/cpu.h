@@ -1,6 +1,7 @@
 #ifndef CPU_H
 #define CPU_H
 
+#include "msr.h"
 #include <boot/boot.h>
 #include <ktypes.h>
 
@@ -44,6 +45,18 @@ struct percpu
 {
 	uint64_t syscall_stack; // Temporary stack for the syscall handler.
 	uint64_t working_stack; // Kernel stack
+							// Task active_task;
 } PACKED;
+
+// https://github.com/davxy/beeos/blob/abc3335738c06aac9a23ce3a292c91da8b46a460/kernel/src/mm/zone.c
+// https://github.com/vercas/Beelzebub/blob/master/beelzebub/src/memory/kernel.vas.cpp
+// https://download.freebsd.org/doc/en/books/design-44bsd/design-44bsd_en.pdf
+// https://github.com/freebsd/freebsd-src
+// https://wiki.osdev.org/Context_Switching
+// https://en.wikipedia.org/wiki/Computer_multitasking
+#define this_cpu                         \
+	{                                    \
+		(struct percpu *)rdmsr(GS_BASE); \
+	}
 
 #endif // CPU_H

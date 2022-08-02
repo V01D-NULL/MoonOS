@@ -45,7 +45,7 @@ $(KERNEL_HDD): $(KERNEL_ELF)
 	
 symlist:
 	@echo '#include "sym.h"' > scripts/parsed.sym
-	@echo 'sym_table_t symbol_table[] = {{0xFFFFFFFFFFFFFFFF, ""}};' >> scripts/parsed.sym
+	@echo 'SymbolTable symbol_table[] = {{0xFFFFFFFFFFFFFFFF, ""}};' >> scripts/parsed.sym
 	$(CC) -x c $(CHARDFLAGS) -I kernel/trace -I kernel/ -m64 -c scripts/parsed.sym -o kernel/trace/symtable.o
 
 klibs:

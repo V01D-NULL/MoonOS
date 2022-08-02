@@ -3,18 +3,21 @@ section .text
 
 %include "asm/defs.inc"
 
+global systemcall_int
+systemcall_int:
+	o64 sysret
+
 global enter_ring3_sysret
 enter_ring3_sysret:
 	; Swap out the kernel gs
 	swapgs
-	cli
-	
+
     ; Setup user stack..
     add rsi, 8192
     mov rbp, rsi
     mov rsp, rbp
 
-    ; NOTE: I'm not setting SS or CS as these are automatically set by sysret
+    ; NOTE: SS & CS are set by sysret
     ; Set user segment selectors
     mov ax, 0x1B
     mov ds, ax
@@ -24,5 +27,5 @@ enter_ring3_sysret:
 
     ; Enter ring3
     mov rcx, rdi   ; RIP
-    mov r11, 0x202 ; RFLAGS
+	mov r11, 0x202 ; RFLAGS
     o64 sysret

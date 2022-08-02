@@ -3,9 +3,12 @@
 
 #include <ktypes.h>
 
-$struct(range_t, {
+// clang-format off
+$struct(Range,
+{
 	size_t base;
 	size_t limit;
 });
+// clang-format off
 
 #endif // RANGE_H

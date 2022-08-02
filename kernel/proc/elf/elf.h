@@ -13,6 +13,6 @@ struct elf_loader_args
     string_view descriptor; // What should the task be known as?
 };
 
-task_t load_elf(const uint8_t *elf, struct elf_loader_args args);
+Task load_elf(const uint8_t *elf, struct elf_loader_args args);
 
 #endif // ELF_H

@@ -5,9 +5,9 @@
 #include <devices/serial/serial.h>
 #include <devices/term/early/early_term.h>
 
-extern sym_table_t symbol_table[];
+extern SymbolTable symbol_table[];
 
-sym_table_t sym_lookup(uint64_t address)
+SymbolTable sym_lookup(uint64_t address)
 {
     uint64_t corrected_address = 0;
     uint64_t index_new = 0;
@@ -30,7 +30,7 @@ sym_table_t sym_lookup(uint64_t address)
 
         if (sym_addr == 0xFFFFFFFF)
         {
-            return (sym_table_t){
+            return (SymbolTable){
                 .addr = corrected_address,
                 .name = symbol_table[index_new].name};
         }
@@ -57,7 +57,7 @@ int64_t find_symbol_by_name(string name)
 
 void backtrace_symbol(uint64_t address)
 {
-    sym_table_t sym = sym_lookup(address);
+    SymbolTable sym = sym_lookup(address);
 
     if (is_boot_term_available())
     {

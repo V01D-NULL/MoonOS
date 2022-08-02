@@ -85,9 +85,9 @@ void *pmm_alloc(void)
     return block;
 }
 
-range_t pmm_alloc_range(size_t pages)
+Range pmm_alloc_range(size_t pages)
 {
-    return (range_t){};
+    return (Range){};
 }
 
 void pmm_free(void *page)

@@ -8,9 +8,9 @@
 #include <ktypes.h>
 
 static Elf64_Ehdr elf_verify_ehdr(const uint8_t **elf);
-static task_t elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, struct elf_loader_args args);
+static Task elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, struct elf_loader_args args);
 
-task_t load_elf(const uint8_t *elf, struct elf_loader_args args)
+Task load_elf(const uint8_t *elf, struct elf_loader_args args)
 {
     Elf64_Ehdr ehdr = elf_verify_ehdr(&elf);
     return elf_parse_phdr(&elf, &ehdr, args);
@@ -33,11 +33,11 @@ static Elf64_Ehdr elf_verify_ehdr(const uint8_t **elf)
     return valid_status ? ehdr : (Elf64_Ehdr){};
 }
 
-static task_t elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, struct elf_loader_args args)
+static Task elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, struct elf_loader_args args)
 {
     Elf64_Half phdr_entries = ehdr->e_phnum;
     Elf64_Phdr *phdr = (Elf64_Phdr *)(*elf + ehdr->e_phoff);
-    task_t task = new_task(args.descriptor, ehdr->e_entry);
+    Task task = create_task_struct(args.descriptor, ehdr->e_entry);
 
     size_t elf_mapping_offset = phdr->p_vaddr;
     bool found_ptload = false;
@@ -68,20 +68,17 @@ static task_t elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, struct elf_l
     if (!found_ptload)
     {
         panic_if(args.do_panic, "Could not find a PT_LOAD segment!");
-        return (task_t){};
+        return (Task){};
     }
 
     // Stack memory (8KiB)
-    task.ustack = elf_mapping_offset;
-    for (size_t i = 0; i <= 2; i++)
+    task.ustack = elf_mapping_offset + PAGE_SIZE;
+    for (size_t i = 1; i <= 2; i++)
     {
         auto addr = elf_mapping_offset = i * PAGE_SIZE + task.ustack;
         v_map_fast(task.pagemap, addr, addr, MAP_USER_RW);
     }
     // Todo: Shadow stack page
-
-    // v_map_range_fast(as_vm_range(0x0, 0x400000, $identity_vma), MAP_KERN, task.pagemap);
-    // v_map_range_fast(as_vm_range(elf_mapping_offset, (4 * GB) - elf_mapping_offset, $identity_vma), MAP_KERN, task.pagemap);
 
     return task;
 }

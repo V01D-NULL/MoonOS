@@ -7,7 +7,7 @@ writer = open(PARSED, "w+")
 
 symbol_table_naked = """
 #include <sym.h>    // kernel/trace/sym.h
-sym_table_t symbol_table[] = {
+SymbolTable symbol_table[] = {
 """
 
 def init_writer():

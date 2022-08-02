@@ -1,7 +1,5 @@
 #include "syscalls.h"
 
-// Take note of how this needs to be setup in order to port mlibc which should be done asap
-//
 void syscall(uint64_t selector, uint64_t arg0, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5)
 {
     /*
@@ -10,10 +8,10 @@ void syscall(uint64_t selector, uint64_t arg0, uint64_t arg1, uint64_t arg2, uin
     */
     asm volatile(
         ".intel_syntax noprefix\n"
-        
+
         "push rcx \n"
         "push r11 \n"
-        
+
         /* There is no input constraint for any specific register ranging from (r8-r15) in gcc... */
         "mov r10, %4\n"
         "mov r8,  %5\n"
@@ -31,5 +29,5 @@ void syscall(uint64_t selector, uint64_t arg0, uint64_t arg1, uint64_t arg2, uin
 
 void syscall_log(const char *buff, size_t len)
 {
-    syscall(1, 0, (uint64_t)buff, len, 0, 0, 0);
+	syscall(1, 1, (uint64_t)buff, len, 0, 0, 0);
 }

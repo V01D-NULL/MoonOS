@@ -7,7 +7,7 @@ extern idt_set_entry
 	cmp [rsp+24], dword 8 ; Compare kernel CS with the CS on the interrupt stack
 
 	je .%1
-    swapgs
+	swapgs
 	.%1:
 %endmacro
 

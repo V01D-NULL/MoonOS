@@ -5,10 +5,13 @@
 
 #define create_lock(name, lock) static lock_t lock = {0, name};
 
-$struct(lock_t, {
+// clang-format off
+$struct(lock_t,
+{
 	int locked;
 	string name;
 });
+// clang-format on
 
 void acquire_lock(lock_t *lock);
 void release_lock(lock_t *lock);

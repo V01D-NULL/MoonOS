@@ -8,26 +8,25 @@
 #include <printk.h>
 #include <devices/serial/serial.h>
 #include <ktypes.h>
+#include <mm/mm.h>
 
-// Follow KISS for now (Keep It Simple Stupid)
-static task_t tasks[10];
-static task_t *current_task;
-static int counter = 0, current_task_idx = 0;
+// Keep it simple and make it work for now
+static Task tasks[10];
+static int registered_tasks = 0, current_task_idx = 0;
 static int ticks_for_quantum = 0;
+create_lock("sched_lock", sched_lock);
 
-static lock_t sched_lock;
+void sched_timer_oneshot(void);
+void sched_reschedule(struct task_registers regs);
 
 void sched_irq(struct iframe *isr)
-{	
-	debug(true, "sched_irq\n");
-	// switch_to_kernel_pagemap();
-	// auto new = tasks[0];
-	// lapic_eoi();
-	// sched_timer_oneshot();
-	// switch_pagemap(new);
-	// enter_ring3((void *)new.entrypoint, new.ustack);
-	// debug(true, "TICK (cs: 0x%x)\n", isr->cs);
-	sched_yield();
+{
+	// debug(true, "sched_irq on rip: %lx\n", isr->rip);
+	struct task_registers regs = {
+		.general_purpose = {isr->gpr},
+	};
+
+	sched_reschedule(regs);
 }
 
 void sched_init(void)
@@ -35,46 +34,49 @@ void sched_init(void)
 	if (!is_isr_registered(IRQ0))
 		install_isr(IRQ0, (isr_t)&sched_irq);
 
-	ticks_for_quantum = lapic_calibrate_timer(20); // Timer triggers IRQ0 after 20 usec
+	ticks_for_quantum = lapic_calibrate_timer(2000); // Timer triggers IRQ0 after 20 usec
+	switch_pagemap(tasks[current_task_idx]);
 	sched_timer_oneshot();
+	enter_ring3((void *)tasks[current_task_idx].entrypoint, tasks[current_task_idx].ustack);
 }
 
-void sched_register_task(task_t task)
+void sched_register_task(Task task)
 {
-	if (counter == 10)
+	if (registered_tasks == 10)
 		return;
 
-	tasks[counter++] = task;
+	tasks[registered_tasks++] = task;
 }
 
 // TODO: Save and restore register state for multiple processes
-void sched_yield(void)
+// TODO: Add idle() task when no processes exist.
+void sched_reschedule(struct task_registers regs)
 {
 	acquire_lock(&sched_lock);
-	// if (counter <= 1 && current_task != NULL)
-	// 	return;
 
-	switch_to_kernel_pagemap();
+	// Find new task
+	if (registered_tasks > 1)
+	{
+		if (++current_task_idx > 10)
+			current_task_idx = 0;
+	}
+	else
+		goto reschedule;
 
-	// if (++current_task_idx > 10)
-	// 	current_task_idx = 0;
+	// Save register state
+	tasks[current_task_idx].registers = regs;
+
+	// Load new task
 	auto new = tasks[current_task_idx];
-	// current_task = &new;
-	
-	// trace("sched_yield(): Giving task '%s' quantum\n", new.descriptor);
-	// v_map_fast(new.pagemap, 0, 0, 7);
-	// v_map_fast(new.pagemap, 0xfee00000, 0xfee00000, MAP_KERN);
-
 	switch_pagemap(new);
-	
-	lapic_eoi();
-    lapic_oneshot_timer(ticks_for_quantum);
 
+reschedule:
+	sched_timer_oneshot();
 	release_lock(&sched_lock);
-    enter_ring3((void *)new.entrypoint, new.ustack);
 }
 
 void sched_timer_oneshot(void)
 {
+	lapic_eoi();
 	lapic_oneshot_timer(ticks_for_quantum);
 }

@@ -179,7 +179,7 @@ struct Pml *create_new_pagemap(void)
     return (struct Pml *)pmm_alloc();
 }
 
-void copy_kernel_mappings(task_t task)
+void copy_kernel_mappings(Task task)
 {
     for (int i = 0; i < 256; i++)
         task.pagemap->page_tables[i] = paging_purge_entry();
@@ -188,7 +188,7 @@ void copy_kernel_mappings(task_t task)
         task.pagemap->page_tables[i] = kernel_pagemap->page_tables[i];
 }
 
-void switch_pagemap(task_t task)
+void switch_pagemap(Task task)
 {
     if (!task.pagemap)
     {

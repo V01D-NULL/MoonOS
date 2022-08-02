@@ -69,12 +69,7 @@ void init_idt(void)
     idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t) isr46, 46);
     idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t) isr47, 47);
 
-    idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t) isr32, 32);
-
-	// Syscall
-	idt_set_entry(KRNL_CS64, 0, 0xEE, (uint64_t) isr128, 128);
-	
-    // Load IDT
+	// Load IDT
     struct idtr _idtr = {
         .limit = 256 * sizeof(struct idt_desc) - 1,
         .offset = (uint64_t)idt

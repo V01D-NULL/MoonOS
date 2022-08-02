@@ -11,7 +11,7 @@ void load_daemon(const uint8_t *elf, string_view name)
     trace("Loading %s...\n", name);
     
     // Note: identity_map = true basically assumes that the load address of the ELF is free, this might be removed in the future.
-    task_t task = load_elf(elf, (struct elf_loader_args){.do_panic = true, .identity_map = true, .descriptor = name});
+    Task task = load_elf(elf, (struct elf_loader_args){.do_panic = true, .identity_map = true, .descriptor = name});
 	sched_register_task(task);
 
     if (!task.entrypoint)

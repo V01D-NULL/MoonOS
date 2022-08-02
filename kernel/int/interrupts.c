@@ -47,27 +47,9 @@ static string_view exception_messages[] = {
 
 void isr_handler(struct iframe regs)
 {
-	if (regs.cs != 0x08)
-	{
-		// asm volatile("swapgs" ::
-		//                  : "memory");
-		// printk("INT", BASH_GREEN "Userprocess triggered an exception\n" BASH_GRAY);
-		// switch_to_kernel_pagemap();
-		debug(true, "Userprocess triggered an exception %d\n", regs.isr_number);
-	}
-
 	/* CPU exceptions */
 	if (regs.isr_number < 32)
 	{
-		if (regs.cs != 8)
-		{
-			// asm volatile("swapgs" ::
-			//                  : "memory");
-			// printk("INT", BASH_GREEN "Userprocess triggered an exception\n" BASH_GRAY);
-			switch_to_kernel_pagemap();
-			debug(true, BASH_GREEN "Userprocess triggered an exception\n" BASH_GRAY);
-		}
-
 		override_quiet_boot();
 		serial_set_color(BASH_RED);
 		debug(true, "ERROR: %s (err_code %ld)\n", exception_messages[regs.isr_number], regs.error_code);
@@ -76,13 +58,9 @@ void isr_handler(struct iframe regs)
 		if (regs.isr_number == 14)
 		{
 			uint64_t cr2 = cr_read(CR2);
-			switch_to_kernel_pagemap();
-			uninstall_isr(32);
-			// printk("INT ~ #PF", "Faulting address: 0x%lx\n", cr2);
+			printk("INT ~ #PF", "Faulting address: 0x%lx\n", cr2);
 			debug(true, "INT ~ #PF Faulting address: 0x%lx\n", cr2);
-			// for (;;)
-			//     ;
-			// // pagefault_handler(cr2, regs.error_code);
+			pagefault_handler(cr2, regs.error_code);
 		}
 		if (regs.isr_number == 6)
 		{
@@ -136,8 +114,8 @@ void isr_handler(struct iframe regs)
 	// Signal EOI
 	if (pic_enabled())
 		pic_eoi(regs.isr_number);
-	// else
-	//     lapic_eoi();
+	else
+	    lapic_eoi();
 }
 
 void install_isr(uint8_t base, isr_t handler)
