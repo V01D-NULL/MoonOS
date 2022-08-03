@@ -44,7 +44,7 @@ Result test_result_ok()
 	return Okay(10);
 }
 
-void kmain(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
+void kern_main(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
 {
 	kmalloc_init();
 	acpi_init();

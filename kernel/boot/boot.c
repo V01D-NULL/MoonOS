@@ -142,7 +142,7 @@ void kinit(struct stivale2_struct *bootloader_info)
             ;
     }
 
-    kmain(&ctx, modules);
+    kern_main(&ctx, modules);
 }
 
 BootContext BootContextGet(void)
