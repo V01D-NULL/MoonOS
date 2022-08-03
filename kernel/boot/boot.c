@@ -1,18 +1,16 @@
 #include <devices/term/early/early_term.h>
 #include <devices/term/limine-port/term.h>
-#include <libgraphics/bootsplash_img.h>
 #include <boot/proto/proto-stivale2.h>
-#include <devices/serial/serial.h>
-#include <devices/fb/early_fb.h>
-#include <libgraphics/draw.h>
-#include <hal/acpi/acpi.h>
-#include <hal/apic/apic.h>
-#include <libk/cmdline.h>
-#include <hal/pic/pic.h>
+#include <moon-io/serial.h>
+#include <base/mem.h>
+#include <platform/acpi/acpi.h>
+#include <platform/apic/apic.h>
+#include <base/bootargs.h>
+#include <platform/pic/pic.h>
 #include <amd64/moon.h>
 #include <stivale2.h>
-#include <int/idt.h>
-#include <int/gdt.h>
+#include <amd64/descriptors/idt.h>
+#include <amd64/descriptors/gdt.h>
 #include <kernel.h>
 #include <mm/pmm.h>
 #include <mm/vmm.h>
@@ -125,16 +123,8 @@ void kinit(struct stivale2_struct *bootloader_info)
         /* Is verbose boot specified in the command line? */
         if (cmdline != NULL)
         {
-            if (!boot_cmdline_find_tag("verbose_boot", (string_view)cmdline->cmdline))
-            {
-                early_fb_init(ctx);
-                fb_draw_image((ctx.fb.fb_width / 2) - (IMG_WIDTH / 2), (ctx.fb.fb_height / 2) - (IMG_HEIGHT / 2), IMG_WIDTH, IMG_HEIGHT, IMG_DATA, IMAGE_RGB);
-                printk_init(false, ctx);
-            }
-            else
-            {
-                printk_init(true, ctx);
-            }
+            auto verbose = bootarg_find("verbose_boot", (string_view)cmdline->cmdline);
+            printk_init(verbose, ctx);
         }
         else
         {

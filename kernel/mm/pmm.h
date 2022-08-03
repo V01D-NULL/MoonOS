@@ -1,10 +1,10 @@
 #ifndef BITMAP_PMM_H
 #define BITMAP_PMM_H
 
-#include <ktypes.h>
+#include <base/base-types.h>
 #include <amd64/moon.h>
 #include <stivale2.h>
-#include <util/range.h>
+#include <moon-extra/range.h>
 
 #define PMM_FREE 0
 #define PMM_USED 1

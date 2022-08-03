@@ -1,9 +1,9 @@
 #ifndef FMT_PRINTK_H
 #define FMT_PRINTK_H
 
-#include <ktypes.h>
+#include <base/base-types.h>
 #include <boot/boot.h>
-#include <devices/serial/serial.h>
+#include <moon-io/serial.h>
 
 #ifndef PR_MODULE
 #define PR_MODULE __FILE__

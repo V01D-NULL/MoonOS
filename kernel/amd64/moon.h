@@ -1,7 +1,7 @@
 #ifndef MOON_DEFS_H
 #define MOON_DEFS_H
 
-#include <ktypes.h>
+#include <base/base-types.h>
 
 #define NORETURN __attribute__((noreturn))
 #define ALIGN_SECTION(x)  __attribute__((aligned (x)))

@@ -1,8 +1,8 @@
 #include <devices/term/early/early_term.h>
 #include <devices/term/limine-port/term.h>
-#include <devices/serial/serial.h>
-#include <libk/kstring.h>
-#include <libk/kprintf.h>
+#include <moon-io/serial.h>
+#include <base/string.h>
+#include <base/fmt.h>
 #include <amd64/cpu.h>
 #include <mm/mm.h>
 #include "printk.h"

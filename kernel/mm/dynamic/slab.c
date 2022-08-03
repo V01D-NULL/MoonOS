@@ -1,9 +1,9 @@
 #define PR_MODULE "slab"
 
-#include <devices/serial/serial.h>
-#include <libk/kstring.h>
-#include <util/common.h>
-#include <ktypes.h>
+#include <moon-io/serial.h>
+#include <base/string.h>
+#include <base/base-types.h>
+#include <base/align.h>
 #include <mm/pmm.h>
 #include <mm/mm.h>
 #include <panic.h>

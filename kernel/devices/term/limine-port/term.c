@@ -15,8 +15,8 @@
     This code was taken from: https://github.com/V01D-NULL/limine-terminal-port
     which is a freestanding port of the limine terminal: https://github.com/limine-bootloader/limine
 */
-#include <libk/kstring.h>
-#include <ktypes.h>
+#include <base/string.h>
+#include <base/base-types.h>
 #include "term.h"
 #include "gterm.h"
 

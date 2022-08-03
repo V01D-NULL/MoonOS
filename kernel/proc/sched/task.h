@@ -1,12 +1,12 @@
 #ifndef TASK_H
 #define TASK_H
 
-#include <ktypes.h>
-#include <util/compiler.h>
+#include <base/base-types.h>
+#include <moon-extra/compiler.h>
 #include <mm/vmm.h>
 #include <amd64/cpu.h>
 #include <proc/elf/elf64.h>
-#include <int/interrupts.h>
+#include <amd64/interrupts.h>
 
 enum task_type
 {
@@ -20,15 +20,9 @@ enum task_type
 struct task_registers
 {
 	struct iframe general_purpose;
-
-	// int64_t rip;
-	// int64_t rflags;
-	// int64_t cs;
 };
 
-// clang-format off
-$struct(Task,
-{
+struct$(Task, {
 	string_view descriptor;
 	struct Pml *pagemap;
 	Elf64_Addr entrypoint;
@@ -36,7 +30,6 @@ $struct(Task,
 	size_t ustack;
 	struct task_registers registers;
 });
-// clang-format on
 
 Task create_task_struct(string_view descriptor, Elf64_Addr entrypoint);
 

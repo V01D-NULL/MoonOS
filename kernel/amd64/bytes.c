@@ -1,5 +1,4 @@
 #include "bytes.h"
-#include <util/common.h>
 
 uint8_t byte_order_reverse_char8(uint8_t byte)
 {

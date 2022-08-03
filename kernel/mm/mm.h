@@ -3,11 +3,8 @@
 
 #include "addr.h"
 #include "page.h"
-#include <ktypes.h>
-#include <ds/linked_list.h>
-
-#define ALIGN_UP(__number) (((__number) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
-#define ALIGN_DOWN(__number) ((__number) & ~(PAGE_SIZE - 1))
+#include <base/base-types.h>
+#include <moon-ds/linked_list.h>
 
 struct zone
 {

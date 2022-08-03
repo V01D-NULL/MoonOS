@@ -2,7 +2,7 @@
 #include "syscalls.h"
 #include <panic.h>
 #include <amd64/msr.h>
-#include <ktypes.h>
+#include <base/base-types.h>
 #include <printk.h>
 extern void enter_ring3_sysret(void *addr, size_t ustack);
 

@@ -1,7 +1,6 @@
 #include "early_term.h"
-#include <devices/serial/serial.h>
-#include <libk/kstring.h>
-#include <libk/kprintf.h>
+#include <base/string.h>
+#include <base/fmt.h>
 #include <stdarg.h>
 
 void (*term_write)(string_view string, size_t length);

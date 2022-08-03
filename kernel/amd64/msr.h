@@ -4,7 +4,7 @@
 #include "cpu.h"
 #include "moon.h"
 #include "bytes.h"
-#include <ktypes.h>
+#include <base/base-types.h>
 
 enum
 {
@@ -21,7 +21,7 @@ enum
 };
 
 // clang-format off
-$struct(Msr,
+struct$(Msr,
 {
 	uint32_t eax;
 	uint32_t edx;

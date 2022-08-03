@@ -1,13 +1,13 @@
 #define PR_MODULE "sched"
 
 #include "scheduler.h"
-#include <proc/smp/spinlock.h>
+#include <amd64/smp/spinlock.h>
 #include <proc/uspace/userspace.h>
-#include <int/interrupts.h>
-#include <hal/apic/apic.h>
+#include <amd64/interrupts.h>
+#include <platform/apic/apic.h>
 #include <printk.h>
-#include <devices/serial/serial.h>
-#include <ktypes.h>
+#include <moon-io/serial.h>
+#include <base/base-types.h>
 #include <mm/mm.h>
 
 // Keep it simple and make it work for now

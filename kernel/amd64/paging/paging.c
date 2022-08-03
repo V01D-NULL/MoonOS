@@ -1,5 +1,5 @@
 #include <amd64/paging/paging.h>
-#include <ktypes.h>
+#include <base/base-types.h>
 
 inline bool check_flag(int flags, int bit) { return (flags >> bit) & 1; }
 

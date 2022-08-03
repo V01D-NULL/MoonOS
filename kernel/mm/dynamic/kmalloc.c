@@ -2,9 +2,10 @@
 
 #include "kmalloc.h"
 #include <mm/pmm.h>
-#include <devices/serial/serial.h>
-#include <ds/linked_list.h>
-#include <ktypes.h>
+#include <moon-io/serial.h>
+#include <base/mem.h>
+#include <moon-ds/linked_list.h>
+#include <base/base-types.h>
 #include <panic.h>
 
 #define KMLIST_SIZE 7 // Smallest slab size is 8, largest (for a small slab) 512.

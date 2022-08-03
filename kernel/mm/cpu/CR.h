@@ -1,6 +1,6 @@
 #ifndef CONTROL_REGISTER_X
 #define CONTROL_REGISTER_X
-#include <ktypes.h>
+#include <base/base-types.h>
 
 /* Defines the cr number: cr(number) */
 enum CR_NUMBER

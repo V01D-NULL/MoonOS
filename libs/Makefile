@@ -1,23 +1,23 @@
 .PHONY: all clean
 
-all: libk.a ds.a libgraphics.a
+all: base.a moon-ds.a moon-io.a
 	@printf "(LIBS) Built all kernel archive libraries\n";
 
-libk.a:
-	@$(MAKE) --no-print-directory -C libk all
-	@mv libk/$@ .
+base.a:
+	@$(MAKE) --no-print-directory -C base all
+	@mv base/$@ .
 
 # data structures
-ds.a:
-	@$(MAKE) --no-print-directory -C ds all
-	@mv ds/$@ .	
+moon-ds.a:
+	@$(MAKE) --no-print-directory -C moon-ds all
+	@mv moon-ds/$@ .	
 
-libgraphics.a:
-	@$(MAKE) --no-print-directory -C libgraphics all
-	@mv libgraphics/$@ .	
+moon-io.a:
+	@$(MAKE) --no-print-directory -C moon-io all
+	@mv moon-io/$@ .	
 
 clean:
-	@rm -f libk.a ds.a libgraphics.a
-	@$(MAKE) --no-print-directory -C libk clean
-	@$(MAKE) --no-print-directory -C ds clean
-	@$(MAKE) --no-print-directory -C libgraphics clean
+	@rm -f base.a moon-ds.a moon-io.a:
+	@$(MAKE) --no-print-directory -C base clean
+	@$(MAKE) --no-print-directory -C moon-ds clean
+	@$(MAKE) --no-print-directory -C moon-io clean

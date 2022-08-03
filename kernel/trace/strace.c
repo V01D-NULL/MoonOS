@@ -1,6 +1,6 @@
 #include "strace.h"
-#include <ktypes.h>
-#include <devices/serial/serial.h>
+#include <base/base-types.h>
+#include <moon-io/serial.h>
 #include "sym.h"
 
 struct stackframe_list {

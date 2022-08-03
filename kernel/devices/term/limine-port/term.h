@@ -18,7 +18,7 @@
 #ifndef __LIB__TERM_H__
 #define __LIB__TERM_H__
 
-#include <ktypes.h>
+#include <base/base-types.h>
 #include "stivale2.h"
 
 #define TERM_TABSIZE (8)

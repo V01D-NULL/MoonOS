@@ -18,7 +18,7 @@
 #ifndef __LIB__GTERM_H__
 #define __LIB__GTERM_H__
 
-#include <ktypes.h>
+#include <base/base-types.h>
 #include <stivale2.h>
 
 void gterm_init(void);

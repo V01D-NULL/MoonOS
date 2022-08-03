@@ -3,7 +3,7 @@
 
 #include "elf64.h"
 #include "elf_common.h"
-#include <ktypes.h>
+#include <base/base-types.h>
 #include <proc/sched/task.h>
 
 struct elf_loader_args

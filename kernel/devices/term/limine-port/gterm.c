@@ -16,13 +16,14 @@
     which is a freestanding port of the limine terminal: https://github.com/limine-bootloader/limine
 */
 
-#include <libk/kstring.h>
+#include <base/string.h>
 #include <boot/boot.h>
-#include <ktypes.h>
+#include <base/base-types.h>
 #include <mm/mm.h>
 #include "gterm.h"
 #include "term.h"
-#include <devices/serial/serial.h>
+#include <moon-io/serial.h>
+#include <base/align.h>
 typedef char symbol[];
 
 // A simple "bump" allocator that steals some memory from the mmap

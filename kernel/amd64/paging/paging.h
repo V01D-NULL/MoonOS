@@ -2,7 +2,7 @@
 #define PAGING_H
 
 #include <amd64/moon.h>
-#include <ktypes.h>
+#include <base/base-types.h>
 
 #define PAGE_SHIFT 12
 

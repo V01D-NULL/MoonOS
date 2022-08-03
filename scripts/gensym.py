@@ -52,7 +52,7 @@ def parse_symbol_tables(unparsed_sym_table):
         
 
 def compile_sym_table():
-    system(f"gcc -ffreestanding -x c -c {PARSED} -m64 -I trace/ -I . -o trace/symtable.o")
+    system(f"gcc -ffreestanding -x c -c {PARSED} -m64 -I trace/ -I ../libs/ -o trace/symtable.o")
     print("[*] Compiled symbol table")
 
 if __name__ == '__main__':

@@ -4,13 +4,13 @@
 #include <amd64/paging/paging.h>
 #include <proc/sched/task.h>
 #include <mm/cpu/CR.h>
-#include <ktypes.h>
+#include <base/base-types.h>
 #include <stivale2.h>
-#include <util/range.h>
+#include <moon-extra/range.h>
 
-$fwd_decl_struct(Task);
+forward_declare_struct$(Task);
 
-$struct(VmmRange, {
+struct$(VmmRange, {
 	Range range;
 	size_t address_offset; // Use one the the vma offsets (mm/mm.h)
 	enum vmm_mapping_protection protection;

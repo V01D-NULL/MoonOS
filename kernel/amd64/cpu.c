@@ -4,10 +4,10 @@
 #include "msr.h"
 #include <mm/mm.h>
 #include <printk.h>
-#include <hal/apic/apic.h>
+#include <platform/apic/apic.h>
 #include <mm/dynamic/kmalloc.h>
-#include <hal/acpi/hpet/hpet.h>
-#include <hal/acpi/acpi.h>
+#include <platform/acpi/hpet/hpet.h>
+#include <platform/acpi/acpi.h>
 
 void init_percpu(uint64_t current_stack)
 {

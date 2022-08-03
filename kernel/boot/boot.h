@@ -2,7 +2,7 @@
 #define BOOT_H
 
 #include <stivale2.h>
-#include <ktypes.h>
+#include <base/base-types.h>
 
 /**
  * Note: BootContext* does not follow the traditional naming convention.
@@ -10,7 +10,7 @@
  *       In other words, I have almost nothing to do with getting this information. As such it should be clearly distinct from the kernel.
  *
  */
-$struct(BootContextSmp, {
+struct$(BootContextSmp, {
 	uint64_t processor_count;
 	uint32_t acpi_processor_uid;
 	uint32_t lapic_id;
@@ -18,11 +18,11 @@ $struct(BootContextSmp, {
 	struct stivale2_smp_info *smp_info;
 });
 
-$struct(BootContextRsdp, {
+struct$(BootContextRsdp, {
 	uint64_t rsdp_address;
 });
 
-$struct(BootContextFramebuffer, {
+struct$(BootContextFramebuffer, {
 	uint64_t fb_addr;
 	uint16_t fb_width;
 	uint16_t fb_height;
@@ -30,7 +30,7 @@ $struct(BootContextFramebuffer, {
 	uint16_t fb_bpp;
 });
 
-$struct(BootContext, {
+struct$(BootContext, {
 	BootContextSmp cpu;
 	BootContextRsdp rsdp;
 	BootContextFramebuffer fb;

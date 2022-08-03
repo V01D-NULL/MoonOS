@@ -1,6 +1,0 @@
-#ifndef LIB_GRAPHICS_BOOTSPLASH_H
-#define LIB_GRAPHICS_BOOTSPLASH_H
-
-void bootsplash();
-
-#endif // LIB_GRAPHICS_BOOTSPLASH_H

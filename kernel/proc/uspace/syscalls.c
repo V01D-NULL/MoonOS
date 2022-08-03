@@ -1,11 +1,11 @@
 #include "syscalls.h"
-#include <util/compiler.h>
+#include <moon-extra/compiler.h>
 #include <amd64/msr.h>
-#include <int/gdt.h>
+#include <amd64/descriptors/gdt.h>
 #include <printk.h>
-#include <ktypes.h>
+#include <base/base-types.h>
 #include <panic.h>
-#include <int/interrupts.h>
+#include <amd64/interrupts.h>
 
 #define Type uint64_t
 #define ignore Type UNIQUE_NAME(ignore)
@@ -55,7 +55,7 @@ void syscall_handler(general_registers reg)
 	// 	  reg.rax, reg.rdi, reg.rsi,
 	// 	  reg.rdx, reg.r10, reg.r8, reg.r9);
 
-	if (reg.rax > $array_size(syscall_list))
+	if (reg.rax > ARRAY_SIZE(syscall_list))
 		panic("%ld is out of range", reg.rax);
 
 	auto status = syscall_list[reg.rax](reg.rdi, reg.rsi, reg.rdx, reg.r10, reg.r8, reg.r9);

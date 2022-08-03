@@ -1,8 +1,7 @@
 #ifndef BYTES_H
 #define BYTES_H
 
-#include <ktypes.h>
-#include <devices/serial/serial.h>
+#include <base/base-types.h>
 #include "moon.h"
 
 #define BYTE_EXTRACTION_MASK 0xFF

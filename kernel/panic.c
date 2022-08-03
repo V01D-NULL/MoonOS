@@ -1,6 +1,6 @@
 #include <devices/term/early/early_term.h>
-#include <devices/serial/serial.h>
-#include <libk/kprintf.h>
+#include <moon-io/serial.h>
+#include <base/fmt.h>
 #include <trace/strace.h>
 #include <amd64/moon.h>
 #include <trace/sym.h>

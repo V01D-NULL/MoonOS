@@ -3,7 +3,7 @@
 
 #include "msr.h"
 #include <boot/boot.h>
-#include <ktypes.h>
+#include <base/base-types.h>
 
 struct cpuid_context
 {
@@ -23,7 +23,7 @@ int current_cpu(void);
 /**
  * A list of general purpose registers.
  */
-$struct(general_registers, {
+struct$(general_registers, {
 	int64_t r15;
 	int64_t r14;
 	int64_t r13;

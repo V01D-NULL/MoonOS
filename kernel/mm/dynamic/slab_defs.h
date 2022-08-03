@@ -1,7 +1,7 @@
 #ifndef SLAB_DEFS_H
 #define SLAB_DEFS_H
 
-#include <ds/linked_list.h>
+#include <moon-ds/linked_list.h>
 #include <mm/mm.h>
 
 #define SMALL_SLAB(x) (x <= (PAGE_SIZE / 8))

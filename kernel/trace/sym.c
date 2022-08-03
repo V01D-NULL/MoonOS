@@ -1,8 +1,8 @@
 #include "sym.h"
 #include <printk.h>
-#include <ktypes.h>
-#include <libk/kstring.h>
-#include <devices/serial/serial.h>
+#include <base/base-types.h>
+#include <base/string.h>
+#include <moon-io/serial.h>
 #include <devices/term/early/early_term.h>
 
 extern SymbolTable symbol_table[];

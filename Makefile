@@ -33,20 +33,20 @@ $(KERNEL_ELF):
 	@$(MAKE) --no-print-directory -C kernel
 
 $(KERNEL_HDD): $(KERNEL_ELF)
-	@$(MAKE) --no-print-directory -C echfs
-	@$(MAKE) --no-print-directory -C limine
+	@$(MAKE) --no-print-directory -C $(ECHFS_DIR)
+	@$(MAKE) --no-print-directory -C $(LIMINE_DIR)
 	@dd if=/dev/zero bs=1M count=0 seek=64 of=$(KERNEL_HDD) 								2> /dev/null
 	@parted -s $(KERNEL_HDD) mklabel gpt 													2> /dev/null
 	@parted -s $(KERNEL_HDD) mkpart primary 2048s 100% 										2> /dev/null
-	@echfs/echfs-utils -g -p0 $(KERNEL_HDD) quick-format 512 								2> /dev/null
-	@echfs/echfs-utils -g -p0 $(KERNEL_HDD) import $^ kernel.elf							2> /dev/null
-	@echfs/echfs-utils -g -p0 $(KERNEL_HDD) import boot/limine.cfg limine.cfg				2> /dev/null
-	@limine/limine-install 	$(KERNEL_HDD)													2> /dev/null
-	
+	@$(ECHFS_DIR)/echfs-utils -g -p0 $(KERNEL_HDD) quick-format 512 								2> /dev/null
+	@$(ECHFS_DIR)/echfs-utils -g -p0 $(KERNEL_HDD) import $^ kernel.elf							2> /dev/null
+	@$(ECHFS_DIR)/echfs-utils -g -p0 $(KERNEL_HDD) import boot/limine.cfg limine.cfg				2> /dev/null
+	@$(LIMINE_DIR)/limine-install 	$(KERNEL_HDD)													2> /dev/null
+
 symlist:
 	@echo '#include "sym.h"' > scripts/parsed.sym
 	@echo 'SymbolTable symbol_table[] = {{0xFFFFFFFFFFFFFFFF, ""}};' >> scripts/parsed.sym
-	$(CC) -x c $(CHARDFLAGS) -I kernel/trace -I kernel/ -m64 -c scripts/parsed.sym -o kernel/trace/symtable.o
+	$(CC) -x c $(CHARDFLAGS) -I kernel/trace -I libs/ -m64 -c scripts/parsed.sym -o kernel/trace/symtable.o
 
 klibs:
 	@$(MAKE) --no-print-directory -C libs all
@@ -63,15 +63,15 @@ debugger_session: $(KERNEL_HDD)
 
 ISO: $(KERNEL_HDD)
 	mkdir iso/ || echo ""
-	@cp -r limine/BOOTIA32.EFI limine/BOOTX64.EFI limine/limine.sys limine/limine-cd.bin \
-	limine/limine-eltorito-efi.bin limine/limine-pxe.bin boot/* $(KERNEL_ELF) iso/
+	@cp -r $(LIMINE_DIR)/BOOTIA32.EFI $(LIMINE_DIR)/BOOTX64.EFI $(LIMINE_DIR)/limine.sys $(LIMINE_DIR)/limine-cd.bin \
+	$(LIMINE_DIR)/limine-eltorito-efi.bin $(LIMINE_DIR)/limine-pxe.bin boot/* $(KERNEL_ELF) iso/
 
 	xorriso -as mkisofs -b limine-cd.bin \
 	-no-emul-boot -boot-load-size 4 -boot-info-table \
 	--efi-boot limine-eltorito-efi.bin -efi-boot-part \
 	--efi-boot-image --protective-msdos-label iso -o $(ISO_NAME)
 
-	limine/limine-install $(ISO_NAME)
+	$(LIMINE_DIR)/limine-install $(ISO_NAME)
 
 # Remove the HDD & elf file while saving all object files (fewer files will be recompiled)
 quick_recompile: symlist

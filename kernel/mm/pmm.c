@@ -1,10 +1,12 @@
 #include <devices/term/early/early_term.h>
-#include <devices/serial/serial.h>
-#include <proc/smp/spinlock.h>
-#include <libk/kassert.h>
-#include <ds/bitmap.h>
+#include <moon-io/serial.h>
+#include <amd64/smp/spinlock.h>
+#include <base/assert.h>
+#include <moon-ds/bitmap.h>
 #include <printk.h>
-#include <ktypes.h>
+#include <base/base-types.h>
+#include <base/mem.h>
+#include <base/align.h>
 #include <panic.h>
 #include "pmm.h"
 #include "mm.h"

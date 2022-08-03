@@ -1,84 +1,86 @@
 #include "elf.h"
 #include <panic.h>
 #include <printk.h>
-#include <devices/serial/serial.h>
+#include <moon-io/serial.h>
 #include <mm/vmm.h>
 #include <mm/pmm.h>
 #include <mm/mm.h>
-#include <ktypes.h>
+#include <base/base-types.h>
+#include <base/string.h>
+#include <base/align.h>
 
 static Elf64_Ehdr elf_verify_ehdr(const uint8_t **elf);
 static Task elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, struct elf_loader_args args);
 
 Task load_elf(const uint8_t *elf, struct elf_loader_args args)
 {
-    Elf64_Ehdr ehdr = elf_verify_ehdr(&elf);
-    return elf_parse_phdr(&elf, &ehdr, args);
+	Elf64_Ehdr ehdr = elf_verify_ehdr(&elf);
+	return elf_parse_phdr(&elf, &ehdr, args);
 }
 
 static Elf64_Ehdr elf_verify_ehdr(const uint8_t **elf)
 {
-    Elf64_Ehdr ehdr = *(Elf64_Ehdr *)(*elf);
+	Elf64_Ehdr ehdr = *(Elf64_Ehdr *)(*elf);
 
-    if (!IS_ELF(ehdr))
-    {
-        return (Elf64_Ehdr){};
-    }
+	if (!IS_ELF(ehdr))
+	{
+		return (Elf64_Ehdr){};
+	}
 
-    bool valid_status;
-    valid_status = ehdr.e_ident[EI_CLASS] == ELFCLASS64 &&
-                   ehdr.e_ident[EI_OSABI] == ELFOSABI_SYSV &&
-                   ehdr.e_type == ET_EXEC;
+	bool valid_status;
+	valid_status = ehdr.e_ident[EI_CLASS] == ELFCLASS64 &&
+				   ehdr.e_ident[EI_OSABI] == ELFOSABI_SYSV &&
+				   ehdr.e_type == ET_EXEC;
 
-    return valid_status ? ehdr : (Elf64_Ehdr){};
+	return valid_status ? ehdr : (Elf64_Ehdr){};
 }
 
 static Task elf_parse_phdr(const uint8_t **elf, Elf64_Ehdr *ehdr, struct elf_loader_args args)
 {
-    Elf64_Half phdr_entries = ehdr->e_phnum;
-    Elf64_Phdr *phdr = (Elf64_Phdr *)(*elf + ehdr->e_phoff);
-    Task task = create_task_struct(args.descriptor, ehdr->e_entry);
+	Elf64_Half phdr_entries = ehdr->e_phnum;
+	Elf64_Phdr *phdr = (Elf64_Phdr *)(*elf + ehdr->e_phoff);
+	Task task = create_task_struct(args.descriptor, ehdr->e_entry);
 
-    size_t elf_mapping_offset = phdr->p_vaddr;
-    bool found_ptload = false;
-    copy_kernel_mappings(task);
+	size_t elf_mapping_offset = phdr->p_vaddr;
+	bool found_ptload = false;
+	copy_kernel_mappings(task);
 
-    for (Elf64_Half i = 0; i < phdr_entries; i++)
-    {
-        if (phdr->p_type == PT_LOAD)
-        {
-            found_ptload = true;
-            size_t num_pages = ALIGN_UP(phdr->p_memsz) / 4096;
+	for (Elf64_Half i = 0; i < phdr_entries; i++)
+	{
+		if (phdr->p_type == PT_LOAD)
+		{
+			found_ptload = true;
+			size_t num_pages = ALIGN_UP(phdr->p_memsz) / 4096;
 
-            // printk("elf", "Virtual mapping: 0x%lX (%d bytes | %d pages)\n", phdr->p_vaddr, phdr->p_memsz, num_pages);
+			// printk("elf", "Virtual mapping: 0x%lX (%d bytes | %d pages)\n", phdr->p_vaddr, phdr->p_memsz, num_pages);
 
-            for (uint64_t i = 0; i < num_pages; i++)
-            {
-                elf_mapping_offset += (i * PAGE_SIZE);
-                v_map(task.pagemap, elf_mapping_offset, elf_mapping_offset, MAP_USER_RW);
-            }
+			for (uint64_t i = 0; i < num_pages; i++)
+			{
+				elf_mapping_offset += (i * PAGE_SIZE);
+				v_map(task.pagemap, elf_mapping_offset, elf_mapping_offset, MAP_USER_RW);
+			}
 
-            memcpy((uint8_t *)phdr->p_vaddr, (const uint8_t *)*elf + phdr->p_offset, phdr->p_filesz);
-            memset((void *)phdr->p_vaddr + phdr->p_filesz, 0, phdr->p_filesz - phdr->p_memsz);
-        }
+			memcpy((uint8_t *)phdr->p_vaddr, (const uint8_t *)*elf + phdr->p_offset, phdr->p_filesz);
+			memset((void *)phdr->p_vaddr + phdr->p_filesz, 0, phdr->p_filesz - phdr->p_memsz);
+		}
 
-        phdr += ehdr->e_phentsize;
-    }
+		phdr += ehdr->e_phentsize;
+	}
 
-    if (!found_ptload)
-    {
-        panic_if(args.do_panic, "Could not find a PT_LOAD segment!");
-        return (Task){};
-    }
+	if (!found_ptload)
+	{
+		panic_if(args.do_panic, "Could not find a PT_LOAD segment!");
+		return (Task){};
+	}
 
-    // Stack memory (8KiB)
-    task.ustack = elf_mapping_offset + PAGE_SIZE;
-    for (size_t i = 1; i <= 2; i++)
-    {
-        auto addr = elf_mapping_offset = i * PAGE_SIZE + task.ustack;
-        v_map_fast(task.pagemap, addr, addr, MAP_USER_RW);
-    }
-    // Todo: Shadow stack page
+	// Stack memory (8KiB)
+	task.ustack = elf_mapping_offset + PAGE_SIZE;
+	for (size_t i = 1; i <= 2; i++)
+	{
+		auto addr = elf_mapping_offset = i * PAGE_SIZE + task.ustack;
+		v_map_fast(task.pagemap, addr, addr, MAP_USER_RW);
+	}
+	// Todo: Shadow stack page
 
-    return task;
+	return task;
 }

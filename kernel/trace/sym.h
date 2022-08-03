@@ -1,9 +1,9 @@
 #ifndef SYMBOLS_H
 #define SYMBOLS_H
 
-#include <ktypes.h>
+#include <base/base-types.h>
 
-$struct(SymbolTable, {
+struct$(SymbolTable, {
 	uint64_t addr;
 	string_view name;
 });
