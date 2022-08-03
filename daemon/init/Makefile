@@ -1,20 +1,19 @@
 CC = @gcc
 TARGET := init.elf
 CFILES	 := $(shell find ./ -type f -name '*.c')
-CFILE_DEPS := $(shell find ../../abi -type f -name '*.c') # Grab abi/ files
-OBJ    := $(CFILE_DEPS:.c=.o) $(CFILES:.c=.o)
-
+USER_LIBS := $(shell find ../../userspace -type f -name '*.a')
+OBJ    := $(CFILES:.c=.o)
 .PHONY: all clean
 
 CFLAGS = -ffreestanding -O2 -std=gnu11 \
-	-mno-sse -mno-sse2 -Wall -I../../ \
+	-mno-sse -mno-sse2 -Wall -I../../userspace \
 
 all: $(TARGET)
-	@printf "Built init daemon\n";
+	@printf "Built init daemon\n\n";
 
 $(TARGET): $(OBJ)
-	@ld.lld -T../daemon.ld $^ -static -nostdlib -o $@
-	@mv $@ ../../../boot/modules
+	@ld.lld -T../daemon.ld $^ $(USER_LIBS) -static -nostdlib -o $@
+	@mv $@ ../../boot/modules
 	
 %.o: %.c
 	@printf " CC  $<\n";

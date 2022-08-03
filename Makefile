@@ -48,14 +48,15 @@ symlist:
 	@echo 'SymbolTable symbol_table[] = {{0xFFFFFFFFFFFFFFFF, ""}};' >> scripts/parsed.sym
 	$(CC) -x c $(CHARDFLAGS) -I kernel/trace -I libs/ -m64 -c scripts/parsed.sym -o kernel/trace/symtable.o
 
-klibs:
+libs:
 	@$(MAKE) --no-print-directory -C libs all
 
 clean:
 	@rm -f $(KERNEL_HDD)
 	@$(MAKE) --no-print-directory -C kernel clean
 	@$(MAKE) --no-print-directory -C libs   clean
-	@$(MAKE) --no-print-directory -C userspace/daemon/init   clean
+	@$(MAKE) --no-print-directory -C daemon/init   clean
+	@$(MAKE) --no-print-directory -C userspace clean
 
 debugger_session: $(KERNEL_HDD)
 	$(DEBUG_TERMINAL) $(DEBUG_TERMINAL_OPTS) ./debug-util/debug.sh &
@@ -78,7 +79,6 @@ quick_recompile: symlist
 	@rm -f $(KERNEL_HDD) kernel/kernel.elf
 	@printf "\n"
 	@$(MAKE) --no-print-directory -C libs
-	@printf "\n"
-	@$(MAKE) --no-print-directory -C userspace/daemon/init
-	@printf "\n"
+	@$(MAKE) --no-print-directory -C userspace/
+	@$(MAKE) --no-print-directory -C daemon/init
 	@$(MAKE) --no-print-directory -C kernel

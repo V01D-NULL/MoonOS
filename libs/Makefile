@@ -1,7 +1,7 @@
 .PHONY: all clean
 
 all: base.a moon-ds.a moon-io.a
-	@printf "(LIBS) Built all kernel archive libraries\n";
+	@printf "(LIBS) Built all kernel archive libraries\n\n";
 
 base.a:
 	@$(MAKE) --no-print-directory -C base all
