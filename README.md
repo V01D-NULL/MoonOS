@@ -41,7 +41,7 @@ Kernel panic:
 - A libc for the userland
 
 # Near future todo list
-- Make more use of the APIC (currently it's used for the timer only)
+- Make better use of the APIC (currently it's used for the timer only)
 - virtual memory subsystem
 - New physical memory manager? (Unsure.)
 
