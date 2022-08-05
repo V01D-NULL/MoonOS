@@ -2,19 +2,19 @@
 
 <h2 align="center"> Moon OS is a modular micro-kernel targeting the x86_64 architecture, aiming to be POSIX-like in the future. </h2>
 <p align="center">
-<img align="center" src="Logo 500x500.jpeg">
+<img align="center" src="meta/Logo 500x500.jpeg">
 </p>
 
 
 # Screenshots:
 Bootsplash:
-<img src="screenshot/bootsplash.png">
+<img src="meta/screenshot/bootsplash.png">
 <br>
 Verbose boot:
-<img src="screenshot/verbose_boot.png">
+<img src="meta/screenshot/verbose_boot.png">
 <br>
 Kernel panic:
-<img src="screenshot/kpanic.png">
+<img src="meta/screenshot/kpanic.png">
 <br>
 
 # Features
