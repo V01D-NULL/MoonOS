@@ -2,6 +2,7 @@
 
 IMPORTANT: Remember to update the README and resume if this works out.
 
+- `init_percpu()` can't take `bootvars->rbp` as a parameter -> Hide `init_percpu` from folders outside of arch/.
 - Move the syscall implementation to `arch/some_architecture`, then create a bunch of system calls like map and unmap.
 - Create `arch_sleep()` in `arch/some_architecture` and call it arch/something/time/sleep.c (It will replace kernel/time/*)
 - Make kernel/time/ an archive library in libs/

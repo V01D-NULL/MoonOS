@@ -10,6 +10,7 @@
 #include <arch/x86/int/idt.h>
 #include <arch/x86/int/gdt.h>
 #include <kernel.h>
+#include <mm/dynamic/kmalloc.h>
 #include <mm/pmm.h>
 #include <mm/vmm.h>
 #include <mm/mm.h>
@@ -140,6 +141,8 @@ void kinit(struct stivale2_struct *bootloader_info)
             ;
     }
 
+	kmalloc_init();
+	init_percpu(ctx.rbp);
     kern_main(&ctx, modules);
 }
 

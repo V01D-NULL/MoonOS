@@ -21,7 +21,7 @@ OBJ_C    := $(CFILES:.c=.o)
 OBJ_ASM  := $(ASMFILES:.s=.o)
 OBJ		 := $(OBJ_C) $(OBJ_ASM)
 
-CFLAGS += -I arch/$(ARCH)/
+CFLAGS += -I arch/$(ARCH)/ -I $(PLATFORM_DIR)
 
 .PHONY: all clean
 

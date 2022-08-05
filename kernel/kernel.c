@@ -4,10 +4,11 @@
 #include <boot/boot.h>
 
 #include <cpu.h>
+#include <sys/syscall.h>
 #include <mm/dynamic/kmalloc.h>
 
 #include <time/sleep.h>
-#include <platform/acpi/x86/acpi.h>
+#include <platform.h>
 
 #include <proc/sched/scheduler.h>
 #include <proc/daemon/load.h>
@@ -47,12 +48,12 @@ Result test_result_ok()
 #include <devices/term/tty.h>
 void kern_main(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
 {
-	kmalloc_init();
-	acpi_init();
+	// Configures either acpi or special hardware and hides
+	// implementation details behind a platform_*() interface.
+	platform_init();
 	sleep_init();
 
-	init_percpu(bootvars->rbp);
-	init_syscalls();
+	arch_init_syscall();
 
 	trace("Detected %d modules\n", mods->module_count);
 	trace("Module string: %s\n", mods->modules[0].string);
@@ -61,7 +62,7 @@ void kern_main(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
 	auto b = test_result_ok();
 	trace("A: success: %ld\n", a.success);
 	trace("B: success: %ld\n", b.success);
-	
+
 	// trace("result: %ld\n", UNWRAP_RESULT(a));
 	UNWRAP_RESULT(b);
 
