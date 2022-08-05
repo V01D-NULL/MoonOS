@@ -6,7 +6,6 @@
 #include <base/bytes.h>
 #include <printk.h>
 #include <panic.h>
-#include <proc/uspace/syscalls.h>
 #include <hardware/legacy/pic/pic.h>
 #include <platform/acpi/x86/apic/apic.h>
 

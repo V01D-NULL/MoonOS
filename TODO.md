@@ -2,7 +2,7 @@
 
 IMPORTANT: Remember to update the README and resume if this works out.
 
-- Move the syscall implementation to `arch/some_architecture` (done), then create a bunch of system calls like map and unmap. (todo).
+- Replace proc/uspace/uspace.s with `arch_enter_userspace()`
 - Create `arch_sleep()` in `arch/some_architecture` and call it arch/something/time/sleep.c (It will replace kernel/time/*)
 - Make kernel/time/ an archive library in libs/
 - Make arch/x86/smp/spinlock/ an archive library in libs/

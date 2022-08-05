@@ -12,7 +12,6 @@
 
 #include <proc/sched/scheduler.h>
 #include <proc/daemon/load.h>
-#include <proc/uspace/syscalls.h>
 
 #include "panic.h"
 #include "printk.h"

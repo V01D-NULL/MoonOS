@@ -1,5 +1,4 @@
 #include "userspace.h"
-#include "syscalls.h"
 #include <panic.h>
 #include <cpu.h>
 #include <base/base-types.h>

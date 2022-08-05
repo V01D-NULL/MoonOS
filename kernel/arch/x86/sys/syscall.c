@@ -3,6 +3,7 @@
 #include <moon-extra/compiler.h>
 #include <panic.h>
 #include <printk.h>
+#include <abi/syscalls.h>
 
 extern void x86_syscall_handler(void);
 
@@ -13,33 +14,6 @@ void arch_init_syscall(void)
 	wrmsr(STAR, (KRNL_CS64 << 32) | (KRNL_DS64 | 3) << 48);
 	wrmsr(LSTAR, (uint64_t)&x86_syscall_handler);
 }
-
-#define Type uint64_t
-#define ignore Type UNIQUE_NAME(ignore)
-
-typedef int (*syscall_routine)(Type, Type, Type, Type, Type, Type);
-
-// Syscall stub
-int sys_stub(ignore, ignore, ignore, ignore, ignore, ignore) { return -1; }
-
-int sys_log(Type fd, Type buff, Type len, ignore, ignore, ignore)
-{
-	(void)fd;
-
-	string_view ptr = (string_view)buff;
-	if (!ptr)
-		return -1;
-	
-	for (auto i = 0; i < len; i++)
-		puts("%c", ptr[i]);
-
-	return 0;
-}
-
-syscall_routine syscall_list[] = {
-	sys_stub,
-	sys_log,
-};
 
 void syscall_handler(general_registers reg)
 {
