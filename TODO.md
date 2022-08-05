@@ -1,5 +1,9 @@
 ### Todo list
 
+IMPORTANT: Remember to update the README and resume if this works out.
+
+- `userspace/` needs it's own `arch/` folder.
+- `kernel/trace/` needs to call `arch_trace_stack()` (Update panic() accordingly (`arch_get_bp()`/`arch_get_sp()`))
 - Move the syscall implementation to `arch/some_architecture`, then create a bunch of system calls like map and unmap.
 - Stop `#including` devices/term/* from arch/x86. Make this more generic. Example: `void printk(...) { arch_term_write(...) }`
 - Create `arch_sleep()` in `arch/some_architecture` and call it arch/something/time/sleep.c (It will replace kernel/time/*)
@@ -12,3 +16,6 @@
 
 - Rename BootContext to BootHandover
 - Replace `struct stivale2_struct_tag_modules *mods` with something like `struct HandoverModules *`. If used with limine it just contains pointers to the beginning of each module and their sizes. If used with something that doesn't have a bootloader like the 3ds, read the modules from the SD car before passing control to `kern_main`. panic() if that goes wrong.
+
+### Misc
+- Move .gitignore, .gitmodules, Logo.jpeg, bochsrc and font.bin into misc/. Update make and markdown files accordingly
