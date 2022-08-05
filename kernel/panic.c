@@ -1,7 +1,6 @@
 #include <devices/term/early/early_term.h>
 #include <moon-io/serial.h>
 #include <base/fmt.h>
-#include <trace/strace.h>
 #include <moon.h>
 #include <trace/sym.h>
 #include <stdarg.h>
@@ -10,7 +9,7 @@
 #include "printk.h"
 #include "panic.h"
 
-NORETURN void _panic(uint64_t rbp, uint64_t rsp, string_view fmt, ...)
+NORETURN void __panic(uint64_t bp, uint64_t sp, string_view fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
@@ -27,13 +26,13 @@ NORETURN void _panic(uint64_t rbp, uint64_t rsp, string_view fmt, ...)
 	fmt_puts("*** Reason: %s ***\n", panic_buff);
 	debug(false, "A kernel panic has occurred\n*** Reason: %s ***\n", panic_buff);
 	
-	struct stacktrace_result res = backtrace_stack(10);
+	struct stacktrace_result res = arch_trace_stack(10);
 	for (int i = 0; i < res.count; i++)
 	{
 		backtrace_symbol(res.trace_results[i].address);
 	}
 
-	size_t frame_size = rbp-rsp;
+	size_t frame_size = bp-sp;
 	printk("stackdump", "Dumping %s's stackframe\nStackframe size: 0x%x\n", sym_lookup(res.trace_results[1].address).name, frame_size);
 	fmt_puts("<addr>\t\t  <stack>\t   <stack+8>\n");
 
@@ -45,10 +44,10 @@ NORETURN void _panic(uint64_t rbp, uint64_t rsp, string_view fmt, ...)
 	for (uint64_t i = 0; i < frame_size; i++)
 	{
 		fmt_puts("%lx: %p %p\n",
-			rbp, *(long*)(rbp),
-			*(long*)(rbp + sizeof(long))
+			bp, *(long*)(bp),
+			*(long*)(bp + sizeof(long))
 		);
-		rbp += sizeof(long) * 2;
+		bp += sizeof(long) * 2;
 	}
 
 	for (;;)

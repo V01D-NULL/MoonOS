@@ -1,5 +1,5 @@
-#ifndef STRACE_H
-#define STRACE_H
+#ifndef ARCH_STACKTRACE_H
+#define ARCH_STACKTRACE_H
 
 #include <base/base-types.h>
 
@@ -16,7 +16,7 @@ struct stacktrace_result {
     struct stacktrace trace_results[UNWIND_MAX];
 };
 
-struct stacktrace_result backtrace_stack(int frames);
+struct stacktrace_result arch_trace_stack(int frames);
 void strace_save_rsp(uint64_t rsp);
 
-#endif // STRACE_H
+#endif // ARCH_STACKTRACE_H

@@ -1,14 +1,11 @@
-#include "strace.h"
-#include <base/base-types.h>
-#include <moon-io/serial.h>
-#include "sym.h"
+#include "stack_trace.h"
 
 struct stackframe_list {
 	struct stackframe_list *next;
 	size_t value;
 };
 
-struct stacktrace_result backtrace_stack(int frames)
+struct stacktrace_result arch_trace_stack(int frames)
 {
     if (frames > UNWIND_MAX)
     {

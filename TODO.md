@@ -2,9 +2,6 @@
 
 IMPORTANT: Remember to update the README and resume if this works out.
 
-- Create custom directory for linker scripts for each arch and platform.
-- `userspace/` needs it's own `arch/` folder.
-- `kernel/trace/` needs to call `arch_trace_stack()` (Update panic() accordingly (`arch_get_bp()`/`arch_get_sp()`))
 - Move the syscall implementation to `arch/some_architecture`, then create a bunch of system calls like map and unmap.
 - Stop `#including` devices/term/* from arch/x86. Make this more generic. Example: `void printk(...) { arch_term_write(...) }`
 - Create `arch_sleep()` in `arch/some_architecture` and call it arch/something/time/sleep.c (It will replace kernel/time/*)
