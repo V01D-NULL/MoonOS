@@ -40,8 +40,8 @@ void banner(bool serial_only)
         return;
     }
 
-    fmt_puts("Welcome to MoonOS\n");
-    fmt_puts("%s", fb_message);
+    puts("Welcome to MoonOS\n");
+    puts("%s", fb_message);
 }
 
 EXTERNAL(stack);

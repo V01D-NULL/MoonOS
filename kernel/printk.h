@@ -24,8 +24,7 @@
 
 void printk(string status, string fmt, ...);
 void printk_init(bool verbose_boot, BootContext term_info);
-void fmt_puts(string_view fmt, ...);
-void puts(string_view s);
+void puts(string_view fmt, ...);
 
 // Note: This should only be called when information
 // must be shown, a kernel panic for example

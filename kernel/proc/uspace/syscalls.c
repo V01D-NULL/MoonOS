@@ -34,7 +34,7 @@ int sys_log(Type fd, Type buff, Type len, ignore, ignore, ignore)
 		return -1;
 	
 	for (auto i = 0; i < len; i++)
-		fmt_puts("%c", ptr[i]);
+		puts("%c", ptr[i]);
 
 	return 0;
 }

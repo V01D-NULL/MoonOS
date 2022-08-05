@@ -44,6 +44,7 @@ Result test_result_ok()
 	return Okay(10);
 }
 
+#include <devices/term/tty.h>
 void kern_main(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
 {
 	kmalloc_init();
@@ -60,7 +61,7 @@ void kern_main(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
 	auto b = test_result_ok();
 	trace("A: success: %ld\n", a.success);
 	trace("B: success: %ld\n", b.success);
-
+	
 	// trace("result: %ld\n", UNWRAP_RESULT(a));
 	UNWRAP_RESULT(b);
 
