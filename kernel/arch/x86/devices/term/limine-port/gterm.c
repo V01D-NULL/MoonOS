@@ -73,7 +73,7 @@ static uint16_t  gterm_width;
 static uint16_t  gterm_height;
 static uint16_t  gterm_bpp;
 
-extern symbol _binary____font_bin_start;
+extern symbol _binary____meta_font_bin_end;
 
 static uint8_t *vga_font_bits = NULL;
 static size_t vga_font_bool_size = 0;
@@ -507,7 +507,7 @@ bool gterm_prepare(size_t *_rows, size_t *_cols, struct stivale2_struct_tag_fram
     vga_font_width = DEFAULT_FONT_WIDTH, vga_font_height = DEFAULT_FONT_HEIGHT;
     
     vga_font_bits = bump(VGA_FONT_MAX, mmap);
-    memcpy64((uint64_t*)vga_font_bits, (uint64_t*)_binary____font_bin_start, VGA_FONT_MAX);
+    memcpy64((uint64_t*)vga_font_bits, (uint64_t*)_binary____meta_font_bin_end, VGA_FONT_MAX);
 
     size_t font_spacing = 1;
     vga_font_width += font_spacing;

@@ -30,7 +30,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJ)
 	@printf " LD  Linking object files\n";
-	@ld -r -b binary -o font.o ../font.bin
+	@ld -r -b binary -o font.o ../meta/font.bin
 	$(LD) $(LDINTERNALFLAGS) $(OBJ) $(KLIBS) ./trace/symtable.o font.o -o $@
 	python3 ../scripts/gensym.py $@
 	$(LD) $(LDINTERNALFLAGS) $(OBJ) $(KLIBS) ./trace/symtable.o font.o -o $@

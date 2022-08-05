@@ -1,6 +1,6 @@
 ARCH = 
-LIMINE_DIR = meta/limine
-ECHFS_DIR =  meta/echfs
+LIMINE_DIR = ./meta/limine
+ECHFS_DIR =  ./meta/echfs
 
 CC = @gcc
 AR = @ar
