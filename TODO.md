@@ -2,6 +2,7 @@
 
 IMPORTANT: Remember to update the README and resume if this works out.
 
+- Create custom directory for linker scripts for each arch and platform.
 - `userspace/` needs it's own `arch/` folder.
 - `kernel/trace/` needs to call `arch_trace_stack()` (Update panic() accordingly (`arch_get_bp()`/`arch_get_sp()`))
 - Move the syscall implementation to `arch/some_architecture`, then create a bunch of system calls like map and unmap.
@@ -19,3 +20,5 @@ IMPORTANT: Remember to update the README and resume if this works out.
 
 ### Misc
 - Move .gitignore, .gitmodules, Logo.jpeg, bochsrc and font.bin into misc/. Update make and markdown files accordingly
+
+When it comes to merging, I guess just search for `git forcibly merge` online and do that.
