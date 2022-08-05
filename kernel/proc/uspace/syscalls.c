@@ -1,11 +1,11 @@
 #include "syscalls.h"
 #include <moon-extra/compiler.h>
-#include <amd64/msr.h>
-#include <amd64/descriptors/gdt.h>
+#include <cpu.h>
+#include <arch/x86/int/gdt.h> // CHANGE ME
 #include <printk.h>
 #include <base/base-types.h>
 #include <panic.h>
-#include <amd64/interrupts.h>
+#include <interrupts.h>
 
 #define Type uint64_t
 #define ignore Type UNIQUE_NAME(ignore)

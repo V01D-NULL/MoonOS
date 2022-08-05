@@ -3,7 +3,7 @@
 #include <moon-io/serial.h>
 #include <base/string.h>
 #include <base/fmt.h>
-#include <amd64/cpu.h>
+#include <cpu.h>
 #include <mm/mm.h>
 #include "printk.h"
 

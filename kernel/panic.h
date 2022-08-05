@@ -1,7 +1,7 @@
 #ifndef PANIC_H
 #define PANIC_H
 
-#include <amd64/moon.h>
+#include <moon.h>
 #include <trace/strace.h>
 
 // panic if eval evaluates to true

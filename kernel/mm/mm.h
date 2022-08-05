@@ -1,8 +1,8 @@
 #ifndef MEMDEFS_H
 #define MEMDEFS_H
 
-#include "addr.h"
 #include "page.h"
+#include <mm/addr.h>
 #include <base/base-types.h>
 #include <moon-ds/linked_list.h>
 

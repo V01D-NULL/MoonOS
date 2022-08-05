@@ -3,7 +3,7 @@
 
 #include <panic.h>
 #include <base/base-types.h>
-#include <amd64/moon.h>
+#include <moon.h>
 
 packed_struct$(Result, {
 	bool success;

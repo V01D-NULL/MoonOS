@@ -2,7 +2,7 @@
 #define BITMAP_PMM_H
 
 #include <base/base-types.h>
-#include <amd64/moon.h>
+#include <moon.h>
 #include <stivale2.h>
 #include <moon-extra/range.h>
 

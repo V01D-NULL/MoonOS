@@ -4,9 +4,9 @@
 #include <base/base-types.h>
 #include <moon-extra/compiler.h>
 #include <mm/vmm.h>
-#include <amd64/cpu.h>
+#include <cpu.h>
 #include <proc/elf/elf64.h>
-#include <amd64/interrupts.h>
+#include <interrupts.h>
 
 enum task_type
 {

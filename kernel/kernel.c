@@ -3,11 +3,11 @@
 #include <stivale2.h>
 #include <boot/boot.h>
 
-#include <amd64/cpu.h>
+#include <cpu.h>
 #include <mm/dynamic/kmalloc.h>
 
-#include <platform/time/sleep.h>
-#include <platform/acpi/acpi.h>
+#include <time/sleep.h>
+#include <platform/acpi/x86/acpi.h>
 
 #include <proc/sched/scheduler.h>
 #include <proc/daemon/load.h>

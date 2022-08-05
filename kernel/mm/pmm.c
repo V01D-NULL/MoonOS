@@ -1,6 +1,6 @@
 #include <devices/term/early/early_term.h>
 #include <moon-io/serial.h>
-#include <amd64/smp/spinlock.h>
+#include <arch/x86/hardware/smp/spinlock.h>
 #include <base/assert.h>
 #include <moon-ds/bitmap.h>
 #include <printk.h>

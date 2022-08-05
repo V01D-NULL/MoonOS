@@ -1,7 +1,7 @@
 #ifndef VMM_H
 #define VMM_H
 
-#include <amd64/paging/paging.h>
+#include <paging/paging.h>
 #include <proc/sched/task.h>
 #include <mm/cpu/CR.h>
 #include <base/base-types.h>

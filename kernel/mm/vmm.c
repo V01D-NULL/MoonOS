@@ -2,7 +2,7 @@
 #include <mm/pmm.h>
 #include <mm/mm.h>
 #include <base/assert.h>
-#include <amd64/moon.h>
+#include <moon.h>
 #include <base/base-types.h>
 #include <printk.h>
 #include <moon-io/serial.h>

@@ -2,7 +2,7 @@
 #include <moon-io/serial.h>
 #include <base/fmt.h>
 #include <trace/strace.h>
-#include <amd64/moon.h>
+#include <moon.h>
 #include <trace/sym.h>
 #include <stdarg.h>
 #include <mm/vmm.h>

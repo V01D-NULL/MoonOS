@@ -2,7 +2,7 @@
 #define LINKED_LIST_H
 
 #include <stdint.h>
-#include <amd64/moon.h>
+#include <moon.h>
 
 #pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
 #pragma GCC diagnostic push
