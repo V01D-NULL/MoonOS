@@ -45,7 +45,6 @@ Result test_result_ok()
 	return Okay(10);
 }
 
-#include <devices/term/tty.h>
 void kern_main(BootContext *bootvars, struct stivale2_struct_tag_modules *mods)
 {
 	// Configures either acpi or special hardware and hides
