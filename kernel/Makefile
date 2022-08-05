@@ -22,6 +22,7 @@ OBJ_ASM  := $(ASMFILES:.s=.o)
 OBJ		 := $(OBJ_C) $(OBJ_ASM)
 
 CFLAGS += -I arch/$(ARCH)/ -I $(PLATFORM_DIR)
+ASMFLAGS += -I arch/$(ARCH)/
 
 .PHONY: all clean
 
