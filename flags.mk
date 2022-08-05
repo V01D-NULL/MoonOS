@@ -1,6 +1,6 @@
-ARCH = 
 LIMINE_DIR = ./meta/limine
 ECHFS_DIR =  ./meta/echfs
+BUILD_DIR = ../meta/build
 
 CC = @gcc
 AR = @ar
@@ -54,7 +54,7 @@ CFLAGS := 				 \
 
 ASMFLAGS = -felf64 -g -F dwarf
 LDINTERNALFLAGS :=  \
-	-Tlinker.ld     \
+	-T $(BUILD_DIR)/link_$(ARCH)_$(BOARD).ld \
 	-static         \
 	-pie			\
 	--no-dynamic-linker \
