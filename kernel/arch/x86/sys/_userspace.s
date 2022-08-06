@@ -3,12 +3,8 @@ section .text
 
 %include "asm/defs.inc"
 
-global systemcall_int
-systemcall_int:
-	o64 sysret
-
-global enter_ring3_sysret
-enter_ring3_sysret:
+global arch_enter_userspace
+arch_enter_userspace:
 	; Swap out the kernel gs
 	swapgs
 

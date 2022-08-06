@@ -37,7 +37,7 @@ void sched_init(void)
 	ticks_for_quantum = lapic_calibrate_timer(2000); // Timer triggers IRQ0 after 20 usec
 	switch_pagemap(tasks[current_task_idx]);
 	sched_timer_oneshot();
-	enter_ring3((void *)tasks[current_task_idx].entrypoint, tasks[current_task_idx].ustack);
+	arch_enter_userspace((void *)tasks[current_task_idx].entrypoint, tasks[current_task_idx].ustack);
 }
 
 void sched_register_task(Task task)

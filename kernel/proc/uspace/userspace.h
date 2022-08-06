@@ -3,6 +3,6 @@
 
 #include <moon.h>
 
-NORETURN void enter_ring3(void *addr, size_t stack);
+extern NORETURN void arch_enter_userspace(void *addr, size_t stack);
 
 #endif // USERSPACE_H
