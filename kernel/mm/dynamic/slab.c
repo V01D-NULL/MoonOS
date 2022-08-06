@@ -4,7 +4,7 @@
 #include <base/string.h>
 #include <base/base-types.h>
 #include <base/align.h>
-#include <mm/pmm.h>
+#include <mm/phys.h>
 #include <panic.h>
 #include "slab.h"
 
@@ -54,7 +54,7 @@ struct kmem_cache *kmem_cache_new(string_view name, size_t size, int alignment)
         panic("Large slabs are not supported yet");
 
     /* Note: This entire code works only for small slabs */
-    struct kmem_cache *cache = (struct kmem_cache *)pmm_alloc();
+    struct kmem_cache *cache = (struct kmem_cache *)arch_alloc_page();
     if (!cache)
         return NULL;
 
@@ -78,7 +78,7 @@ static struct kmem_slab *__kmem_create_slab(struct kmem_cache *cachep, bool smal
     }
 
     /* Prepare bufctl */
-    struct kmem_bufctl *buf = (struct kmem_bufctl *)pmm_alloc();
+    struct kmem_bufctl *buf = (struct kmem_bufctl *)arch_alloc_page();
     if (!buf)
         return NULL;
 

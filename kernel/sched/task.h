@@ -3,11 +3,10 @@
 
 #include <base/base-types.h>
 #include <moon-extra/compiler.h>
-#include <mm/vmm.h>
 #include <cpu.h>
 #include <loader/elf/elf64.h>
-#include <interrupts.h>
-
+#include <interrupts.h>  // TEMPORARY (used for the struct iframe)
+#include <paging/paging.h>
 enum task_type
 {
 	/* Special microkernel service/daemon/server */

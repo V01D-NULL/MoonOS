@@ -11,7 +11,7 @@
 #include <kernel.h>
 #include <mm/dynamic/kmalloc.h>
 #include <mm/phys.h>
-#include <mm/vmm.h>
+#include <mm/virt.h>
 #include <printk.h>
 #include "stivale2.h"
 
@@ -89,7 +89,10 @@ void boot(struct stivale2_struct *bootloader_info)
 		}
 
 		boot_term_write("boot: Reached target vmm\n");
-		v_init();
+		{
+			extern void arch_init_paging(void);
+			arch_init_paging();
+		}		
 
 		boot_term_write("boot: Reached target gdt and tss\n");
 		init_gdt((uint64_t)stack + sizeof((uint64_t)stack)); // Note: boot_term_write is unusable now

@@ -50,7 +50,7 @@ enum
     PG_SUPER = (1 << 2)    // Supervisor
 };
 
-enum vmm_mapping_protection
+enum
 {
     MAP_READONLY = PG_PRESENT,                   // Present/readonly, kernel only
     MAP_KERN = PG_PRESENT | PG_RW,               // Read-write kernel only

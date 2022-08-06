@@ -8,6 +8,7 @@
 #include <printk.h>
 #include <moon-io/serial.h>
 #include <base/base-types.h>
+#include <mm/virt.h>
 
 // Keep it simple and make it work for now
 static Task tasks[10];
@@ -34,7 +35,7 @@ void sched_init(void)
 		install_isr(IRQ0, (isr_t)&sched_irq);
 
 	ticks_for_quantum = lapic_calibrate_timer(2000); // Timer triggers IRQ0 after 20 usec
-	switch_pagemap(tasks[current_task_idx]);
+	arch_switch_pagemap(tasks[current_task_idx]);
 	sched_timer_oneshot();
 	arch_enter_userspace((void *)tasks[current_task_idx].entrypoint, tasks[current_task_idx].ustack);
 }
@@ -67,7 +68,7 @@ void sched_reschedule(struct task_registers regs)
 
 	// Load new task
 	auto new = tasks[current_task_idx];
-	switch_pagemap(new);
+	arch_switch_pagemap(new);
 
 reschedule:
 	sched_timer_oneshot();

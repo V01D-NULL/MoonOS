@@ -2,6 +2,7 @@
 
 #include <moon-sys/handover.h>
 
+#include <boot/stivale2.h> // TEMPORARY (until stivale2_struct_tag_modules is replaced by HandoverModules)
 #include <cpu.h>
 #include <sys/syscall.h>
 #include <mm/dynamic/kmalloc.h>

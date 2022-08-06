@@ -8,4 +8,7 @@ struct$(Range, {
 	size_t limit;
 });
 
+#define RANGE(x, y) \
+	(Range) { .base = x, .limit = y }
+
 #endif // RANGE_H

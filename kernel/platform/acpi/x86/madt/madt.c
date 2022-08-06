@@ -6,7 +6,7 @@
 #include <platform/acpi/x86/apic/apic.h>
 #include <arch/x86/hardware/legacy/pic/pic.h>
 #include <printk.h>
-#include <mm/pmm.h>
+#include <mm/phys.h>
 #include <base/string.h>
 
 /* Entry types */
@@ -28,7 +28,7 @@ static void enumarate_apic_devices(madt_t **madt);
 struct apic_device_info madt_init(void *madt_base)
 {
     madt_t *madt = (madt_t*)((uintptr_t) madt_base - $high_vma);
-    apic_dev.ioapics = (struct ioapic_dev**)pmm_alloc(); // TODO: Make this a heap allocation!
+    apic_dev.ioapics = (struct ioapic_dev**)arch_alloc_page(); // TODO: Make this a heap allocation!
 
     // Strings aren't null terminated apparently, so we do it ourselves
     uint8_t oem_str[7];

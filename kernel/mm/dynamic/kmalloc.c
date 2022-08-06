@@ -1,7 +1,7 @@
 #define PR_MODULE "kmalloc"
 
 #include "kmalloc.h"
-#include <mm/pmm.h>
+#include <mm/phys.h>
 #include <moon-io/serial.h>
 #include <base/mem.h>
 #include <moon-ds/linked_list.h>
@@ -155,11 +155,11 @@ void kmem_cache_destroy(struct kmem_cache *cachep)
             panic("Tried to destroy slab '%s' but it's refcount wasn't 0! (refcount: %d)", cachep->descriptor, slab->refcount);
 
         list_foreach(bufctl, next, slab->freelist)
-            pmm_free((void *)bufctl);
+            arch_free_page((void *)bufctl);
     }
 
     memset(cachep, 0, sizeof(struct kmem_cache));
-    pmm_free(cachep);
+    arch_free_page(cachep);
 }
 
 // Dump up to 'n' slabs

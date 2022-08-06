@@ -69,4 +69,16 @@ inline int64_t cr2_read(void)
     return cr;
 }
 
+inline int64_t cr3_read(void)
+{
+    int64_t cr;
+    asm volatile(
+        "mov %%cr3, %0\n\t"
+        : "=r"(cr)
+        :
+        : "%rax"
+    );
+    return cr;
+}
+
 #endif // CPU_H

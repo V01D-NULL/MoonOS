@@ -566,7 +566,7 @@ bool gterm_prepare(size_t *_rows, size_t *_cols, struct stivale2_struct_tag_fram
     map = bump(map_size, mmap);
     
     bg_canvas_size = gterm_width * gterm_height * sizeof(uint32_t);
-    bg_canvas = bump(bg_canvas_size, mmap); //pmm_alloc_range((bg_canvas_size/4096) + 1).base;
+    bg_canvas = bump(bg_canvas_size, mmap); //arch_alloc_page_range((bg_canvas_size/4096) + 1).base;
     
     return true;
 }
