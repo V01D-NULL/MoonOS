@@ -10,7 +10,7 @@
 
 void init_percpu(uint64_t current_stack)
 {
-	struct Percpu *pcpu = (struct Percpu *)kmalloc(sizeof(struct Percpu), KMEM_PANIC | KMEM_HIGH_VMA);
+	struct Percpu *pcpu = (struct Percpu *)kalloc(sizeof(struct Percpu), KMEM_PANIC | KMEM_HIGH_VMA);
 
 	// NOTE: Every logical core (which each calls init_percpu) shares it's stack with the syscall handler
 	pcpu->syscall_stack = current_stack;

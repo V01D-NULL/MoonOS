@@ -17,8 +17,8 @@ enum
 
 typedef int kmem_flags_t;
 
-void kmalloc_init(void);
-void *kmalloc(int sz, kmem_flags_t flags);
+void kalloc_init(void);
+void *kalloc(int sz, kmem_flags_t flags);
 void kfree(void *ptr, int sz);
 
 struct kmem_cache *kmem_cache_create(string_view name, size_t size, int alignment);

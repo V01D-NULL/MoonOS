@@ -4,7 +4,7 @@
 #include <moon.h>
 #include <trace/sym.h>
 #include <stdarg.h>
-#include <mm/vmm.h>
+#include <mm/vm_sys.h>
 #include "printk.h"
 #include "panic.h"
 

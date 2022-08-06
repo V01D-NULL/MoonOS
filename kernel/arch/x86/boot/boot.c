@@ -118,7 +118,7 @@ void boot(struct stivale2_struct *bootloader_info)
 	else
 		boot_fail("Fatal: Cannot obtain a memory map from the bootloader");
 
-	kmalloc_init();
+	kalloc_init();
 	init_percpu((uint64_t)stack);
 	kern_main(&ctx, modules);
 }
