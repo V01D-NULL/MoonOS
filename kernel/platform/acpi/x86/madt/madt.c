@@ -5,7 +5,6 @@
 #include <moon-io/serial.h>
 #include <platform/acpi/x86/apic/apic.h>
 #include <arch/x86/hardware/legacy/pic/pic.h>
-#include <mm/mm.h>
 #include <printk.h>
 #include <mm/pmm.h>
 #include <base/string.h>

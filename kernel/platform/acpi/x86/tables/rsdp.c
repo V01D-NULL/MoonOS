@@ -2,10 +2,8 @@
 
 #include "rsdp.h"
 #include <moon-io/serial.h>
-#include <boot/boot.h>
 #include <panic.h>
 #include <printk.h>
-#include <mm/mm.h>
 #include <base/base-types.h>
 #include <stdalign.h>
 
@@ -14,9 +12,8 @@ static struct RSDP rsdp;
 
 void rsdp_verify_checksum(uint64_t rsdp_address);
 
-void rsdp_init(void)
+void rsdp_init(phys_t rsdp_addr)
 {
-    auto rsdp_addr = BootContextGet().rsdp.rsdp_address;
     rsdp_verify_checksum(rsdp_addr);
     trace("RSDP Table: %llX\n", rsdp_addr + $high_vma);
     

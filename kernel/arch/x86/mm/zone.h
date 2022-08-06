@@ -1,7 +1,3 @@
-#ifndef MEMDEFS_H
-#define MEMDEFS_H
-
-#include "page.h"
 #include <mm/addr.h>
 #include <base/base-types.h>
 #include <moon-ds/linked_list.h>
@@ -19,5 +15,3 @@ struct zone
     int zone_nr;
     string_view name;
 };
-
-#endif // MEMDEFS_H

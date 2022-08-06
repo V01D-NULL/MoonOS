@@ -26,7 +26,7 @@ enum
 
 struct iframe
 {
-	general_registers gpr;
+	GeneralRegisters gpr;
 	int64_t isr_number;
 	int64_t error_code;
 	int64_t rip;

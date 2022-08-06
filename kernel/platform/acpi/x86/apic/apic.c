@@ -7,10 +7,9 @@
 #include <base/base-types.h>
 #include <interrupts.h>
 #include <platform/acpi/x86/acpi.h>
-#include <time/sleep.h>
+#include <moon-sys/time/sleep.h>
 #include <mm/addr.h>
 #include <panic.h>
-#include <mm/cpu/CR.h>
 #include <paging/paging.h>
 
 static uint64_t lapic_base = 0x0;
@@ -33,7 +32,7 @@ static void lapic_enable(void)
 void lapic_init(void)
 {
 	struct apic_device_info apic;
-	acpi_table_t madt;
+	AcpiTable madt;
 	if ((madt = acpi_find_table("APIC")) != NULL)
 		apic = madt_init(madt);
 	else

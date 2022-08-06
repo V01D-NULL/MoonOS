@@ -1,14 +1,13 @@
 #define PR_MODULE "sched"
 
 #include "scheduler.h"
-#include <arch/x86/hardware/smp/spinlock.h>
-#include <proc/uspace/userspace.h>
+#include <moon-sys/spinlock.h>
+#include <uspace/userspace.h>
 #include <interrupts.h>
 #include <platform/acpi/x86/apic/apic.h>
 #include <printk.h>
 #include <moon-io/serial.h>
 #include <base/base-types.h>
-#include <mm/mm.h>
 
 // Keep it simple and make it work for now
 static Task tasks[10];

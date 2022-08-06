@@ -1,8 +1,8 @@
 #define PR_MODULE "daemon"
 
-#include <proc/sched/scheduler.h>
-#include <proc/uspace/userspace.h>
-#include <proc/elf/elf.h>
+#include <sched/scheduler.h>
+#include <uspace/userspace.h>
+#include <loader/elf/elf.h>
 #include <printk.h>
 #include <panic.h>
 

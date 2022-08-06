@@ -7,6 +7,7 @@
 #include <moon-ds/linked_list.h>
 #include <base/base-types.h>
 #include <panic.h>
+#include <mm/addr.h>
 
 #define KMLIST_SIZE 7 // Smallest slab size is 8, largest (for a small slab) 512.
 static struct kmem_cache *kmlist[KMLIST_SIZE];

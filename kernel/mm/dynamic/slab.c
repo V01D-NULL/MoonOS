@@ -5,7 +5,6 @@
 #include <base/base-types.h>
 #include <base/align.h>
 #include <mm/pmm.h>
-#include <mm/mm.h>
 #include <panic.h>
 #include "slab.h"
 

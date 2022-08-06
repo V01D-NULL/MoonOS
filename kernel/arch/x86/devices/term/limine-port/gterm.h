@@ -19,7 +19,7 @@
 #define __LIB__GTERM_H__
 
 #include <base/base-types.h>
-#include <stivale2.h>
+#include <boot/stivale2.h>
 
 void gterm_init(void);
 bool gterm_prepare(size_t *_rows, size_t *_cols, struct stivale2_struct_tag_framebuffer *fb, struct stivale2_struct_tag_memmap *mmap);

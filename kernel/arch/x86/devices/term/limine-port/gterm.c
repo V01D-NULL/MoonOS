@@ -17,9 +17,8 @@
 */
 
 #include <base/string.h>
-#include <boot/boot.h>
 #include <base/base-types.h>
-#include <mm/mm.h>
+#include <mm/addr.h>
 #include "gterm.h"
 #include "term.h"
 #include <moon-io/serial.h>
@@ -507,7 +506,7 @@ bool gterm_prepare(size_t *_rows, size_t *_cols, struct stivale2_struct_tag_fram
     vga_font_width = DEFAULT_FONT_WIDTH, vga_font_height = DEFAULT_FONT_HEIGHT;
     
     vga_font_bits = bump(VGA_FONT_MAX, mmap);
-    memcpy64((uint64_t*)vga_font_bits, (uint64_t*)_binary____font_bin_start, VGA_FONT_MAX);
+	memcpy((uint8_t*)vga_font_bits, (uint8_t*)_binary____font_bin_start, VGA_FONT_MAX);
 
     size_t font_spacing = 1;
     vga_font_width += font_spacing;

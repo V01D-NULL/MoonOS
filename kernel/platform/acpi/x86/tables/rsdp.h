@@ -1,10 +1,10 @@
 #ifndef RSDP_H
 #define RSDP_H
 
+#include <mm/addr.h>
+#include <platform/acpi/x86/acpi.h>
 #include <base/base-types.h>
 #include <moon.h>
-#include <boot/boot.h>
-#include <platform/acpi/x86/acpi.h>
 
 struct RSDP
 {
@@ -22,7 +22,7 @@ struct RSDP
     uint8_t reserved[3];
 } PACKED;
 
-void rsdp_init(void);
+void rsdp_init(phys_t rsdp_addr);
 struct RSDP get_rsdp(void);
 bool use_xsdt(void);
 

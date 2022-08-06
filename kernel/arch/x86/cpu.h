@@ -2,10 +2,9 @@
 #define CPU_H
 
 #include "msr.h"
-#include <boot/boot.h>
 #include <base/base-types.h>
 
-struct cpuid_context
+struct CpuidContext
 {
 	int eax;
 	int ebx;
@@ -14,16 +13,16 @@ struct cpuid_context
 	int function;
 };
 
-// cpu-ish initialization (gs_base, stacks, lapics, etc)
+// cpu initialization (gs_base, stacks, lapics, etc)
 void init_percpu(uint64_t current_stack);
 
-void cpuid(struct cpuid_context *cpuid_context);
+void cpuid(struct CpuidContext *cpuid_context);
 int current_cpu(void);
 
 /**
  * A list of general purpose registers.
  */
-struct$(general_registers, {
+struct$(GeneralRegisters, {
 	int64_t r15;
 	int64_t r14;
 	int64_t r13;
@@ -41,11 +40,10 @@ struct$(general_registers, {
 	int64_t rax;
 });
 
-struct percpu
+struct Percpu
 {
 	uint64_t syscall_stack; // Temporary stack for the syscall handler.
 	uint64_t working_stack; // Kernel stack
-							// Task active_task;
 } PACKED;
 
 // https://github.com/davxy/beeos/blob/abc3335738c06aac9a23ce3a292c91da8b46a460/kernel/src/mm/zone.c
@@ -56,7 +54,19 @@ struct percpu
 // https://en.wikipedia.org/wiki/Computer_multitasking
 #define this_cpu                         \
 	{                                    \
-		(struct percpu *)rdmsr(GS_BASE); \
+		(struct Percpu *)rdmsr(GS_BASE); \
 	}
+
+inline int64_t cr2_read(void)
+{
+    int64_t cr;
+    asm volatile(
+        "mov %%cr2, %0\n\t"
+        : "=r"(cr)
+        :
+        : "%rax"
+    );
+    return cr;
+}
 
 #endif // CPU_H

@@ -5,7 +5,7 @@
 #include <moon-extra/compiler.h>
 #include <mm/vmm.h>
 #include <cpu.h>
-#include <proc/elf/elf64.h>
+#include <loader/elf/elf64.h>
 #include <interrupts.h>
 
 enum task_type

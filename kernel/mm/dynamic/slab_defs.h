@@ -2,7 +2,7 @@
 #define SLAB_DEFS_H
 
 #include <moon-ds/linked_list.h>
-#include <mm/mm.h>
+#include <mm/page.h>
 
 #define SMALL_SLAB(x) (x <= (PAGE_SIZE / 8))
 

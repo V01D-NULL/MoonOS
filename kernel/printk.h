@@ -2,7 +2,6 @@
 #define FMT_PRINTK_H
 
 #include <base/base-types.h>
-#include <boot/boot.h>
 #include <moon-io/serial.h>
 
 #ifndef PR_MODULE
@@ -23,7 +22,7 @@
 	} while (0)
 
 void printk(string status, string fmt, ...);
-void printk_init(bool verbose_boot, BootContext term_info);
+void printk_init(bool verbose_boot);
 void puts(string_view fmt, ...);
 
 // Note: This should only be called when information

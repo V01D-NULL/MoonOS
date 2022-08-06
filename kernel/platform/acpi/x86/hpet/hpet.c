@@ -4,7 +4,6 @@
 #include <platform/acpi/x86/acpi.h>
 #include <printk.h>
 #include <base/base-types.h>
-#include <mm/mm.h>
 #include <panic.h>
 
 #define HPET_ADDR_OFFSET 44 // 'address' offset in the hpet table. (Moon only uses the hpet to calibrate

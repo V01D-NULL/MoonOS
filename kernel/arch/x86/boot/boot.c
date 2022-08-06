@@ -6,147 +6,116 @@
 #include <base/bootargs.h>
 #include <arch/x86/hardware/legacy/pic/pic.h>
 #include <moon.h>
-#include <stivale2.h>
 #include <arch/x86/int/idt.h>
 #include <arch/x86/int/gdt.h>
 #include <kernel.h>
 #include <mm/dynamic/kmalloc.h>
-#include <mm/pmm.h>
+#include <mm/phys.h>
 #include <mm/vmm.h>
-#include <mm/mm.h>
 #include <printk.h>
-#include "boot.h"
+#include "stivale2.h"
 
 const char serial_message[] = {
-    "███╗   ███╗ ██████╗  ██████╗ ███╗   ██╗ ██████╗ ███████╗ \n"
-    "████╗ ████║██╔═══██╗██╔═══██╗████╗  ██║██╔═══██╗██╔════╝ \n"
-    "██╔████╔██║██║   ██║██║   ██║██╔██╗ ██║██║   ██║███████╗ \n"
-    "██║╚██╔╝██║██║   ██║██║   ██║██║╚██╗██║██║   ██║╚════██║ \n"
-    "██║ ╚═╝ ██║╚██████╔╝╚██████╔╝██║ ╚████║╚██████╔╝███████║ \n"
-    "╚═╝     ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝ \n"};
+	"███╗   ███╗ ██████╗  ██████╗ ███╗   ██╗ ██████╗ ███████╗ \n"
+	"████╗ ████║██╔═══██╗██╔═══██╗████╗  ██║██╔═══██╗██╔════╝ \n"
+	"██╔████╔██║██║   ██║██║   ██║██╔██╗ ██║██║   ██║███████╗ \n"
+	"██║╚██╔╝██║██║   ██║██║   ██║██║╚██╗██║██║   ██║╚════██║ \n"
+	"██║ ╚═╝ ██║╚██████╔╝╚██████╔╝██║ ╚████║╚██████╔╝███████║ \n"
+	"╚═╝     ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝ \n"};
 
 const char fb_message[] = {
-    "\n"
-    " _____             _____ _____  \n"
-    "|     |___ ___ ___|     |   __| \n"
-    "| | | | . | . |   |  |  |__   | \n"
-    "|_|_|_|___|___|_|_|_____|_____| \n"
-    "\n"};
+	"\n"
+	" _____             _____ _____  \n"
+	"|     |___ ___ ___|     |   __| \n"
+	"| | | | . | . |   |  |  |__   | \n"
+	"|_|_|_|___|___|_|_|_____|_____| \n"
+	"\n"};
 
 void banner(bool serial_only)
 {
-    if (serial_only)
-    {
-        debug(false, "%s", serial_message);
-        return;
-    }
+	if (serial_only)
+	{
+		debug(false, "%s", serial_message);
+		return;
+	}
 
-    puts("Welcome to MoonOS\n");
-    puts("%s", fb_message);
+	puts("Welcome to MoonOS\n");
+	puts("%s", fb_message);
+}
+
+void boot_fail(string_view reason)
+{
+	debug(false, "%s", reason);
+	boot_term_write("%s", reason);
+	for (;;)
+		asm volatile("cli;hlt");
 }
 
 EXTERNAL(stack);
-static BootContext ctx;
 
-void kinit(struct stivale2_struct *bootloader_info)
+void boot(struct stivale2_struct *bootloader_info)
 {
-    ctx.rbp = (uint64_t)stack;
-    struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
-    struct stivale2_struct_tag_terminal *term = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_TERMINAL_ID);
-    struct stivale2_struct_tag_memmap *mmap = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
-    struct stivale2_struct_tag_smp *smp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_SMP_ID);
-    struct stivale2_struct_tag_rsdp *rsdp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_RSDP_ID);
-    struct stivale2_struct_tag_cmdline *cmdline = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_CMDLINE_ID);
-    struct stivale2_struct_tag_modules *modules = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_MODULES_ID);
-    struct stivale2_struct_tag_firmware *fw = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FIRMWARE_ID);
-    ctx.is_uefi = !(fw->flags & STIVALE2_FIRMWARE_BIOS);
+	BootHandover ctx = {};
 
-    if (!term)
-    {
-        set_boot_term_available(false);
-    }
-    else
-    {
-        boot_term_init(term->term_write, term->cols, term->rows);
-    }
+	struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
+	struct stivale2_struct_tag_terminal *term = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_TERMINAL_ID);
+	struct stivale2_struct_tag_memmap *mmap = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
+	struct stivale2_struct_tag_rsdp *rsdp = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_RSDP_ID);
+	struct stivale2_struct_tag_cmdline *cmdline = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_CMDLINE_ID);
+	struct stivale2_struct_tag_modules *modules = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_MODULES_ID);
 
-    // Can't work under these conditions
-    if (!fb)
-    {
-        debug(false, BASH_RED "WARNING: " BASH_DEFAULT "MoonOS was NOT provided with a framebuffer. Refusing to boot.");
-        for (;;)
-            ;
-    }
-    ctx.fb.fb_addr = fb->framebuffer_addr;
-    ctx.fb.fb_width = fb->framebuffer_width;
-    ctx.fb.fb_height = fb->framebuffer_height;
-    ctx.fb.fb_bpp = fb->framebuffer_bpp;
-    ctx.fb.fb_pitch = fb->framebuffer_pitch;
+	if (!term)
+		set_boot_term_available(false);
+	else
+		boot_term_init(term->term_write, term->cols, term->rows);
 
-    if (smp != NULL)
-    {
-        ctx.cpu.processor_count = smp->cpu_count;
-        ctx.cpu.bootstrap_processor_lapic_id = smp->bsp_lapic_id;
-        ctx.cpu.acpi_processor_uid = smp->smp_info->processor_id;
-        ctx.cpu.lapic_id = smp->smp_info->lapic_id;
-        ctx.cpu.smp_info = smp->smp_info;
-    }
+	// Can't work under these conditions
+	if (!fb)
+		boot_fail(BASH_RED "WARNING: " BASH_DEFAULT "MoonOS was NOT provided with a framebuffer. Refusing to boot.");
 
-    if (rsdp != NULL)
-    {
-        ctx.rsdp.rsdp_address = rsdp->rsdp;
-    }
+	if (rsdp != NULL)
+		ctx.rsdp = rsdp->rsdp;
 
-    if (mmap != NULL)
-    {
-        boot_term_write("boot: Copying memory map to boot context\n");
-        memcpy((uint8_t *)ctx.mmap, (uint8_t *)mmap, sizeof(struct stivale2_struct_tag_memmap) * mmap->entries);
+	if (mmap != NULL)
+	{
+		// Prepare the terminal
+		boot_term_write("boot: Reached target term_prepare\n");
+		term_prepare(fb, mmap);
 
-        // Prepare the terminal
-        term_prepare(fb, mmap);
-        
-        boot_term_write("boot: Reached target pmm\n");
-        pmm_init(mmap->memmap, mmap->entries);
+		boot_term_write("boot: Reached target pmm\n");
+		{
+			extern void init_phys_allocator(void *, int);
+			init_phys_allocator(mmap->memmap, mmap->entries);
+		}
 
-        boot_term_write("boot: Reached target vmm\n");
-        v_init(mmap->memmap, mmap->entries);
-        
+		boot_term_write("boot: Reached target vmm\n");
+		v_init();
+
 		boot_term_write("boot: Reached target gdt and tss\n");
-        init_gdt((uint64_t)stack + sizeof((uint64_t)stack)); // Note: boot_term_write is unusable now
+		init_gdt((uint64_t)stack + sizeof((uint64_t)stack)); // Note: boot_term_write is unusable now
 
-        // Core#0 will remap the pic once.
-        // After acpi_init the pic is disabled in favor of the apic
-        pic_remap();
-        init_idt();
+		// Core#0 will remap the pic once.
+		// After acpi_init the pic is disabled in favor of the apic
+		pic_remap();
+		init_idt();
 
-        /* Is verbose boot specified in the command line? */
-        if (cmdline != NULL)
-        {
-            auto verbose = bootarg_find("verbose_boot", (string_view)cmdline->cmdline);
-            printk_init(verbose, ctx);
-        }
-        else
-        {
-            for (;;)
-                ;
-        }
+		/* Is verbose boot specified in the command line? */
+		if (cmdline != NULL)
+		{
+			auto verbose = bootarg_find("verbose_boot", (string_view)cmdline->cmdline);
+			printk_init(verbose);
+		}
+		else
+		{
+			boot_fail("No boot cmdline\n");
+		}
 
-        banner(false);
-    }
-    else
-    {
-        debug(false, "\n!Did not get a memory map from the bootloader!\n");
-        boot_term_write("Fatal: Cannot obtain a memory map from the bootloader");
-        for (;;)
-            ;
-    }
+		banner(false);
+	}
+	else
+		boot_fail("Fatal: Cannot obtain a memory map from the bootloader");
 
 	kmalloc_init();
-	init_percpu(ctx.rbp);
-    kern_main(&ctx, modules);
-}
-
-BootContext BootContextGet(void)
-{
-    return ctx;
+	init_percpu((uint64_t)stack);
+	kern_main(&ctx, modules);
 }

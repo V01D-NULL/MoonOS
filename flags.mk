@@ -28,7 +28,13 @@ ARCH = x86
 BOARD = acpi
 
 # Set automatically.
-PLATFORM_DIR = 
+# PLATFORM_DIR = 
+
+ifeq ($(BOARD), nintendo)
+	PLATFORM_DIR = ./platform/$(BOARD)
+else
+	PLATFORM_DIR = ./platform/$(BOARD)/$(ARCH)
+endif
 
 ISO_NAME	  = MoonOS.iso 
 

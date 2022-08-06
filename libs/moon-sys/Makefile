@@ -1,6 +1,6 @@
 include ../../flags.mk
 
-TARGET := moon-io.a
+TARGET := moon-sys.a
 
 CFILES	 := $(shell find ./ -type f -name '*.c')
 ASMFILES := $(shell find ./ -type f -name '*.s')
@@ -10,8 +10,10 @@ OBJ		 := $(OBJ_C) $(OBJ_ASM)
 
 .PHONY: all clean
 
-CFLAGS += -I ../../kernel/ \
-		  -I ../ -I .
+CFLAGS += -I ../ -I . \
+		  -I ../../kernel/$(PLATFORM_DIR) \
+		  -I ../../kernel/arch/$(ARCH) \
+		  -I ../../kernel/
 
 all: $(TARGET)
 

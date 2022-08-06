@@ -4,7 +4,6 @@
 #include <moon-io/serial.h>
 #include <mm/vmm.h>
 #include <mm/pmm.h>
-#include <mm/mm.h>
 #include <base/base-types.h>
 #include <base/string.h>
 #include <base/align.h>

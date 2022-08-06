@@ -6,7 +6,6 @@
 */
 #include <base/base-types.h>
 #include <printk.h>
-#include <boot/boot.h>
 #include "slab_defs.h"
 
 bool kmem_cache_grow(struct kmem_cache *cachep, int count);

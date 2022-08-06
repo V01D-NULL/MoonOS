@@ -1,6 +1,7 @@
 #include "vmm.h"
 #include <mm/pmm.h>
-#include <mm/mm.h>
+#include <mm/addr.h>
+#include <mm/page.h>
 #include <base/assert.h>
 #include <moon.h>
 #include <base/base-types.h>
@@ -16,7 +17,7 @@ static struct Pml *vmm_pml_advance(
     struct Pml *entry,
     size_t level, int flags);
 
-void v_init(struct stivale2_mmap_entry *mmap, int entries)
+void v_init(void)
 {
     assert((kernel_pagemap = pmm_alloc()) != NULL);
 
@@ -26,9 +27,7 @@ void v_init(struct stivale2_mmap_entry *mmap, int entries)
     v_map_range_fast(as_vm_range(0, GiB(4), $high_vma_heap), MAP_KERN, kernel_pagemap);
     v_map_range_fast(as_vm_range(0, GiB(2), $high_vma_code), MAP_READONLY, kernel_pagemap);
 
-    debug(true, "Old PML4: 0x%llx\n", cr_read(CR3)); // Bootloader pml4
     switch_to_kernel_pagemap();
-    debug(true, "New PML4: 0x%llx\n", cr_read(CR3)); // Kernel pml4
 }
 
 inline uint64_t index_of(uint64_t vaddr, int offset)
@@ -166,7 +165,7 @@ void pagefault_handler(uint64_t cr2, int error_code)
 
 
     // Todo: Check if cr2 is a high vma and verify flags accordingly (Don't want a user accessing kernel data structures :p)
-    v_map((struct Pml*)cr_read(CR3), cr2, cr2, pf.flags);
+    // v_map((struct Pml*)cr3_read(), cr2, cr2, pf.flags);
 }
 
 struct Pml *get_kernel_pagemap(void)

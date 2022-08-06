@@ -3,7 +3,6 @@
 #include <platform/acpi/x86/tables/rsdt.h>
 #include <platform/acpi/x86/madt/madt.h>
 
-#include <mm/mm.h>
 #include <moon-io/serial.h>
 #include <base/string.h>
 #include <printk.h>
@@ -12,12 +11,12 @@
 
 bool acpi_validate_sdt_checksum(struct SDT *sdt);
 
-void acpi_init(void)
+void acpi_init(phys_t rsdp)
 {
-    rsdp_init();
+    rsdp_init(rsdp);
 }
 
-acpi_table_t acpi_find_table(string_view identifier)
+AcpiTable acpi_find_table(string_view identifier)
 {
     struct RSDP rsdp = get_rsdp();
 
@@ -44,7 +43,7 @@ acpi_table_t acpi_find_table(string_view identifier)
         
         if (!strncmp(sdt->signature, (string )identifier, 4) && acpi_validate_sdt_checksum(sdt))
         {
-            return (acpi_table_t) ((uintptr_t)sdt + $high_vma);
+            return (AcpiTable) ((uintptr_t)sdt + $high_vma);
         }
     }
 

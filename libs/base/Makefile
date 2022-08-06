@@ -10,10 +10,9 @@ OBJ		 := $(OBJ_C) $(OBJ_ASM)
 
 .PHONY: all clean
 
-CFLAGS := $(CFLAGS) \
-			-I ../../kernel/ \
-			-I ../ -I . \
-			-I ../../kernel/arch/$(ARCH)/
+CFLAGS += -I ../../kernel/ \
+		  -I ../ -I . \
+		  -I ../../kernel/arch/$(ARCH)/
 
 all: $(TARGET)
 

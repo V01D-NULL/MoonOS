@@ -3,12 +3,11 @@
 #include <base/string.h>
 #include <base/fmt.h>
 #include <cpu.h>
-#include <mm/mm.h>
 #include "printk.h"
 
 static bool is_verbose_boot = false;
 
-void printk_init(bool verbose_boot, BootContext term_info)
+void printk_init(bool verbose_boot)
 {
     arch_tty_init();
     is_verbose_boot = verbose_boot;

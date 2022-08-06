@@ -19,7 +19,7 @@
 #define __LIB__TERM_H__
 
 #include <base/base-types.h>
-#include "stivale2.h"
+#include <boot/stivale2.h>
 
 #define TERM_TABSIZE (8)
 #define MAX_ESC_VALUES (16)

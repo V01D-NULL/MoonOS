@@ -4,7 +4,7 @@
 #include "elf64.h"
 #include "elf_common.h"
 #include <base/base-types.h>
-#include <proc/sched/task.h>
+#include <sched/task.h>
 
 struct elf_loader_args
 {

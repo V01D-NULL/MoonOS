@@ -15,7 +15,7 @@ void arch_init_syscall(void)
 	wrmsr(LSTAR, (uint64_t)&x86_syscall_handler);
 }
 
-void syscall_handler(general_registers reg)
+void syscall_handler(GeneralRegisters reg)
 {
 	// debug(true, "\nSyscall handler\n");
 	// debug(false, "{\n"

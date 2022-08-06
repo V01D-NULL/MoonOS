@@ -1,4 +1,4 @@
------- Memory layout -------
+------ Memory layout x86_64 -------
 == Mappings ==
 + 0x0-0x100000000    - Anything, 4GiB mapped.
 + 

@@ -5,7 +5,6 @@
 #include <trace/sym.h>
 #include <stdarg.h>
 #include <mm/vmm.h>
-#include <mm/mm.h>
 #include "printk.h"
 #include "panic.h"
 

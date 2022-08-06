@@ -1,4 +1,4 @@
-ENTRY(kinit)
+ENTRY(boot)
 
 PHDRS
 {

@@ -3,12 +3,6 @@ include ../flags.mk
 TARGET := kernel.elf
 KLIBS  := $(shell find ../libs -type f -name '*.a')
 
-ifeq ($(BOARD), nintendo)
-	PLATFORM_DIR = ./platform/$(BOARD)
-else
-	PLATFORM_DIR = ./platform/$(BOARD)/$(ARCH)
-endif
-
 CFILES	 := $(shell find ./arch/$(ARCH) -type f -name '*.c') \
 			$(shell find $(PLATFORM_DIR) -name '*.c' -not -path './arch/*') \
 			$(shell find ./ -name '*.c' -not -path './arch/*' -and -not -path './platform/*')
