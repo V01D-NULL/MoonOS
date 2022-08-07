@@ -3,6 +3,7 @@
 *.o
 *.elf
 *.map
+*.firm
 kernel/parsed.sym
 scripts/parsed.sym
 MoonOS.hdd
