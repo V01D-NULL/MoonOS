@@ -1,12 +1,11 @@
-include ../../flags.mk
+include ../../Make.conf
+include ../../meta/build/make/Makefile.$(ARCH).$(BOARD).conf
 
 TARGET := base.a
 
 CFILES	 := $(shell find ./ -type f -name '*.c')
 ASMFILES := $(shell find ./ -type f -name '*.s')
-OBJ_C    := $(CFILES:.c=.o)
-OBJ_ASM  := $(ASMFILES:.s=.o)
-OBJ		 := $(OBJ_C) $(OBJ_ASM)
+OBJ		 := $(ASMFILES:.s=.o) $(CFILES:.c=.o)
 
 .PHONY: all clean
 

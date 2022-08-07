@@ -1,4 +1,5 @@
-include ../../flags.mk
+include ../../Make.conf
+include ../../meta/build/make/Makefile.$(ARCH).$(BOARD).conf
 
 TARGET := moon-io.a
 

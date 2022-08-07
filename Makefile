@@ -5,7 +5,7 @@ KERNEL_ELF	   = kernel/kernel.elf
 DEBUG_TERMINAL = gnome-terminal
 DEBUG_TERMINAL_OPTS = --tab "[DEBUG] MoonOS [DEBUG]" --command
 
--include flags.mk
+-include Make.conf
 
 .PHONY: clean all run
 

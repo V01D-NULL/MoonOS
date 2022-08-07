@@ -1,4 +1,4 @@
-include ../flags.mk
+include ../Make.conf
 
 TARGET := userspace-components.a
 
