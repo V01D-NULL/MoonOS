@@ -8,7 +8,6 @@
 #include <mm/dynamic/kmalloc.h>
 
 #include <moon-sys/time/sleep.h>
-#include <platform.h>
 
 #include <sched/scheduler.h>
 #include <loader/daemon/load.h>
@@ -16,11 +15,8 @@
 #include "panic.h"
 #include "printk.h"
 
-void kern_main(BootHandover *handover, struct stivale2_struct_tag_modules *mods)
+void kern_main(struct stivale2_struct_tag_modules *mods)
 {
-	// Configures either acpi or special hardware and hides
-	// implementation details behind a platform_*() interface.
-	platform_init(handover);
 	arch_init_syscall();
 
 	trace("Detected %d modules\n", mods->module_count);

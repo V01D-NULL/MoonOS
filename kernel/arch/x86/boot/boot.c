@@ -13,6 +13,7 @@
 #include <mm/phys.h>
 #include <mm/virt.h>
 #include <printk.h>
+#include <platform.h>
 #include "stivale2.h"
 
 const char serial_message[] = {
@@ -56,7 +57,6 @@ EXTERNAL(stack);
 void boot(struct stivale2_struct *bootloader_info)
 {
 	BootHandover ctx = {};
-
 	struct stivale2_struct_tag_framebuffer *fb = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_FRAMEBUFFER_ID);
 	struct stivale2_struct_tag_terminal *term = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_TERMINAL_ID);
 	struct stivale2_struct_tag_memmap *mmap = stivale2_get_tag(bootloader_info, STIVALE2_STRUCT_TAG_MEMMAP_ID);
@@ -92,7 +92,7 @@ void boot(struct stivale2_struct *bootloader_info)
 		{
 			extern void arch_init_paging(void);
 			arch_init_paging();
-		}		
+		}
 
 		boot_term_write("boot: Reached target gdt and tss\n");
 		init_gdt((uint64_t)stack + sizeof((uint64_t)stack)); // Note: boot_term_write is unusable now
@@ -119,6 +119,7 @@ void boot(struct stivale2_struct *bootloader_info)
 		boot_fail("Fatal: Cannot obtain a memory map from the bootloader");
 
 	kalloc_init();
+	platform_init(&ctx);
 	init_percpu((uint64_t)stack);
-	kern_main(&ctx, modules);
+	kern_main(modules);
 }

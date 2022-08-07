@@ -36,5 +36,5 @@ void cpuid(struct CpuidContext *cpuid_context)
 int current_cpu(void)
 {
 	// TODO: Add support for x2APIC mode.
-	return lapic_read(0x20) >> 24;
+	return lapic_cpu_id();
 }

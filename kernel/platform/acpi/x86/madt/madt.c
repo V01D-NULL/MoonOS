@@ -44,8 +44,8 @@ struct apic_device_info madt_init(void *madt_base)
     pic_disable();
     enumarate_apic_devices(&madt);
 
-    // trace("OEM String: '%s'\n", oem_str);
-    // trace("OEM Table ID: '%s'\n", oem_table_id);
+    trace("OEM String: '%s'\n", oem_str);
+    trace("OEM Table ID: '%s'\n", oem_table_id);
 
     return apic_dev;
 }

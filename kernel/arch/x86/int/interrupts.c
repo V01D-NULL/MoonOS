@@ -58,6 +58,7 @@ void isr_handler(struct iframe regs)
 			uint64_t cr2 = cr2_read();
 			printk("INT ~ #PF", "Faulting address: 0x%lx\n", cr2);
 			debug(true, "INT ~ #PF Faulting address: 0x%lx\n", cr2);
+			for(;;);
 			arch_pagefault_handler(cr2, regs.error_code);
 		}
 		if (regs.isr_number == 6)

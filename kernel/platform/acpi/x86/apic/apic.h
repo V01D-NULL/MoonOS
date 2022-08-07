@@ -12,5 +12,6 @@ void lapic_eoi(void);
 void lapic_oneshot_timer(uint64_t usec);
 uint32_t lapic_calibrate_timer(uint64_t usec);
 
+int lapic_cpu_id(void);
 
 #endif // APIC_H

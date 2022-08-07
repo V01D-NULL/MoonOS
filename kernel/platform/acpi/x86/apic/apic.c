@@ -79,3 +79,11 @@ void lapic_oneshot_timer(uint64_t usec)
 {
 	lapic_write(LAPIC_TIMER_INITIAL_COUNT, usec);
 }
+
+int lapic_cpu_id(void)
+{
+	if (lapic_base)
+		return lapic_read(0x20) >> 24;
+
+	return 0;
+}
