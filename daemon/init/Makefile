@@ -1,6 +1,6 @@
 -include ../../Make.conf
 
-CC = @gcc
+CC = @clang
 TARGET := init.elf
 CFILES	 := $(shell find ./ -type f -name '*.c')
 USER_LIBS := $(shell find ../../userspace -type f -name '*.a')

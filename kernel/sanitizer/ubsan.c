@@ -27,6 +27,7 @@
 */
 #include <stdint.h>
 #include <moon-io/serial.h>
+#include <base/base-types.h>
 
 struct tu_source_location
 {

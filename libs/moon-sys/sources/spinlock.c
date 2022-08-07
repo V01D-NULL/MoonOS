@@ -3,7 +3,7 @@
 void acquire_lock(Lock *lock)
 {
 	while (__atomic_test_and_set(lock, __ATOMIC_ACQUIRE))
-		asm volatile("pause");
+		;// asm volatile("pause");
 }
 
 void release_lock(Lock *lock)

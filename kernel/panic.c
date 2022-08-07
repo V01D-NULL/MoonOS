@@ -1,4 +1,3 @@
-#include <devices/term/early/early_term.h>
 #include <moon-io/serial.h>
 #include <base/fmt.h>
 #include <moon.h>
@@ -18,9 +17,6 @@ NORETURN void __panic(uint64_t bp, uint64_t sp, string_view fmt, ...)
 
 	override_quiet_boot();
     
-    if (is_boot_term_available())
-        boot_term_write("\nA kernel panic has occurred\n*** Reason: %s ***\n", panic_buff);
-	
     printk("panic", "\nA kernel panic has occurred\n");
 	puts("*** Reason: %s ***\n", panic_buff);
 	debug(false, "A kernel panic has occurred\n*** Reason: %s ***\n", panic_buff);
@@ -50,5 +46,5 @@ NORETURN void __panic(uint64_t bp, uint64_t sp, string_view fmt, ...)
 	}
 
 	for (;;)
-		asm("hlt");
+		asm("wfi");
 }

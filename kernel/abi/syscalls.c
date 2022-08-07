@@ -4,7 +4,6 @@
 #include <printk.h>
 #include <base/base-types.h>
 #include <panic.h>
-#include <interrupts.h>
 
 #define Type uint64_t
 #define ignore Type UNIQUE_NAME(ignore)

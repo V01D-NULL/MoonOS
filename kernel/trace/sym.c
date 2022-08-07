@@ -1,9 +1,9 @@
+#if defined(__x86_64__)
 #include "sym.h"
 #include <printk.h>
 #include <base/base-types.h>
 #include <base/string.h>
 #include <moon-io/serial.h>
-#include <devices/term/early/early_term.h>
 
 extern SymbolTable symbol_table[];
 
@@ -58,15 +58,7 @@ int64_t find_symbol_by_name(string name)
 void backtrace_symbol(uint64_t address)
 {
     SymbolTable sym = sym_lookup(address);
-
-    if (is_boot_term_available())
-    {
-        boot_term_write("%llx - %s\n", sym.addr, sym.name);
-    }
-    else
-    {
-        printk("backtrace", "%llx - %s\n", sym.addr, sym.name);
-    }
-
+    printk("backtrace", "%llx - %s\n", sym.addr, sym.name);
     debug(false, "%llx - %s\n", sym.addr, sym.name);
 }
+#endif

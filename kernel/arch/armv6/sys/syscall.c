@@ -1,0 +1,1 @@
+void arch_init_syscall(void) {}

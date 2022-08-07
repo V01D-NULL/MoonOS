@@ -16,11 +16,6 @@ limine/*.bin
 .VSCodeCounter
 .vscode/
 
-#Doxygen
-html
-latex
-Doxyfile
-
 #Other
 ./log.txt
 ./test

@@ -8,5 +8,5 @@ void __assert_impl(string_view file, uint64_t line, string_view func, string_vie
     debug(true, "ASSERT", "%s:%d: %s: Assertion `%s' failed", (char *)file, line, func, desc);
     
     for (;;)
-        asm("hlt");
+        asm("wfi");
 }

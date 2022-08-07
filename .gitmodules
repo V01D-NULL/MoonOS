@@ -4,3 +4,6 @@
 [submodule "echfs"]
 	path = meta/echfs
 	url = https://github.com/echfs/echfs.git
+[submodule "meta/firmtool"]
+	path = meta/firmtool
+	url = https://github.com/TuxSH/firmtool.git

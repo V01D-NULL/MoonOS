@@ -1,3 +1,5 @@
+#if defined (__x86_64__)
+
 #include "moon-io/serial.h"
 #include "moon-io/port-io.h"
 #include <base/fmt.h>
@@ -78,3 +80,5 @@ void impl_quiet_debug(string fmt, ...)
 
 	serial_write_str((string)&serial_q_buff);
 }
+
+#endif // __x86_64__

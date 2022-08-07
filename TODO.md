@@ -2,9 +2,15 @@
 
 IMPORTANT: Remember to update the README and resume if this works out.
 
-- Different architectures need different makefiles (maybe have a Makefile.arch.platform.conf These files then execute specific build instructions for specific architectures & platforms)
+- Remove inline assembly snippets / hide them behind arch_*() functions
+
+- Cleanup the root level Makefile. (It's performing a lot of limine bootloader related stuff which should only be used in conjunction with the x86 architecture. Can be fixed by moving most of the stuff into `meta/make/Makefile.x86.acpi.conf`)
+
+- Modify the gensym script to generate a symbol table for arm and x86 respectively (mainly eye-balling the hardcoded x86 gcc here. Probably just take the compiler and it's arguments in sys.argv or something)
 
 - Replace `struct stivale2_struct_tag_modules *mods` with something like `struct HandoverModules *`. If used with limine it just contains pointers to the beginning of each module and their sizes. If used with something that doesn't have a bootloader like the 3ds, read the modules from the SD car before passing control to `kern_main`. panic() if that goes wrong.
+
+- Once the armv6 port is stable, search for `__x86_64__` in the code since it was a quick hack to get the PoC up and running. Don't wanna keep that.
 
 ### Misc
 When it comes to merging, I guess just search for `git forcibly merge` online and do that.

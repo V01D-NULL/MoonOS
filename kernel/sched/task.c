@@ -7,7 +7,7 @@ Task create_task_struct(string_view descriptor, Elf64_Addr entrypoint)
 		.descriptor = descriptor,
 		.pagemap = arch_create_new_pagemap(),
 		.entrypoint = entrypoint,
-		.registers.rip = entrypoint,
+		.registers.ip = entrypoint,
 		.ustack = 0
 	};
 }

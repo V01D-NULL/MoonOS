@@ -1,6 +1,8 @@
 #ifndef PORT_IO_H
 #define PORT_IO_H
 
+#if defined (__x86_64__)
+
 #include <base/base-types.h>
 
 inline void outb(uint16_t port, uint8_t val)
@@ -56,4 +58,5 @@ inline void io_wait(void)
 	inb(0x80);
 }
 
+#endif // __x86_64__
 #endif // PORT_IO_H
