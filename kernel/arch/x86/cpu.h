@@ -57,28 +57,32 @@ struct Percpu
 		(struct Percpu *)rdmsr(GS_BASE); \
 	}
 
+inline void arch_halt_cpu(void)
+{
+	for (;;)
+		asm("hlt");
+}
+
 inline int64_t cr2_read(void)
 {
-    int64_t cr;
-    asm volatile(
-        "mov %%cr2, %0\n\t"
-        : "=r"(cr)
-        :
-        : "%rax"
-    );
-    return cr;
+	int64_t cr;
+	asm volatile(
+		"mov %%cr2, %0\n\t"
+		: "=r"(cr)
+		:
+		: "%rax");
+	return cr;
 }
 
 inline int64_t cr3_read(void)
 {
-    int64_t cr;
-    asm volatile(
-        "mov %%cr3, %0\n\t"
-        : "=r"(cr)
-        :
-        : "%rax"
-    );
-    return cr;
+	int64_t cr;
+	asm volatile(
+		"mov %%cr3, %0\n\t"
+		: "=r"(cr)
+		:
+		: "%rax");
+	return cr;
 }
 
 #endif // CPU_H

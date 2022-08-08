@@ -6,4 +6,6 @@
 
 inline void platform_init(UNUSED BootHandover *handover) {}
 
+inline void platform_usleep(UNUSED uint64_t usec) {}
+
 #endif // PLATFORM_H

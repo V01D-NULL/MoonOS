@@ -12,9 +12,12 @@ struct$(SymbolTable, {
 void backtrace_symbol(uint64_t address);
 int64_t find_symbol_by_name(string name);
 SymbolTable sym_lookup(uint64_t address);
-#endif // __x86_64__
 
+#else
+
+// Stubs
 inline void backtrace_symbol(uint64_t address) {}
-inline SymbolTable sym_lookup(uint64_t address) {}
+inline SymbolTable sym_lookup(uint64_t address) { return (SymbolTable){}; }
 
+#endif // __x86_64__
 #endif // SYMBOLS_H

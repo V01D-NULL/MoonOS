@@ -2,10 +2,14 @@
 #define PLATFORM_H
 
 // #include "acpi.h"
+#include <moon-sys/handover.h>
+#include <moon.h>
 
-inline void platform_init(void)
+inline void platform_init(UNUSED BootHandover *handover)
 {
 	// acpi_init();
 }
+
+inline void platform_usleep(UNUSED uint64_t usec) { }
 
 #endif // PLATFORM_H

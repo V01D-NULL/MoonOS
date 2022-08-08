@@ -4,6 +4,7 @@
 #include <trace/sym.h>
 #include <stdarg.h>
 #include <mm/vm_sys.h>
+#include <cpu.h>
 #include "printk.h"
 #include "panic.h"
 
@@ -45,6 +46,6 @@ NORETURN void __panic(uint64_t bp, uint64_t sp, string_view fmt, ...)
 		bp += sizeof(long) * 2;
 	}
 
-	for (;;)
-		asm("wfi");
+	arch_halt_cpu();
+	__builtin_unreachable();
 }

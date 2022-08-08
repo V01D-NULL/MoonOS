@@ -2,7 +2,7 @@
 
 #include <moon-sys/handover.h>
 
-#if defined (__x86_64__)
+#if defined(__x86_64__)
 #include <boot/stivale2.h> // TEMPORARY (until stivale2_struct_tag_modules is replaced by HandoverModules)
 #endif
 
@@ -34,8 +34,5 @@ void kern_main(void)
 	sched_init();
 #endif
 
-	for (;;)
-	{
-		asm("wfi");
-	}
+	arch_halt_cpu();
 }

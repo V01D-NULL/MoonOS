@@ -26,7 +26,7 @@ void timer_irq(struct iframe *frame)
 	// clang-format off
 	struct arch_task_registers regs = {
 		.registers = frame->gpr,
-		.rip = frame->rip
+		.ip = frame->rip
 	};
 	// clang-format on
 

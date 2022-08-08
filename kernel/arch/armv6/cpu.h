@@ -33,4 +33,10 @@ struct Percpu
 	uint64_t working_stack; // Kernel stack
 } PACKED;
 
+inline void arch_halt_cpu(void)
+{
+	for (;;)
+		asm("wfi");
+}
+
 #endif // CPU_H

@@ -32,5 +32,7 @@ struct stacktrace_result arch_trace_stack(int frames)
 	//                                                      // included in the stack trace, we use at index 1 instead of 0.
 
 	// return result;
-	// return (struct stacktrace_result){};
+	
+	struct stacktrace_result tmp;
+	return tmp;
 }
