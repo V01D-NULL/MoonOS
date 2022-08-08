@@ -10,3 +10,52 @@ IMPORTANT: Remember to update the README and resume if this works out.
 
 ### Misc
 When it comes to merging, I guess just search for `git forcibly merge` online and do that.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Maybe just copy luma gcc flags for the nintendo build instead of using clang...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

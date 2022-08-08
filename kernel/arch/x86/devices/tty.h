@@ -3,8 +3,8 @@
 
 #include <base/fmt.h>
 #include <base/string.h>
-#include "limine-port/term.h"
-#include "early/early_term.h"
+#include "term/limine-port/term.h"
+#include "term/early/early_term.h"
 
 // #ifndef TTY_BUFF_SZ
 // #define TTY_BUFF_SZ 512

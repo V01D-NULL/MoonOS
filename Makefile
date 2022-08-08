@@ -22,7 +22,7 @@ else
 	$(EMU) $(EMU_OPTS) $(EMU_OPTS_KVM)
 endif
 
-$(TARGET):
+$(KERNEL_ELF):
 	@$(MAKE) --no-print-directory -C kernel
 
 symlist:

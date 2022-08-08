@@ -1,4 +1,4 @@
-#include <devices/term/tty.h>
+#include <devices/tty.h>
 #include <moon-io/serial.h>
 #include <base/string.h>
 #include <base/fmt.h>
