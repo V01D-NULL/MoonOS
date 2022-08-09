@@ -1,6 +1,6 @@
 # Moon OS
 
-<h2 align="center"> Moon OS is a modular micro-kernel targeting the x86_64 architecture, aiming to be POSIX-like in the future. </h2>
+<h2 align="center"> Moon OS is a modular micro-kernel targeting the x86_64 and armv6 architecture, aiming to be POSIX-like in the future. </h2>
 <p align="center">
 <img align="center" src="meta/Logo 500x500.jpeg">
 </p>
@@ -18,14 +18,22 @@ Kernel panic:
 <br>
 
 # Features
-- 4 level paging
-- Stacktrace/symbol backtrace
+- Support for multiple architectures:
+	- x86_64 PCs with acpi support
+		- 4 level paging
+		- Stacktrace/symbol backtrace
+		- zoned bitmap and slab allocator.
+		- System calls via `syscall` (No support for `int` based system calls)
+	- Nintendo 3ds (armv6)
+		- I2C driver
+		- Bootrom IVT
+		- Render strings to the display
+
+# Shared features (both architectures support this):
 - ubsan
 - Parsable boot arguments (quiet/verbose)
 - Elf loader
-- zoned bitmap and slab allocators.
-- System calls via the `syscall` instruction (The regular int 0x80 is not supported)
-- Physical kernel heap (small slabs (i.e. max of 512 bytes per cache))
+- Primitive scheduler (Will be improved overtime, for now the my focus is on getting everything up and running (IPC, servers, libc, etc))
 
 # Future features:
 - Threads
@@ -53,6 +61,7 @@ Kernel panic:
 	- In kernel decompression library to decompress the initrd
 	- Native (build machine) program to build and add files (to maintain decent modularity) to the initrd.
 	- Load and render an image from the initrd (tga, bmp)
+- New additions to make the armv6 port a lot more usable (SD Card driver, gpu, vblank)
 
 # Directory walkthrough:
 - libs/   	  --  Utilities not strictly related to a kernel (Scheduler, memory manager, etc), but required for it to function.
@@ -67,11 +76,15 @@ Kernel panic:
 	- sudo apt update
 	- sudo apt install gcc nasm qemu-system-x86 libfuse-dev
 - Build kernel
-	- `make all` -- Build the kernel to an ISO file
-	- `make run` -- Run the kernel in qemu and build it if necessary
-	- `make kvm` -- Run the kernel in qemu with kvm and build it if necessary
+	- `make all` -- Build the kernel
+	- `make run` -- Run the kernel in qemu and build it if necessary (x86_64 only)
+	- `make kvm` -- Run the kernel in qemu with kvm and build it if necessary (x86_64 only)
 	- Command line options for `kvm` and `run`:
-		- `modern=yes` -- Emulate modern features
+		- `modern=yes` -- Emulate modern features (x86_64 only)
+
+- Configure architecture:
+	- Simply edit two variables in `Make.conf`:
+		- `ARCH` and `BOARD`. Permitted values are documented in a comment.
 
 
 # My journey: (Inspiration for newcomers)
