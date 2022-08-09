@@ -9,7 +9,7 @@ uint32_t lapic_read(uint32_t offset);
 void lapic_write(uint32_t offset, uint32_t value);
 void lapic_eoi(void);
 
-void lapic_oneshot_timer(uint64_t usec);
+void lapic_oneshot_timer(uint64_t ticks);
 uint32_t lapic_calibrate_timer(uint64_t usec);
 
 int lapic_cpu_id(void);

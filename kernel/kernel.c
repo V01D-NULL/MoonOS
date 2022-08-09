@@ -14,6 +14,7 @@
 
 #include <sched/scheduler.h>
 #include <loader/daemon/load.h>
+#include <platform.h>
 
 #include "panic.h"
 #include "printk.h"
@@ -32,6 +33,8 @@ void kern_main(void)
 
 	load_daemon((const uint8_t *)mods->modules[0].begin, mods->modules[0].string);
 	sched_init();
+#else
+	panic("Modules have not been implemented yet");
 #endif
 
 	arch_halt_cpu();

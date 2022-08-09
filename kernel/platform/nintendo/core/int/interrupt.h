@@ -1,0 +1,6 @@
+#ifndef N3DS_BOOTROM_INTERRUPT_H
+#define N3DS_BOOTROM_INTERRUPT_H
+
+void ivt_init(void);
+
+#endif // N3DS_BOOTROM_INTERRUPT_H

@@ -5,16 +5,10 @@
 #include "hpet/hpet.h"
 
 #include <moon-sys/handover.h>
+#include <cpu.h>
 
-inline void platform_init(BootHandover *handover)
-{
-	acpi_init(handover->rsdp);
-	hpet_init();
-}
-
-inline void platform_usleep(uint64_t usec)
-{
-	hpet_usleep(usec);
-}
+void platform_init(BootHandover *handover);
+void platform_usleep(uint64_t usec);
+NORETURN void platform_shutdown(void);
 
 #endif // PLATFORM_H

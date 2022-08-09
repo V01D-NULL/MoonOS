@@ -75,9 +75,9 @@ uint32_t lapic_calibrate_timer(uint64_t usec)
 	return ticks;
 }
 
-void lapic_oneshot_timer(uint64_t usec)
+void lapic_oneshot_timer(uint64_t ticks)
 {
-	lapic_write(LAPIC_TIMER_INITIAL_COUNT, usec);
+	lapic_write(LAPIC_TIMER_INITIAL_COUNT, ticks);
 }
 
 int lapic_cpu_id(void)

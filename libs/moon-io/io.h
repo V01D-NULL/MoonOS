@@ -1,7 +1,7 @@
 #ifndef PORT_IO_H
 #define PORT_IO_H
 
-#if defined (__x86_64__)
+#if defined(__x86_64__)
 
 #include <base/base-types.h>
 
@@ -59,4 +59,25 @@ inline void io_wait(void)
 }
 
 #endif // __x86_64__
+
+inline void mmio_write8(uint32_t io_port, uint8_t val)
+{
+	*((volatile uint8_t *)io_port) = val;
+}
+
+inline void mmio_write16(uint32_t io_port, uint16_t val)
+{
+	*((volatile uint16_t *)io_port) = val;
+}
+
+inline void mmio_write32(uint32_t io_port, uint32_t val)
+{
+	*((volatile uint32_t *)io_port) = val;
+}
+
+inline uint32_t mmio_read(uint32_t io_port)
+{
+	return *((volatile uint32_t *)io_port);
+}
+
 #endif // PORT_IO_H

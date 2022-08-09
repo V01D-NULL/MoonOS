@@ -4,16 +4,16 @@
 */
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
-ENTRY(_start)
+ENTRY(boot)
 
 PHDRS
 {
-    main PT_LOAD;
+    bootstrap_kernel PT_LOAD;
 }
 
 MEMORY
 {
-    main                : ORIGIN = 0x1FF80000, LENGTH = 0x1FFFD000 - 0x1FF80000
+    bootstrap_kernel                : ORIGIN = 0x1FF80000, LENGTH = 0x1FFFD000 - 0x1FF80000
 }
 
 SECTIONS
@@ -32,7 +32,7 @@ SECTIONS
         /* .fini */
         KEEP( *(.fini) )
         . = ALIGN(8);
-    } >main :main
+    } >bootstrap_kernel :bootstrap_kernel
 
     .rodata :
     {
@@ -42,11 +42,11 @@ SECTIONS
         *all.rodata*(*)
         SORT(CONSTRUCTORS)
         . = ALIGN(8);
-    } >main
+    } >bootstrap_kernel
 
 	/* Helps unwind callstack */
-    .ARM.extab : { *(.ARM.extab* .gnu.linkonce.armextab.*) __exidx_start = ABSOLUTE(.);} >main
-    ARM.exidx : { *(.ARM.exidx* .gnu.linkonce.armexidx.*)  __exidx_end = ABSOLUTE(.);} >main
+    .ARM.extab : { *(.ARM.extab* .gnu.linkonce.armextab.*) __exidx_start = ABSOLUTE(.);} >bootstrap_kernel
+    ARM.exidx : { *(.ARM.exidx* .gnu.linkonce.armexidx.*)  __exidx_end = ABSOLUTE(.);} >bootstrap_kernel
 
     .data :
     {
@@ -55,7 +55,7 @@ SECTIONS
         KEEP (*(.large_patch*))
         CONSTRUCTORS
         . = ALIGN(32);
-    } >main
+    } >bootstrap_kernel
 
     .bss (NOLOAD) :
     {
@@ -67,7 +67,7 @@ SECTIONS
         *(COMMON)
         . = ALIGN(8);
         PROVIDE (__bss_end__ = ABSOLUTE(.));
-    } >main :NONE
+    } >bootstrap_kernel :NONE
     __end__ = ABSOLUTE(.) ;
 
     /* ==================

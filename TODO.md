@@ -2,6 +2,10 @@
 
 IMPORTANT: Remember to update the README and resume if this works out.
 
+- Add `arch_reboot_after_confirmation` which waits for a keypress or something and reboots. Could be used in `panic()`.
+
+- Replace mmio code (example: apic, hpet) with the `mmio_*()` functions
+
 - Modify the gensym script to generate a symbol table for arm and x86 respectively (mainly eye-balling the hardcoded x86 gcc here. Probably just take the compiler and it's arguments in sys.argv or something)
 
 - Replace `struct stivale2_struct_tag_modules *mods` with something like `struct HandoverModules *`. If used with limine it just contains pointers to the beginning of each module and their sizes. If used with something that doesn't have a bootloader like the 3ds, read the modules from the SD car before passing control to `kern_main`. panic() if that goes wrong.
@@ -10,52 +14,3 @@ IMPORTANT: Remember to update the README and resume if this works out.
 
 ### Misc
 When it comes to merging, I guess just search for `git forcibly merge` online and do that.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Maybe just copy luma gcc flags for the nintendo build instead of using clang...
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
