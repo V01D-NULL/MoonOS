@@ -1,7 +1,5 @@
 ### Todo list
 
-IMPORTANT: Remember to update the README and resume if this works out.
-
 - Add `arch_reboot_after_confirmation` which waits for a keypress or something and reboots. Could be used in `panic()`.
 
 - Replace mmio code (example: apic, hpet) with the `mmio_*()` functions
