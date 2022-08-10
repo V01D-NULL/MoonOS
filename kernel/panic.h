@@ -15,13 +15,13 @@
 		}                       \
 	} while (0)
 
-#define panic(...)                                                                    \
-	do                                                                                \
-	{                                                                                 \
-		extern NORETURN void __panic(uint64_t bp, uint64_t sp, string_view fmt, ...); \
-		uint64_t sp = arch_get_sp();                                                  \
-		uint64_t bp = arch_get_bp();                                                  \
-		__panic(bp, sp, __VA_ARGS__);                                                 \
+#define panic(...)                                                                \
+	do                                                                            \
+	{                                                                             \
+		extern NORETURN void __panic(size_t bp, size_t sp, string_view fmt, ...); \
+		size_t sp = arch_get_sp();                                                \
+		size_t bp = arch_get_bp();                                                \
+		__panic(bp, sp, __VA_ARGS__);                                             \
 	} while (0)
 
 #endif // PANIC_H

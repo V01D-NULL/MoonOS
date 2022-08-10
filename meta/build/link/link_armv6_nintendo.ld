@@ -1,19 +1,16 @@
-/*
-* This linker script is modified to fit this projects purpose.
-* The orignal linker script can found here: https://github.com/LumaTeam/Luma3DS/blob/master/arm9/linker.ld
+/* 
+	Taken from: https://github.com/LumaTeam/Luma3DS/blob/master/arm11/linker.ld 
 */
+
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 ENTRY(boot)
 
+/* Mostly copied from https://github.com/devkitPro/buildscripts/blob/master/dkarm-eabi/crtls/3dsx.ld */
+
 PHDRS
 {
     bootstrap_kernel PT_LOAD;
-}
-
-MEMORY
-{
-    bootstrap_kernel                : ORIGIN = 0x1FF80000, LENGTH = 0x1FFFD000 - 0x1FF80000
 }
 
 SECTIONS
@@ -23,16 +20,25 @@ SECTIONS
     PROVIDE(__stack_bottom__    = 0x1FFFD000);
 
     . = __start__;
+
     .text :
     {
+        KEEP( *(.text.start) )
+        KEEP( *(.init) )
+
         /* .text */
         *(.text)
         *(.text.*)
+        *(.glue_7)
+        *(.glue_7t)
+        *(.stub)
+        *(.gnu.warning)
+        *(.gnu.linkonce.t*)
 
         /* .fini */
         KEEP( *(.fini) )
-        . = ALIGN(8);
-    } >bootstrap_kernel :bootstrap_kernel
+        . = ALIGN(32);
+    } :bootstrap_kernel
 
     .rodata :
     {
@@ -40,22 +46,64 @@ SECTIONS
         *(.roda)
         *(.rodata.*)
         *all.rodata*(*)
+        *(.gnu.linkonce.r*)
         SORT(CONSTRUCTORS)
         . = ALIGN(8);
-    } >bootstrap_kernel
+    }
 
-	/* Helps unwind callstack */
-    .ARM.extab : { *(.ARM.extab* .gnu.linkonce.armextab.*) __exidx_start = ABSOLUTE(.);} >bootstrap_kernel
-    ARM.exidx : { *(.ARM.exidx* .gnu.linkonce.armexidx.*)  __exidx_end = ABSOLUTE(.);} >bootstrap_kernel
+    .preinit_array :
+    {
+        PROVIDE (__preinit_array_start = .);
+        KEEP (*(.preinit_array))
+        PROVIDE (__preinit_array_end = .);
+    }
+
+    .init_array :
+    {
+        PROVIDE (__init_array_start = .);
+        KEEP (*(SORT(.init_array.*)))
+        KEEP (*(.init_array))
+        PROVIDE (__init_array_end = .);
+    }
+
+    .fini_array :
+    {
+        PROVIDE (__fini_array_start = .);
+        KEEP (*(.fini_array))
+        KEEP (*(SORT(.fini_array.*)))
+        PROVIDE (__fini_array_end = .);
+    }
+
+    .ctors :
+    {
+        KEEP (*crtbegin.o(.ctors)) /* MUST be first -- GCC requires it */
+        KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
+        KEEP (*(SORT(.ctors.*)))
+        KEEP (*(.ctors))
+        . = ALIGN(4);   /* REQUIRED. LD is flaky without it. */
+    }
+
+    .dtors :
+    {
+        KEEP (*crtbegin.o(.dtors))
+        KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
+        KEEP (*(SORT(.dtors.*)))
+        KEEP (*(.dtors))
+        . = ALIGN(4);   /* REQUIRED. LD is flaky without it. */
+    }
+
+    .ARM.extab : { *(.ARM.extab* .gnu.linkonce.armextab.*) __exidx_start = .;}
+    ARM.exidx : { *(.ARM.exidx* .gnu.linkonce.armexidx.*)  __exidx_end = .;}
 
     .data :
     {
         *(.data)
         *(.data.*)
         KEEP (*(.large_patch*))
+        *(.gnu.linkonce.d*)
         CONSTRUCTORS
         . = ALIGN(32);
-    } >bootstrap_kernel
+    }
 
     .bss (NOLOAD) :
     {
@@ -64,11 +112,13 @@ SECTIONS
         *(.dynbss)
         *(.bss)
         *(.bss.*)
+        *(.gnu.linkonce.b*)
         *(COMMON)
         . = ALIGN(8);
         PROVIDE (__bss_end__ = ABSOLUTE(.));
-    } >bootstrap_kernel :NONE
-    __end__ = ABSOLUTE(.) ;
+    } :NONE
+
+    PROVIDE (__end__ = ABSOLUTE(.));
 
     /* ==================
        ==== Metadata ====

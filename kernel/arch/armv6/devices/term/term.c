@@ -1,5 +1,6 @@
 #include "term.h"
 #include <framebuffer/fb.h>
+#include <font.h>
 
 static int x = 1;
 static int y = 1;
@@ -12,19 +13,19 @@ void _term_write(string_view str, size_t len)
 		if (x >= FB_TOP_WIDTH)
 		{
 			x = 0;
-			y += 9;
+			y += char_height;
 		}
 		
 		if (str[i] == '\t')
 		{
-			x += 24;
+			x += char_width * 2;
 			continue;
 		}
 
 		else if (str[i] == '\n')
 		{
 			x = 0;
-			y += 9;
+			y += char_height;
 			continue;
 		}
 		

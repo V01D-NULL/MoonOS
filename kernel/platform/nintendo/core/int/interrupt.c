@@ -8,8 +8,8 @@
 
 extern void irq_handler();
 extern void fiq_handler();
+extern void svc_handler();
 extern void ud_handler();
-extern void unknown_handler();
 extern void prefetch_abort_handler();
 extern void data_abort_handler();
 
@@ -17,8 +17,8 @@ extern void data_abort_handler();
 uint32_t arm11_ivt[6] = {
 	(uint32_t)&irq_handler,
 	(uint32_t)&fiq_handler,
+	(uint32_t)&svc_handler,
 	(uint32_t)&ud_handler,
-	(uint32_t)&unknown_handler,
 	(uint32_t)&prefetch_abort_handler,
 	(uint32_t)&data_abort_handler
 };
@@ -26,8 +26,8 @@ uint32_t arm11_ivt[6] = {
 string_view str_table[6] = {
 	"IRQ",
 	"FIQ",
+	"SVC",
 	"UD",
-	"???",
 	"Prefetch abort",
 	"Data abort"
 };
@@ -35,7 +35,10 @@ string_view str_table[6] = {
 
 NORETURN void a11_exception_main(int arg0)
 {
-	panic("ARM11: An exception occurred (%s)", str_table[arg0]);
+	trace("Error: %s\n", str_table[arg0]);
+	for(;;)
+		;
+	// panic("ARM11: An exception occurred (%s)", str_table[arg0]);
 }
 
 void ivt_init(void)
@@ -60,5 +63,5 @@ void ivt_init(void)
 
 	arm11_bootrom_vectors[10] = FAR_JUMP;
 	arm11_bootrom_vectors[11] = arm11_ivt[5];
-	trace("Setup bootrom IVT\n");
+	// trace("Setup bootrom IVT\n");
 }

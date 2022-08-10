@@ -5,22 +5,20 @@
 
 inline size_t arch_get_sp(void)
 {
-	return 0;
-	// uint64_t rsp = 0;
-	// asm volatile("mov %%rsp, %0"
-	// 			 : "=r"(rsp));
+	size_t sp = 0;
+	asm volatile("mov %0, sp"
+				 : "=r"(sp));
 
-	// return rsp;
+	return sp;
 }
 
 inline size_t arch_get_bp(void)
 {
-	return 0;
-	// uint64_t rbp = 0;
-	// asm volatile("mov %%rbp, %0"
-	// 			 : "=r"(rbp));
+	size_t bp = 0;
+	asm volatile("mov %0, fp"
+				 : "=r"(bp));
 
-	// return rbp;
+	return bp;
 }
 
 #endif // ARCH_H

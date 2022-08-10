@@ -17,7 +17,7 @@ SymbolTable sym_lookup(uint64_t address);
 
 // Stubs
 inline void backtrace_symbol(uint64_t address) {}
-inline SymbolTable sym_lookup(uint64_t address) { return (SymbolTable){}; }
+inline SymbolTable sym_lookup(uint64_t address) { return (SymbolTable){.addr = 0, .name = ""}; }
 
 #endif // __x86_64__
 #endif // SYMBOLS_H
