@@ -2,13 +2,12 @@
 #include <moon.h>
 #include "fb.h"
 
-// TODO: Add colors
-inline void pixel(uint8_t *fb, UNUSED uint32_t hex, uint32_t x, uint32_t y)
+inline void pixel(uint8_t *fb, uint32_t hex, uint32_t x, uint32_t y)
 {
 	fb += CORRECT_XY(x, y);
-	*fb++ = 0xFF;
-	*fb++ = 0xFF;
-	*fb++ = 0xFF;
+	*fb++ = (hex >> 16);
+	*fb++ = (hex >> 8) & 0xFF;
+	*fb++ = hex & 0xFF;
 }
 
 void fb_putc(uint32_t posX, uint32_t posY, uint32_t color, char c)
@@ -23,6 +22,8 @@ void fb_putc(uint32_t posX, uint32_t posY, uint32_t color, char c)
 			bool can_draw = selection & (1 << (7 - x));
 			if (can_draw)
 				pixel(top_display_fb, color, posX + x, posY + y);
+			else
+				pixel(top_display_fb, 0, posX + x, posY + y);
 		}
 	}
 }

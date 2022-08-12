@@ -480,9 +480,6 @@ void gterm_putchar(uint8_t c) {
     }
 }
 
-// --------
-// NOTE: This terminal port is still a WIP, I'm using a bump allocator because I have no real heap yet.
-//
 bool gterm_prepare(size_t *_rows, size_t *_cols, struct stivale2_struct_tag_framebuffer *fb, struct stivale2_struct_tag_memmap *mmap) {
     cursor_status = true;
     scroll_enabled = true;
@@ -566,7 +563,7 @@ bool gterm_prepare(size_t *_rows, size_t *_cols, struct stivale2_struct_tag_fram
     map = bump(map_size, mmap);
     
     bg_canvas_size = gterm_width * gterm_height * sizeof(uint32_t);
-    bg_canvas = bump(bg_canvas_size, mmap); //arch_alloc_page_range((bg_canvas_size/4096) + 1).base;
+    bg_canvas = bump(bg_canvas_size, mmap);
     
     return true;
 }

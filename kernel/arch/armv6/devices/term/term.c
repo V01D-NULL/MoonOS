@@ -1,6 +1,7 @@
 #include "term.h"
 #include <framebuffer/fb.h>
 #include <font.h>
+#include <base/mem.h>
 
 static int x = 1;
 static int y = 1;
@@ -15,7 +16,7 @@ void _term_write(string_view str, size_t len)
 			x = 0;
 			y += char_height;
 		}
-		
+
 		if (str[i] == '\t')
 		{
 			x += char_width * 2;
@@ -28,7 +29,7 @@ void _term_write(string_view str, size_t len)
 			y += char_height;
 			continue;
 		}
-		
+
 		fb_putc(x, y, 0xFFFFFF, str[i]);
 	}
 }
