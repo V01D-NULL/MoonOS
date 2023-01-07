@@ -6,5 +6,6 @@
 void sched_init(void);
 void sched_register_task(Task task);
 void sched_yield(void);
+Task sched_reschedule(struct arch_task_registers regs);
 
 #endif // SCHEDULER_H

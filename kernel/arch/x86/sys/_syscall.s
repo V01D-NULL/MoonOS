@@ -6,12 +6,11 @@ section .text
 extern syscall_handler
 global x86_syscall_handler
 x86_syscall_handler:
+	jmp $
 	swapgs
 	
 	mov qword [gs:0x08], rsp ; Save user rsp
     mov rbp, qword [gs:0x0]  ; Set syscall handler stack (shared with kernel)
-	; jmp $
-    ; mov rbp, qword 0
 	sti
 
     pusha64 ; Todo: Let the user do this

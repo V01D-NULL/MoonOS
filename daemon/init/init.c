@@ -1,8 +1,8 @@
-// #include <abi/syscalls.h>
+#include <abi/syscalls.h>
 
 void _start(void)
 {
-	// syscall_log("init: Started init daemon\n", 27);
+	syscall_log("init: Started init daemon\n", 27);
 
 	for (;;)
 	{

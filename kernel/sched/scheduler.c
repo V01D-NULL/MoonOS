@@ -13,11 +13,9 @@
 static Task tasks[10];
 static int registered_tasks = 0, current_task_idx = 0;
 
-void sched_reschedule(struct arch_task_registers regs);
-
 void sched_init(void)
 {
-	arch_scheduler_callback((void *)&sched_reschedule);
+	// arch_scheduler_callback((void *)&sched_reschedule);
 	arch_switch_pagemap(tasks[current_task_idx]);
 	arch_enter_userspace((void *)tasks[current_task_idx].entrypoint, tasks[current_task_idx].ustack);
 }
@@ -31,7 +29,7 @@ void sched_register_task(Task task)
 }
 
 // TODO: Add idle() task when no processes exist.
-void sched_reschedule(struct arch_task_registers regs)
+Task sched_reschedule(struct arch_task_registers regs)
 {
 	// Find new task
 	if (registered_tasks > 1)
@@ -40,7 +38,7 @@ void sched_reschedule(struct arch_task_registers regs)
 			current_task_idx = 0;
 	}
 	else
-		return;
+		return tasks[current_task_idx];
 
 	// Save register state
 	tasks[current_task_idx].registers = regs;
@@ -48,4 +46,5 @@ void sched_reschedule(struct arch_task_registers regs)
 	// Load new task
 	auto new = tasks[current_task_idx];
 	arch_switch_pagemap(new);
+	return new;
 }

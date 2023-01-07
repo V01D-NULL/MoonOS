@@ -17,14 +17,14 @@ void arch_init_syscall(void)
 
 void syscall_handler(GeneralRegisters reg)
 {
-	// debug(true, "\nSyscall handler\n");
-	// debug(false, "{\n"
-	// 			 "   arg0: 0x%p | arg1: 0x%p | arg2: 0x%p\n"
-	// 			 "   arg3: 0x%p | arg4: 0x%p | arg5: 0x%p\n"
-	// 			 "   arg6: 0x%p\n"
-	// 			 "}\n",
-	// 	  reg.rax, reg.rdi, reg.rsi,
-	// 	  reg.rdx, reg.r10, reg.r8, reg.r9);
+	debug(true, "\nSyscall handler\n");
+	debug(false, "{\n"
+				 "   arg0: 0x%p | arg1: 0x%p | arg2: 0x%p\n"
+				 "   arg3: 0x%p | arg4: 0x%p | arg5: 0x%p\n"
+				 "   arg6: 0x%p\n"
+				 "}\n",
+		  reg.rax, reg.rdi, reg.rsi,
+		  reg.rdx, reg.r10, reg.r8, reg.r9);
 
 	if (reg.rax > ARRAY_SIZE(syscall_list))
 		panic("%ld is out of range", reg.rax);
