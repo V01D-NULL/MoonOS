@@ -11,7 +11,7 @@ bool elf_load_section(void *elf, string_view target, Elf64_Ehdr ehdr)
 	{
 		Elf64_Shdr *shdr = (Elf64_Shdr *)(elf + (ehdr.e_shoff + i * ehdr.e_shentsize));
 
-		if (!strncmp(&section_names[shdr->sh_name], target, 7))
+		if (!strncmp(&section_names[shdr->sh_name], target, target_len))
 		{
 			memcpy((uint8_t *)shdr->sh_addr, (uint8_t *)(elf + shdr->sh_offset), ehdr.e_shentsize);
 			return true;
