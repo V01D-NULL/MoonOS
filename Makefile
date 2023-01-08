@@ -41,7 +41,7 @@ clean:
 	@$(MAKE) --no-print-directory -C userspace clean
 
 debug: quick_recompile
-	$(DEBUG_TERMINAL) $(DEBUG_TERMINAL_OPTS) ./debug-util/debug.sh &
+	$(DEBUG_TERMINAL) $(DEBUG_TERMINAL_OPTS) ./meta/debug-util/debug.sh &
 	$(EMU) $(EMU_DEBUG_OPTS)
 
 # Remove the HDD & elf file while saving all object files (fewer files will be recompiled)

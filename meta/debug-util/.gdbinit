@@ -6,6 +6,6 @@ set print pretty on
 
 set disassembly-flavor intel
 
-b *kinit
+b boot
 
 continue

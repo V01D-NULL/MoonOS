@@ -1,1 +1,1 @@
-gdb -x debug-util/.gdbinit
+gdb -x meta/debug-util/.gdbinit
