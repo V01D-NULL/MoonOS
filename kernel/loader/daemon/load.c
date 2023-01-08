@@ -2,20 +2,19 @@
 
 #include <sched/scheduler.h>
 #include <uspace/userspace.h>
-#include <loader/elf/elf.h>
+#include <loader/elf.h>
 #include <printk.h>
 #include <panic.h>
 
 void load_daemon(const uint8_t *elf, string_view name)
 {
-    trace("Loading %s...\n", name);
-    
-    // Note: identity_map = true basically assumes that the load address of the ELF is free, this might be removed in the future.
-    Task task = load_elf(elf, (struct elf_loader_args){.do_panic = true, .identity_map = true, .descriptor = name});
+	trace("Loading %s...\n", name);
+
+	Task task = load_elf(elf, name, true);
 	sched_register_task(task);
 
-    if (!task.entrypoint)
-        panic("Failed to load ELF; Cannot start kernel daemon!");
+	if (!task.entrypoint)
+		panic("Failed to load ELF; Cannot start kernel daemon!");
 
-    trace("Successfully loaded %s daemon\n", name);
+	trace("Successfully loaded %s daemon\n", name);
 }

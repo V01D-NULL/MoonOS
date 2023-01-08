@@ -13,8 +13,6 @@
 static Task tasks[10];
 static int registered_tasks = 0, current_task_idx = 0;
 
-// void sched_reschedule(struct arch_task_registers regs);
-
 void sched_init(void)
 {
 	arch_switch_pagemap(tasks[current_task_idx]);

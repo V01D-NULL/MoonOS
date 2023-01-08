@@ -3,7 +3,7 @@
 
 #include <base/base-types.h>
 #include <moon-extra/compiler.h>
-#include <loader/elf/elf64.h>
+#include <moon-sys/elf/elf64.h>
 #include <paging/paging.h>
 #include <sys/context_switch.h>
 #include <cpu.h>
