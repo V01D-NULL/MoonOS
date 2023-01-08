@@ -13,11 +13,10 @@
 static Task tasks[10];
 static int registered_tasks = 0, current_task_idx = 0;
 
-void sched_reschedule(struct arch_task_registers regs);
+// void sched_reschedule(struct arch_task_registers regs);
 
 void sched_init(void)
 {
-	arch_scheduler_callback((void *)&sched_reschedule);
 	arch_switch_pagemap(tasks[current_task_idx]);
 	arch_enter_userspace((void *)tasks[current_task_idx].entrypoint, tasks[current_task_idx].ustack);
 }

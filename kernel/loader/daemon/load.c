@@ -18,7 +18,4 @@ void load_daemon(const uint8_t *elf, string_view name)
         panic("Failed to load ELF; Cannot start kernel daemon!");
 
     trace("Successfully loaded %s daemon\n", name);
-    // asm volatile("swapgs" ::: "memory");
-    // switch_pagemap(task);
-    // arch_enter_userspace((void *)task.entrypoint, task.ustack);
 }

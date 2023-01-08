@@ -4,8 +4,7 @@
 #include <platform/acpi/x86/apic/apic.h>
 #include <printk.h>
 
-typedef void (*schedulerCallback)(struct arch_task_registers);
-static schedulerCallback sched_callback;
+extern void sched_reschedule(struct arch_task_registers regs);
 static long timer_quantum;
 
 // create_lock("sched_lock", sched_lock);
@@ -16,7 +15,6 @@ void arch_scheduler_callback(void *sched_handler_fn)
 	if (!is_isr_registered(IRQ0))
 		install_isr(IRQ0, (isr_t)&timer_irq);
 
-	sched_callback = (schedulerCallback)sched_handler_fn;
 	timer_quantum = lapic_calibrate_timer(2000); // Timer triggers IRQ0 after 20 usec
 	lapic_oneshot_timer(timer_quantum);
 }
@@ -30,7 +28,7 @@ void timer_irq(struct iframe *frame)
 	};
 	// clang-format on
 
-	sched_callback(regs);
+	sched_reschedule(regs);
 	lapic_eoi();
 	lapic_oneshot_timer(timer_quantum);
 }
