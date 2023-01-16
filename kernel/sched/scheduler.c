@@ -29,8 +29,10 @@ void sched_register_task(Task task)
 }
 
 // TODO: Add idle() task when no processes exist.
-void sched_reschedule(struct arch_task_registers regs)
+void sched_reschedule(struct arch_task_registers* regs)
 {
+	// Save register state
+	tasks[current_task_idx].registers = *regs;
 	// Find new task
 	if (registered_tasks > 1)
 	{
@@ -40,13 +42,12 @@ void sched_reschedule(struct arch_task_registers regs)
 	else
 		return;
 
-	// Save register state
-	tasks[current_task_idx].registers = regs;
 
 	// trace("%d %d\n", current_task_idx, registered_tasks);
 
 	// Load new task
 	auto new = tasks[current_task_idx];
 	arch_switch_pagemap(new);
-	debug(false, "new task: %s\n", new.descriptor);
+	regs->ip = new.registers.ip;
+	// debug(false, "new task: %s\n", new.descriptor);
 }
