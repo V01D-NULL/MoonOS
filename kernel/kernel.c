@@ -32,6 +32,7 @@ void kern_main(void)
 	trace("Module string: %s\n", mods->modules[0].string);
 
 	load_daemon((const uint8_t *)mods->modules[0].begin, mods->modules[0].string);
+	load_daemon((const uint8_t *)mods->modules[1].begin, mods->modules[1].string);
 	sched_init();
 #else
 	panic("Modules have not been implemented yet");

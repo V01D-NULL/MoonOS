@@ -51,6 +51,7 @@ quick_recompile: symlist
 	@$(MAKE) --no-print-directory -C libs
 	@$(MAKE) --no-print-directory -C userspace/
 	@$(MAKE) --no-print-directory -C daemon/init
+	@$(MAKE) --no-print-directory -C daemon/hello
 	@$(MAKE) --no-print-directory -C kernel
 
 -include meta/build/make/Makefile.$(ARCH).$(BOARD).conf

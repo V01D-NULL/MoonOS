@@ -1,7 +1,9 @@
 #include "moon-sys/elf/load_section.h"
 #include <base/string.h>
+#include <mm/virt.h>
+#include <paging/paging.h>
 
-bool elf_load_section(void *elf, string_view target, Elf64_Ehdr ehdr)
+bool elf_load_section(void *elf, string_view target, Elf64_Ehdr ehdr, void *base)
 {
 	size_t target_len = strlen(target);
 	Elf64_Shdr *shstrtab = elf + (ehdr.e_shoff + ehdr.e_shstrndx * ehdr.e_shentsize);
@@ -13,7 +15,9 @@ bool elf_load_section(void *elf, string_view target, Elf64_Ehdr ehdr)
 
 		if (!strncmp(&section_names[shdr->sh_name], target, target_len))
 		{
-			memcpy((uint8_t *)shdr->sh_addr, (uint8_t *)(elf + shdr->sh_offset), ehdr.e_shentsize);
+			auto phys = arch_alloc_page();
+			arch_quickmap_page((struct Pml*)base, shdr->sh_addr, (size_t)phys, MAP_USER_RO);
+			memcpy((uint8_t *)phys, (uint8_t *)(elf + shdr->sh_offset), ehdr.e_shentsize);
 			return true;
 		}
 	}

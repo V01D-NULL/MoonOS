@@ -31,6 +31,7 @@ static Task elf_parse_phdr(const uint8_t *elf, Elf64_Ehdr ehdr, string_view desc
 	bool found_ptload = false;
 	arch_copy_kernel_mappings(task);
 
+			auto phys = arch_alloc_page();
 	for (Elf64_Half i = 0; i < phdr_entries; i++)
 	{
 		if (phdr->p_type == PT_LOAD)
@@ -38,21 +39,38 @@ static Task elf_parse_phdr(const uint8_t *elf, Elf64_Ehdr ehdr, string_view desc
 			found_ptload = true;
 			size_t num_pages = ALIGN_UP(phdr->p_memsz) / 4096;
 
+
 			for (uint64_t i = 0; i < num_pages; i++)
 			{
 				elf_mapping_offset += (i * PAGE_SIZE);
-				arch_map_page(task.pagemap, elf_mapping_offset, elf_mapping_offset, MAP_USER_RW);
+				arch_quickmap_page(task.pagemap, elf_mapping_offset, (size_t)phys, MAP_USER_RW);
 			}
 
-			memcpy((uint8_t *)phdr->p_vaddr, (const uint8_t *)elf + phdr->p_offset, phdr->p_filesz);
-			memset((void *)phdr->p_vaddr + phdr->p_filesz, 0, phdr->p_filesz - phdr->p_memsz);
+			memcpy((uint8_t *)phys, (const uint8_t *)elf + phdr->p_offset, phdr->p_filesz);
+			memset((void *)phys + phdr->p_filesz, 0, phdr->p_filesz - phdr->p_memsz);
+			
+			// Elf64_Shdr *shstrtab = elf + (ehdr.e_shoff + ehdr.e_shstrndx * ehdr.e_shentsize);
+			// string_view section_names = elf + shstrtab->sh_offset;
+// 
+			// for (int i = 0; i < ehdr.e_shnum; i++)
+		// 	{
+		// 		Elf64_Shdr *shdr = (Elf64_Shdr *)(elf + (ehdr.e_shoff + i * ehdr.e_shentsize));
+
+		// 		if (!strncmp(&section_names[shdr->sh_name], ".rodata", 7))
+		// 		{
+		// 			memcpy((uint8_t *)(phys + shdr->sh_offset), (uint8_t *)(elf + shdr->sh_offset), ehdr.e_shentsize);
+		// 		}
+		// 	}
 		}
 
 		phdr += ehdr.e_phentsize;
 	}
 	
-	elf_load_section((void *)elf, ".data", ehdr);
-	elf_load_section((void *)elf, ".rodata", ehdr);
+	// elf_load_section((void *)elf, ".data", ehdr);
+
+	// auto base = arch_alloc_page();
+	// arch_quickmap_page(task.pagemap, shdr->sh_addr, arch_alloc_page(), MAP_USER_RO);
+	// elf_load_section((void *)elf, ".rodata", ehdr, task.pagemap);
 
 	if (!found_ptload)
 	{

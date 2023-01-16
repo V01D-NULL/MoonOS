@@ -15,6 +15,7 @@ static int registered_tasks = 0, current_task_idx = 0;
 
 void sched_init(void)
 {
+	arch_scheduler_callback(NULL);
 	arch_switch_pagemap(tasks[current_task_idx]);
 	arch_enter_userspace((void *)tasks[current_task_idx].entrypoint, tasks[current_task_idx].ustack);
 }
@@ -33,7 +34,7 @@ void sched_reschedule(struct arch_task_registers regs)
 	// Find new task
 	if (registered_tasks > 1)
 	{
-		if (++current_task_idx > 10)
+		if (++current_task_idx >= registered_tasks)
 			current_task_idx = 0;
 	}
 	else
@@ -42,7 +43,10 @@ void sched_reschedule(struct arch_task_registers regs)
 	// Save register state
 	tasks[current_task_idx].registers = regs;
 
+	// trace("%d %d\n", current_task_idx, registered_tasks);
+
 	// Load new task
 	auto new = tasks[current_task_idx];
 	arch_switch_pagemap(new);
+	debug(false, "new task: %s\n", new.descriptor);
 }
