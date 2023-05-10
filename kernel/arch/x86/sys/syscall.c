@@ -17,7 +17,7 @@ void arch_init_syscall(void)
 
 void syscall_handler(GeneralRegisters reg)
 {
-	debug(true, "\nSyscall handler\n");
+	// debug(true, "\nSyscall handler\n");
 	// debug(false, "{\n"
 	// 			 "   arg0: 0x%p | arg1: 0x%p | arg2: 0x%p\n"
 	// 			 "   arg3: 0x%p | arg4: 0x%p | arg5: 0x%p\n"

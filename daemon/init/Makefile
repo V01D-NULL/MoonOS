@@ -14,13 +14,14 @@ all: $(TARGET)
 	@printf "Built init daemon\n\n";
 
 $(TARGET): $(OBJ)
-	@ld.lld -T../daemon.ld $^ $(USER_LIBS) -static -nostdlib -o $@
+	@nasm -f elf64 entry.s -o entry.o
+	@ld.lld -T../daemon.ld $^ entry.o $(USER_LIBS) -static -nostdlib -o $@
+#	@ld.lld -T../daemon.ld $^ $(USER_LIBS) -static -nostdlib -o $@
 	@mv $@ ../../boot/modules
 	
 %.o: %.c
 	@printf " CC  $<\n";
 	$(CC) $(CFLAGS) -c $< -o $@
-#	nasm -f elf64 entry.s -o test.o
 
 clean:
 	@rm -rf $(TARGET) $(OBJ)

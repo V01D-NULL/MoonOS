@@ -1,12 +1,17 @@
 #include <abi/syscalls.h>
 
-void _start(void)
+extern void do_sys(void);
+
+void main(void)
 {
-	syscall_log("init: Started init daemon\n", 27);
+	do_sys();
+	// syscall_log("init: Started init daemon\n", 27);
+	
+// 	for (int i = 0; i < 40; i++)
+// 		syscall_log("FGHIJ\n", 6);
 
 	for (;;)
 	{
-		// syscall_log("ABCDE\n", 7);
-		// syscall_log("FGHIJ\n", 7);
+		do_sys();
 	}
 }

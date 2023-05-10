@@ -1,5 +1,6 @@
 #include "syscalls.h"
 #include <moon-extra/compiler.h>
+#include <base/string.h>
 #include <cpu.h>
 #include <printk.h>
 #include <base/base-types.h>
@@ -16,6 +17,8 @@ int sys_log(Type fd, Type buff, Type len, ignore, ignore, ignore)
 	(void)fd;
 
 	string_view ptr = (string_view)buff;
+	// debug(true, "len %d | strlen: %d\n", len, strlen(ptr));
+
 	if (!ptr)
 		return -1;
 

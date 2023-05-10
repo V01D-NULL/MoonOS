@@ -4,7 +4,7 @@
 #include <platform/acpi/x86/apic/apic.h>
 #include <printk.h>
 
-extern void sched_reschedule(struct arch_task_registers* regs);
+extern void sched_reschedule(struct arch_task_registers *regs);
 static long timer_quantum;
 
 // create_lock("sched_lock", sched_lock);
