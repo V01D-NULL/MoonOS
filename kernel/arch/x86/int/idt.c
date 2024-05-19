@@ -52,7 +52,7 @@ void init_idt(void)
     idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t) isr29, 29);
     idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t) isr30, 30);
     idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t) isr31, 31);
-    idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t) isr32, 32);
+    // idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t) isr32, 32);
     idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t) isr33, 33);
     idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t) isr34, 34);
     idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t) isr35, 35);

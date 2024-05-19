@@ -4,7 +4,7 @@
 #include <mm/page.h>
 #include <base/base-types.h>
 
-#define ALIGN_UP(__number) (((__number) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
+	#define ALIGN_UP(__number) (((__number) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 #define ALIGN_DOWN(__number) ((__number) & ~(PAGE_SIZE - 1))
 
 inline uint64_t align(int size, int align)

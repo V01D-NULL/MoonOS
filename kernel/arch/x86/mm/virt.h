@@ -19,5 +19,7 @@ struct Pml *arch_create_new_pagemap(void);
 void arch_copy_kernel_mappings(Task task);
 void arch_switch_pagemap(Task task);
 void arch_pagefault_handler(uint64_t cr2, int error_code);
+phys_t arch_translate(struct Pml *pml4, virt_t vaddr);
+
 
 #endif // VIRTUAL_MEMORY_H

@@ -121,5 +121,6 @@ void boot(struct stivale2_struct *bootloader_info)
 	kalloc_init();
 	platform_init(&ctx);
 	init_percpu((uint64_t)stack);
+	idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t) isr32, 32);
 	kern_main(modules);
 }

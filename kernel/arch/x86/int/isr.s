@@ -15,6 +15,7 @@ _asm_isr_handler_stub:
     cld
 	isr_swapgs swapgs_entry
     pusha64
+    mov rdi, rsp
     call isr_handler   ; C interrupt handler routine
     popa64
 	isr_swapgs swapgs_exit
@@ -76,9 +77,17 @@ isr_err 14
 %assign n n+1
 %endrep
 
+; Timer/task switch
+global isr32
+extern task_switch_handler
+isr32:
+    push 0  ; Dummy error code
+    push 32 ; Push interrupt number
+    jmp task_switch_handler
+
 ; IRQ's
-%assign n 32
-%rep 16
+%assign n 33
+%rep 15
     isr n
 %assign n n+1
 %endrep

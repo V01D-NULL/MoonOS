@@ -183,3 +183,31 @@ void arch_pagefault_handler(uint64_t cr2, int error_code)
     // Todo: Check if cr2 is a high vma and verify flags accordingly (Don't want a user accessing kernel data structures :p)
     arch_map_page((struct Pml*)cr3_read(), cr2, cr2, pf.flags);
 }
+
+phys_t arch_translate(struct Pml *pml4, virt_t vaddr)
+{
+    if (!pml4) {
+        panic("Tried to call %s with a NULL PML4!", __func__);
+    }
+
+    struct pte *pml3_entry = &pml4->page_tables[index_of(vaddr, 4)];
+    if (!pml3_entry->present) return 0;
+
+    struct Pml *pml3 = (struct Pml *)((uintptr_t)pml3_entry->address << PAGE_SHIFT);
+
+    struct pte *pml2_entry = &pml3->page_tables[index_of(vaddr, 3)];
+    if (!pml2_entry->present) return 0;
+
+    struct Pml *pml2 = (struct Pml *)((uintptr_t)pml2_entry->address << PAGE_SHIFT);
+
+    struct pte *pml1_entry = &pml2->page_tables[index_of(vaddr, 2)];
+    if (!pml1_entry->present) return 0;
+
+    struct Pml *pml1 = (struct Pml *)((uintptr_t)pml1_entry->address << PAGE_SHIFT);
+
+    struct pte *pte = &pml1->page_tables[index_of(vaddr, 1)];
+    if (!pte->present) return 0;
+
+    // Combine the physical address with the offset within the page
+    return (phys_t)(pte->address << PAGE_SHIFT) | (vaddr & (PAGE_SIZE - 1));
+}

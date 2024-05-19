@@ -14,7 +14,6 @@
 	do                                  \
 	{                                   \
 		set_boot_term_available(false); \
-		term_init();                    \
 	} while (0)
 
 void arch_tty_write(string_view str);

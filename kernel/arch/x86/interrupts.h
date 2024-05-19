@@ -40,15 +40,15 @@ struct iframe
 
 #define TRY_EXEC_HANDLER(base)                                                                     \
 	{                                                                                              \
-		if (isr_handler_array[regs.isr_number] != 0)                                               \
+		if (isr_handler_array[regs->isr_number] != 0)                                               \
 		{                                                                                          \
-			isr_handler_array[regs.isr_number]((struct iframe *)&regs);                            \
+			isr_handler_array[regs->isr_number]((struct iframe *)&regs);                            \
 		}                                                                                          \
 		else                                                                                       \
 		{                                                                                          \
-			if (!IS_IRQ(regs.isr_number))                                                          \
+			if (!IS_IRQ(regs->isr_number))                                                          \
 			{                                                                                      \
-				debug(true, "Unhandled interrupt 0x%x (%ld)\n", regs.isr_number, regs.isr_number); \
+				debug(true, "Unhandled interrupt 0x%x (%ld)\n", regs->isr_number, regs->isr_number); \
 			}                                                                                      \
 		}                                                                                          \
 	}
