@@ -2,5 +2,6 @@
 
 void main(void)
 {
+	for(;;)
 	syscall_log("hello\n", 6);
 }

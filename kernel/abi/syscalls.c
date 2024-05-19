@@ -26,7 +26,7 @@ int sys_log(Type fd, Type buff, Type len, ignore, ignore, ignore)
 	// 	debug(true, "oh fuck %s | %lx\n", ptr, buff);
 	// }
 
-	debug(true, "[%s]\n", get_current_task());
+	debug(true, "%s", ptr);
 	// for (auto i = 0; i < len; i++)
 	// 	puts("%c", ptr[i]);
 

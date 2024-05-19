@@ -46,7 +46,7 @@ void print_registers(struct arch_task_registers* regs)
     debug(false, "IP: %p\n", regs->ip);
 }
 
-void sched_reschedule(struct arch_task_registers* regs)
+Task sched_reschedule(struct arch_task_registers* regs)
 {
     // Save register state
     // regs->ip = tasks[current_task_idx].entrypoint;
@@ -70,15 +70,17 @@ void sched_reschedule(struct arch_task_registers* regs)
     arch_switch_pagemap(new);
     
     // Restore context
-    regs->ip = new.registers.ip;
-    regs->registers = new.registers.registers;
-    regs->rsp = new.registers.rsp;
+    // regs->ip = new.registers.ip;
+    // regs->registers = new.registers.registers;
+    // regs->rsp = new.registers.rsp;
+
+    return new;
 
     // Print new task registers
-    debug(true,"New task registers:\n");
-    print_registers(regs);
+    // debug(true,"New task registers:\n");
+    // print_registers(regs);
 
-    debug(false, "new task: %s | %lx | %lx | %lx\n", new.descriptor, new.pagemap, new.entrypoint, new.registers.ip);
+    // debug(false, "new task: %s | %lx | %lx | %lx\n", new.descriptor, new.pagemap, new.entrypoint, new.registers.ip);
 }
 
 string_view get_current_task(void) {
