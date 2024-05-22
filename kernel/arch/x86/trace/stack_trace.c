@@ -1,34 +1,30 @@
 #include "stack_trace.h"
 
-struct stackframe_list {
-	struct stackframe_list *next;
-	size_t value;
-};
-
 struct stacktrace_result arch_trace_stack(int frames)
 {
     if (frames > UNWIND_MAX)
-    {
         frames = UNWIND_MAX;
-    }
 
     struct stacktrace_result result;
-    struct stackframe_list *stackframe;
-    asm volatile("mov %%rbp, %0"
-            : "=r"(stackframe) :: "memory");
+    void                   **rbp;
+    asm volatile("mov %%rbp, %0" : "=r"(rbp));
 
     int i = 0;
-    while (i < frames && stackframe)
+    for (; i < frames && rbp != NULL; i++)
     {
-		result.trace_results[i++].address = stackframe->value;
-        stackframe = stackframe->next;
+        void *return_address    = *(rbp + sizeof(int8_t));
+        result.trace_results[i] = (size_t)return_address;
+        rbp                     = (void **)(*rbp);
     }
 
-    //Note: Setting result.count = frames could cause UB as the stack
-    //is not guaranteed to be comprised of `frames` stack frames.
+    // Note: Setting result.count = frames could cause UB as the stack
+    // is not guaranteed to be comprised of `frames` stack frames.
     result.count = i - 1;
-    result.caller_rbp = result.trace_results[1].address; // Save caller rbp to dump stack contents later. Since panic() is
-                                                         // included in the stack trace, we use at index 1 instead of 0.
-    
+
+    // Save caller rbp to dump stack contents later. Since
+    // panic() is included in the stack trace, we use at
+    // index 1 instead of 0.
+    result.caller_rbp = result.trace_results[1];
+
     return result;
 }
