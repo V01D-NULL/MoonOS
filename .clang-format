@@ -1,0 +1,43 @@
+BasedOnStyle: Google
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+AllowShortIfStatementsOnASingleLine: false
+BreakBeforeBraces: Allman
+SpaceBeforeParens: ControlStatements
+SpacesInParentheses: false
+SpaceInEmptyParentheses: false
+PointerAlignment: Right
+IndentCaseLabels: true
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveDeclarations: Consecutive
+AlignTrailingComments: true
+AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortLoopsOnASingleLine: false
+BreakBeforeBinaryOperators: None
+BreakConstructorInitializers: BeforeColon
+ColumnLimit: 80
+DerivePointerAlignment: false
+IncludeBlocks: Preserve
+IncludeCategories:
+  - Regex: '^<.*\.h>'
+    Priority: 1
+  - Regex: '^".*\.h"'
+    Priority: 2
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 1
+SortIncludes: true
+
+# Custom settings for breaking long lines
+BinPackArguments: false
+PenaltyBreakBeforeFirstCallParameter: 0
+PenaltyBreakString: 1000
+PenaltyExcessCharacter: 1000
+PenaltyReturnTypeOnItsOwnLine: 1000
+PenaltyBreakFirstLessLess: 0
+PenaltyBreakAssignment: 0
+ContinuationIndentWidth: 4
+AllowAllParametersOfDeclarationOnNextLine: true
+BreakBeforeTernaryOperators: true
+AlwaysBreakAfterReturnType: None
+BreakConstructorInitializers: BeforeColon
