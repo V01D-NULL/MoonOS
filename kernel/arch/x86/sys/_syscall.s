@@ -7,21 +7,18 @@ extern syscall_handler
 global x86_syscall_handler
 x86_syscall_handler:
 	swapgs
-	
-	mov qword [gs:0x08], rsp ; Save user rsp
-    mov rbp, qword [gs:0x0]  ; Set syscall handler stack (shared with kernel)
-	; jmp $
-    ; mov rbp, qword 0
-	sti
+
+	mov qword gs:0x16, qword 1
+	mov qword gs:0x08, rsp ; Save user rsp
+    mov rsp, qword gs:0x0 ; Set syscall handler stack (shared with kernel)
 
     pusha64 ; Todo: Let the user do this
+	mov rbp, qword 0
     call syscall_handler
     popa64
-	
-	cli
-    mov rsp, qword [gs:0x08] ; Restore original rsp
-	mov rbp, qword 0
+
+    mov rsp, qword gs:0x08 ; Restore original rsp
+	mov qword gs:0x16, qword 0
     swapgs
-    
-	mov rax, 0
+
     o64 sysret

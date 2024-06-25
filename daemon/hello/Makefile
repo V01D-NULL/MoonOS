@@ -1,7 +1,7 @@
 -include ../../Make.conf
 
 CC = @clang
-TARGET := init.elf
+TARGET := hello.elf
 CFILES	 := $(shell find ./ -type f -name '*.c')
 USER_LIBS := $(shell find ../../userspace -type f -name '*.a')
 OBJ    := $(CFILES:.c=.o)
@@ -11,7 +11,7 @@ CFLAGS = -ffreestanding -O2 -std=gnu11 \
 	-mno-sse -mno-sse2 -Wall -I../../userspace/arch/$(ARCH)/ \
 
 all: $(TARGET)
-	@printf "Built init daemon\n\n";
+	@printf "Built hello daemon\n\n";
 
 $(TARGET): $(OBJ)
 	@nasm -f elf64 entry.s -o entry.o

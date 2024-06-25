@@ -1,10 +1,13 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
+#include <moon-extra/result.h>
 #include "task.h"
 
-void sched_init(void);
-void sched_register_task(Task task);
-void sched_yield(void);
+typedef Result(Task, Nullish) SchedulerResult;
 
-#endif // SCHEDULER_H
+void        sched_init(void);
+void        sched_register_task(Task task);
+string_view get_current_task(void);
+
+#endif  // SCHEDULER_H

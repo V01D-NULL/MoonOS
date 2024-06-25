@@ -35,10 +35,11 @@ static int is_transit_empty(void)
 
 void serial_write(char chr)
 {
-	while (is_transit_empty() == 0)
-		;
+	outb(0xE9, chr);
+	// while (is_transit_empty() == 0)
+	// 	;
 
-	outb(COM1, chr);
+	// outb(COM1, chr);
 }
 
 void serial_write_str(string_view str)
