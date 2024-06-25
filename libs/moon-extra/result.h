@@ -1,27 +1,33 @@
 #ifndef RESULT_H
 #define RESULT_H
 
-#include <panic.h>
 #include <base/base-types.h>
 #include <moon.h>
+#include <panic.h>
 
-packed_struct$(Result, {
-	bool success;
-	uint64_t status;
-});
+typedef void *Nullish;
 
-inline uint64_t UNWRAP_RESULT(Result r)
-{
-	if (r.success)
-		return r.status;
+#define Result(Ok, Err) \
+    struct              \
+    {                   \
+        bool is_ok;     \
+        union           \
+        {               \
+            Ok  ok;     \
+            Err err;    \
+        };              \
+    }
 
-	panic("Failed to unwrap result");
-}
+#define Error(T, V)              \
+    (T)                          \
+    {                            \
+        .is_ok = false, .err = V \
+    }
 
-#define Error() \
-	(Result) { 0 }
+#define Okay(T, V)             \
+    (T)                        \
+    {                          \
+        .is_ok = true, .ok = V \
+    }
 
-#define Okay(x) \
-	(Result) { .success = true, .status = x }
-
-#endif // RESULT_H
+#endif  // RESULT_H

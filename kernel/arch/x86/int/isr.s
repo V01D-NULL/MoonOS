@@ -77,7 +77,7 @@ isr_err 14
 %assign n n+1
 %endrep
 
-; Timer/task switch
+; ; Timer/task switch
 global isr32
 extern task_switch_handler
 isr32:
