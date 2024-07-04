@@ -44,11 +44,9 @@ void hpet_init(void)
 
     arch_map_page(va(cr3_read()), hpet_addr, pa(hpet_addr), 3);
 
-    trace("HPET Address: %p\n", hpet_addr);
+    trace(TRACE_MISC, "HPET Address: %p\n", hpet_addr);
 
-    hpet_dev = (struct hpet_device *)(hpet_addr);
-    trace("HPET Address: %p\n", hpet_addr);
-
+    hpet_dev            = (struct hpet_device *)(hpet_addr);
     counter_tick_period = (hpet_dev->general_capabilities >> 32);
 
     hpet_dev->general_configuration = 0;

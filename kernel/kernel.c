@@ -28,8 +28,8 @@ void kern_main(void)
     arch_init_syscall();
 
 #if defined(__x86_64__)
-    trace("Detected %d modules\n", mods.count);
-    trace("Module string: %s\n", mods.modules[0].cmdline);
+    trace(TRACE_MISC, "Detected %d modules\n", mods.count);
+    trace(TRACE_MISC, "Module string: %s\n", mods.modules[0].cmdline);
 
     load_daemon(
         (const uint8_t *)mods.modules[0].address, mods.modules[0].cmdline);

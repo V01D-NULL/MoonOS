@@ -16,11 +16,29 @@
         debug(true, x, __VA_ARGS__);    \
     } while (0)
 
-#define trace(...)                      \
-    do                                  \
-    {                                   \
-        printk(PR_MODULE, __VA_ARGS__); \
+#define trace(bitmask, ...)                 \
+    do                                      \
+    {                                       \
+        if (bitmask & TRACE_MASK)           \
+            printk(PR_MODULE, __VA_ARGS__); \
     } while (0)
+
+#define TRACE_MASK (TRACE_ALL)
+
+enum
+{
+    TRACE_BOOT    = (1 << 0),
+    TRACE_INT     = (1 << 1),
+    TRACE_DEBUG   = (1 << 2),
+    TRACE_SYSCALL = (1 << 3),
+    TRACE_MISC    = (1 << 4),  // For logs with no specific category
+    TRACE_TASK    = (1 << 5),
+    TRACE_SERVICE = (1 << 6),
+    TRACE_SLAB    = (1 << 7),
+
+    TRACE_ALL  = ~0,
+    TRACE_NONE = 0,
+};
 
 void printk(string status, string fmt, ...);
 void printk_init(bool verbose_boot, HandoverFramebuffer fb);

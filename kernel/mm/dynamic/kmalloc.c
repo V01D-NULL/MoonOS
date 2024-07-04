@@ -174,19 +174,19 @@ void kmem_cache_destroy(struct kmem_cache *cachep)
 // Dump up to 'n' slabs
 void kmem_cache_dump(struct kmem_cache *cachep, int n)
 {
-    trace("Dumping bufctl freelists...\n");
+    trace(TRACE_SLAB, "Dumping bufctl freelists...\n");
     debug(true, "Dumping bufctl freelists...\n");
     int counter = 0;
 
     list_foreach(slab, next, cachep->nodes)
     {
-        trace("Found slab at %p\n", slab);
+        trace(TRACE_SLAB, "Found slab at %p\n", slab);
         debug(true, "Found slab at %p\n", slab);
 
         list_foreach(out, next, slab->freelist)
         {
             debug(true, "out->ptr: %lx\n", out->ptr);
-            trace("out->ptr: %lx\n", out->ptr);
+            trace(TRACE_SLAB, "out->ptr: %lx\n", out->ptr);
         }
 
         if (n > 0)

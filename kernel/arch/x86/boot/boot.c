@@ -38,24 +38,24 @@ void boot(void)
     set_hhdm_offset(handover.hhdm_offset);
     printk_init(true, handover.framebuffer);
 
-    trace("Reached target pmm\n");
+    trace(TRACE_BOOT, "Reached target pmm\n");
     {
         extern void init_phys_allocator(HandoverMemoryMap);
         init_phys_allocator(handover.memory_map);
     }
 
-    trace("Reached target vmm\n");
+    trace(TRACE_BOOT, "Reached target vmm\n");
     {
         extern void arch_init_paging(BootHandover);
         arch_init_paging(handover);
     }
 
-    trace("Reached target gdt and tss\n");
+    trace(TRACE_BOOT, "Reached target gdt and tss\n");
     init_gdt((uint64_t)stack + sizeof((uint64_t)stack));
 
     // Core#0 will remap the pic once.
     // After acpi_init the pic is disabled in favor of the apic
-    trace("Reached target pic\n");
+    trace(TRACE_BOOT, "Reached target pic\n");
     pic_remap();
     init_idt();
 

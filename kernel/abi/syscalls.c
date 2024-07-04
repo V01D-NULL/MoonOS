@@ -28,9 +28,9 @@ int sys_log(Type fd, Type buff, Type len, ignore, ignore, ignore)
     debug(true, "len %d | strlen: %d\n", len, strlen(ptr));
 
     asm volatile("int3");
-    trace("%s", ptr);
+    trace(TRACE_SYSCALL, "%s", ptr);
     // for (auto i = 0; i < len; i++)
-    //     trace("%c", ptr[i]);
+    //     trace(TRACE_SYSCALL, "%c", ptr[i]);
 
     return 0;
 }

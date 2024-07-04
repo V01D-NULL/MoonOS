@@ -15,7 +15,7 @@ void rsdp_verify_checksum(uint64_t rsdp_address);
 void rsdp_init(virt_t rsdp_addr)
 {
     rsdp_verify_checksum(rsdp_addr);
-    trace("RSDP Table: %llX\n", rsdp_addr);
+    trace(TRACE_MISC, "RSDP Table: %llX\n", rsdp_addr);
 
     rsdp = *(struct RSDP *)rsdp_addr;
 
@@ -23,20 +23,22 @@ void rsdp_init(virt_t rsdp_addr)
     // missing terminator. Is there really no specification to use a NULL
     // terminating character in the entirety of ACPI?
     rsdp.oem_string[5] = '\0';
-    trace("RSDP OEM: %s\n", rsdp.oem_string);
+    trace(TRACE_MISC, "RSDP OEM: %s\n", rsdp.oem_string);
 
     /* XSDT */
     if (rsdp.revision >= 2)
     {
-        trace("ACPI Version: 2.0+ (detection based on revision)\n");
-        trace("XSDT address: %llX\n", rsdp.xsdt_address);
+        trace(TRACE_MISC, "ACPI Version: 2.0+ (detection based on revision)\n");
+        trace(TRACE_MISC, "XSDT address: %llX\n", rsdp.xsdt_address);
         has_xsdt = true;
     }
     /* RSDT */
     else
     {
-        trace("Revision: %d (Assuming ACPI version 1.0)\n", rsdp.revision);
-        trace("RSDT address: %llX\n", rsdp.rsdt_address);
+        trace(TRACE_MISC,
+              "Revision: %d (Assuming ACPI version 1.0)\n",
+              rsdp.revision);
+        trace(TRACE_MISC, "RSDT address: %llX\n", rsdp.rsdt_address);
     }
 }
 

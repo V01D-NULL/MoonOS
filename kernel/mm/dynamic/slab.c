@@ -75,10 +75,10 @@ static struct kmem_slab *__kmem_create_slab(struct kmem_cache *cachep,
 {
     if (!small_slab)
     {
-        trace(
-            "__kmem_create_slab: '%s' is a large slab. They aren't supported "
-            "yet.\n",
-            cachep->descriptor);
+        trace(TRACE_SLAB,
+              "__kmem_create_slab: '%s' is a large slab. They aren't supported "
+              "yet.\n",
+              cachep->descriptor);
         return NULL;
     }
 

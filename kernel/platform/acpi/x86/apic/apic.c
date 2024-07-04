@@ -42,7 +42,7 @@ void lapic_init(void)
     lapic_base = va(apic.lapic_addr);
     arch_map_page(va(cr3_read()), lapic_base, pa(lapic_base), MAP_KERN);
     lapic_enable();
-    trace("lapic_base = %p\n", lapic_base);
+    trace(TRACE_MISC, "lapic_base = %p\n", lapic_base);
 }
 
 uint32_t lapic_read(uint32_t offset)
