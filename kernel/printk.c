@@ -7,28 +7,25 @@
 
 static bool is_verbose_boot = false;
 
-void printk_init(bool verbose_boot, uint64_t fb_addr, uint16_t fb_width,
-                 uint16_t fb_height, uint16_t fb_pitch,
-                 uint8_t fb_red_mask_size, uint8_t fb_red_mask_shift,
-                 uint8_t fb_green_mask_size, uint8_t fb_green_mask_shift,
-                 uint8_t fb_blue_mask_size, uint8_t fb_blue_mask_shift)
+void printk_init(bool verbose_boot, HandoverFramebuffer fb)
 {
-    arch_tty_init(fb_addr,
-                  fb_width,
-                  fb_height,
-                  fb_pitch,
-                  fb_red_mask_size,
-                  fb_red_mask_shift,
-                  fb_green_mask_size,
-                  fb_green_mask_shift,
-                  fb_blue_mask_size,
-                  fb_blue_mask_shift);
+    arch_tty_init(fb.address,
+                  fb.width,
+                  fb.height,
+                  fb.pitch,
+                  fb.red_mask_size,
+                  fb.red_mask_shift,
+                  fb.green_mask_size,
+                  fb.green_mask_shift,
+                  fb.blue_mask_size,
+                  fb.blue_mask_shift);
+
     is_verbose_boot = verbose_boot;
 }
 
 void printk(string status, string fmt, ...)
 {
-    if (!is_verbose_boot)
+    if (unlikely(!is_verbose_boot))
         return;
 
     char    buffer[512];

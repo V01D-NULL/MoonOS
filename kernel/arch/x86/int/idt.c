@@ -53,22 +53,6 @@ void init_idt(void)
     idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr29, 29);
     idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr30, 30);
     idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr31, 31);
-    idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr32, 32);
-    idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr33, 33);
-    idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr34, 34);
-    idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr35, 35);
-    idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr36, 36);
-    idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr37, 37);
-    idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr38, 38);
-    idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr39, 39);
-    idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr40, 40);
-    idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr41, 41);
-    idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr42, 42);
-    idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr43, 43);
-    idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr44, 44);
-    idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr45, 45);
-    idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr46, 46);
-    idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr47, 47);
 
     // Load IDT
     struct idtr _idtr = {

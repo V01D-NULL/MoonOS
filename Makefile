@@ -34,7 +34,6 @@ libs:
 	@$(MAKE) --no-print-directory -C libs all
 
 clean:
-	@rm -f $(KERNEL_HDD)
 	@$(MAKE) --no-print-directory -C kernel clean
 	@$(MAKE) --no-print-directory -C libs   clean
 	@$(MAKE) --no-print-directory -C daemon/init   clean
@@ -44,9 +43,10 @@ debug: quick_recompile
 	$(DEBUG_TERMINAL) $(DEBUG_TERMINAL_OPTS) ./meta/debug-util/debug.sh &
 	$(EMU) $(EMU_DEBUG_OPTS)
 
-# Remove the HDD & elf file while saving all object files (fewer files will be recompiled)
+# FIXME: Use .d files instead of this
+# Remove the elf file while saving all object files (fewer files will be recompiled)
 quick_recompile: symlist
-	@rm -f $(KERNEL_HDD) kernel/kernel.elf
+	@rm -f kernel/kernel.elf
 	@printf "\n"
 	@$(MAKE) --no-print-directory -C libs
 	@$(MAKE) --no-print-directory -C userspace/

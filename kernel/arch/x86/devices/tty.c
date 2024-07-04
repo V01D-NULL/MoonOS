@@ -33,8 +33,5 @@ void arch_tty_init(uint64_t fb_addr, uint16_t fb_width, uint16_t fb_height,
 
 void arch_tty_write(string_view str)
 {
-    // if (is_boot_term_available())
-    //     boot_term_write("%s", str);
-    // else
     flanterm_write(ft_ctx, str, strlen(str));
 }

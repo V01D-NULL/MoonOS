@@ -1,9 +1,7 @@
 [submodule "limine"]
 	path = meta/limine
 	url = https://github.com/limine-bootloader/limine
-[submodule "echfs"]
-	path = meta/echfs
-	url = https://github.com/echfs/echfs.git
+	branch = v7.x-binary
 [submodule "meta/firmtool"]
 	path = meta/firmtool
 	url = https://github.com/TuxSH/firmtool.git

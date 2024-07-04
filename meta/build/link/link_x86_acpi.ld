@@ -2,7 +2,6 @@ ENTRY(boot)
 
 PHDRS
 {
-    null    PT_NULL    FLAGS(0) ;                   /* Null segment */
     text    PT_LOAD    FLAGS((1 << 0) | (1 << 2)) ; /* Execute + Read */
     rodata  PT_LOAD    FLAGS((1 << 2)) ;            /* Read only */
     data    PT_LOAD    FLAGS((1 << 1) | (1 << 2)) ; /* Write + Read */
@@ -11,43 +10,46 @@ PHDRS
 
 SECTIONS
 {
-    /* We wanna be placed in the higher half, 2MiB above 0 in physical memory. */
-    . = 0xffffffff80200000;
-    kernel_start = .;
+    . = 0xffffffff80000000;
     
-    /* Then let's place all the other traditional executable sections afterwards. */
-    .text : ALIGN(0x1000) {
-        *(.text*)
-    }
+    .text : {
+        *(.text .text.*)
+    } : text
 
-    /* We place the .stivalehdr section containing the header in its own section, */
-    /* and we use the KEEP directive on it to make sure it doesn't get discarded. */
-    .stivale2hdr : ALIGN(0x1000) {
-        KEEP(*(.stivale2hdr))
-    }
+    . = ALIGN(CONSTANT(MAXPAGESIZE));
 
     .rodata : {
-        *(.rodata*)
-    }
+        *(.rodata .rodata.*)
+    } :rodata
 
-    .data : ALIGN(0x1000) {
-        *(.data*)
-    }
+    . = ALIGN(CONSTANT(MAXPAGESIZE));
 
-    .dynamic : ALIGN(0x1000) {
+    .data : {
+        *(.data .data.*)
+
+        /* Place the sections that contain the Limine requests as part of the .data */
+        /* output section. */
+        KEEP(*(.requests_start_marker))
+        KEEP(*(.requests))
+        KEEP(*(.requests_end_marker))
+    } :data
+
+    .dynamic : {
         *(.dynamic)
     } :data :dynamic
 
-    .bss : ALIGN(0x1000) {
+    .bss : {
+        *(.bss .bss.*)
         *(COMMON)
-        *(.bss*)
-    }
-    kernel_end = .;
+    } :data
 
-    /* Hack in a small heap area for an early framebuffer console */
-    . += CONSTANT(MAXPAGESIZE);
-    . = . - 0xffffffff80200000;
-    __embedded_kheap_start = .;
-    . += 1920 * 1080 * 20;
-    __embedded_kheap_end = .;
+    . = ALIGN(CONSTANT(MAXPAGESIZE));
+    kernel_end = .;
+    
+    /DISCARD/ : {
+        *(.eh_frame*)
+        *(.note .note.*)
+        *(.interp)
+    }
+
 }

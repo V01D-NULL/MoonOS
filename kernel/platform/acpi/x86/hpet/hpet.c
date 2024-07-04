@@ -1,16 +1,20 @@
 #define PR_MODULE "hpet"
 
 #include "hpet.h"
+#include <base/base-types.h>
+#include <mm/virt.h>
+#include <panic.h>
 #include <platform/acpi/x86/acpi.h>
 #include <printk.h>
-#include <base/base-types.h>
-#include <panic.h>
 
-#define HPET_ADDR_OFFSET 44 // 'address' offset in the hpet table. (Moon only uses the hpet to calibrate
-                            // the lapic timer, so a HPET table struct seemed like overkill)
+#define HPET_ADDR_OFFSET \
+    44  // 'address' offset in the hpet table. (Moon only uses the hpet to
+        // calibrate the lapic timer, so a HPET table struct seemed like
+        // overkill)
 
 // Intel hpet spec 1-0a: 2.3.1 Register Overview
-struct hpet_device // Represents a single register set for an hpet minus some things that I don't require for hpet_usleep()
+struct hpet_device  // Represents a single register set for an hpet minus some
+                    // things that I don't require for hpet_usleep()
 {
     uint64_t general_capabilities;
     uint64_t reserved0;
@@ -36,16 +40,20 @@ void hpet_init(void)
     if (!hpet)
         panic("No HPET detected, cannot calibrate lapic timer!");
 
-    auto hpet_addr = *(uint64_t *)(hpet + HPET_ADDR_OFFSET);
+    auto hpet_addr = va(*(uint64_t *)(hpet + HPET_ADDR_OFFSET));
+
+    arch_map_page(va(cr3_read()), hpet_addr, pa(hpet_addr), 3);
+
+    trace("HPET Address: %p\n", hpet_addr);
 
     hpet_dev = (struct hpet_device *)(hpet_addr);
     trace("HPET Address: %p\n", hpet_addr);
 
     counter_tick_period = (hpet_dev->general_capabilities >> 32);
-    
+
     hpet_dev->general_configuration = 0;
-    hpet_dev->main_counter_value = 0;
-    hpet_dev->general_configuration = 1; // Enable the HPET
+    hpet_dev->main_counter_value    = 0;
+    hpet_dev->general_configuration = 1;  // Enable the HPET
 }
 
 static uint64_t hpet_counter_value(void)
@@ -57,7 +65,7 @@ static uint64_t hpet_counter_value(void)
 const uint64_t hpet_usec_to_ticks(uint64_t usec)
 {
     const uint64_t femtosecond = 1000000000;
-    const uint64_t ticks = hpet_counter_value();
+    const uint64_t ticks       = hpet_counter_value();
     return ticks + (usec * femtosecond) / counter_tick_period;
 }
 

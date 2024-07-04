@@ -1,26 +1,27 @@
 #define PR_MODULE "rsdp"
 
 #include "rsdp.h"
+#include <base/base-types.h>
 #include <moon-io/serial.h>
 #include <panic.h>
 #include <printk.h>
-#include <base/base-types.h>
 #include <stdalign.h>
 
-static bool has_xsdt = false;
+static bool        has_xsdt = false;
 static struct RSDP rsdp;
 
 void rsdp_verify_checksum(uint64_t rsdp_address);
 
-void rsdp_init(phys_t rsdp_addr)
+void rsdp_init(virt_t rsdp_addr)
 {
     rsdp_verify_checksum(rsdp_addr);
-    trace("RSDP Table: %llX\n", rsdp_addr + $high_vma);
-    
-    rsdp = *(struct RSDP*) rsdp_addr;
+    trace("RSDP Table: %llX\n", rsdp_addr);
 
-    // If this is omitted this member might print more than 6 bytes due to a missing terminator.
-    // Is there really no specification to use a NULL terminating character in the entirety of ACPI?
+    rsdp = *(struct RSDP *)rsdp_addr;
+
+    // If this is omitted this member might print more than 6 bytes due to a
+    // missing terminator. Is there really no specification to use a NULL
+    // terminating character in the entirety of ACPI?
     rsdp.oem_string[5] = '\0';
     trace("RSDP OEM: %s\n", rsdp.oem_string);
 
@@ -41,8 +42,8 @@ void rsdp_init(phys_t rsdp_addr)
 
 void rsdp_verify_checksum(uint64_t rsdp_address)
 {
-    int checksum = 0;
-    uint8_t *ptr = (uint8_t *)rsdp_address;
+    int      checksum = 0;
+    uint8_t *ptr      = (uint8_t *)rsdp_address;
 
     debug(true, "RSDP checksum raw:\n");
     for (int i = 0; i < 20; i++)
