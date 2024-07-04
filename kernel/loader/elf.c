@@ -7,7 +7,6 @@
 #include <mm/phys.h>
 #include <mm/virt.h>
 #include <moon-io/serial.h>
-#include <moon-sys/elf/load_section.h>
 #include <moon-sys/elf/verify.h>
 #include <panic.h>
 #include <printk.h>

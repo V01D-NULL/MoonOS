@@ -100,17 +100,6 @@ void arch_map_page(struct Pml *pml4, virt_t vaddr, phys_t paddr, int flags)
     invlpg(vaddr);
 }
 
-void arch_quickmap_page(struct Pml *pml4, virt_t vaddr, phys_t paddr, int flags)
-{
-    struct Pml *pml3, *pml2, *pml1 = NULL;
-    pml3 = vmm_pml_advance(pml4, index_of(vaddr, 4), flags);
-    pml2 = vmm_pml_advance(pml3, index_of(vaddr, 3), flags);
-    pml1 = vmm_pml_advance(pml2, index_of(vaddr, 2), flags);
-
-    pml1->page_tables[index_of(vaddr, 1)] = paging_create_entry(paddr, flags);
-    invlpg(vaddr);
-}
-
 void arch_unmap_page(struct Pml *pml4, virt_t vaddr)
 {
     if (!pml4)
@@ -136,18 +125,6 @@ void arch_map_range(struct Pml *pml4, Range range, int flags, uint64_t offset)
     for (; base != limit; base += PAGE_SIZE)
     {
         arch_map_page(pml4, base + offset, base, flags);
-    }
-}
-
-void arch_quickmap_range(struct Pml *pml4, Range range, int flags,
-                         uint64_t offset)
-{
-    uint64_t base = range.base, limit = range.limit;
-    assert(base % 4096 == 0 && limit % 4096 == 0);
-
-    for (; base != limit; base += PAGE_SIZE)
-    {
-        arch_quickmap_page(pml4, base + offset, base, flags);
     }
 }
 

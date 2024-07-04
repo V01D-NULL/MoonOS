@@ -7,12 +7,7 @@
 #include "addr.h"
 
 void arch_map_page(struct Pml *pml4, virt_t vaddr, phys_t paddr, int flags);
-void arch_quickmap_page(struct Pml *pml4, virt_t vaddr, phys_t paddr,
-                        int flags);
-
 void arch_map_range(struct Pml *pml4, Range range, int flags, uint64_t offset);
-void arch_quickmap_range(struct Pml *pml4, Range range, int flags,
-                         uint64_t offset);
 
 void arch_unmap_page(struct Pml *pml4, virt_t vaddr);
 
