@@ -20,7 +20,7 @@
 #include "printk.h"
 
 #if defined(__x86_64__)
-void kern_main(struct stivale2_struct_tag_modules *mods)
+void kern_main(HandoverModules mods)
 #else
 void kern_main(void)
 #endif
@@ -28,13 +28,13 @@ void kern_main(void)
     arch_init_syscall();
 
 #if defined(__x86_64__)
-    trace("Detected %d modules\n", mods->module_count);
-    trace("Module string: %s\n", mods->modules[0].string);
+    trace("Detected %d modules\n", mods.count);
+    trace("Module string: %s\n", mods.modules[0].cmdline);
 
     load_daemon(
-        (const uint8_t *)mods->modules[0].begin, mods->modules[0].string);
+        (const uint8_t *)mods.modules[0].address, mods.modules[0].cmdline);
     load_daemon(
-        (const uint8_t *)mods->modules[1].begin, mods->modules[1].string);
+        (const uint8_t *)mods.modules[1].address, mods.modules[1].cmdline);
 
     sched_init();
 #else

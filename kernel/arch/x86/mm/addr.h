@@ -10,19 +10,8 @@
 
 typedef uint64_t virt_t, phys_t;
 
-static const size_t $identity_vma = 0x0;                 /* Regular, physical memory offset   */
-static const size_t $high_vma = 0xffff800000000000;      /* Kernel data structures offset     */
-static const size_t $high_vma_heap = 0xffffd00000000000; /* Kernel heap area offset           */
-static const size_t $high_vma_code = 0xffffffff80000000; /* Kernel code offset                */
+void    set_hhdm_offset(size_t offset);
+phys_t *va(phys_t paddr);
+virt_t *pa(virt_t vaddr);
 
-USED static phys_t *va(phys_t paddr)
-{
-    return (phys_t *)(paddr + ($high_vma));
-}
-
-USED static virt_t *pa(virt_t vaddr)
-{
-    return (virt_t *)(vaddr - ($high_vma));
-}
-
-#endif // ADDR_H
+#endif  // ADDR_H

@@ -1,53 +1,54 @@
-#include <devices/term/early/early_term.h>
-#include <moon-io/serial.h>
-#include <moon-sys/spinlock.h>
+#include "phys.h"
+#include <base/align.h>
 #include <base/assert.h>
-#include <moon-ds/bitmap.h>
-#include <printk.h>
 #include <base/base-types.h>
 #include <base/mem.h>
-#include <base/align.h>
+#include <devices/term/early/early_term.h>
+#include <moon-ds/bitmap.h>
+#include <moon-io/serial.h>
+#include <moon-sys/spinlock.h>
 #include <panic.h>
-#include "phys.h"
+#include <printk.h>
 #include "zone.h"
 
 create_lock("pmm", pmm_lock);
 
-static void *find_first_free_block(void);
+static void       *find_first_free_block(void);
 static string_view get_mmap_type(int entry);
-static void dump_mmap(int entries, struct stivale2_mmap_entry *map);
+static void        dump_mmap(HandoverMemoryMap mmap);
 
 static struct zone *init_zone(uint64_t base, uint64_t len, int nr)
 {
-    struct zone *zone = (struct zone*)base;
+    struct zone *zone = (struct zone *)base;
 
     base = ALIGN_UP(base + sizeof(struct zone));
     len -= PAGE_SIZE;
 
     boot_term_write("zone: 0x%lX-0x%lX\n", base, base + len);
-    zone->start = base;
-    zone->len = len;
-    zone->name = "Physical memory (Generic-RAM)";
+    zone->start      = base;
+    zone->len        = len;
+    zone->name       = "Physical memory (Generic-RAM)";
     zone->page_count = len / PAGE_SIZE;
-    zone->zone_nr = nr;
+    zone->zone_nr    = nr;
 
     return zone;
 }
 
 static struct zone *zone_list;
 
-void init_phys_allocator(struct stivale2_mmap_entry *mmap, int entries)
+void init_phys_allocator(HandoverMemoryMap mmap)
 {
-    dump_mmap(entries, mmap);
+    dump_mmap(mmap);
 
     // 1. Create zones
     struct zone *tail = NULL;
-    for (int i = 0, zone_nr = 0; i < entries; i++)
+    for (int i = 0, zone_nr = 0; i < mmap.entry_count; i++)
     {
-        if (mmap[i].type != STIVALE2_MMAP_USABLE)
+        if (mmap.entries[i]->type != HANDOVER_MEMMAP_USABLE)
             continue;
 
-        auto zone = init_zone(mmap[i].base, mmap[i].length - 1, zone_nr++);
+        auto zone = init_zone(
+            va(mmap.entries[i]->base), mmap.entries[i]->length - 1, zone_nr++);
 
         if (!tail)
             zone_list = zone;
@@ -61,11 +62,17 @@ void init_phys_allocator(struct stivale2_mmap_entry *mmap, int entries)
     // 2. Initialize a bitmap for each zone
     list_foreach(zone, list, zone_list)
     {
-        size_t bitmap_size_bytes = ALIGN_UP((zone->start + zone->len) / PAGE_SIZE / 8);
+        size_t bitmap_size_bytes =
+            ALIGN_UP(((uint64_t)pa(zone->start) + zone->len) / PAGE_SIZE / 8);
 
         zone->bitmap = (uint8_t *)zone->start;
 
-        debug(true, "Zone#%d: Bitmap stored at %lX-%lX | size: %ldKiB\n", zone->zone_nr, zone->start, zone->start + zone->len - 1, bitmap_size_bytes / 1024);
+        debug(true,
+              "Zone#%d: Bitmap stored at %lX-%lX | size: %ldKiB\n",
+              zone->zone_nr,
+              zone->start,
+              zone->start + zone->len - 1,
+              bitmap_size_bytes / 1024);
         // memset((void *)zone->bitmap, arch_free_page, zone->len);
 
         zone->start += bitmap_size_bytes;
@@ -103,7 +110,7 @@ void arch_free_page(void *page)
     list_foreach(zone, list, zone_list)
     {
         auto zone_sz = zone->start + zone->len;
-        auto addr = (uintptr_t)page;
+        auto addr    = (uintptr_t)page;
 
         if (addr > zone_sz)
             continue;
@@ -126,7 +133,8 @@ static void *find_first_free_block(void)
             {
                 __set_bit(zone->bitmap, i);
                 // debug(true, "bit: %d\n", i);
-                // debug(true, "Zone#%d returning: 0x%lX\n", zone->zone_nr, zone->start + (i * PAGE_SIZE));
+                // debug(true, "Zone#%d returning: 0x%lX\n", zone->zone_nr,
+                // zone->start + (i * PAGE_SIZE));
                 return (void *)(zone->start + (i * PAGE_SIZE));
             }
         }
@@ -139,47 +147,46 @@ static string_view get_mmap_type(int entry)
 {
     switch (entry)
     {
-    case STIVALE2_MMAP_USABLE:
-        return "RAM";
+        case HANDOVER_MEMMAP_USABLE:
+            return "RAM";
 
-    case STIVALE2_MMAP_RESERVED:
-        return "Reserved";
+        case HANDOVER_MEMMAP_RESERVED:
+            return "Reserved";
 
-    case STIVALE2_MMAP_ACPI_RECLAIMABLE:
-        return "ACPI Reclaimable";
+        case HANDOVER_MEMMAP_ACPI_RECLAIMABLE:
+            return "ACPI Reclaimable";
 
-    case STIVALE2_MMAP_ACPI_NVS:
-        return "ACPI NVS";
+        case HANDOVER_MEMMAP_ACPI_NVS:
+            return "ACPI NVS";
 
-    case STIVALE2_MMAP_BAD_MEMORY:
-        return "Bad Memory";
+        case HANDOVER_MEMMAP_BAD_MEMORY:
+            return "Bad Memory";
 
-    case STIVALE2_MMAP_BOOTLOADER_RECLAIMABLE:
-        return "Bootloader Reclaimable";
+        case HANDOVER_MEMMAP_BOOTLOADER_RECLAIMABLE:
+            return "Bootloader Reclaimable";
 
-    case STIVALE2_MMAP_KERNEL_AND_MODULES:
-        return "Kernel And Modules";
+        case HANDOVER_MEMMAP_KERNEL_AND_MODULES:
+            return "Kernel And Modules";
 
-    case STIVALE2_MMAP_FRAMEBUFFER:
-        return "Framebuffer";
+        case HANDOVER_MEMMAP_FRAMEBUFFER:
+            return "Framebuffer";
 
-    default:
-        return "???";
+        default:
+            return "???";
     }
 }
 
-static void dump_mmap(int entries, struct stivale2_mmap_entry *map)
+static void dump_mmap(HandoverMemoryMap mmap)
 {
     debug(true, "Full mmap dump:\n");
-    for (int i = 0; i < entries; i++)
+    for (int i = 0; i < mmap.entry_count; i++)
     {
-        boot_term_write("0x%llx - 0x%llx [%d - %s]\n",
-                        map[i].base,
-                        map[i].base + map[i].length - 1,
-                        map[i].type,
-                        get_mmap_type(
-                            map[i].type));
+        debug(false,
+              "0x%llx - 0x%llx [%d - %s]\n",
+              mmap.entries[i]->base,
+              mmap.entries[i]->base + mmap.entries[i]->length - 1,
+              mmap.entries[i]->type,
+              get_mmap_type(mmap.entries[i]->type));
     }
-    boot_term_write("\n");
     debug(false, "\n");
 }
