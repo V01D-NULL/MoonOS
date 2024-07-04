@@ -62,8 +62,6 @@ void timer_irq(struct iframe *frame)
     //       frame->gpr.r14,
     //       frame->gpr.r15);
 
-    for (;;)
-        ;
     // debug(true, "RIP BEFORE %p\n", frame->rip);
     auto res = sched_reschedule(&regs);
     if (!res.is_ok)
