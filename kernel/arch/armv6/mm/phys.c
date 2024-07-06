@@ -1,21 +1,20 @@
-#include <base/base-types.h>
-#include <base/assert.h>
-#include <base/align.h>
-#include <base/mem.h>
-#include <printk.h>
-#include <panic.h>
 #include "phys.h"
+#include <base/align.h>
+#include <base/assert.h>
+#include <base/base-types.h>
+#include <base/mem.h>
+#include <panic.h>
+#include <printk.h>
 
-void init_phys_allocator(void) {}
-
-void *arch_alloc_page(void)
+void init_phys_allocator(void)
 {
-	return NULL;
 }
 
-Range arch_alloc_page_range(UNUSED size_t pages)
+void *arch_alloc_page_sz(UNUSED int sz)
 {
-	return (Range){};
+    return NULL;
 }
 
-void arch_free_page(UNUSED void *page) {}
+void arch_free_page(UNUSED void *page)
+{
+}
