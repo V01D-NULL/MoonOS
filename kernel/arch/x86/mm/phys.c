@@ -80,27 +80,6 @@ void init_phys_allocator(HandoverMemoryMap mmap)
         zone->start += bitmap_size_bytes;
         zone->len -= bitmap_size_bytes;
     }
-
-    auto ptr1 = arch_alloc_page();
-    auto ptr2 = arch_alloc_page_sz(8192);
-
-    trace(TRACE_BOOT,
-          "arch alloc page: %p | arch alloc page sz: %p\n",
-          ptr1,
-          ptr2);
-
-    arch_free_page(ptr1);
-    arch_free_page(ptr2);
-
-    trace(TRACE_BOOT,
-          "Reallocating ptr1 and ptr2: %p | %p (old: %p | %p)\n",
-          arch_alloc_page(),
-          arch_alloc_page_sz(8192),
-          ptr1,
-          ptr2);
-
-    for (;;)
-        ;
 }
 
 void *arch_alloc_page_sz(int sz)
