@@ -1,6 +1,5 @@
 #include "tty.h"
 
-#include <devices/term/early/early_term.h>
 #include <devices/term/flanterm/backends/fb.h>
 #include <devices/term/flanterm/flanterm.h>
 

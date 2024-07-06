@@ -5,7 +5,6 @@
 #include <base/assert.h>
 #include <base/bootargs.h>
 #include <base/mem.h>
-#include <devices/term/early/early_term.h>
 #include <kernel.h>
 #include <mm/dynamic/kmalloc.h>
 #include <mm/phys.h>
