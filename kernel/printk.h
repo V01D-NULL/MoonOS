@@ -35,6 +35,7 @@ enum
     TRACE_TASK    = (1 << 5),
     TRACE_SERVICE = (1 << 6),
     TRACE_SLAB    = (1 << 7),
+    TRACE_BUDDY   = (1 << 8),
 
     TRACE_ALL  = ~0,
     TRACE_NONE = 0,

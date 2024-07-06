@@ -4,16 +4,18 @@
 #include <base/base-types.h>
 #include <base/mem.h>
 #include <devices/term/early/early_term.h>
+#include <mm/buddy.h>
 #include <moon-ds/bitmap.h>
 #include <moon-io/serial.h>
 #include <moon-sys/spinlock.h>
 #include <panic.h>
 #include <printk.h>
+#define BUDDY_ALLOC_IMPLEMENTATION
 #include "zone.h"
 
 create_lock("pmm", pmm_lock);
 
-static void       *find_first_free_block(void);
+static void       *find_first_free_block(int sz);
 static string_view get_mmap_type(int entry);
 static void        dump_mmap(HandoverMemoryMap mmap);
 
@@ -30,6 +32,7 @@ static struct zone *init_zone(uint64_t base, uint64_t len, int nr)
     zone->name       = "Physical memory (Generic-RAM)";
     zone->page_count = len / PAGE_SIZE;
     zone->zone_nr    = nr;
+    zone->buddy      = NULL;
 
     return zone;
 }
@@ -65,25 +68,45 @@ void init_phys_allocator(HandoverMemoryMap mmap)
         size_t bitmap_size_bytes =
             ALIGN_UP(((uint64_t)pa(zone->start) + zone->len) / PAGE_SIZE / 8);
 
-        zone->bitmap = (uint8_t *)zone->start;
+        zone->buddy = buddy_embed((void *)zone->start, zone->len);
 
         debug(true,
-              "Zone#%d: Bitmap stored at %lX-%lX | size: %ldKiB\n",
+              "Zone#%d: Buddy memory stored at %lX-%lX | size: %ldKiB\n",
               zone->zone_nr,
               zone->start,
               zone->start + zone->len - 1,
               bitmap_size_bytes / 1024);
-        // memset((void *)zone->bitmap, arch_free_page, zone->len);
 
         zone->start += bitmap_size_bytes;
         zone->len -= bitmap_size_bytes;
     }
+
+    auto ptr1 = arch_alloc_page();
+    auto ptr2 = arch_alloc_page_sz(8192);
+
+    trace(TRACE_BOOT,
+          "arch alloc page: %p | arch alloc page sz: %p\n",
+          ptr1,
+          ptr2);
+
+    arch_free_page(ptr1);
+    arch_free_page(ptr2);
+
+    trace(TRACE_BOOT,
+          "Reallocating ptr1 and ptr2: %p | %p (old: %p | %p)\n",
+          arch_alloc_page(),
+          arch_alloc_page_sz(8192),
+          ptr1,
+          ptr2);
+
+    for (;;)
+        ;
 }
 
-void *arch_alloc_page(void)
+void *arch_alloc_page_sz(int sz)
 {
     acquire_lock(&pmm_lock);
-    void *block = find_first_free_block();
+    void *block = find_first_free_block(sz);
 
     if (!block)
         return NULL;
@@ -94,14 +117,8 @@ void *arch_alloc_page(void)
     return block;
 }
 
-Range arch_alloc_page_range(size_t pages)
-{
-    return (Range){};
-}
-
 void arch_free_page(void *page)
 {
-    // Don't try to acquire a spin lock if the page is NULL
     if (!page)
         return;
 
@@ -109,35 +126,31 @@ void arch_free_page(void *page)
 
     list_foreach(zone, list, zone_list)
     {
-        auto zone_sz = zone->start + zone->len;
-        auto addr    = (uintptr_t)page;
+        auto zone_end = zone->start + zone->len;
+        auto addr     = (uintptr_t)page;
 
-        if (addr > zone_sz)
-            continue;
-
-        addr -= zone->start;
-        auto bit = (addr / 4096);
-        __clear_bit(zone->bitmap, bit);
+        if (addr >= zone->start && addr <= zone_end)
+        {
+            buddy_free(zone->buddy, page);
+            break;
+        }
     }
 
     release_lock(&pmm_lock);
 }
 
-static void *find_first_free_block(void)
+static void *find_first_free_block(int sz)
 {
     list_foreach(zone, list, zone_list)
     {
-        for (size_t i = 0; i < zone->page_count; i++)
-        {
-            if (!__check_bit(zone->bitmap, i))
-            {
-                __set_bit(zone->bitmap, i);
-                // debug(true, "bit: %d\n", i);
-                // debug(true, "Zone#%d returning: 0x%lX\n", zone->zone_nr,
-                // zone->start + (i * PAGE_SIZE));
-                return (void *)(zone->start + (i * PAGE_SIZE));
-            }
-        }
+        if (zone->len < sz)
+            continue;
+
+        const void *ptr = buddy_malloc(zone->buddy, sz);
+        if (unlikely(!ptr))
+            continue;
+
+        return ptr;
     }
 
     return NULL;
