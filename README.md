@@ -22,7 +22,7 @@ Kernel panic:
 	- x86_64 PCs with acpi support
 		- 4 level paging
 		- Stacktrace/symbol backtrace
-		- zoned bitmap and slab allocator.
+		- zoned buddy and slab allocator.
 		- System calls via `syscall` (No support for `int` based system calls)
 	- Nintendo 3ds (armv6)
 		- I2C driver
