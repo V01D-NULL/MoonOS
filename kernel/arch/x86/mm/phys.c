@@ -1,9 +1,9 @@
+#define PR_MODULE "phys"
 #include "phys.h"
 #include <base/align.h>
 #include <base/assert.h>
 #include <base/base-types.h>
 #include <base/mem.h>
-#include <devices/term/early/early_term.h>
 #include <mm/buddy.h>
 #include <moon-ds/bitmap.h>
 #include <moon-io/serial.h>
@@ -26,7 +26,7 @@ static struct zone *init_zone(uint64_t base, uint64_t len, int nr)
     base = ALIGN_UP(base + sizeof(struct zone));
     len -= PAGE_SIZE;
 
-    boot_term_write("zone: 0x%lX-0x%lX\n", base, base + len);
+    trace(TRACE_BOOT, "zone: 0x%lX-0x%lX\n", base, base + len);
     zone->start      = base;
     zone->len        = len;
     zone->name       = "Physical memory (Generic-RAM)";
