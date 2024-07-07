@@ -5,3 +5,9 @@
 [submodule "meta/firmtool"]
 	path = meta/firmtool
 	url = https://github.com/TuxSH/firmtool.git
+[submodule "meta/test/Unity"]
+	path = meta/test/Unity
+	url = https://github.com/ThrowTheSwitch/Unity.git
+[submodule "meta/test/CMock"]
+	path = meta/test/CMock
+	url = https://github.com/ThrowTheSwitch/CMock.git
