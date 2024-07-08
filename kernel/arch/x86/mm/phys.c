@@ -1,4 +1,4 @@
-#define PR_MODULE (const char *)"phys"
+#define PR_MODULE "phys"
 #include "phys.h"
 #include <base/align.h>
 #include <base/assert.h>
