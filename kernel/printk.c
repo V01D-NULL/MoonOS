@@ -37,7 +37,7 @@ void printk(string_view status, string_view fmt, ...)
     tty_write("[core#%d] %s: %s", current_cpu(), status, buffer);
 }
 
-void write(string_view fmt, ...)
+void tty_write(string_view fmt, ...)
 {
     char    buffer[512];
     va_list arg;

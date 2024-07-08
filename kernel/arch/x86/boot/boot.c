@@ -39,7 +39,6 @@ void boot(void)
 
     trace(TRACE_BOOT, "Reached target pmm\n");
     {
-        extern void init_phys_allocator(HandoverMemoryMap);
         init_phys_allocator(handover.memory_map);
     }
 
