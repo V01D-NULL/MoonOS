@@ -74,7 +74,8 @@ Kernel panic:
 ## Building: (assuming you are using a debian based distro)
 - Install needed tools:
 	- sudo apt update
-	- sudo apt install gcc nasm qemu-system-x86 libfuse-dev
+	- sudo apt install gcc nasm qemu-system-x86 libfuse-dev ruby ruby-rubygems
+	- sudo gem install ceedling # Testing
 - Build kernel
 	- `make all` -- Build the kernel
 	- `make run` -- Run the kernel in qemu and build it if necessary (x86_64 only)

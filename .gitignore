@@ -23,6 +23,4 @@ limine/*.bin
 iso
 
 # Test related
-meta/test/build
-meta/test/src/test_runners/
-*.out
+meta/tests/build/*
