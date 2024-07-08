@@ -19,11 +19,7 @@
 #include "panic.h"
 #include "printk.h"
 
-#if defined(__x86_64__)
 void kern_main(HandoverModules mods)
-#else
-void kern_main(void)
-#endif
 {
     arch_init_syscall();
 
@@ -38,7 +34,7 @@ void kern_main(void)
 
     sched_init();
 #else
-    panic("Modules have not been implemented yet");
+    panic("Scheduling has not been implemented yet");
 #endif
 
     arch_halt_cpu();
