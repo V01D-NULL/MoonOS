@@ -1,0 +1,116 @@
+:project:
+  :use_exceptions: FALSE
+  :use_test_preprocessor: TRUE
+  :use_auxiliary_dependencies: TRUE
+  :build_root: build
+  :test_file_prefix: test_
+  :which_ceedling: gem
+  :ceedling_version: '?'
+
+:environment: []
+
+:extension:
+  :executable: .out
+
+:paths:
+  :test:
+    - +:test/kernel/**
+    - +:test/arch/x86/**
+    - -:test/support
+  :support:
+    - test/support
+  :include: ['../../libs/**', '../../kernel/**']
+  :source:
+    - ../../kernel/loader/daemon/load.c
+    - ../../kernel/loader/elf.c
+    - ../../kernel/sanitizer/ubsan.c
+    - ../../kernel/kernel.c
+    - ../../kernel/abi/syscalls.c
+    - ../../kernel/printk.c
+    - ../../kernel/panic.c
+    - ../../kernel/trace/sym.c
+    - ../../kernel/sched/task.c
+    - ../../kernel/sched/scheduler.c
+    - ../../kernel/mm/dynamic/kmalloc.c
+    - ../../kernel/mm/dynamic/slab.c
+    - ../../kernel/mm/vm_sys.c
+    - ../../kernel/arch/x86/int/interrupts.c
+    - ../../kernel/arch/x86/int/idt.c
+    - ../../kernel/arch/x86/int/gdt.c
+    - ../../kernel/arch/x86/cpu.c
+    - ../../kernel/arch/x86/devices/term/flanterm/flanterm.c
+    - ../../kernel/arch/x86/devices/term/flanterm/backends/fb.c
+    - ../../kernel/arch/x86/devices/tty.c
+    - ../../kernel/arch/x86/paging/paging.c
+    - ../../kernel/arch/x86/boot/boot.c
+    - ../../kernel/arch/x86/boot/proto/limine.c
+    - ../../kernel/arch/x86/sys/syscall.c
+    - ../../kernel/arch/x86/sys/context_switch.c
+    - ../../kernel/arch/x86/trace/stack_trace.c
+    - ../../kernel/arch/x86/hardware/legacy/pic/pic.c
+    - ../../kernel/arch/x86/mm/addr.c
+    - ../../kernel/arch/x86/mm/phys.c
+    - ../../kernel/arch/x86/mm/virt.c
+    - ../../kernel/arch/x86/mm/page.c
+    - ../../libs/**
+
+:defines:
+  :common: &common_defines []
+  :test:
+    - *common_defines
+    - TEST
+  :test_preprocess:
+    - *common_defines
+    - TEST
+
+:cmock:
+  :mock_prefix: mock_
+  :when_no_prototypes: :warn
+  :enforce_strict_ordering: TRUE
+  :plugins:
+    - :ignore
+  :treat_as:
+    uint8:    HEX8
+    uint16:   HEX16
+    uint32:   UINT32
+    int8:     INT8
+    bool:     UINT8
+
+:libraries:
+  :placement: :end
+  :flag: "-l${1}"
+  :path_flag: "-L ${1}"
+  :system: []
+  :test: []
+  :release: []
+
+:plugins:
+  :load_paths:
+    - "#{Ceedling.load_path}"
+  :enabled:
+    - stdout_pretty_tests_report
+    - module_generator
+
+:flags:
+  :test:
+    :compile:
+      :*:
+        - -std=gnu11
+        - -Wall
+        - -Wextra
+        - -Wpointer-arith
+        - -Wcast-align
+        - -Wwrite-strings
+        - -Wswitch-default
+        - -Wunreachable-code
+        - -Winit-self
+        - -Wmissing-field-initializers
+        - -Wno-unknown-pragmas
+        - -Wstrict-prototypes
+        - -Wundef
+        - -Wold-style-definition
+        - -ffreestanding
+
+:unity:
+  :defines:
+    - UNITY_OUTPUT_COLOR

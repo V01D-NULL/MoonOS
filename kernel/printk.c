@@ -23,7 +23,7 @@ void printk_init(bool verbose_boot, HandoverFramebuffer fb)
     is_verbose_boot = verbose_boot;
 }
 
-void printk(string status, string fmt, ...)
+void printk(string_view status, string_view fmt, ...)
 {
     if (unlikely(!is_verbose_boot))
         return;
@@ -34,10 +34,10 @@ void printk(string status, string fmt, ...)
     vsnprintf((string)&buffer, (size_t)-1, fmt, arg);
     va_end(arg);
 
-    puts("[core#%d] %s: %s", current_cpu(), status, buffer);
+    tty_write("[core#%d] %s: %s", current_cpu(), status, buffer);
 }
 
-void puts(string_view fmt, ...)
+void tty_write(string_view fmt, ...)
 {
     char    buffer[512];
     va_list arg;
@@ -50,7 +50,7 @@ void puts(string_view fmt, ...)
 
 // Note: This should only be called when information
 // must be shown. A kernel panic for example
-void override_quiet_boot()
+void override_quiet_boot(void)
 {
     is_verbose_boot = true;
 }

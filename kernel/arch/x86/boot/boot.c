@@ -18,8 +18,8 @@
 
 void banner(void)
 {
-    puts("Welcome to MoonOS\n");
-    puts(
+    tty_write("Welcome to MoonOS\n");
+    tty_write(
         "\n"
         " _____             _____ _____  \n"
         "|     |___ ___ ___|     |   __| \n"
@@ -39,7 +39,6 @@ void boot(void)
 
     trace(TRACE_BOOT, "Reached target pmm\n");
     {
-        extern void init_phys_allocator(HandoverMemoryMap);
         init_phys_allocator(handover.memory_map);
     }
 

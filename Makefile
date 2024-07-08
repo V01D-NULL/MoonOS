@@ -43,6 +43,15 @@ debug: quick_recompile
 	$(DEBUG_TERMINAL) $(DEBUG_TERMINAL_OPTS) ./meta/debug-util/debug.sh &
 	$(EMU) $(EMU_DEBUG_OPTS)
 
+test:
+	cd meta/tests && CEEDLING_MAIN_PROJECT_FILE=project-$(ARCH)-$(BOARD).yml ceedling
+
+clean_test:
+	cd meta/tests && CEEDLING_MAIN_PROJECT_FILE=project-$(ARCH)-$(BOARD).yml ceedling clean
+
+distclean_test:
+	rm -rf meta/tests/build
+
 # FIXME: Use .d files instead of this
 # Remove the elf file while saving all object files (fewer files will be recompiled)
 quick_recompile: symlist
