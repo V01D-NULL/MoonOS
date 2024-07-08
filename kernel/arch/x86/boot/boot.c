@@ -18,8 +18,8 @@
 
 void banner(void)
 {
-    puts("Welcome to MoonOS\n");
-    puts(
+    tty_write("Welcome to MoonOS\n");
+    tty_write(
         "\n"
         " _____             _____ _____  \n"
         "|     |___ ___ ___|     |   __| \n"

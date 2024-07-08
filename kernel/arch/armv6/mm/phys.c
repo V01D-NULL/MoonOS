@@ -6,7 +6,7 @@
 #include <panic.h>
 #include <printk.h>
 
-void init_phys_allocator(void)
+void init_phys_allocator(HandoverMemoryMap mmap)
 {
 }
 

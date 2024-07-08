@@ -19,7 +19,7 @@ NORETURN void __panic(size_t bp, size_t sp, string_view fmt, ...)
     override_quiet_boot();
 
     printk("panic", "\nA kernel panic has occurred\n");
-    puts("*** Reason: %s ***\n", panic_buff);
+    tty_write("*** Reason: %s ***\n", panic_buff);
     debug(
         false, "A kernel panic has occurred\n*** Reason: %s ***\n", panic_buff);
 
@@ -34,7 +34,7 @@ NORETURN void __panic(size_t bp, size_t sp, string_view fmt, ...)
            "Dumping %s's stackframe\nStackframe size: 0x%x\n",
            sym_lookup(res.trace_results[1]).name,
            frame_size);
-    puts("<addr>\t\t  <stack>\t   <stack+8>\n");
+    tty_write("<addr>\t\t  <stack>\t   <stack+8>\n");
 
     // The larger the stackframe the less likely the chance of seeing messages
     // printed earlier due to the terminal scrolling. 0x18 was chosen randomly.
@@ -44,10 +44,10 @@ NORETURN void __panic(size_t bp, size_t sp, string_view fmt, ...)
     // Dump stackframe of the function that called panic()
     for (size_t i = 0; i < frame_size; i++)
     {
-        puts("%lx: %p %p\n",
-             bp,
-             *(size_t *)(bp),
-             *(size_t *)(bp + sizeof(size_t)));
+        tty_write("%lx: %p %p\n",
+                  bp,
+                  *(size_t *)(bp),
+                  *(size_t *)(bp + sizeof(size_t)));
         bp += sizeof(size_t) * 2;
     }
 

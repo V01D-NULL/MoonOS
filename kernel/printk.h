@@ -41,12 +41,12 @@ enum
     TRACE_NONE = 0,
 };
 
-void printk(string status, string fmt, ...);
+void printk(string_view status, string_view fmt, ...);
 void printk_init(bool verbose_boot, HandoverFramebuffer fb);
-void puts(string_view fmt, ...);
+void tty_write(string_view fmt, ...);
 
 // Note: This should only be called when information
 // must be shown, a kernel panic for example
-void override_quiet_boot();
+void override_quiet_boot(void);
 
 #endif  // FMT_PRINTK_H
