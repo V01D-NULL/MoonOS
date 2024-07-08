@@ -24,19 +24,19 @@ void serial_write_str(string_view str);
 void serial_set_color(string_view color_code);
 
 #define debug(log_verbose, ...)                              \
-    if (log_verbose)                                         \
-        impl_verbose_debug(__FILE__, __LINE__, __VA_ARGS__); \
-    else                                                     \
-        impl_quiet_debug(__VA_ARGS__);
+	if (log_verbose)                                         \
+		impl_verbose_debug(__FILE__, __LINE__, __VA_ARGS__); \
+	else                                                     \
+		impl_quiet_debug(__VA_ARGS__);
 
 /// Output a formatted string to the serial port
-void impl_verbose_debug(string_view file, int line, string_view fmt, ...);
-void impl_quiet_debug(string_view fmt, ...);
+void impl_verbose_debug(string file, int line, string fmt, ...);
+void impl_quiet_debug(string fmt, ...);
 
 #else
 
 #define debug(log_verbose, ...)
 
-#endif  // __x86_64__
+#endif // __x86_64__
 
-#endif  // SERIAL_H
+#endif // SERIAL_H
