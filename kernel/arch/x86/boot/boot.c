@@ -30,7 +30,7 @@ void banner(void)
 
 ALIGN_SECTION(16) static uint8_t stack[8192];
 
-void boot(void)
+NORETURN void boot(void)
 {
     BootHandover handover = limine_initialize();
 
