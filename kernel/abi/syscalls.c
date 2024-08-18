@@ -1,7 +1,9 @@
+#define PR_MODULE "syscall"
 #include "syscalls.h"
 #include <base/base-types.h>
 #include <base/string.h>
 #include <cpu.h>
+#include <mm/addr.h>
 #include <moon-extra/compiler.h>
 #include <moon-io/io.h>
 #include <panic.h>
@@ -21,16 +23,16 @@ int sys_log(Type fd, Type buff, Type len, ignore, ignore, ignore)
 {
     (void)fd;
 
-    if (buff == 0)
+    // Note: is_user_address takes buff = NULL into account
+    if (unlikely(is_user_address(buff) == false))
         return -1;
 
     string_view ptr = (string_view)buff;
-    debug(true, "len %d | strlen: %d\n", len, strlen(ptr));
 
-    asm volatile("int3");
+    if (strlen(ptr) != len)
+        return -2;
+
     trace(TRACE_SYSCALL, "%s", ptr);
-    // for (auto i = 0; i < len; i++)
-    //     trace(TRACE_SYSCALL, "%c", ptr[i]);
 
     return 0;
 }

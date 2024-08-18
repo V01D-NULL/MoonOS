@@ -32,7 +32,7 @@ static struct zone *init_zone(uint64_t base, uint64_t len, int nr)
     zone->name       = "Physical memory (Generic-RAM)";
     zone->page_count = len / PAGE_SIZE;
     zone->zone_nr    = nr;
-    zone->buddy      = NULL;
+    zone->buddy      = buddy_embed((void *)base, len);
 
     return zone;
 }
@@ -43,11 +43,16 @@ void init_phys_allocator(HandoverMemoryMap mmap)
 {
     dump_mmap(mmap);
 
-    // 1. Create zones
+    // Create zones and initialize buddy allocators arenas
     struct zone *tail = NULL;
     for (int i = 0, zone_nr = 0; i < mmap.entry_count; i++)
     {
-        if (mmap.entries[i]->type != HANDOVER_MEMMAP_USABLE)
+        if (mmap.entries[i]->type != HANDOVER_MEMMAP_USABLE ||
+            mmap.entries[i]->length ==
+                PAGE_SIZE)  // The zone itself occupies one page (4kib), so we
+                            // skip small memory regions. Future work: implement
+                            // a way to merge small memory regions and/or ensure
+                            // zones have a smaller memory overhead.
             continue;
 
         auto zone = init_zone(
@@ -61,25 +66,6 @@ void init_phys_allocator(HandoverMemoryMap mmap)
         tail = zone;
     }
     list_set_next((struct zone *)NULL, list, tail);
-
-    // 2. Initialize a bitmap for each zone
-    list_foreach(zone, list, zone_list)
-    {
-        size_t bitmap_size_bytes =
-            ALIGN_UP(((uint64_t)pa(zone->start) + zone->len) / PAGE_SIZE / 8);
-
-        zone->buddy = buddy_embed((void *)zone->start, zone->len);
-
-        debug(true,
-              "Zone#%d: Buddy memory stored at %lX-%lX | size: %ldKiB\n",
-              zone->zone_nr,
-              zone->start,
-              zone->start + zone->len - 1,
-              bitmap_size_bytes / 1024);
-
-        zone->start += bitmap_size_bytes;
-        zone->len -= bitmap_size_bytes;
-    }
 }
 
 void *arch_alloc_page_sz(int sz)

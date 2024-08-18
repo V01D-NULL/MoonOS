@@ -16,3 +16,9 @@ virt_t *pa(virt_t vaddr)
 {
     return (virt_t *)(vaddr - hhdm_offset);
 }
+
+bool is_user_address(virt_t addr)
+{
+    return IS_CANONICAL(addr) && addr >= USER_REGION_BOTTOM &&
+           addr <= USER_REGION_TOP;
+}

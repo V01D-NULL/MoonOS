@@ -37,7 +37,6 @@ load_idt:
        mov gs, ax
        mov ss, ax
        mov es, ax
-       sti
        ret
 
 %macro isr 1

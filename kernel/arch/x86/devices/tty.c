@@ -3,7 +3,7 @@
 #include <devices/term/flanterm/backends/fb.h>
 #include <devices/term/flanterm/flanterm.h>
 
-static struct flanterm_context *ft_ctx;
+struct flanterm_context *ft_ctx = ~0;
 
 void arch_tty_init(uint64_t fb_addr, uint16_t fb_width, uint16_t fb_height,
                    uint16_t fb_pitch, uint8_t fb_red_mask_size,
