@@ -3,8 +3,6 @@
 #include <base/mem.h>
 #include <moon-io/serial.h>
 
-// TODO: Paging works. Now make sure to use revision 2 and stop accessing
-// physical address (i.e. use the HHDM and va() function in addr.h)
 LIMINE_REQUEST static volatile LIMINE_BASE_REVISION(2);
 
 LIMINE_REQUEST static volatile struct limine_framebuffer_request
