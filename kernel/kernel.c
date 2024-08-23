@@ -18,7 +18,10 @@ NORETURN void kern_main(HandoverModules mods)
 {
     arch_init_syscall();
 
-#if defined(__x86_64__)
+#if !defined(__x86_64__)
+    panic("Platform not fully supported");
+#endif
+
     trace(TRACE_MISC, "Detected %d modules\n", mods.count);
     trace(TRACE_MISC, "Module string: %s\n", mods.modules[0].cmdline);
 
@@ -28,9 +31,5 @@ NORETURN void kern_main(HandoverModules mods)
         (const uint8_t *)mods.modules[1].address, mods.modules[1].cmdline);
 
     sched_init();
-#else
-    panic("Scheduling has not been implemented yet");
-#endif
-
     arch_halt_cpu();
 }
