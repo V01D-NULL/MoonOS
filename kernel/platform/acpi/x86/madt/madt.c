@@ -27,11 +27,10 @@ static void                    enumarate_apic_devices(madt_t **madt);
 
 struct apic_device_info madt_init(void *madt_base)
 {
-    madt_t *madt     = (madt_t *)((uintptr_t)madt_base);
-    apic_dev.ioapics = (struct ioapic_dev **)
-        arch_alloc_page();  // TODO: Make this a heap allocation!
+    madt_t *madt = (madt_t *)((uintptr_t)madt_base);
+    init(&apic_dev.ioapics);
 
-    // Strings aren't null terminated apparently, so we do it ourselves
+    // Strings aren't always null terminated in the SDT, so we do it ourselves
     uint8_t oem_str[7];
     memcpy((uint8_t *)oem_str, (uint8_t *)madt->sdt.oem_string, 6);
     oem_str[6] = '\0';
@@ -74,8 +73,10 @@ static void enumarate_apic_devices(madt_t **madt)
 
                 if (*madt_interrupt_devices == IOAPIC)
                 {
-                    apic_dev.ioapics[apic_dev.usable_ioapics++] =
-                        ((struct ioapic_dev *)madt_interrupt_devices);
+                    push(&apic_dev.ioapics,
+                         (struct ioapic_dev *)madt_interrupt_devices);
+                    // apic_dev.ioapics[apic_dev.usable_ioapics++] =
+                    //     ((struct ioapic_dev *)madt_interrupt_devices);
                 }
 
                 madt_interrupt_devices += madt_interrupt_devices[1];
