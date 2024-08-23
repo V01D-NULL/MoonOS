@@ -3,7 +3,6 @@
 #include <moon-sys/handover.h>
 
 #include <cpu.h>
-#include <mm/alloc.h>
 #include <sys/syscall.h>
 
 #include <moon-sys/time/sleep.h>
@@ -14,8 +13,6 @@
 
 #include "panic.h"
 #include "printk.h"
-
-#include <mm/phys.h>
 
 NORETURN void kern_main(HandoverModules mods)
 {
