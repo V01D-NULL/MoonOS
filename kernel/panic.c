@@ -1,7 +1,6 @@
 #include "panic.h"
 #include <base/fmt.h>
 #include <cpu.h>
-#include <mm/vm_sys.h>
 #include <moon-io/serial.h>
 #include <moon.h>
 #include <stdarg.h>

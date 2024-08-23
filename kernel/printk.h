@@ -36,6 +36,8 @@ enum
     TRACE_SERVICE = (1 << 6),
     TRACE_SLAB    = (1 << 7),
     TRACE_BUDDY   = (1 << 8),
+    TRACE_TLSF    = (1 << 9),
+    TRACE_ALLOC   = (1 << 10),
 
     TRACE_ALL  = ~0,
     TRACE_NONE = 0,
