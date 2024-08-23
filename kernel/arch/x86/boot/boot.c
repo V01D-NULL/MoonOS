@@ -6,7 +6,7 @@
 #include <base/bootargs.h>
 #include <base/mem.h>
 #include <kernel.h>
-#include <mm/dynamic/kmalloc.h>
+#include <mm/alloc.h>
 #include <mm/phys.h>
 #include <mm/virt.h>
 #include <moon-io/serial.h>
@@ -59,7 +59,7 @@ NORETURN void boot(void)
 
     banner();
 
-    kalloc_init();
+    alloc_init();
     platform_init(handover);
     init_percpu((uint64_t)stack);
     idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr32, 32);

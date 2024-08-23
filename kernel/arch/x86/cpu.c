@@ -1,7 +1,7 @@
 #define PR_MODULE "cpu"
 
 #include "cpu.h"
-#include <mm/dynamic/kmalloc.h>
+#include <mm/alloc.h>
 #include <platform/acpi/x86/acpi.h>
 #include <platform/acpi/x86/apic/apic.h>
 #include <platform/acpi/x86/hpet/hpet.h>
@@ -10,18 +10,17 @@
 
 void init_percpu(uint64_t current_stack)
 {
-    struct Percpu *pcpu =
-        (struct Percpu *)kalloc(sizeof(struct Percpu), KMEM_PANIC);
+    struct Percpu *pcpu = (struct Percpu *)alloc(sizeof(struct Percpu));
 
     // NOTE: Every logical core (which each calls init_percpu) shares it's stack
     // with the syscall handler
     pcpu->syscall_stack = current_stack;
     pcpu->working_stack = 0;  // Set by the syscall handler
 
-    printk("pcpu",
-           "0x%p | pcpu->syscall_stack: 0x%p\n",
-           pcpu,
-           pcpu->syscall_stack);
+    trace(TRACE_BOOT,
+          "0x%p | pcpu->syscall_stack: 0x%p\n",
+          pcpu,
+          pcpu->syscall_stack);
     wrmsr(IA32_KERNEL_GS_BASE, (uint64_t)pcpu);
     wrmsr(GS_BASE, (uint64_t)pcpu);
 

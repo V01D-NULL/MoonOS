@@ -2,12 +2,8 @@
 
 #include <moon-sys/handover.h>
 
-#if defined(__x86_64__)
-#include <boot/stivale2.h>  // TEMPORARY (until stivale2_struct_tag_modules is replaced by HandoverModules)
-#endif
-
 #include <cpu.h>
-#include <mm/dynamic/kmalloc.h>
+#include <mm/alloc.h>
 #include <sys/syscall.h>
 
 #include <moon-sys/time/sleep.h>
@@ -19,7 +15,9 @@
 #include "panic.h"
 #include "printk.h"
 
-void kern_main(HandoverModules mods)
+#include <mm/phys.h>
+
+NORETURN void kern_main(HandoverModules mods)
 {
     arch_init_syscall();
 
