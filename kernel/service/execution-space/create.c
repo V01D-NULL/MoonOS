@@ -11,10 +11,10 @@ EsCreateResult create_execution_space(const uint8_t *elf_pointer)
     };
     arch_copy_kernel_mappings(execution_space.vm_space);
 
-    auto entry_point = TRY_UNWRAP(
-        _load_elf(elf_pointer, execution_space.vm_space), EsCreateResult);
+    execution_space.ec.entry = TRY_UNWRAP(
+        load_elf(elf_pointer, execution_space.vm_space), EsCreateResult);
 
-    trace(TRACE_ELF, "Entry point: %#lx\n", entry_point);
+    trace(TRACE_ELF, "Entry point: %#lx\n", execution_space.ec.entry);
 
     return Okay(EsCreateResult, execution_space);
 }

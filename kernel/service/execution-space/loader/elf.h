@@ -19,6 +19,6 @@ typedef struct
 
 typedef Result(ElfEntryPoint, Nullish) ElfLoaderResult;
 
-ElfLoaderResult _load_elf(const uint8_t *elf_pointer, struct Pml *space);
+ElfLoaderResult load_elf(const uint8_t *elf_pointer, struct Pml *space);
 
 #endif  // ELF_LOADER_H

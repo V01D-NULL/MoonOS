@@ -24,7 +24,7 @@ void sched_init(void)
     // Switch to the first task's page map and enter userspace
     scheduler_running = true;
     arch_scheduler_callback(NULL);
-    arch_switch_pagemap(first_task);
+    // arch_switch_pagemap(first_task);
     arch_enter_userspace(
         (void *)first_task.entrypoint, (void *)first_task.ustack);
 }
@@ -56,7 +56,7 @@ SchedulerResult sched_reschedule(struct arch_task_registers *regs)
 
     // Load new task
     auto new = tasks[current_task_idx];
-    arch_switch_pagemap(new);
+    // arch_switch_pagemap(new);
 
     return Okay(SchedulerResult, new);
 }

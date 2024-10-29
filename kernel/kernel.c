@@ -7,12 +7,13 @@
 
 #include <moon-sys/time/sleep.h>
 
-#include <loader/daemon/load.h>
 #include <platform.h>
 #include <sched/scheduler.h>
 
 #include "panic.h"
 #include "printk.h"
+
+#include <service/execution-space/create.h>
 
 NORETURN void kern_main(HandoverModules mods)
 {
@@ -25,11 +26,10 @@ NORETURN void kern_main(HandoverModules mods)
     trace(TRACE_MISC, "Detected %d modules\n", mods.count);
     trace(TRACE_MISC, "Module string: %s\n", mods.modules[0].cmdline);
 
-    load_daemon(
-        (const uint8_t *)mods.modules[0].address, mods.modules[0].cmdline);
-    load_daemon(
-        (const uint8_t *)mods.modules[1].address, mods.modules[1].cmdline);
+    UNWRAP(create_execution_space((const uint8_t *)(mods.modules[0].address)));
 
-    sched_init();
+    trace(TRACE_MISC, "Starting scheduler\n");
+
+    // sched_init();
     arch_halt_cpu();
 }

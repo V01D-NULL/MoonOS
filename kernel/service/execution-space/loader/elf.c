@@ -24,7 +24,7 @@ static ElfFile parse_elf_file(const uint8_t *elf)
     return elf_file;
 }
 
-ElfLoaderResult _load_elf(const uint8_t *elf_pointer, struct Pml *space)
+ElfLoaderResult load_elf(const uint8_t *elf_pointer, struct Pml *space)
 {
     ElfFile elf = parse_elf_file(elf_pointer);
 
