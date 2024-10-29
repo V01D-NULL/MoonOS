@@ -5,10 +5,9 @@
 #include <moon-extra/result.h>
 #include <moon-sys/elf/elf64.h>
 #include <moon-sys/elf/elf_common.h>
+#include <paging/paging.h>
 
-typedef struct
-{
-} LoadedElf;
+typedef uint64_t ElfEntryPoint;
 
 typedef struct
 {
@@ -18,8 +17,8 @@ typedef struct
     char       *shstrtab;
 } ElfFile;
 
-typedef Result(LoadedElf, Nullish) ElfLoaderResult;
+typedef Result(ElfEntryPoint, Nullish) ElfLoaderResult;
 
-ElfLoaderResult _load_elf(const uint8_t *elf_pointer);
+ElfLoaderResult _load_elf(const uint8_t *elf_pointer, struct Pml *space);
 
 #endif  // ELF_LOADER_H
