@@ -67,10 +67,10 @@ void timer_irq(struct iframe *frame)
     if (!res.is_ok)
         return;
 
-    Task newTask = res.ok;
-    frame->rip   = newTask.registers.ip;
-    frame->gpr   = newTask.registers.registers;
-    frame->rsp   = newTask.registers.rsp;
+    // Task newTask = res.ok;
+    // frame->rip   = newTask.registers.ip;
+    // frame->gpr   = newTask.registers.registers;
+    // frame->rsp   = newTask.registers.rsp;
 
     // debug(true, "RIP AFTER %p\n", frame->rip);
 

@@ -2,6 +2,7 @@
 
 #include "hpet.h"
 #include <base/base-types.h>
+#include <cpu.h>
 #include <mm/virt.h>
 #include <panic.h>
 #include <platform/acpi/x86/acpi.h>

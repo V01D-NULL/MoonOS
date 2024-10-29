@@ -2,12 +2,13 @@
 #define SCHEDULER_H
 
 #include <moon-extra/result.h>
-#include "task.h"
 
-typedef Result(Task, Nullish) SchedulerResult;
+typedef int FIXME;
+
+typedef Result(FIXME, Nullish) SchedulerResult;
 
 void        sched_init(void);
-void        sched_register_task(Task task);
+void        sched_register_task(FIXME task);
 string_view get_current_task(void);
 
 #endif  // SCHEDULER_H

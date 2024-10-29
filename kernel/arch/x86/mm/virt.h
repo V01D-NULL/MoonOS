@@ -3,7 +3,6 @@
 
 #include <moon-extra/range.h>
 #include <paging/paging.h>
-#include <sched/task.h>
 #include "addr.h"
 
 void arch_map_page(struct Pml *pml4, virt_t vaddr, phys_t paddr, int flags);

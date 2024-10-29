@@ -1,5 +1,6 @@
 #include "virt.h"
 #include <base/assert.h>
+#include <cpu.h>
 #include <moon-io/serial.h>
 #include <moon-sys/handover.h>
 #include <panic.h>
