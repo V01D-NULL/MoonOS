@@ -30,4 +30,22 @@ typedef void *Nullish;
         .is_ok = true, .ok = V \
     }
 
+#define UNWRAP(result)                                          \
+    ({                                                          \
+        if (!result.is_ok)                                      \
+        {                                                       \
+            panic("Unwrapping error result! (%s)", result.err); \
+        }                                                       \
+        result.ok;                                              \
+    })
+
+#define TRY_UNWRAP(result, T)            \
+    ({                                   \
+        if (!result.is_ok)               \
+        {                                \
+            return Error(T, result.err); \
+        }                                \
+        result.ok;                       \
+    })
+
 #endif  // RESULT_H
