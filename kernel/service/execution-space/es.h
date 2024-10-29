@@ -7,6 +7,7 @@
 typedef struct
 {
     struct Pml      *vm_space;
+    uint64_t         stack_pointer;
     ExecutionContext ec;
 } ExecutionSpace;
 
