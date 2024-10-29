@@ -17,11 +17,11 @@ NORETURN void __panic(size_t bp, size_t sp, string_view fmt, ...)
 
     override_quiet_boot();
 
-    printk("panic", "\nA kernel panic has occurred\n");
-    tty_write("*** Reason: %s ***\n", panic_buff);
-    debug(
-        false, "A kernel panic has occurred\n*** Reason: %s ***\n", panic_buff);
-
+    printk("panic", "\n\033[31mA kernel panic has occurred\033[39m\n");
+    tty_write("*** \033[97mReason: %s\033[39m ***\n", panic_buff);
+    debug(false,
+          "A kernel panic has occurred\n*** \033[97mReason: %s\033[39m ***\n",
+          panic_buff);
     struct stacktrace_result res = arch_trace_stack(10);
     for (int i = 0; i < res.count; i++)
     {
