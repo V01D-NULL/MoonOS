@@ -15,7 +15,6 @@ AlignTrailingComments: true
 AllowShortFunctionsOnASingleLine: InlineOnly
 AllowShortLoopsOnASingleLine: false
 BreakBeforeBinaryOperators: None
-BreakConstructorInitializers: BeforeColon
 ColumnLimit: 80
 DerivePointerAlignment: false
 IncludeBlocks: Preserve
