@@ -2,6 +2,7 @@
 
 void main(void)
 {
-	for(;;)
-	syscall_log("init\n", 5);
+    syscall_log("init\n", 5);
+    for (;;)
+        ;
 }

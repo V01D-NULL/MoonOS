@@ -2,13 +2,12 @@
 #define SCHEDULER_H
 
 #include <moon-extra/result.h>
+#include <service/execution-space/es.h>
 
-typedef int FIXME;
+typedef Result(ExecutionContext, Nullish) SchedulerResult;
 
-typedef Result(FIXME, Nullish) SchedulerResult;
-
-void        sched_init(void);
-void        sched_register_task(FIXME task);
-string_view get_current_task(void);
+void sched_prepare(void);
+void sched_enqueue(ExecutionContext ec);
+void sched_begin_work(ExecutionSpace es);
 
 #endif  // SCHEDULER_H

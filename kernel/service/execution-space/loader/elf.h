@@ -14,7 +14,8 @@ typedef struct
     Elf64_Ehdr  ehdr;
     Elf64_Phdr *phdrs;
     Elf64_Shdr *shdrs;
-    char       *shstrtab;
+    Elf64_Shdr *shstrtab;
+    uint8_t    *base;
 } ElfFile;
 
 typedef Result(ElfEntryPoint, Nullish) ElfLoaderResult;

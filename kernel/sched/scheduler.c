@@ -3,6 +3,7 @@
 #include "scheduler.h"
 #include <base/base-types.h>
 #include <mm/virt.h>
+#include <moon-ds/containers.h>
 #include <moon-extra/result.h>
 #include <moon-io/serial.h>
 #include <moon-sys/spinlock.h>
@@ -10,35 +11,35 @@
 #include <sys/context_switch.h>
 #include <uspace/userspace.h>
 
-// Keep it simple and make it work for now
-// static Task tasks[10];
-static int  registered_tasks = 0, current_task_idx = 0;
+// TODO: Replace me with something like a map
+cc_vec(ExecutionContext) processes;
+
+// TODO: Remove me. This should not be necessary
 static bool scheduler_running = false;
 
-void sched_init(void)
+void sched_prepare(void)
 {
-    // Task first_task          = tasks[current_task_idx];
-    // first_task.registers.rsp = (uint64_t)first_task.ustack;
-    // first_task.registers.ip  = (uint64_t)first_task.entrypoint;
-
-    // // Switch to the first task's page map and enter userspace
-    // scheduler_running = true;
-    // arch_scheduler_callback(NULL);
-    // // arch_switch_pagemap(first_task);
-    // arch_enter_userspace(
-    //     (void *)first_task.entrypoint, (void *)first_task.ustack);
+    init(&processes);
 }
 
-void sched_register_task(FIXME task)
+void sched_begin_work(ExecutionSpace es)
 {
-    // if (registered_tasks == 10)
-    //     return;
+    trace(TRACE_MISC, "Starting scheduler\n");
 
-    // tasks[registered_tasks++] = task;
+    scheduler_running = true;
+    arch_switch_pagemap(es.vm_space);
+    arch_enter_userspace(
+        (void *)es.ec.entry, (void *)es.stack_pointer + PAGE_SIZE);
+}
+
+void sched_enqueue(ExecutionContext ec)
+{
+    push(&processes, ec);
 }
 
 SchedulerResult sched_reschedule(struct arch_task_registers *regs)
 {
+    debug(true, "Rescheduling\n");
     // if (unlikely(!scheduler_running))
     //     return Error(SchedulerResult, NULL);
 
@@ -59,9 +60,4 @@ SchedulerResult sched_reschedule(struct arch_task_registers *regs)
     // // arch_switch_pagemap(new);
 
     // return Okay(SchedulerResult, new);
-}
-
-string_view get_current_task(void)
-{
-    // return tasks[current_task_idx].descriptor;
 }
