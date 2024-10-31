@@ -5,7 +5,21 @@ section .text
 
 global arch_enter_userspace
 arch_enter_userspace:
-	; Swap out the kernel gs
+    ; Clear all registers except for RDI, RSI, and RBP because they are
+    ; used for arguments and do not contain kernel addresses or data
+    xor rax, rax
+    xor rbx, rbx
+    xor rcx, rcx
+    xor rdx, rdx
+    xor r8, r8
+    xor r9, r9
+    xor r10, r10
+    xor r11, r11
+    xor r12, r12
+    xor r13, r13
+    xor r14, r14
+    xor r15, r15
+
 	swapgs
 
     ; Setup user stack..
@@ -19,7 +33,7 @@ arch_enter_userspace:
     mov fs, ax
     mov gs, ax
     mov es, ax
-	
+    
     ; Enter ring3
     mov rcx, rdi   ; RIP
 	mov r11, 0x202 ; RFLAGS
