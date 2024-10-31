@@ -11,53 +11,40 @@
 #include <sys/context_switch.h>
 #include <uspace/userspace.h>
 
-// TODO: Replace me with something like a map
-cc_vec(ExecutionContext) processes;
-
-// TODO: Remove me. This should not be necessary
-static bool scheduler_running = false;
+cc_vec(ExecutionSpace) processes;
 
 void sched_prepare(void)
 {
     init(&processes);
 }
 
-void sched_begin_work(ExecutionSpace es)
+void sched_begin_work(void)
 {
     trace(TRACE_MISC, "Starting scheduler\n");
 
-    scheduler_running = true;
-    arch_switch_pagemap(es.vm_space);
-    arch_enter_userspace(
-        (void *)es.ec.entry, (void *)es.stack_pointer + PAGE_SIZE);
+    ExecutionSpace *es = get(&processes, 0);
+
+    arch_switch_pagemap(es->vm_space);
+    arch_start_scheduler_timer();
+    arch_enter_userspace((void *)es->ec.entry, (void *)es->stack_pointer);
 }
 
-void sched_enqueue(ExecutionContext ec)
+void sched_enqueue(ExecutionSpace es)
 {
-    push(&processes, ec);
+    push(&processes, es);
 }
 
 SchedulerResult sched_reschedule(struct arch_task_registers *regs)
 {
-    debug(true, "Rescheduling\n");
-    // if (unlikely(!scheduler_running))
-    //     return Error(SchedulerResult, NULL);
+    static size_t current_index = 0;
 
-    // // Save register state
-    // tasks[current_task_idx].registers = *regs;
+    // Save the current register state
+    ExecutionSpace *current = get(&processes, current_index);
+    current->ec.registers   = *regs;
 
-    // // Find new task
-    // if (registered_tasks > 1)
-    // {
-    //     if (++current_task_idx >= registered_tasks)
-    //         current_task_idx = 0;
-    // }
-    // else
-    //     return;
+    // Select the next process
+    current_index       = (current_index + 1) % size(&processes);
+    ExecutionSpace next = *get(&processes, current_index);
 
-    // // Load new task
-    // auto new = tasks[current_task_idx];
-    // // arch_switch_pagemap(new);
-
-    // return Okay(SchedulerResult, new);
+    return Okay(SchedulerResult, next);
 }

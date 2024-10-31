@@ -13,7 +13,8 @@ EsCreateResult create_execution_space(const uint8_t *elf_pointer)
 {
     ExecutionSpace execution_space = {
         .vm_space      = arch_create_new_pagemap(),
-        .stack_pointer = (uint64_t)pa(arch_alloc_page_sz(PAGE_SIZE)),
+        .stack_pointer = (uint64_t)pa(arch_alloc_page_sz(PAGE_SIZE)) +
+                         PAGE_SIZE,  // + PAGE_SIZE to get the top of the stack
     };
 
     if (!execution_space.vm_space)
@@ -24,8 +25,8 @@ EsCreateResult create_execution_space(const uint8_t *elf_pointer)
 
     arch_copy_kernel_mappings(execution_space.vm_space);
     arch_map_page(execution_space.vm_space,
-                  execution_space.stack_pointer,
-                  execution_space.stack_pointer,
+                  execution_space.stack_pointer - PAGE_SIZE,
+                  execution_space.stack_pointer - PAGE_SIZE,
                   MAP_USER_RW);
 
     uint64_t elf_entry_point = TRY_UNWRAP(

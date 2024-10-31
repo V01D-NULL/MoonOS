@@ -4,10 +4,10 @@
 #include <moon-extra/result.h>
 #include <service/execution-space/es.h>
 
-typedef Result(ExecutionContext, Nullish) SchedulerResult;
+typedef Result(ExecutionSpace, Nullish) SchedulerResult;
 
 void sched_prepare(void);
-void sched_enqueue(ExecutionContext ec);
-void sched_begin_work(ExecutionSpace es);
+void sched_enqueue(ExecutionSpace es);
+void sched_begin_work(void);
 
 #endif  // SCHEDULER_H

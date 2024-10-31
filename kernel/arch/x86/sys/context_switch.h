@@ -5,11 +5,11 @@
 
 struct arch_task_registers
 {
-	GeneralRegisters registers;
-	int64_t ip;
-	int64_t rsp;
+    GeneralRegisters registers;
+    int64_t          ip;
+    int64_t          rsp;
 };
 
-void arch_scheduler_callback(void *sched_handler_fn);
+void arch_start_scheduler_timer(void);
 
-#endif // CONTEXT_SWITCH_H
+#endif  // CONTEXT_SWITCH_H

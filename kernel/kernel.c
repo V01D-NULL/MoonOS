@@ -27,11 +27,14 @@ NORETURN void kern_main(HandoverModules mods)
     trace(TRACE_MISC, "Detected %d modules\n", mods.count);
     trace(TRACE_MISC, "Module string: %s\n", mods.modules[0].cmdline);
 
-    auto space = UNWRAP(
-        create_execution_space((const uint8_t *)(mods.modules[0].address)));
+    for (int i = 0; i < mods.count; i++)
+    {
+        auto space = UNWRAP(
+            create_execution_space((const uint8_t *)(mods.modules[i].address)));
 
-    sched_enqueue(space.ec);
-    sched_begin_work(space);
+        sched_enqueue(space);
+    }
 
+    sched_begin_work();
     arch_halt_cpu();
 }
