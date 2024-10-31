@@ -67,7 +67,7 @@ Kernel panic:
 - libs/   	  --  Utilities not strictly related to a kernel (Scheduler, memory manager, etc), but required for it to function.
 - kernel/ 	  --  Kernel source code
 - boot/		  --  Everything Moon needs in order to boot 
-- service/     --  Special micro-kernel servers
+- service/     --  Special micro-kernel servers + libc
 - userspace/  --  Bootloader files, configs, modules, etc. Many files are automatically added at build-time.
 
 # Installation
