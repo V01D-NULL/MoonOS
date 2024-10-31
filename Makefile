@@ -34,7 +34,6 @@ clean:
 	@$(MAKE) --no-print-directory -C kernel clean
 	@$(MAKE) --no-print-directory -C libs   clean
 	@$(MAKE) --no-print-directory -C service   clean
-	@$(MAKE) --no-print-directory -C userspace clean
 
 debug: quick_recompile
 	$(DEBUG_TERMINAL) $(DEBUG_TERMINAL_OPTS) ./meta/debug-util/debug.sh &
@@ -55,7 +54,6 @@ quick_recompile: symlist
 	@rm -f kernel/kernel.elf
 	@printf "\n"
 	@$(MAKE) --no-print-directory -C libs
-	@$(MAKE) --no-print-directory -C userspace
 	@$(MAKE) --no-print-directory -C service
 	@$(MAKE) --no-print-directory -C kernel
 

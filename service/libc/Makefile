@@ -9,8 +9,7 @@ SFILES := $(shell find ./ -type f -name '*.s') $(shell find ./$(ARCH) -type f -n
 OBJ    := $(CFILES:.c=.o) $(SFILES:.s=.o)
 .PHONY: all clean
 
-CFLAGS = -ffreestanding -O2 -std=gnu11 \
-	-mno-sse -mno-sse2 -Wall -I../../../userspace/arch/$(ARCH)/ \
+CFLAGS = -ffreestanding -O2 -std=gnu11 -mno-sse -mno-sse2 -Wall -I public/
 
 all: $(TARGET)
 	@printf "Built libc\n\n";
