@@ -1,5 +1,6 @@
 #include "virt.h"
 #include <base/assert.h>
+#include <cpu.h>
 #include <moon-io/serial.h>
 #include <moon-sys/handover.h>
 #include <panic.h>
@@ -138,27 +139,15 @@ struct Pml *arch_create_new_pagemap(void)
     return (struct Pml *)arch_alloc_page();
 }
 
-void arch_copy_kernel_mappings(Task task)
+void arch_copy_kernel_mappings(struct Pml *pagemap)
 {
     for (int i = 256; i < 512; i++)
-        task.pagemap->page_tables[i] = kernel_pagemap->page_tables[i];
+        pagemap->page_tables[i] = kernel_pagemap->page_tables[i];
 }
 
-void arch_switch_pagemap(Task task)
+void arch_switch_pagemap(struct Pml *pagemap)
 {
-    if (!task.pagemap)
-    {
-        panic_if(task.task_type == TASK_DAEMON,
-                 "The kernel daemon task '%s' attempted to switch to a NULL "
-                 "pagemap!",
-                 task.descriptor);
-
-        return;  // Todo: Should probably return a status code or something
-    }
-
-    // memcpy((uint8_t *)active_pagemap, (const uint8_t *)task.pagemap,
-    // sizeof(*task.pagemap) / sizeof(task.pagemap[0]));
-    wrcr3(pa(task.pagemap));
+    wrcr3(pa(pagemap));
 }
 
 void arch_pagefault_handler(uint64_t cr2, int error_code)

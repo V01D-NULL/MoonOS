@@ -1,5 +1,7 @@
 #include "context_switch.h"
-#include <printk.h>
 #include <moon.h>
+#include <printk.h>
 
-void arch_scheduler_callback(UNUSED void *sched_handler_fn) {}
+void arch_start_scheduler_timer(void)
+{
+}

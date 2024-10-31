@@ -34,10 +34,11 @@ enum
     TRACE_MISC    = (1 << 4),  // For logs with no specific category
     TRACE_TASK    = (1 << 5),
     TRACE_SERVICE = (1 << 6),
-    TRACE_SLAB    = (1 << 7),
-    TRACE_BUDDY   = (1 << 8),
-    TRACE_TLSF    = (1 << 9),
-    TRACE_ALLOC   = (1 << 10),
+    TRACE_ELF     = (1 << 7),
+    TRACE_SLAB    = (1 << 8),
+    TRACE_BUDDY   = (1 << 9),
+    TRACE_TLSF    = (1 << 10),
+    TRACE_ALLOC   = (1 << 11),
 
     TRACE_ALL  = ~0,
     TRACE_NONE = 0,

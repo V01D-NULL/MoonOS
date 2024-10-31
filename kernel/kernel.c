@@ -7,16 +7,18 @@
 
 #include <moon-sys/time/sleep.h>
 
-#include <loader/daemon/load.h>
 #include <platform.h>
 #include <sched/scheduler.h>
 
 #include "panic.h"
 #include "printk.h"
 
+#include <service/execution-space/create.h>
+
 NORETURN void kern_main(HandoverModules mods)
 {
     arch_init_syscall();
+    sched_prepare();
 
 #if !defined(__x86_64__)
     panic("Platform not fully supported");
@@ -25,11 +27,14 @@ NORETURN void kern_main(HandoverModules mods)
     trace(TRACE_MISC, "Detected %d modules\n", mods.count);
     trace(TRACE_MISC, "Module string: %s\n", mods.modules[0].cmdline);
 
-    load_daemon(
-        (const uint8_t *)mods.modules[0].address, mods.modules[0].cmdline);
-    load_daemon(
-        (const uint8_t *)mods.modules[1].address, mods.modules[1].cmdline);
+    for (int i = 0; i < mods.count; i++)
+    {
+        auto space = UNWRAP(
+            create_execution_space((const uint8_t *)(mods.modules[i].address)));
 
-    sched_init();
+        sched_enqueue(space);
+    }
+
+    sched_begin_work();
     arch_halt_cpu();
 }

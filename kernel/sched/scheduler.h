@@ -2,12 +2,12 @@
 #define SCHEDULER_H
 
 #include <moon-extra/result.h>
-#include "task.h"
+#include <service/execution-space/es.h>
 
-typedef Result(Task, Nullish) SchedulerResult;
+typedef Result(ExecutionSpace, Nullish) SchedulerResult;
 
-void        sched_init(void);
-void        sched_register_task(Task task);
-string_view get_current_task(void);
+void sched_prepare(void);
+void sched_enqueue(ExecutionSpace es);
+void sched_begin_work(void);
 
 #endif  // SCHEDULER_H

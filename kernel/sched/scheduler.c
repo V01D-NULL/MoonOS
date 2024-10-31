@@ -3,6 +3,7 @@
 #include "scheduler.h"
 #include <base/base-types.h>
 #include <mm/virt.h>
+#include <moon-ds/containers.h>
 #include <moon-extra/result.h>
 #include <moon-io/serial.h>
 #include <moon-sys/spinlock.h>
@@ -10,58 +11,40 @@
 #include <sys/context_switch.h>
 #include <uspace/userspace.h>
 
-// Keep it simple and make it work for now
-static Task tasks[10];
-static int  registered_tasks = 0, current_task_idx = 0;
-static bool scheduler_running = false;
+cc_vec(ExecutionSpace) processes;
 
-void sched_init(void)
+void sched_prepare(void)
 {
-    Task first_task          = tasks[current_task_idx];
-    first_task.registers.rsp = (uint64_t)first_task.ustack;
-    first_task.registers.ip  = (uint64_t)first_task.entrypoint;
-
-    // Switch to the first task's page map and enter userspace
-    scheduler_running = true;
-    arch_scheduler_callback(NULL);
-    arch_switch_pagemap(first_task);
-    arch_enter_userspace(
-        (void *)first_task.entrypoint, (void *)first_task.ustack);
+    init(&processes);
 }
 
-void sched_register_task(Task task)
+void sched_begin_work(void)
 {
-    if (registered_tasks == 10)
-        return;
+    trace(TRACE_MISC, "Starting scheduler\n");
 
-    tasks[registered_tasks++] = task;
+    ExecutionSpace *es = get(&processes, 0);
+
+    arch_switch_pagemap(es->vm_space);
+    arch_start_scheduler_timer();
+    arch_enter_userspace((void *)es->ec.entry, (void *)es->stack_pointer);
+}
+
+void sched_enqueue(ExecutionSpace es)
+{
+    push(&processes, es);
 }
 
 SchedulerResult sched_reschedule(struct arch_task_registers *regs)
 {
-    if (unlikely(!scheduler_running))
-        return Error(SchedulerResult, NULL);
+    static size_t current_index = 0;
 
-    // Save register state
-    tasks[current_task_idx].registers = *regs;
+    // Save the current register state
+    ExecutionSpace *current = get(&processes, current_index);
+    current->ec.registers   = *regs;
 
-    // Find new task
-    if (registered_tasks > 1)
-    {
-        if (++current_task_idx >= registered_tasks)
-            current_task_idx = 0;
-    }
-    else
-        return;
+    // Select the next process
+    current_index       = (current_index + 1) % size(&processes);
+    ExecutionSpace next = *get(&processes, current_index);
 
-    // Load new task
-    auto new = tasks[current_task_idx];
-    arch_switch_pagemap(new);
-
-    return Okay(SchedulerResult, new);
-}
-
-string_view get_current_task(void)
-{
-    return tasks[current_task_idx].descriptor;
+    return Okay(SchedulerResult, next);
 }
