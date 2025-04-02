@@ -6,6 +6,6 @@
 
 typedef Result(ExecutionSpace, Nullish) EsCreateResult;
 
-EsCreateResult create_execution_space(const uint8_t *elf_pointer);
+EsCreateResult create_execution_space(const uint8_t *elf_pointer, int pid);
 
 #endif  // CREATE_ES_H

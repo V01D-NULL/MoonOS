@@ -14,6 +14,9 @@ phys_t *va(phys_t paddr)
 
 virt_t *pa(virt_t vaddr)
 {
+    if (!vaddr)
+        return NULL;
+
     return (virt_t *)(vaddr - hhdm_offset);
 }
 

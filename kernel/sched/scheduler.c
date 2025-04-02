@@ -11,17 +11,19 @@
 #include <sys/context_switch.h>
 #include <uspace/userspace.h>
 
-cc_vec(ExecutionSpace) processes;
+// cc_map(int, ExecutionSpace) processesMap = NULL;
+cc_vec(ExecutionSpace) processes = NULL;
+static size_t current_index      = 0;
 
 void sched_prepare(void)
 {
+    // init(&processesMap);
     init(&processes);
 }
 
 void sched_begin_work(void)
 {
     trace(TRACE_MISC, "Starting scheduler\n");
-
     ExecutionSpace *es = get(&processes, 0);
 
     arch_switch_pagemap(es->vm_space);
@@ -36,8 +38,6 @@ void sched_enqueue(ExecutionSpace es)
 
 SchedulerResult sched_reschedule(struct arch_task_registers *regs)
 {
-    static size_t current_index = 0;
-
     // Save the current register state
     ExecutionSpace *current = get(&processes, current_index);
     current->ec.registers   = *regs;
@@ -47,4 +47,20 @@ SchedulerResult sched_reschedule(struct arch_task_registers *regs)
     ExecutionSpace next = *get(&processes, current_index);
 
     return Okay(SchedulerResult, next);
+}
+
+ExecutionSpace *sched_current(void)
+{
+    if (unlikely(processes == NULL || !size(&processes)))
+        return NULL;
+
+    return get(&processes, current_index);
+}
+
+ExecutionSpace *sched_get(int pid)
+{
+    if (unlikely(pid < 0 || pid >= size(&processes)))
+        return NULL;
+
+    return get(&processes, pid);
 }

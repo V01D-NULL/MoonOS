@@ -13,6 +13,7 @@
 #include "panic.h"
 #include "printk.h"
 
+#include <moon-ds/containers.h>
 #include <service/execution-space/create.h>
 
 NORETURN void kern_main(HandoverModules mods)
@@ -29,8 +30,8 @@ NORETURN void kern_main(HandoverModules mods)
 
     for (int i = 0; i < mods.count; i++)
     {
-        auto space = UNWRAP(
-            create_execution_space((const uint8_t *)(mods.modules[i].address)));
+        auto space = UNWRAP(create_execution_space(
+            (const uint8_t *)(mods.modules[i].address), i));
 
         sched_enqueue(space);
     }

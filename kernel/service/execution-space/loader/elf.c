@@ -43,17 +43,18 @@ ElfLoaderResult load_elf(const uint8_t *elf_pointer, struct Pml *space)
                      "ELF file is not valid or is configured incorrectly");
     }
 
+    auto phdr = elf.phdrs;
     for (Elf64_Half i = 0; i < elf.ehdr.e_phnum; i++)
     {
-        if (elf.phdrs->p_type != PT_LOAD)
+        if (phdr->p_type != PT_LOAD)
             continue;
 
-        size_t num_pages = ALIGN_UP(elf.phdrs->p_memsz) / PAGE_SIZE;
+        size_t num_pages = ALIGN_UP(phdr->p_memsz) / PAGE_SIZE;
 
         for (uint64_t j = 0; j < num_pages; j++)
-            load_segment(elf.base, space, elf.phdrs, j);
+            load_segment(elf.base, space, phdr, j);
 
-        elf.phdrs = (Elf64_Phdr *)elf.phdrs + elf.ehdr.e_phentsize;
+        phdr = (Elf64_Phdr *)((char *)phdr + elf.ehdr.e_phentsize);
     }
 
     load_section_headers(elf, space);

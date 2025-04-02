@@ -40,3 +40,13 @@ void syscall_log(const char *buff, size_t len)
 {
     syscall(1, 1, (uint64_t)buff, len, 0, 0, 0);
 }
+
+void syscall_ipc_send(uint64_t to, uint64_t buff)
+{
+    syscall(2, to, buff, 0, 0, 0, 0);
+}
+
+void syscall_ipc_receive(uint64_t buff)
+{
+    syscall(3, buff, 0, 0, 0, 0, 0);
+}

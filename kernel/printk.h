@@ -39,6 +39,7 @@ enum
     TRACE_BUDDY   = (1 << 9),
     TRACE_TLSF    = (1 << 10),
     TRACE_ALLOC   = (1 << 11),
+    TRACE_IPC     = (1 << 12),
 
     TRACE_ALL  = ~0,
     TRACE_NONE = 0,
