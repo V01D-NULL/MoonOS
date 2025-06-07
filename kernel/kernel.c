@@ -14,10 +14,13 @@
 
 #include "panic.h"
 #include "printk.h"
-#include "tar.h"
 
 NORETURN void kern_main(HandoverModules mods)
 {
+    panic_if(mods.count != 2,
+             "Expected 2 handover modules, received '%d'",
+             mods.count);
+
     auto initModule = mods.modules[0];
     panic_if(strncmp(initModule.cmdline, "init.elf", 8) != 0,
              "First handover module is not init process");
