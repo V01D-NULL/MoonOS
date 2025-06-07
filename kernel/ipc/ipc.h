@@ -29,6 +29,7 @@ struct UserIpcMessage
     } message;
 };
 
+void               ipc_init(void);
 bool               ipc_assign_port(ExecutionSpace *space, int port);
 void               ipc_send(uint64_t to, uint64_t buff, uint64_t buff_len);
 struct IpcMessage *ipc_receive(IpcMessageQueue message_queue);

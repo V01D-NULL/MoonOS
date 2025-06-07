@@ -44,7 +44,6 @@ int sys_ipc_send(Type to, Type buff, ignore, ignore, ignore, ignore)
     if (unlikely(is_user_address(buff) == false))
         return 1;
 
-    auto task    = sched_get(to);
     auto message = (struct UserIpcMessage *)buff;
 
     auto payload = alloc(message->message.payload_size);

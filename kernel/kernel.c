@@ -2,6 +2,7 @@
 
 #include <cpu.h>
 #include <ipc/ipc.h>
+#include <ipc/port.h>
 #include <moon-sys/handover.h>
 #include <moon-sys/time/sleep.h>
 #include <platform.h>
@@ -29,13 +30,15 @@ NORETURN void kern_main(HandoverModules mods)
 
     arch_init_syscall();
     sched_prepare();
+    ipc_init();
 
 #if !defined(__x86_64__)
     panic("Platform not fully supported");
 #endif
 
-    auto space = UNWRAP(create_execution_space(mods.modules[0].address, 0));
-    ipc_assign_port(&space, 0);
+    auto space = UNWRAP(create_execution_space(initModule.address, 0));
+    panic_if(ipc_assign_port(&space, PORT_INIT) == false,
+             "Unable to assign IPC port to init process");
     sched_enqueue(space);
 
     sched_begin_work();
