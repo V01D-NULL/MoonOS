@@ -3,6 +3,8 @@
 #include <cpu.h>
 #include <ipc/ipc.h>
 #include <ipc/port.h>
+#include <mm/phys.h>
+#include <mm/virt.h>
 #include <moon-sys/handover.h>
 #include <moon-sys/time/sleep.h>
 #include <platform.h>
@@ -12,19 +14,15 @@
 
 #include "panic.h"
 #include "printk.h"
+#include "tar.h"
 
 NORETURN void kern_main(HandoverModules mods)
 {
-    panic_if(
-        mods.count != 2,
-        "Expected two handover modules (init, ramdisk). Received %d instead.",
-        mods.count);
-
-    auto initModule    = mods.modules[0];
-    auto ramdiskModule = mods.modules[1];
-
+    auto initModule = mods.modules[0];
     panic_if(strncmp(initModule.cmdline, "init.elf", 8) != 0,
              "First handover module is not init process");
+
+    auto ramdiskModule = mods.modules[1];
     panic_if(strncmp(ramdiskModule.cmdline, "ramdisk", 7) != 0,
              "Second handover module is not ramdisk");
 
@@ -40,6 +38,10 @@ NORETURN void kern_main(HandoverModules mods)
     panic_if(ipc_assign_port(&space, PORT_INIT) == false,
              "Unable to assign IPC port to init process");
     sched_enqueue(space);
+
+    Range range = {.base  = (ramdiskModule.address),
+                   .limit = (ramdiskModule.address) + ramdiskModule.size};
+    arch_map_range(space.vm_space, range, MAP_USER_RO, 0);
 
     sched_begin_work();
     arch_halt_cpu();
