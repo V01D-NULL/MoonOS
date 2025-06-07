@@ -18,6 +18,19 @@
 
 NORETURN void kern_main(HandoverModules mods)
 {
+    panic_if(
+        mods.count != 2,
+        "Expected two handover modules (init, ramdisk). Received %d instead.",
+        mods.count);
+
+    auto initModule    = mods.modules[0];
+    auto ramdiskModule = mods.modules[1];
+
+    panic_if(strncmp(initModule.cmdline, "init.elf", 8) != 0,
+             "First handover module is not init process");
+    panic_if(strncmp(ramdiskModule.cmdline, "ramdisk", 7) != 0,
+             "Second handover module is not ramdisk");
+
     arch_init_syscall();
     sched_prepare();
 
@@ -25,16 +38,8 @@ NORETURN void kern_main(HandoverModules mods)
     panic("Platform not fully supported");
 #endif
 
-    trace(TRACE_MISC, "Detected %d modules\n", mods.count);
-    trace(TRACE_MISC, "Module string: %s\n", mods.modules[0].cmdline);
-
-    for (int i = 0; i < mods.count; i++)
-    {
-        auto space = UNWRAP(create_execution_space(
-            (const uint8_t *)(mods.modules[i].address), i));
-
-        sched_enqueue(space);
-    }
+    auto space = UNWRAP(create_execution_space(mods.modules[0].address, 0));
+    sched_enqueue(space);
 
     sched_begin_work();
     arch_halt_cpu();
