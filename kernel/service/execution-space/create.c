@@ -25,19 +25,14 @@ EsCreateResult create_execution_space(const uint8_t *elf_pointer, int pid)
     if (!execution_space.stack_pointer)
         return Error(EsCreateResult, "Failed to allocate stack");
 
-    init(&execution_space.message_queue);
+    execution_space.message_queue = NULL;
+    execution_space.port          = -1;
 
     arch_copy_kernel_mappings(execution_space.vm_space);
     arch_map_page(execution_space.vm_space,
                   execution_space.stack_pointer - PAGE_SIZE,
                   execution_space.stack_pointer - PAGE_SIZE,
                   MAP_USER_RW);
-
-    Range ipc_region = {
-        .base  = IPC_MESSAGE_REGION_BASE,
-        .limit = IPC_MESSAGE_REGION_BASE + IPC_MESSAGE_REGION_SZ,
-    };
-    arch_map_range(execution_space.vm_space, ipc_region, MAP_USER_RW, 0);
 
     uint64_t elf_entry_point = TRY_UNWRAP(
         load_elf(elf_pointer, execution_space.vm_space), EsCreateResult);

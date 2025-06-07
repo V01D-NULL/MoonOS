@@ -1,20 +1,16 @@
 #define PR_MODULE "main"
 
-#include <moon-sys/handover.h>
-
 #include <cpu.h>
-#include <sys/syscall.h>
-
+#include <ipc/ipc.h>
+#include <moon-sys/handover.h>
 #include <moon-sys/time/sleep.h>
-
 #include <platform.h>
 #include <sched/scheduler.h>
+#include <service/execution-space/create.h>
+#include <sys/syscall.h>
 
 #include "panic.h"
 #include "printk.h"
-
-#include <moon-ds/containers.h>
-#include <service/execution-space/create.h>
 
 NORETURN void kern_main(HandoverModules mods)
 {
@@ -39,6 +35,7 @@ NORETURN void kern_main(HandoverModules mods)
 #endif
 
     auto space = UNWRAP(create_execution_space(mods.modules[0].address, 0));
+    ipc_assign_port(&space, 0);
     sched_enqueue(space);
 
     sched_begin_work();

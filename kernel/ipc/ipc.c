@@ -1,7 +1,26 @@
 #define PR_MODULE "ipc"
 #include "ipc.h"
+#include <mm/virt.h>
+#include <moon-extra/range.h>
 #include <printk.h>
 #include <sched/scheduler.h>
+
+bool ipc_assign_port(ExecutionSpace *space, int port)
+{
+    if (space->port != -1)
+    {
+        return false;
+    }
+
+    space->port = port;
+    init(&space->message_queue);
+    Range ipc_region = {
+        .base  = IPC_MESSAGE_REGION_BASE,
+        .limit = IPC_MESSAGE_REGION_BASE + IPC_MESSAGE_REGION_SZ,
+    };
+    arch_map_range(space->vm_space, ipc_region, MAP_USER_RW, 0);
+    return true;
+}
 
 void ipc_send(uint64_t to, uint64_t payload, uint64_t payload_size)
 {
