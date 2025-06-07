@@ -42,8 +42,8 @@ NORETURN void kern_main(HandoverModules mods)
              "Unable to assign IPC port to init process");
     sched_enqueue(space);
 
-    Range range = {.base  = (ramdiskModule.address),
-                   .limit = (ramdiskModule.address) + ramdiskModule.size};
+    Range range = {.base  = ramdiskModule.address,
+                   .limit = ramdiskModule.address + ramdiskModule.size};
     arch_map_range(space.vm_space, range, MAP_USER_RO, 0);
 
     sched_begin_work();
