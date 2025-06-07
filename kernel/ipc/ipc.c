@@ -14,7 +14,7 @@ void ipc_init(void)
 
 bool ipc_assign_port(ExecutionSpace *space, int port)
 {
-    if (space->port != -1)
+    if (space->port != -1 || get(&port_to_pid, port) != NULL)
     {
         return false;
     }
