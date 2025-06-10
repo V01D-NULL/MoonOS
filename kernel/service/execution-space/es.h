@@ -10,6 +10,8 @@ typedef struct
 {
     int              pid;
     int              port;
+    int              argc;
+    uint64_t        *argv;
     struct Pml      *vm_space;
     uint64_t         stack_pointer;
     ExecutionContext ec;

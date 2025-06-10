@@ -37,10 +37,16 @@ NORETURN void kern_main(HandoverModules mods)
     panic("Platform not fully supported");
 #endif
 
-    auto space = UNWRAP(create_execution_space(initModule.address, 0));
+    ArgumentVector argv;
+    init(&argv);
+    push(&argv, "init.elf");
+    push(&argv, ramdiskModule.address);
+
+    auto space = UNWRAP(create_execution_space(initModule.address, 0, argv));
     panic_if(ipc_assign_port(&space, PORT_INIT) == false,
              "Unable to assign IPC port to init process");
     sched_enqueue(space);
+    cleanup(&argv);
 
     Range range = {.base  = ramdiskModule.address,
                    .limit = ramdiskModule.address + ramdiskModule.size};

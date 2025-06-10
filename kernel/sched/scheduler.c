@@ -28,7 +28,8 @@ void sched_begin_work(void)
 
     arch_switch_pagemap(es->vm_space);
     arch_start_scheduler_timer();
-    arch_enter_userspace((void *)es->ec.entry, (void *)es->stack_pointer);
+    arch_enter_userspace(
+        (void *)es->ec.entry, (void *)es->stack_pointer, es->argc, es->argv);
 }
 
 void sched_enqueue(ExecutionSpace es)
