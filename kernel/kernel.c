@@ -1,5 +1,6 @@
 #define PR_MODULE "main"
 
+#include <base/fmt.h>
 #include <cpu.h>
 #include <ipc/ipc.h>
 #include <ipc/port.h>
@@ -40,16 +41,20 @@ NORETURN void kern_main(HandoverModules mods)
     ArgumentVector argv;
     init(&argv);
     push(&argv, "init.elf");
-    push(&argv, ramdiskModule.address);
+
+    char buffer[20];
+    snprintf(buffer, sizeof(buffer), "0x%p", pa(ramdiskModule.address));
+    push(&argv, buffer);
 
     auto space = UNWRAP(create_execution_space(initModule.address, 0, argv));
+    cleanup(&argv);
+
     panic_if(ipc_assign_port(&space, PORT_INIT) == false,
              "Unable to assign IPC port to init process");
     sched_enqueue(space);
-    cleanup(&argv);
 
-    Range range = {.base  = ramdiskModule.address,
-                   .limit = ramdiskModule.address + ramdiskModule.size};
+    Range range = {.base  = pa(ramdiskModule.address),
+                   .limit = pa(ramdiskModule.address) + ramdiskModule.size};
     arch_map_range(space.vm_space, range, MAP_USER_RO, 0);
 
     sched_begin_work();

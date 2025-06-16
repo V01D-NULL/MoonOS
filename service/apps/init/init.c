@@ -1,6 +1,8 @@
 #include <abi/syscalls.h>
 #include <ipc/ipc.h>
 #include <memory.h>
+#include <string.h>
+#include "utils/tar.h"
 
 // TODO:
 //  This init process will setup the system and it's services (kinda like
@@ -11,14 +13,20 @@
 //     none that are reserved for system use (example: net, fs))
 //     2. Launch the service
 
+// TODO: Dynamically allocate this in the future
+struct TarHeader *headers[32];
+
 void main(int argc, char **argv)
 {
-    // Test: first argument is "init.elf". Log it. (Second argument is ramdisk
-    // with kernel services. Load those next..)
-    if (argc == 2)
+    if (argc != 2)
     {
-        syscall_log(argv[0], 8);
+        // TODO: abort()
     }
+
+    int entry_count = tar_parse_headers(strtoul(argv[1]), &headers);
+
+    for (int i = 0; i < entry_count; i++)
+        syscall_log(headers[i]->filename, strlen(headers[i]->filename));
 
     for (;;)
     {
