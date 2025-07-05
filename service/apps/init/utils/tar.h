@@ -17,6 +17,7 @@ struct TarHeader
     char typeflag[1];
 };
 
-int tar_parse_headers(uint64_t address, struct TarHeader **headers);
+int      tar_parse_headers(uint64_t address, struct TarHeader **headers);
+uint32_t tar_get_content_size(const char *in);
 
 #endif  // TAR_H

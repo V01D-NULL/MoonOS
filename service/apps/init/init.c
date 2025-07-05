@@ -1,4 +1,5 @@
 #include <abi/syscalls.h>
+#include <base-types.h>
 #include <ipc/ipc.h>
 #include <memory.h>
 #include <string.h>
@@ -26,7 +27,12 @@ void main(int argc, char **argv)
     int entry_count = tar_parse_headers(strtoul(argv[1]), &headers);
 
     for (int i = 0; i < entry_count; i++)
-        syscall_log(headers[i]->filename, strlen(headers[i]->filename));
+    {
+        auto tar_content = (uint64_t)headers[i] + TAR_BLOCK_SIZE;
+        syscall_create_process(
+            tar_content,
+            5);  // TODO: dynamically assign port based on application
+    }
 
     for (;;)
     {

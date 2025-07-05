@@ -65,3 +65,13 @@ ExecutionSpace *sched_get(int pid)
 
     return get(&processes, pid);
 }
+
+// TODO: Refactor...this is a hacked together mess but it works for now.
+int sched_new_pid(void)
+{
+    auto sz = size(&processes);
+    if (sz == 0)
+        return sz;
+
+    return sz + 1;
+}

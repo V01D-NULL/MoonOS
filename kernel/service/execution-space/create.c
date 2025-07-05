@@ -7,14 +7,17 @@
 #include <mm/phys.h>
 #include <mm/virt.h>
 #include <printk.h>
+#include <sched/scheduler.h>
 #include <service/execution-context/create.h>
 #include "loader/elf.h"
 
-EsCreateResult create_execution_space(const uint8_t *elf_pointer, int pid,
+EsCreateResult create_execution_space(const uint8_t *elf_pointer,
                                       ArgumentVector argv)
 {
     ExecutionSpace execution_space = {
-        .pid           = pid,
+        .pid = sched_new_pid(),  // TODO: This is a quick hack to get things
+                                 // working. This requires a refactor to avoid
+                                 // race conditions, duplicate pids, etc.
         .port          = -1,
         .message_queue = NULL,
         .vm_space      = arch_create_new_pagemap(),
@@ -34,7 +37,7 @@ EsCreateResult create_execution_space(const uint8_t *elf_pointer, int pid,
                   execution_space.stack_pointer - PAGE_SIZE,
                   MAP_USER_RW);
 
-    int argc = execution_space.argc = size(&argv);
+    int argc = execution_space.argc = argv != NULL ? size(&argv) : 0;
 
     if (argc > 0)
     {

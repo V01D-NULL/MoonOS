@@ -46,7 +46,7 @@ NORETURN void kern_main(HandoverModules mods)
     snprintf(buffer, sizeof(buffer), "0x%p", pa(ramdiskModule.address));
     push(&argv, buffer);
 
-    auto space = UNWRAP(create_execution_space(initModule.address, 0, argv));
+    auto space = UNWRAP(create_execution_space(initModule.address, argv));
     cleanup(&argv);
 
     panic_if(ipc_assign_port(&space, PORT_INIT) == false,

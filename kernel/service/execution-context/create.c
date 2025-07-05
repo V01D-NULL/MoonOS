@@ -7,8 +7,8 @@ ExecutionContext create_ec(uint64_t entry, uint64_t sp)
         .registers =
             {
                 .ip        = entry,
-                .registers = {0},
-                .rsp       = sp,
+                .registers = {.rbp = sp, 0},
+                .rsp       = sp - 2048,
             },
     };
 }

@@ -12,6 +12,8 @@ void ipc_init(void)
     init(&port_to_pid);
 }
 
+// TODO: Check permissions of execution space. Is it asking for a system port id
+// and may it do that?
 bool ipc_assign_port(ExecutionSpace *space, int port)
 {
     if (space->port != -1 || get(&port_to_pid, port) != NULL)

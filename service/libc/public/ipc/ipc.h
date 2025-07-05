@@ -2,6 +2,7 @@
 #define PUBLIC_IPC_H
 
 #include <stdint.h>
+#include "ports.h"
 
 typedef enum
 {

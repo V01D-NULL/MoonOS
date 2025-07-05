@@ -2,11 +2,11 @@
 #include <abi/syscalls.h>
 #include <string.h>
 
-unsigned int getsize(const char *in)
+uint32_t tar_get_content_size(const char *in)
 {
-    unsigned int size = 0;
-    unsigned int j;
-    unsigned int count = 1;
+    uint32_t size = 0;
+    uint32_t j;
+    uint32_t count = 1;
 
     for (j = 11; j > 0; j--, count *= 8)
         size += ((in[j - 1] - '0') * count);
@@ -25,9 +25,8 @@ int tar_parse_headers(uint64_t address, struct TarHeader **headers)
         if (header->filename[i] == '\0')
             break;
 
-        unsigned int size = getsize(header->size);
-
-        headers[i] = header;
+        uint32_t size = tar_get_content_size(header->size);
+        headers[i]    = header;
 
         address += ((size / 512) + 1) * 512;
 

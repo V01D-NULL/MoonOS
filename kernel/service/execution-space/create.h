@@ -8,7 +8,7 @@ typedef Result(ExecutionSpace, Nullish) EsCreateResult;
 
 typedef cc_vec(string) ArgumentVector;
 
-EsCreateResult create_execution_space(const uint8_t *elf_pointer, int pid,
+EsCreateResult create_execution_space(const uint8_t *elf_pointer,
                                       ArgumentVector argv);
 
 #endif  // CREATE_ES_H
