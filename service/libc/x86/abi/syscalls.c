@@ -1,14 +1,15 @@
 #include <abi/syscalls.h>
 #include <stdint.h>
 
-void syscall(uint64_t selector, uint64_t arg0, uint64_t arg1, uint64_t arg2,
-             uint64_t arg3, uint64_t arg4, uint64_t arg5)
+uint64_t syscall(uint64_t selector, uint64_t arg0, uint64_t arg1, uint64_t arg2,
+                 uint64_t arg3, uint64_t arg4, uint64_t arg5)
 {
     /*
         Argument order/register set taken from linux for compatibility reasons.
         See:
        https://chromium.googlesource.com/chromiumos/docs/+/master/constants/syscalls.md#x86_64-64_bit
     */
+    uint64_t status;
     asm volatile(
         ".intel_syntax noprefix\n"
 
@@ -25,7 +26,7 @@ void syscall(uint64_t selector, uint64_t arg0, uint64_t arg1, uint64_t arg2,
         "pop rcx    \n"
 
         ".att_syntax prefix\n"
-        :
+        : "=a"(status)
         : "a"(selector),
           "D"(arg0),
           "S"(arg1),
@@ -34,19 +35,28 @@ void syscall(uint64_t selector, uint64_t arg0, uint64_t arg1, uint64_t arg2,
           "r"(arg4),
           "r"(arg5)
         : "memory", "r8", "r9", "r10");
+
+    return status;
 }
 
-void syscall_log(const char *buff, size_t len)
+uint64_t syscall_log(const char *buff, size_t len)
 {
     syscall(1, 1, (uint64_t)buff, len, 0, 0, 0);
 }
 
-void syscall_ipc_send(uint64_t to, uint64_t buff)
+uint64_t syscall_ipc_send(uint64_t to, uint64_t buff)
 {
     syscall(2, to, buff, 0, 0, 0, 0);
 }
 
-void syscall_ipc_receive(uint64_t buff)
+uint64_t syscall_ipc_receive(uint64_t buff)
 {
-    syscall(3, buff, 0, 0, 0, 0, 0);
+    int status = syscall(3, buff, 0, 0, 0, 0, 0);
+    if (status == 5)
+        syscall_log("err\n", 4);
+}
+
+uint64_t syscall_create_process(uint64_t elf, uint64_t port_id)
+{
+    syscall(4, elf, port_id, 0, 0, 0, 0);
 }
