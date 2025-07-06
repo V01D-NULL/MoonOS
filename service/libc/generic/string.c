@@ -25,23 +25,20 @@ int strlen(const char *s)
 uint64_t strtoul(const char *str)
 {
     unsigned long result = 0;
-    int           base   = 10;  // Default base
+    int           base   = 10;
     const char   *ptr    = str;
 
-    // Check for "0x" or "0X" prefix for hexadecimal
     if (ptr[0] == '0' && (ptr[1] == 'x' || ptr[1] == 'X'))
     {
         base = 16;
         ptr += 2;  // Move past the "0x" prefix
     }
 
-    // Convert the string to an unsigned long
     while (*ptr)
     {
         char          c = *ptr;
         unsigned long value;
 
-        // Determine the value of the current character
         if (c >= '0' && c <= '9')
         {
             value = c - '0';
@@ -56,13 +53,12 @@ uint64_t strtoul(const char *str)
         }
         else
         {
-            break;  // Stop on invalid character
+            break;
         }
 
-        // Check if the character value is valid for the base
         if (value >= base)
         {
-            break;  // Stop on invalid character for the base
+            break;
         }
 
         result = result * base + value;
