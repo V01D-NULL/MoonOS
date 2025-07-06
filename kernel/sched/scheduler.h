@@ -11,5 +11,6 @@ void            sched_enqueue(ExecutionSpace es);
 void            sched_begin_work(void);
 ExecutionSpace *sched_current(void);
 ExecutionSpace *sched_get(int pid);
+int             sched_new_pid(void);
 
 #endif  // SCHEDULER_H

@@ -1,11 +1,49 @@
 #define PR_MODULE "ipc"
 #include "ipc.h"
+#include <mm/virt.h>
+#include <moon-extra/range.h>
 #include <printk.h>
 #include <sched/scheduler.h>
 
+omap(int, int) port_to_pid;
+
+void ipc_init(void)
+{
+    init(&port_to_pid);
+}
+
+// TODO: Check permissions of execution space. Is it asking for a system port id
+// and may it do that?
+bool ipc_assign_port(ExecutionSpace *space, int port)
+{
+    if (space->port != -1 || get(&port_to_pid, port) != NULL)
+    {
+        return false;
+    }
+
+    space->port = port;
+    init(&space->message_queue);
+    insert(&port_to_pid, space->port, space->pid);
+    Range ipc_region = {
+        .base  = IPC_MESSAGE_REGION_BASE,
+        .limit = IPC_MESSAGE_REGION_BASE + IPC_MESSAGE_REGION_SZ,
+    };
+    arch_map_range(space->vm_space, ipc_region, MAP_USER_RW, 0);
+    return true;
+}
+
 void ipc_send(uint64_t to, uint64_t payload, uint64_t payload_size)
 {
-    ExecutionSpace *target_space  = sched_get(to);
+    int *target_pid = get(&port_to_pid, to);
+    if (target_pid == NULL)
+    {
+        trace(TRACE_IPC,
+              "IPC send failed: requested port '%d' does not exist\n",
+              to);
+        return;
+    }
+
+    ExecutionSpace *target_space  = sched_get(*target_pid);
     ExecutionSpace *current_space = sched_current();
 
     if (!target_space || !current_space)

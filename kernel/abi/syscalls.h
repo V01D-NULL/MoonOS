@@ -10,6 +10,7 @@ int sys_stub(SyscallArgs);
 int sys_log(SyscallArgs);
 int sys_ipc_send(SyscallArgs);
 int sys_ipc_receive(SyscallArgs);
+int sys_create_process(SyscallArgs);
 
 // clang-format off
 USED
@@ -19,6 +20,7 @@ syscall_list[] = {
 	sys_log,
 	sys_ipc_send,
 	sys_ipc_receive,
+	sys_create_process,
 };
 // clang-format on
 

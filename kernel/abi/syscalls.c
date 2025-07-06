@@ -11,6 +11,7 @@
 #include <panic.h>
 #include <printk.h>
 #include <sched/scheduler.h>
+#include <service/execution-space/create.h>
 
 #define Type uint64_t
 #define ignore Type UNIQUE_NAME(ignore)
@@ -44,7 +45,6 @@ int sys_ipc_send(Type to, Type buff, ignore, ignore, ignore, ignore)
     if (unlikely(is_user_address(buff) == false))
         return 1;
 
-    auto task    = sched_get(to);
     auto message = (struct UserIpcMessage *)buff;
 
     auto payload = alloc(message->message.payload_size);
@@ -79,5 +79,25 @@ int sys_ipc_receive(Type buff, ignore, ignore, ignore, ignore, ignore)
 
     free(message->payload, message->payload_size);
 
+    return 0;
+}
+
+int sys_create_process(Type elf, Type port_id, ignore, ignore, ignore, ignore)
+{
+    if (!elf || !port_id)
+        return 1;
+
+    trace(TRACE_SYSCALL, "elf: %p | port id: %d\n", elf, port_id);
+
+    auto create_es_result = create_execution_space(elf, NULL);  // TODO: argv
+    if (!create_es_result.is_ok)
+        return 2;
+
+    auto space = create_es_result.ok;
+
+    if (!ipc_assign_port(&space, port_id))
+        return 3;
+
+    sched_enqueue(space);
     return 0;
 }

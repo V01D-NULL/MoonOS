@@ -28,7 +28,8 @@ void sched_begin_work(void)
 
     arch_switch_pagemap(es->vm_space);
     arch_start_scheduler_timer();
-    arch_enter_userspace((void *)es->ec.entry, (void *)es->stack_pointer);
+    arch_enter_userspace(
+        (void *)es->ec.entry, (void *)es->stack_pointer, es->argc, es->argv);
 }
 
 void sched_enqueue(ExecutionSpace es)
@@ -63,4 +64,14 @@ ExecutionSpace *sched_get(int pid)
         return NULL;
 
     return get(&processes, pid);
+}
+
+// TODO: Refactor...this is a hacked together mess but it works for now.
+int sched_new_pid(void)
+{
+    auto sz = size(&processes);
+    if (sz == 0)
+        return sz;
+
+    return sz + 1;
 }

@@ -5,12 +5,10 @@ section .text
 
 global arch_enter_userspace
 arch_enter_userspace:
-    ; Clear all registers except for RDI, RSI, and RBP because they are
+    ; Clear all registers except for RDI, RSI, RDX, RCX and RBP because they are
     ; used for arguments and do not contain kernel addresses or data
     xor rax, rax
     xor rbx, rbx
-    xor rcx, rcx
-    xor rdx, rdx
     xor r8, r8
     xor r9, r9
     xor r10, r10
@@ -25,6 +23,9 @@ arch_enter_userspace:
     ; Setup user stack..
     mov rbp, rsi
     mov rsp, rbp
+    sub rsp, 16
+    mov [rsp], rdx
+    mov [rsp+8], rcx
 
     ; NOTE: SS & CS are set by sysret
     ; Set user segment selectors

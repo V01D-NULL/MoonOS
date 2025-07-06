@@ -13,7 +13,6 @@ all: $(TARGET)
 
 $(TARGET): $(OBJ)
 	@ld.lld -T../service.ld $^ ../../libc/libc.a -static -nostdlib -o $@
-	@mv $@ ../../../boot/modules
 	
 %.o: %.c
 	@printf " CC  $<\n";

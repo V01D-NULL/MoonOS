@@ -4,5 +4,7 @@ extern main
 
 _start:
     mov rdi, main
-    ; TODO: Pass argc and argv
+    mov rsi, [rsp]      ; argc
+    mov rdx, [rsp+8]    ; argv
+
     jmp libc_entry
