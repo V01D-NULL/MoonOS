@@ -41,22 +41,20 @@ uint64_t syscall(uint64_t selector, uint64_t arg0, uint64_t arg1, uint64_t arg2,
 
 uint64_t syscall_log(const char *buff, size_t len)
 {
-    syscall(1, 1, (uint64_t)buff, len, 0, 0, 0);
+    return syscall(1, 1, (uint64_t)buff, len, 0, 0, 0);
 }
 
 uint64_t syscall_ipc_send(uint64_t to, uint64_t buff)
 {
-    syscall(2, to, buff, 0, 0, 0, 0);
+    return syscall(2, to, buff, 0, 0, 0, 0);
 }
 
 uint64_t syscall_ipc_receive(uint64_t buff)
 {
-    int status = syscall(3, buff, 0, 0, 0, 0, 0);
-    if (status == 5)
-        syscall_log("err\n", 4);
+    return syscall(3, buff, 0, 0, 0, 0, 0);
 }
 
 uint64_t syscall_create_process(uint64_t elf, uint64_t port_id)
 {
-    syscall(4, elf, port_id, 0, 0, 0, 0);
+    return syscall(4, elf, port_id, 0, 0, 0, 0);
 }
