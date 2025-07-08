@@ -3,6 +3,7 @@
 #include "scheduler.h"
 #include <base/base-types.h>
 #include <mm/virt.h>
+#include <moon-ds/bitmap.h>
 #include <moon-ds/containers.h>
 #include <moon-extra/result.h>
 #include <moon-io/serial.h>
@@ -11,14 +12,18 @@
 #include <sys/context_switch.h>
 #include <uspace/userspace.h>
 
-// cc_map(int, ExecutionSpace) processesMap = NULL;
-cc_vec(ExecutionSpace) processes = NULL;
-static size_t current_index      = 0;
+long *pid_bitmap;
+int   next_available_pid = 0;
+
+cc_omap(int, ExecutionSpace) processes;
+cc_vec(int) in_use_pids;
+static int current_pid_index = 0;
 
 void sched_prepare(void)
 {
-    // init(&processesMap);
+    init(&in_use_pids);
     init(&processes);
+    pid_bitmap = calloc(MAX_PIDS * sizeof(long));
 }
 
 void sched_begin_work(void)
@@ -34,18 +39,18 @@ void sched_begin_work(void)
 
 void sched_enqueue(ExecutionSpace es)
 {
-    push(&processes, es);
+    insert(&processes, es.pid, es);
 }
 
 SchedulerResult sched_reschedule(struct arch_task_registers *regs)
 {
     // Save the current register state
-    ExecutionSpace *current = get(&processes, current_index);
+    ExecutionSpace *current = get(&processes, current_pid_index);
     current->ec.registers   = *regs;
 
     // Select the next process
-    current_index       = (current_index + 1) % size(&processes);
-    ExecutionSpace next = *get(&processes, current_index);
+    current_pid_index   = (current_pid_index + 1) % size(&processes);
+    ExecutionSpace next = *get(&processes, current_pid_index);
 
     return Okay(SchedulerResult, next);
 }
@@ -55,7 +60,7 @@ ExecutionSpace *sched_current(void)
     if (unlikely(processes == NULL || !size(&processes)))
         return NULL;
 
-    return get(&processes, current_index);
+    return get(&processes, current_pid_index);
 }
 
 ExecutionSpace *sched_get(int pid)
@@ -66,12 +71,13 @@ ExecutionSpace *sched_get(int pid)
     return get(&processes, pid);
 }
 
-// TODO: Refactor...this is a hacked together mess but it works for now.
-int sched_new_pid(void)
+int sched_allocate_pid(void)
 {
-    auto sz = size(&processes);
-    if (sz == 0)
-        return sz;
+    if (next_available_pid >= MAX_PIDS)
+        panic("Unable to allocate new PID because MAX_PIDS (%d) was reached",
+              MAX_PIDS);
 
-    return sz + 1;
+    __set_bit(pid_bitmap, next_available_pid);
+    push(&in_use_pids, next_available_pid);
+    return next_available_pid++;
 }

@@ -15,9 +15,7 @@ EsCreateResult create_execution_space(const uint8_t *elf_pointer,
                                       ArgumentVector argv)
 {
     ExecutionSpace execution_space = {
-        .pid = sched_new_pid(),  // TODO: This is a quick hack to get things
-                                 // working. This requires a refactor to avoid
-                                 // race conditions, duplicate pids, etc.
+        .pid           = sched_allocate_pid(),
         .port          = -1,
         .message_queue = NULL,
         .vm_space      = arch_create_new_pagemap(),
