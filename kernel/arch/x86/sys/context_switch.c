@@ -15,15 +15,18 @@ void arch_start_scheduler_timer(void)
     lapic_oneshot_timer(timer_quantum);
 }
 
+void arch_reschedule_now(void)
+{
+    lapic_oneshot_timer(1);
+}
+
 void timer_irq(struct iframe *frame)
 {
-    // clang-format off
-	struct arch_task_registers regs = {
-		.registers = frame->gpr,
-		.rsp = frame->rsp,
-		.ip = frame->rip,
-	};
-    // clang-format on
+    struct arch_task_registers regs = {
+        .registers = frame->gpr,
+        .rsp       = frame->rsp,
+        .ip        = frame->rip,
+    };
 
     ExecutionSpace newSpace = UNWRAP(sched_reschedule(&regs));
 

@@ -58,3 +58,8 @@ uint64_t syscall_create_process(uint64_t elf, uint64_t port_id)
 {
     return syscall(4, elf, port_id, 0, 0, 0, 0);
 }
+
+uint64_t syscall_exit(int exit_code)
+{
+    return syscall(5, exit_code, 0, 0, 0, 0, 0);
+}

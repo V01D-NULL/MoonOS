@@ -3,7 +3,6 @@
 #include "scheduler.h"
 #include <base/base-types.h>
 #include <mm/virt.h>
-#include <moon-ds/bitmap.h>
 #include <moon-ds/containers.h>
 #include <moon-extra/result.h>
 #include <moon-io/serial.h>
@@ -12,23 +11,22 @@
 #include <sys/context_switch.h>
 #include <uspace/userspace.h>
 
-long *pid_bitmap;
-int   next_available_pid = 0;
-
-cc_omap(int, ExecutionSpace) processes;
-cc_vec(int) in_use_pids;
-static int current_pid_index = 0;
+vec(ExecutionSpace) processes;
+static int current_pid_index  = 0;
+static int next_available_pid = 0;
 
 void sched_prepare(void)
 {
-    init(&in_use_pids);
     init(&processes);
-    pid_bitmap = calloc(MAX_PIDS * sizeof(long));
+    next_available_pid = 0;
 }
 
 void sched_begin_work(void)
 {
     trace(TRACE_MISC, "Starting scheduler\n");
+    if (size(&processes) == 0)
+        panic("No processes to schedule");
+
     ExecutionSpace *es = get(&processes, 0);
 
     arch_switch_pagemap(es->vm_space);
@@ -39,11 +37,14 @@ void sched_begin_work(void)
 
 void sched_enqueue(ExecutionSpace es)
 {
-    insert(&processes, es.pid, es);
+    push(&processes, es);
 }
 
 SchedulerResult sched_reschedule(struct arch_task_registers *regs)
 {
+    if (unlikely(processes == NULL || !size(&processes)))
+        return Error(SchedulerResult, "No processes to schedule");
+
     // Save the current register state
     ExecutionSpace *current = get(&processes, current_pid_index);
     current->ec.registers   = *regs;
@@ -65,10 +66,13 @@ ExecutionSpace *sched_current(void)
 
 ExecutionSpace *sched_get(int pid)
 {
-    if (unlikely(pid < 0 || pid >= size(&processes)))
-        return NULL;
-
-    return get(&processes, pid);
+    for (size_t i = 0; i < size(&processes); i++)
+    {
+        ExecutionSpace *es = get(&processes, i);
+        if (es && es->pid == pid)
+            return es;
+    }
+    return NULL;
 }
 
 int sched_allocate_pid(void)
@@ -76,8 +80,19 @@ int sched_allocate_pid(void)
     if (next_available_pid >= MAX_PIDS)
         panic("Unable to allocate new PID because MAX_PIDS (%d) was reached",
               MAX_PIDS);
-
-    __set_bit(pid_bitmap, next_available_pid);
-    push(&in_use_pids, next_available_pid);
     return next_available_pid++;
+}
+
+int sched_dequeue(int pid)
+{
+    for (size_t i = 0; i < size(&processes); i++)
+    {
+        ExecutionSpace *es = get(&processes, i);
+        if (es && es->pid == pid)
+        {
+            erase(&processes, i);
+            return 0;
+        }
+    }
+    return -1;
 }

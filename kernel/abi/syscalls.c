@@ -101,3 +101,43 @@ int sys_create_process(Type elf, Type port_id, ignore, ignore, ignore, ignore)
     sched_enqueue(space);
     return 0;
 }
+
+int sys_exit(Type code, ignore, ignore, ignore, ignore, ignore)
+{
+    ExecutionSpace *current = sched_current();
+    if (!current)
+        return 1;
+
+    if (sched_dequeue(current->pid) != 0)
+        panic("sys_exit: Failed to dequeue current process");
+
+    asm volatile(
+        ".intel_syntax noprefix\n"
+
+        "pop r15\n"
+        "pop r14\n"
+        "pop r13\n"
+        "pop r12\n"
+        "pop r11\n"
+        "pop r10\n"
+        "pop r9\n"
+        "pop r8\n"
+        "pop rsi\n"
+        "pop rdi\n"
+        "pop rbp\n"
+        "pop rdx\n"
+        "pop rcx\n"
+        "pop rbx\n"
+        "pop rax\n"
+        "mov qword ptr gs:[0x16], 0\n"
+        "swapgs\n"
+        "sti\n"
+
+        ".att_syntax prefix\n" ::
+            :);
+    arch_reschedule_now();
+
+    // Should never reach here
+    panic("sys_exit: Failed to switch to the next process");
+    __builtin_unreachable();
+}

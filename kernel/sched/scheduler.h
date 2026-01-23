@@ -14,5 +14,6 @@ void            sched_begin_work(void);
 ExecutionSpace *sched_current(void);
 ExecutionSpace *sched_get(int pid);
 int             sched_allocate_pid(void);
+int             sched_dequeue(int pid);
 
 #endif  // SCHEDULER_H
