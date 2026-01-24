@@ -11,5 +11,6 @@ struct arch_task_registers
 };
 
 void arch_start_scheduler_timer(void);
+void arch_reschedule_now(void);
 
 #endif  // CONTEXT_SWITCH_H

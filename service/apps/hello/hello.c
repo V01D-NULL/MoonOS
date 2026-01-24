@@ -3,8 +3,6 @@
 
 void main(void)
 {
-    ipc_send(PORT_INIT, (uint64_t)"Hello", 5);
-
-    for (;;)
-        ;
+    ipc_send(PORT_INIT, (uint64_t) "Hello", 5);
+    syscall_exit(0);
 }

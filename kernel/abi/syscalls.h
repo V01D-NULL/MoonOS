@@ -11,6 +11,7 @@ int sys_log(SyscallArgs);
 int sys_ipc_send(SyscallArgs);
 int sys_ipc_receive(SyscallArgs);
 int sys_create_process(SyscallArgs);
+int sys_exit(SyscallArgs);
 
 // clang-format off
 USED
@@ -21,6 +22,7 @@ syscall_list[] = {
 	sys_ipc_send,
 	sys_ipc_receive,
 	sys_create_process,
+	sys_exit
 };
 // clang-format on
 

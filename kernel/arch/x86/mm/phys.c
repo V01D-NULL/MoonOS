@@ -37,7 +37,7 @@ static struct zone *init_zone(uint64_t base, uint64_t len, int nr)
     return zone;
 }
 
-static struct zone *zone_list;
+static struct zone *zone_list[1024];
 
 void init_phys_allocator(HandoverMemoryMap mmap)
 {
@@ -58,14 +58,8 @@ void init_phys_allocator(HandoverMemoryMap mmap)
         auto zone = init_zone(
             va(mmap.entries[i]->base), mmap.entries[i]->length - 1, zone_nr++);
 
-        if (!tail)
-            zone_list = zone;
-        else
-            list_set_next(zone, list, tail);
-
-        tail = zone;
+        zone_list[zone_nr - 1] = zone;
     }
-    list_set_next((struct zone *)NULL, list, tail);
 }
 
 void *arch_alloc_page_sz(int sz)
@@ -89,10 +83,11 @@ void arch_free_page(void *page)
 
     acquire_lock(&pmm_lock);
 
-    list_foreach(zone, list, zone_list)
+    for (int i = 0; zone_list[i] != NULL; i++)
     {
-        auto zone_end = zone->start + zone->len;
-        auto addr     = (uintptr_t)page;
+        struct zone *zone     = zone_list[i];
+        auto         zone_end = zone->start + zone->len;
+        auto         addr     = (uintptr_t)page;
 
         if (addr >= zone->start && addr <= zone_end)
         {
@@ -106,8 +101,9 @@ void arch_free_page(void *page)
 
 static void *find_first_free_block(int sz)
 {
-    list_foreach(zone, list, zone_list)
+    for (int i = 0; zone_list[i] != NULL; i++)
     {
+        struct zone *zone = zone_list[i];
         if (zone->len < sz)
             continue;
 
