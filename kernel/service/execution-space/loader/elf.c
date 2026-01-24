@@ -31,8 +31,6 @@ static ElfFile parse_elf_file(const uint8_t *elf)
 void load_segment(uint8_t *elf_base, struct Pml *space, Elf64_Phdr *phdr,
                   uint64_t page_number);
 
-void load_section_headers(ElfFile elf, struct Pml *space);
-
 ElfLoaderResult load_elf(const uint8_t *elf_pointer, struct Pml *space)
 {
     ElfFile elf = parse_elf_file(elf_pointer);
@@ -56,8 +54,6 @@ ElfLoaderResult load_elf(const uint8_t *elf_pointer, struct Pml *space)
 
         phdr = (Elf64_Phdr *)((char *)phdr + elf.ehdr.e_phentsize);
     }
-
-    load_section_headers(elf, space);
 
     return Okay(ElfLoaderResult, elf.ehdr.e_entry);
 }
@@ -91,34 +87,4 @@ void load_segment(uint8_t *elf_base, struct Pml *space, Elf64_Phdr *phdr,
 
     if (copy_size < PAGE_SIZE)
         memset(phys + copy_size, 0, PAGE_SIZE - copy_size);
-}
-
-void load_section_headers(ElfFile elf, struct Pml *space)
-{
-    Elf64_Shdr *shstrtab =
-        (Elf64_Shdr *)(elf.base + elf.ehdr.e_shoff +
-                       elf.ehdr.e_shstrndx * elf.ehdr.e_shentsize);
-
-    const char *section_names = (const char *)(elf.base + shstrtab->sh_offset);
-
-    for (int section_idx = 0; section_idx < elf.ehdr.e_shnum; section_idx++)
-    {
-        Elf64_Shdr *shdr = (Elf64_Shdr *)(elf.base + elf.ehdr.e_shoff +
-                                          section_idx * elf.ehdr.e_shentsize);
-        debug(true,
-              "Section %d: %s\n",
-              section_idx,
-              &section_names[shdr->sh_name]);
-
-        if (!strncmp(&section_names[shdr->sh_name], ".rodata", 7))
-        {
-            debug(true, "Found .rodata section\n");
-            uintptr_t rodata_vaddr = shdr->sh_addr;
-            uintptr_t rodata_phys  = arch_translate(space, rodata_vaddr);
-            debug(true, "Copying .rodata to 0x%lx\n", rodata_phys);
-            memcpy((void *)rodata_phys,
-                   (const void *)(elf.base + shdr->sh_offset),
-                   shdr->sh_size);
-        }
-    }
 }
