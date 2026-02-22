@@ -24,6 +24,10 @@ void main(int argc, char **argv)
         // TODO: abort()
     }
 
+    syscall_log("hi\n", 3);
+    for (;;)
+        ;
+
     int entry_count = tar_parse_headers(strtoul(argv[1]), &headers);
 
     for (int i = 0; i < entry_count; i++)

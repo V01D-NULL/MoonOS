@@ -16,6 +16,8 @@
 #include "panic.h"
 #include "printk.h"
 
+#include <service/capability.h>
+
 NORETURN void kern_main(HandoverModules mods)
 {
     panic_if(mods.count != 2,
@@ -46,8 +48,16 @@ NORETURN void kern_main(HandoverModules mods)
     snprintf(buffer, sizeof(buffer), "0x%p", pa(ramdiskModule.address));
     push(&argv, buffer);
 
-    auto space = UNWRAP(create_execution_space(initModule.address, argv));
+    vec(Capability) caps;
+    init(&caps);
+
+    Capability allocatable_region_cap = capability_create_memory_region(
+        pa(arch_alloc_page_sz(MiB(16))), MiB(16), true);
+    push(&caps, allocatable_region_cap);
+
+    auto space = UNWRAP(create_execution_space(initModule.address, argv, caps));
     cleanup(&argv);
+    cleanup(&caps);
 
     panic_if(ipc_assign_port(&space, PORT_INIT) == false,
              "Unable to assign IPC port to init process");

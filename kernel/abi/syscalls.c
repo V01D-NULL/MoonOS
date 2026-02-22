@@ -89,7 +89,8 @@ int sys_create_process(Type elf, Type port_id, ignore, ignore, ignore, ignore)
 
     trace(TRACE_SYSCALL, "elf: %p | port id: %d\n", elf, port_id);
 
-    auto create_es_result = create_execution_space(elf, NULL);  // TODO: argv
+    auto create_es_result =
+        create_execution_space(elf, NULL, NULL);  // TODO: argv, capabilities
     if (!create_es_result.is_ok)
         return 2;
 

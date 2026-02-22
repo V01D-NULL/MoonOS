@@ -4,6 +4,7 @@
 #include <ipc/message-queue.h>
 #include <moon-ds/containers.h>
 #include <paging/paging.h>
+#include <service/capability.h>
 #include <service/execution-context/ec.h>
 
 typedef struct
@@ -16,6 +17,7 @@ typedef struct
     uint64_t         stack_pointer;
     ExecutionContext ec;
     IpcMessageQueue  message_queue;
+    vec(Capability) capabilities;
 } ExecutionSpace;
 
 #endif  // ES_H
