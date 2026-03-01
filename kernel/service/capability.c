@@ -1,5 +1,8 @@
+#define PR_MODULE "cap"
 #include "capability.h"
+#include <base/align.h>
 #include <mm/addr.h>
+#include <mm/buddy.h>
 #include <printk.h>
 
 Capability capability_create(CapabilityType type, CapabilityData data,
@@ -12,33 +15,70 @@ Capability capability_create(CapabilityType type, CapabilityData data,
     return cap;
 }
 
-Capability capability_create_memory_region(void *region, int sz, bool rw)
+Capability capability_create_memory_region(void *region, int sz, bool rw,
+                                           CapabilityMemoryRegionType type)
 {
-    Range range = {.base = region, .limit = region + sz};
-    trace(TRACE_ALL,
-          "Creating memory region capability for range [%p - %p]\n",
-          range.base,
-          range.limit);
-    tlsf_t pool = tlsf_create_with_pool(va(region), sz);
-
-    trace(TRACE_ALL,
-          "Created TLSF pool at %p for memory region capability\n",
-          pool);
-
     CapabilityData data;
-    data.memory_region.range = range;
-    data.memory_region.pool  = pool;
+    data.memory_region.range = (Range){.base = region, .limit = sz};
+    data.memory_region.type  = type;
+
+    trace(TRACE_CAP,
+          "Creating memory region capability: base=%p, limit=%p, rw=%d\n",
+          data.memory_region.range.base,
+          data.memory_region.range.limit,
+          rw);
 
     return capability_create(
-        CAP_MEMORY_REGION | (rw ? CAP_READ | CAP_WRITE : CAP_READ),
-        data,
-        false);
+        (rw ? CAP_WRITE : 0) | CAP_READ | CAP_MEMORY_REGION, data, false);
+}
+
+Capability capability_make_region_allocatable(Capability region_cap)
+{
+    if (!CAPABILITY_HAS_ACCESS(region_cap, CAP_MEMORY_REGION))
+        return (Capability){.type = CAP_BAD};
+
+    Range range = region_cap.data.memory_region.range;
+
+    trace(TRACE_CAP,
+          "Making region allocatable: base=%p, limit=%zu\n",
+          va(range.base),
+          range.limit);
+
+    CapabilityData data;
+    data.allocatable_memory_region.range = range;
+    data.allocatable_memory_region.pool =
+        buddy_embed(va(range.base), range.limit);
+
+    return capability_create(
+        CAP_ALLOCATABLE_MEMORY_REGION | CAP_READ | CAP_WRITE, data, false);
 }
 
 void *capability_alloc_from(Capability cap, size_t size)
 {
-    if (cap.type != CAP_MEMORY_REGION)
+    if (!CAPABILITY_HAS_ACCESS(cap, CAP_ALLOCATABLE_MEMORY_REGION))
         return NULL;
 
-    return tlsf_malloc(va(cap.data.memory_region.pool), size);
+    void *ptr = buddy_malloc(cap.data.allocatable_memory_region.pool, size);
+    if (ptr)
+        memset(ptr, 0, size);
+
+    return ptr;
+}
+
+void *capability_alloc_from_aligned(Capability cap, size_t size,
+                                    size_t alignment)
+{
+    if (!CAPABILITY_HAS_ACCESS(cap, CAP_ALLOCATABLE_MEMORY_REGION))
+        return NULL;
+
+    if (alignment < tlsf_align_size())
+        alignment = tlsf_align_size();
+
+    void *ptr =
+        tlsf_memalign(cap.data.allocatable_memory_region.pool, alignment, size);
+
+    if (ptr)
+        memset(ptr, 0, size);
+
+    return ptr;
 }

@@ -18,7 +18,9 @@
 
 #include <service/capability.h>
 
-NORETURN void kern_main(HandoverModules mods)
+vec(Capability) setup_init_task_capabilities(HandoverMemoryMap memory_map);
+
+NORETURN void kern_main(HandoverModules mods, HandoverMemoryMap memory_map)
 {
     panic_if(mods.count != 2,
              "Expected 2 handover modules, received '%d'",
@@ -48,12 +50,7 @@ NORETURN void kern_main(HandoverModules mods)
     snprintf(buffer, sizeof(buffer), "0x%p", pa(ramdiskModule.address));
     push(&argv, buffer);
 
-    vec(Capability) caps;
-    init(&caps);
-
-    Capability allocatable_region_cap = capability_create_memory_region(
-        pa(arch_alloc_page_sz(MiB(16))), MiB(16), true);
-    push(&caps, allocatable_region_cap);
+    auto caps = setup_init_task_capabilities(memory_map);
 
     auto space = UNWRAP(create_execution_space(initModule.address, argv, caps));
     cleanup(&argv);
@@ -69,4 +66,58 @@ NORETURN void kern_main(HandoverModules mods)
 
     sched_begin_work();
     arch_halt_cpu();
+}
+
+vec(Capability) setup_init_task_capabilities(HandoverMemoryMap memory_map)
+{
+    vec(Capability) caps;
+    init(&caps);
+
+    bool has_allocatable_region = false;
+
+    // Grant full memory access to init task
+    for (int i = 0; i < memory_map.entry_count; i++)
+    {
+        if ((memory_map.entries[i]->type != HANDOVER_MEMMAP_USABLE &&
+             memory_map.entries[i]->type != HANDOVER_MEMMAP_FRAMEBUFFER) ||
+            memory_map.entries[i]->length == PAGE_SIZE)
+            continue;
+
+        CapabilityMemoryRegionType region_type =
+            memory_map.entries[i]->type == HANDOVER_MEMMAP_USABLE
+                ? CAP_MEMORY_REGION_RAM
+                : CAP_MEMORY_REGION_FRAMEBUFFER;
+
+        Capability region_cap =
+            capability_create_memory_region(memory_map.entries[i]->base,
+                                            memory_map.entries[i]->length,
+                                            true,
+                                            region_type);
+
+        // Create 16 MiB allocatable region capability for init task
+        if (memory_map.entries[i]->length >= MiB(16) &&
+            has_allocatable_region == false)
+        {
+            has_allocatable_region = true;
+            arch_reserve_range((void *)memory_map.entries[i]->base, MiB(16));
+
+            Capability allocatable_region_cap =
+                capability_make_region_allocatable(region_cap);
+
+            // Q&D way to steal some memory for the allocatable region
+            // capability. Future work: implement a proper way to carve out
+            // allocatable regions
+            region_cap.data.memory_region.range.base += MiB(16);
+            region_cap.data.memory_region.range.limit -= MiB(16);
+
+            if (allocatable_region_cap.type == CAP_BAD)
+                panic("Failed to create allocatable region capability");
+
+            push(&caps, allocatable_region_cap);
+        }
+
+        push(&caps, region_cap);
+    }
+
+    return caps;
 }

@@ -4,7 +4,7 @@
 #include <moon-sys/handover.h>
 
 #if defined(__x86_64__)
-void kern_main(HandoverModules mods);
+void kern_main(HandoverModules mods, HandoverMemoryMap memory_map);
 #else
 void kern_main(void);
 #endif

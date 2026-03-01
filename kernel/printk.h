@@ -40,6 +40,7 @@ enum
     TRACE_TLSF    = (1 << 10),
     TRACE_ALLOC   = (1 << 11),
     TRACE_IPC     = (1 << 12),
+    TRACE_CAP     = (1 << 13),
 
     TRACE_ALL  = ~0,
     TRACE_NONE = 0,
