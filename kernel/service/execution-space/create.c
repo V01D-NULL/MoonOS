@@ -15,37 +15,40 @@ EsCreateResult create_execution_space(const uint8_t *elf_pointer,
                                       ArgumentVector argv,
                                       vec(Capability) capabilities)
 {
-    Capability memory_region_cap = {.type = CAP_BAD};
-    for_each(&capabilities, cap)
-    {
-        if (cap->type & CAP_ALLOCATABLE_MEMORY_REGION)
-        {
-            memory_region_cap = *cap;
-            break;
-        }
-    }
-
-    if (memory_region_cap.type == CAP_BAD)
-        return Error(EsCreateResult, "No memory region capability provided");
-
     ExecutionSpace execution_space = {
+        .vm_space      = arch_create_new_pagemap(),
         .pid           = sched_allocate_pid(),
         .port          = -1,
         .message_queue = NULL,
         .capabilities  = NULL,
-        .vm_space      = arch_create_new_pagemap(),
-        .stack_pointer =
-            pa(capability_alloc_from(memory_region_cap, PAGE_SIZE)) + PAGE_SIZE,
+        .stack_pointer = NULL,
     };
 
     if (!execution_space.vm_space)
         return Error(EsCreateResult, "Failed to create new pagemap");
 
-    if (!execution_space.stack_pointer)
+    init(&execution_space.capabilities);
+    Capability memory_region_cap = {.type = CAP_BAD};
+
+    for_each(&capabilities, cap)
+    {
+        if (cap->type & CAP_ALLOCATABLE_MEMORY_REGION &&
+            memory_region_cap.type == CAP_BAD)
+        {
+            memory_region_cap = *cap;
+        }
+
+        push(&execution_space.capabilities, *cap);
+    }
+
+    if (memory_region_cap.type == CAP_BAD)
+        return Error(EsCreateResult, "No memory region capability provided");
+
+    auto stack_pointer = capability_alloc_from(memory_region_cap, PAGE_SIZE);
+    if (!stack_pointer)
         return Error(EsCreateResult, "Failed to allocate stack");
 
-    init(&execution_space.capabilities);
-    for_each(&capabilities, cap) push(&execution_space.capabilities, *cap);
+    execution_space.stack_pointer = pa(stack_pointer) + PAGE_SIZE;
 
     arch_copy_kernel_mappings(execution_space.vm_space);
     arch_map_page(execution_space.vm_space,
