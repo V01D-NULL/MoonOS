@@ -62,6 +62,22 @@ void init_phys_allocator(HandoverMemoryMap mmap)
     }
 }
 
+void arch_reserve_range(void *base, size_t len)
+{
+    acquire_lock(&pmm_lock);
+
+    for (int i = 0; zone_list[i] != NULL; i++)
+    {
+        struct zone *zone = zone_list[i];
+        if (zone->len < len)
+            continue;
+
+        buddy_toggle_range_reservation(zone->buddy, base, len, 1);
+    }
+
+    release_lock(&pmm_lock);
+}
+
 void *arch_alloc_page_sz(int sz)
 {
     acquire_lock(&pmm_lock);

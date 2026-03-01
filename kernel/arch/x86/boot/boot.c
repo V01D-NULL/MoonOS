@@ -63,5 +63,5 @@ NORETURN void boot(void)
     platform_init(handover);
     init_percpu((uint64_t)stack);
     idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr32, 32);
-    kern_main(handover.modules);
+    kern_main(handover.modules, handover.memory_map);
 }

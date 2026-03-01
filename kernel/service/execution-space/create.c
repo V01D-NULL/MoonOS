@@ -12,22 +12,43 @@
 #include "loader/elf.h"
 
 EsCreateResult create_execution_space(const uint8_t *elf_pointer,
-                                      ArgumentVector argv)
+                                      ArgumentVector argv,
+                                      vec(Capability) capabilities)
 {
     ExecutionSpace execution_space = {
+        .vm_space      = arch_create_new_pagemap(),
         .pid           = sched_allocate_pid(),
         .port          = -1,
         .message_queue = NULL,
-        .vm_space      = arch_create_new_pagemap(),
-        .stack_pointer = (uint64_t)pa(arch_alloc_page_sz(PAGE_SIZE)) +
-                         PAGE_SIZE,  // + PAGE_SIZE to get the top of the stack
+        .capabilities  = NULL,
+        .stack_pointer = NULL,
     };
 
     if (!execution_space.vm_space)
         return Error(EsCreateResult, "Failed to create new pagemap");
 
-    if (!execution_space.stack_pointer)
+    init(&execution_space.capabilities);
+    Capability memory_region_cap = {.type = CAP_BAD};
+
+    for_each(&capabilities, cap)
+    {
+        if (cap->type & CAP_ALLOCATABLE_MEMORY_REGION &&
+            memory_region_cap.type == CAP_BAD)
+        {
+            memory_region_cap = *cap;
+        }
+
+        push(&execution_space.capabilities, *cap);
+    }
+
+    if (memory_region_cap.type == CAP_BAD)
+        return Error(EsCreateResult, "No memory region capability provided");
+
+    auto stack_pointer = capability_alloc_from(memory_region_cap, PAGE_SIZE);
+    if (!stack_pointer)
         return Error(EsCreateResult, "Failed to allocate stack");
+
+    execution_space.stack_pointer = pa(stack_pointer) + PAGE_SIZE;
 
     arch_copy_kernel_mappings(execution_space.vm_space);
     arch_map_page(execution_space.vm_space,
@@ -39,7 +60,11 @@ EsCreateResult create_execution_space(const uint8_t *elf_pointer,
 
     if (argc > 0)
     {
-        auto argv_base = alloc_aligned((argc + 1) * sizeof(string), 16);
+        auto argv_base = capability_alloc_from(
+            memory_region_cap, (argc + 1) * sizeof(char *));
+
+        if (!argv_base)
+            return Error(EsCreateResult, "Failed to allocate memory for argv");
 
         execution_space.argv = pa(argv_base);
         arch_map_page(execution_space.vm_space,
@@ -52,7 +77,9 @@ EsCreateResult create_execution_space(const uint8_t *elf_pointer,
             auto   arg        = *get(&argv, i);
             size_t arg_length = strlen(arg) + 1;  // +1 for null terminator
 
-            char *arg_copy = (char *)alloc_aligned(arg_length, 16);
+            char *arg_copy =
+                (char *)capability_alloc_from(memory_region_cap, arg_length);
+
             strcpy(arg_copy, arg);
 
             ((char **)argv_base)[i] = pa(arg_copy);
