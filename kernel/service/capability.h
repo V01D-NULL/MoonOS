@@ -54,7 +54,6 @@ Capability capability_create_memory_region(void *region, int sz, bool rw,
                                            CapabilityMemoryRegionType type);
 Capability capability_make_region_allocatable(Capability region_cap);
 void      *capability_alloc_from(Capability cap, size_t size);
-void      *capability_alloc_from_aligned(Capability cap, size_t size,
-                                         size_t alignment);
+void       capablity_free_from(Capability cap, void *ptr);
 
 #endif  // CAPABILITY_H

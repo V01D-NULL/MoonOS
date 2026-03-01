@@ -65,20 +65,10 @@ void *capability_alloc_from(Capability cap, size_t size)
     return ptr;
 }
 
-void *capability_alloc_from_aligned(Capability cap, size_t size,
-                                    size_t alignment)
+void capablity_free_from(Capability cap, void *ptr)
 {
     if (!CAPABILITY_HAS_ACCESS(cap, CAP_ALLOCATABLE_MEMORY_REGION))
-        return NULL;
+        return;
 
-    if (alignment < tlsf_align_size())
-        alignment = tlsf_align_size();
-
-    void *ptr =
-        tlsf_memalign(cap.data.allocatable_memory_region.pool, alignment, size);
-
-    if (ptr)
-        memset(ptr, 0, size);
-
-    return ptr;
+    buddy_free(cap.data.allocatable_memory_region.pool, ptr);
 }
