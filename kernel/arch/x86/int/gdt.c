@@ -5,22 +5,28 @@ extern void load_gdt(uint64_t gdtr);
 
 static struct __attribute__((align(64))) gdt_table gdt;
 
-void set_tss_entry(uint64_t base, uint8_t flags, uint8_t access)
+void set_tss_entry(uint64_t base)
 {
-    gdt.tssd.size     = 104;
-    gdt.tssd.base0    = base & 0xFFFF;
-    gdt.tssd.base1    = (base >> 16) & 0xFF;
-    gdt.tssd.access   = access;
-    gdt.tssd.flags    = flags;
-    gdt.tssd.base2    = (base >> 24) & 0xFF;
-    gdt.tssd.base3    = (base >> 32);
-    gdt.tssd.reserved = 0;
+    gdt.tssd.limit0      = sizeof(tss_t) - 1;
+    gdt.tssd.base0       = base & 0xFFFF;
+    gdt.tssd.base1       = (base >> 16) & 0xFF;
+    gdt.tssd.type        = 0x9;  // Available
+    gdt.tssd.zero0       = 0;
+    gdt.tssd.dpl         = 0;
+    gdt.tssd.present     = 1;
+    gdt.tssd.limit1      = 0;
+    gdt.tssd.available   = 0;
+    gdt.tssd.zero1       = 0;
+    gdt.tssd.granularity = 0;
+    gdt.tssd.base2       = (base >> 24) & 0xFF;
+    gdt.tssd.base3       = (base >> 32) & 0xFFFFFFFF;
+    gdt.tssd.reserved    = 0;
 }
 
 static tss_t tss;
 void         init_tss(uint64_t stack)
 {
-    set_tss_entry((uintptr_t)&tss, 0x20, 0x89);
+    set_tss_entry((uintptr_t)&tss);
     memset((void *)&tss, 0, sizeof(tss_t));
 
     tss.RSP0 = stack;
