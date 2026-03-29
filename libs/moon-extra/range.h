@@ -3,12 +3,16 @@
 
 #include <base/base-types.h>
 
-struct$(Range, {
-	size_t base;
-	size_t limit;
-});
+typedef struct
+{
+    size_t base;
+    size_t limit;
+} Range;
 
-#define RANGE(x, y) \
-	(Range) { .base = x, .limit = y }
+#define RANGE(x, y)           \
+    (Range)                   \
+    {                         \
+        .base = x, .limit = y \
+    }
 
-#endif // RANGE_H
+#endif  // RANGE_H

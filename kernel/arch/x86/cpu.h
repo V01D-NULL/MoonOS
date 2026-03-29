@@ -25,7 +25,8 @@ int  current_cpu(void);
 /**
  * A list of general purpose registers.
  */
-struct$(GeneralRegisters, {
+typedef struct
+{
     int64_t r15;
     int64_t r14;
     int64_t r13;
@@ -41,7 +42,7 @@ struct$(GeneralRegisters, {
     int64_t rcx;
     int64_t rbx;
     int64_t rax;
-});
+} GeneralRegisters;
 
 struct Percpu
 {

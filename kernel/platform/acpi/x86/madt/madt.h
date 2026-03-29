@@ -5,11 +5,12 @@
 #include <moon.h>
 #include <platform/acpi/x86/tables/sdt.h>
 
-packed_struct$(madt_t, {
+typedef struct
+{
     struct SDT sdt;
     uint32_t   local_apic_addr;
     uint32_t   local_apic_flags;
-});
+} madt_t PACKED;
 
 struct ioapic_dev
 {

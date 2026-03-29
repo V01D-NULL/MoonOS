@@ -20,13 +20,10 @@ enum
 	IA32_FMASK = 0xC0000084
 };
 
-// clang-format off
-struct$(Msr,
-{
+typedef struct {
 	uint32_t eax;
 	uint32_t edx;
-});
-// clang-format on
+} Msr;
 
 inline uint64_t rdmsr(uint32_t msr)
 {

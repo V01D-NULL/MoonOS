@@ -14,29 +14,34 @@
 #define HANDOVER_MEMMAP_FRAMEBUFFER            7
 // clang-format on
 
-struct$(HandoverModuleEntry, {
+typedef struct
+{
     void       *address;
     uint64_t    size;
     string_view cmdline;
-});
+} HandoverModuleEntry;
 
-struct$(HandoverModules, {
+typedef struct
+{
     uint64_t            count;
     HandoverModuleEntry modules[16];
-});
+} HandoverModules;
 
-struct$(MemoryMapEntry, {
+typedef struct
+{
     uint64_t base;
     uint64_t length;
     uint64_t type;
-});
+} MemoryMapEntry;
 
-struct$(HandoverMemoryMap, {
+typedef struct
+{
     uint64_t         entry_count;
     MemoryMapEntry **entries;
-});
+} HandoverMemoryMap;
 
-struct$(HandoverFramebuffer, {
+typedef struct
+{
     void    *address;
     uint64_t width;
     uint64_t height;
@@ -52,9 +57,10 @@ struct$(HandoverFramebuffer, {
     uint8_t  unused[7];
     uint64_t edid_size;
     void    *edid;
-});
+} HandoverFramebuffer;
 
-struct$(BootHandover, {
+typedef struct
+{
 #if defined(__x86_64__) || defined(__aarch64__)
     uint64_t rsdp;
 #endif
@@ -65,6 +71,6 @@ struct$(BootHandover, {
     HandoverMemoryMap   memory_map;
     HandoverFramebuffer framebuffer;
     HandoverModules     modules;
-});
+} BootHandover;
 
 #endif  // BOOT_INFO_HANDOVER_H

@@ -3,10 +3,10 @@
 
 #include <base/base-types.h>
 
-struct$(SymbolTable, {
+typedef struct {
 	uint64_t addr;
 	string_view name;
-});
+} SymbolTable;
 
 #if defined(__x86_64__)
 void backtrace_symbol(uint64_t address);

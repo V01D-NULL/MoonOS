@@ -5,12 +5,13 @@
 
 #define create_lock(name, lock) static Lock lock = {0, name};
 
-struct$(Lock, {
-	int locked;
-	string name;
-});
+typedef struct
+{
+    int    locked;
+    string name;
+} Lock;
 
 void acquire_lock(Lock *lock);
 void release_lock(Lock *lock);
 
-#endif // SPINLOCK_H
+#endif  // SPINLOCK_H
