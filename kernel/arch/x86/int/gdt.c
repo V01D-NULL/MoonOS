@@ -27,7 +27,6 @@ static tss_t tss;
 void         init_tss(uint64_t stack)
 {
     set_tss_entry((uintptr_t)&tss);
-    memset((void *)&tss, 0, sizeof(tss_t));
 
     tss.RSP0 = stack;
     tss.IST1 = 0;  // Disable IST
