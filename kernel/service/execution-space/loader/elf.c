@@ -5,7 +5,6 @@
 #include <mm/phys.h>
 #include <mm/virt.h>
 #include <moon-ds/containers.h>
-#include <moon-extra/iterator.h>
 #include <printk.h>
 
 static bool has_valid_attributes(const Elf64_Ehdr ehdr)
