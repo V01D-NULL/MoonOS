@@ -11,6 +11,7 @@
 #include <mm/virt.h>
 #include <moon-io/serial.h>
 #include <moon.h>
+#include <panic.h>
 #include <platform.h>
 #include <printk.h>
 #include "proto/limine.h"
@@ -28,8 +29,6 @@ void banner(void)
         "\n");
 }
 
-ALIGN_SECTION(16) static uint8_t stack[8192];
-
 NORETURN void boot(void)
 {
     BootHandover handover = limine_initialize();
@@ -40,6 +39,7 @@ NORETURN void boot(void)
     trace(TRACE_BOOT, "Reached target pmm\n");
     {
         init_phys_allocator(handover.memory_map);
+        alloc_init();
     }
 
     trace(TRACE_BOOT, "Reached target vmm\n");
@@ -48,8 +48,15 @@ NORETURN void boot(void)
         arch_init_paging(handover);
     }
 
+    auto bsp_stack = alloc_aligned(BSP_STACK_SIZE, 16);
+    if (bsp_stack == NULL)
+    {
+        panic("Failed to allocate BSP stack");
+    }
+    uint64_t bsp_stack_top = (uint64_t)bsp_stack + BSP_STACK_SIZE;
+
     trace(TRACE_BOOT, "Reached target gdt and tss\n");
-    init_gdt((uint64_t)stack + sizeof((uint64_t)stack));
+    init_gdt(bsp_stack_top);
 
     // Core#0 will remap the pic once.
     // After acpi_init the pic is disabled in favor of the apic
@@ -59,9 +66,8 @@ NORETURN void boot(void)
 
     banner();
 
-    alloc_init();
     platform_init(handover);
-    init_percpu((uint64_t)stack);
+    init_percpu(bsp_stack_top);
     idt_set_entry(KRNL_CS64, 0, 0x8E, (uint64_t)isr32, 32);
     kern_main(handover.modules, handover.memory_map);
 }

@@ -5,6 +5,8 @@
 #include <moon.h>
 #include "msr.h"
 
+#define BSP_STACK_SIZE 8192
+
 struct CpuidContext
 {
     int eax;
