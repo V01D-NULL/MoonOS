@@ -49,7 +49,7 @@ AcpiTable acpi_find_table(string_view identifier)
         }
     }
 
-    printk("acpi", "Could not find table '%s'\n", identifier);
+    trace(TRACE_HARDWARE, "Could not find table '%s'\n", identifier);
     return NULL;
 }
 

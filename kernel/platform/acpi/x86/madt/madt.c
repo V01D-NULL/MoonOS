@@ -44,8 +44,8 @@ struct apic_device_info madt_init(void *madt_base)
     pic_disable();
     enumarate_apic_devices(&madt);
 
-    trace(TRACE_MISC, "OEM String: '%s'\n", oem_str);
-    trace(TRACE_MISC, "OEM Table ID: '%s'\n", oem_table_id);
+    trace(TRACE_HARDWARE, "OEM String: '%s'\n", oem_str);
+    trace(TRACE_HARDWARE, "OEM Table ID: '%s'\n", oem_table_id);
 
     return apic_dev;
 }
@@ -61,7 +61,7 @@ static void enumarate_apic_devices(madt_t **madt)
         {
             case 0 ... 5:
             {
-                trace(TRACE_MISC,
+                trace(TRACE_HARDWARE,
                       "Detected %s\n",
                       interrupt_device_id_map[*madt_interrupt_devices]);
 
@@ -84,12 +84,12 @@ static void enumarate_apic_devices(madt_t **madt)
             }
 
             case 9:
-                printk("madt", "Detected x2APIC\n");
+                trace(TRACE_HARDWARE, "Detected x2APIC\n");
                 madt_interrupt_devices += madt_interrupt_devices[1];
                 break;
 
             default:
-                trace(TRACE_MISC,
+                trace(TRACE_HARDWARE,
                       "Invalid interrupt device detected, got %d, expected 0-5 "
                       "or 9\n",
                       *madt_interrupt_devices);

@@ -30,7 +30,7 @@ void arch_tty_init(uint64_t fb_addr, uint16_t fb_width, uint16_t fb_height,
     // clang-format on
 }
 
-void arch_tty_write(string_view str)
+void arch_tty_write(StringView str)
 {
-    flanterm_write(ft_ctx, str, strlen(str));
+    flanterm_write(ft_ctx, str.data, str.length);
 }

@@ -1,3 +1,4 @@
+#define PR_MODULE "panic"
 #include "panic.h"
 #include <base/fmt.h>
 #include <cpu.h>
@@ -17,8 +18,8 @@ NORETURN void __panic(size_t bp, size_t sp, string_view fmt, ...)
 
     override_quiet_boot();
 
-    printk("panic", "\n\033[31mA kernel panic has occurred\033[39m\n");
-    tty_write("*** \033[97mReason: %s\033[39m ***\n", panic_buff);
+    trace(TRACE_ERROR, "\n\033[31mA kernel panic has occurred\033[39m\n");
+    trace(TRACE_ERROR, "*** \033[97mReason: %s\033[39m ***\n", panic_buff);
     debug(false,
           "A kernel panic has occurred\n*** \033[97mReason: %s\033[39m ***\n",
           panic_buff);
@@ -29,11 +30,11 @@ NORETURN void __panic(size_t bp, size_t sp, string_view fmt, ...)
     }
 
     size_t frame_size = bp - sp;
-    printk("stackdump",
-           "Dumping %s's stackframe\nStackframe size: 0x%x\n",
-           sym_lookup(res.trace_results[1]).name,
-           frame_size);
-    tty_write("<addr>\t\t  <stack>\t   <stack+8>\n");
+    trace(TRACE_ERROR,
+          "Dumping %s's stackframe\nStackframe size: 0x%x\n",
+          sym_lookup(res.trace_results[1]).name,
+          frame_size);
+    trace(TRACE_ERROR, "<addr>\t\t  <stack>\t   <stack+8>\n");
 
     // The larger the stackframe the less likely the chance of seeing messages
     // printed earlier due to the terminal scrolling. 0x18 was chosen randomly.
@@ -43,10 +44,11 @@ NORETURN void __panic(size_t bp, size_t sp, string_view fmt, ...)
     // Dump stackframe of the function that called panic()
     for (size_t i = 0; i < frame_size; i++)
     {
-        tty_write("%lx: %p %p\n",
-                  bp,
-                  *(size_t *)(bp),
-                  *(size_t *)(bp + sizeof(size_t)));
+        trace(TRACE_ERROR,
+              "%lx: %p %p\n",
+              bp,
+              *(size_t *)(bp),
+              *(size_t *)(bp + sizeof(size_t)));
         bp += sizeof(size_t) * 2;
     }
 

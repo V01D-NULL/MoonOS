@@ -11,37 +11,37 @@
 isr_t isr_handler_array[256] = {0};
 bool  can_return             = false;
 
-static string_view exception_messages[] = {
-    "Type: (#DE) Division Exception",
-    "Type: (#DB) Debug Exception",
-    "Type: (NONE) NMI interrupt (Non Maskable Interrupt)",
-    "Type: (#BP) Breakpoint Exception",
-    "Type: (#OF) Into detected Overflow Exception",
-    "Type: (#BR) BOUND Range Exceeded",
-    "Type: (#UD) Invalid Opcode (Undefined Opcode)",
-    "Type: (#NM) Device Not Available (No Math Coprocessor)",
-    "Type: (#DF) Double Fault",
-    "Type: (NONE) Coprocessor Segment Overrun (reserved)",
-    "Type: (#TS) Invalid TSS",
-    "Type: (#NP) Segment Not Present",
-    "Type: (#SS) Stack-Segment Fault",
-    "Type: (#GP) General Protection Fault",
-    "Type: (#PF) Page Fault",
-    "Type: (NONE) Unknown interrupt",
-    "Type: (#CF) Coprocessor fault",
-    "Type: (#AC) Alignment check",
-    "Type: (NONE) Reserved",
-    "Type: (NONE) Reserved",
-    "Type: (NONE) Reserved",
-    "Type: (NONE) Reserved",
-    "Type: (NONE) Reserved",
-    "Type: (NONE) Reserved",
-    "Type: (NONE) Reserved",
-    "Type: (NONE) Reserved",
-    "Type: (NONE) Reserved",
-    "Type: (NONE) Reserved",
-    "Type: (NONE) Reserved",
-    "Type: (NONE) Reserved"};
+static StringView exception_messages[] = {
+    str_literal("Type: (#DE) Division Exception"),
+    str_literal("Type: (#DB) Debug Exception"),
+    str_literal("Type: (NONE) NMI interrupt (Non Maskable Interrupt)"),
+    str_literal("Type: (#BP) Breakpoint Exception"),
+    str_literal("Type: (#OF) Into detected Overflow Exception"),
+    str_literal("Type: (#BR) BOUND Range Exceeded"),
+    str_literal("Type: (#UD) Invalid Opcode (Undefined Opcode)"),
+    str_literal("Type: (#NM) Device Not Available (No Math Coprocessor)"),
+    str_literal("Type: (#DF) Double Fault"),
+    str_literal("Type: (NONE) Coprocessor Segment Overrun (reserved)"),
+    str_literal("Type: (#TS) Invalid TSS"),
+    str_literal("Type: (#NP) Segment Not Present"),
+    str_literal("Type: (#SS) Stack-Segment Fault"),
+    str_literal("Type: (#GP) General Protection Fault"),
+    str_literal("Type: (#PF) Page Fault"),
+    str_literal("Type: (NONE) Unknown interrupt"),
+    str_literal("Type: (#CF) Coprocessor fault"),
+    str_literal("Type: (#AC) Alignment check"),
+    str_literal("Type: (NONE) Reserved"),
+    str_literal("Type: (NONE) Reserved"),
+    str_literal("Type: (NONE) Reserved"),
+    str_literal("Type: (NONE) Reserved"),
+    str_literal("Type: (NONE) Reserved"),
+    str_literal("Type: (NONE) Reserved"),
+    str_literal("Type: (NONE) Reserved"),
+    str_literal("Type: (NONE) Reserved"),
+    str_literal("Type: (NONE) Reserved"),
+    str_literal("Type: (NONE) Reserved"),
+    str_literal("Type: (NONE) Reserved"),
+    str_literal("Type: (NONE) Reserved")};
 
 void isr_handler(struct iframe *regs)
 {
@@ -54,7 +54,7 @@ void isr_handler(struct iframe *regs)
         serial_set_color(BASH_RED);
         debug(true,
               "ERROR: %s (err_code %ld) | %lx\n",
-              exception_messages[regs->isr_number],
+              exception_messages[regs->isr_number].data,
               regs->error_code,
               cr2_read());
         // for(;;);
@@ -137,8 +137,9 @@ void install_isr(uint8_t base, isr_t handler)
         isr_handler_array[base] = handler;
     }
     else
-        printk(
-            "INT", "The interrupt ( %d ) has already been registered!\n", base);
+        trace(TRACE_INT,
+              "The interrupt (%d) has already been registered!\n",
+              base);
 }
 
 void uninstall_isr(uint8_t base)

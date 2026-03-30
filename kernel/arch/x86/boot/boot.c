@@ -19,14 +19,14 @@
 
 void banner(void)
 {
-    tty_write("Welcome to MoonOS\n");
-    tty_write(
-        "\n"
-        " _____             _____ _____  \n"
-        "|     |___ ___ ___|     |   __| \n"
-        "| | | | . | . |   |  |  |__   | \n"
-        "|_|_|_|___|___|_|_|_____|_____| \n"
-        "\n");
+    trace(TRACE_BOOT, "Welcome to MoonOS\n");
+    trace(TRACE_BOOT,
+          "\n"
+          " _____             _____ _____  \n"
+          "|     |___ ___ ___|     |   __| \n"
+          "| | | | . | . |   |  |  |__   | \n"
+          "|_|_|_|___|___|_|_|_____|_____| \n"
+          "\n");
 }
 
 NORETURN void boot(void)

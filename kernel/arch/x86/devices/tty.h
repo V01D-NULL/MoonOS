@@ -9,6 +9,6 @@ void arch_tty_init(uint64_t fb_addr, uint16_t fb_width, uint16_t fb_height,
                    uint8_t fb_red_mask_shift, uint8_t fb_green_mask_size,
                    uint8_t fb_green_mask_shift, uint8_t fb_blue_mask_size,
                    uint8_t fb_blue_mask_shift);
-void arch_tty_write(string_view str);
+void arch_tty_write(StringView str);
 
 #endif  // TTY_H
