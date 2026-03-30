@@ -17,11 +17,11 @@ StringView make_string_view(const char *str)
     };
 }
 
-StringView make_string_view_from_string(String str)
+StringView make_string_view_from_string(const String *str)
 {
     return (StringView){
-        .length = str.length,
-        .data   = str.data,
+        .length = str->length,
+        .data   = str->data,
     };
 }
 
