@@ -23,7 +23,7 @@ void printk_init(bool verbose_boot, HandoverFramebuffer fb)
     is_verbose_boot = verbose_boot;
 }
 
-void printk(string_view status, string_view fmt, ...)
+void printk(StringView status, StringView fmt, ...)
 {
     if (unlikely(!is_verbose_boot))
         return;
@@ -31,21 +31,18 @@ void printk(string_view status, string_view fmt, ...)
     char    buffer[512];
     va_list arg;
     va_start(arg, fmt);
-    vsnprintf((string)&buffer, (size_t)-1, fmt, arg);
+    vsnprintf(buffer, sizeof(buffer), fmt.data, arg);
     va_end(arg);
 
-    tty_write("[core#%d] %s: %s", current_cpu(), status, buffer);
-}
+    char output[512];
+    snprintf(output,
+             sizeof(output),
+             "[core#%d] %s: %s",
+             current_cpu(),
+             status.data,
+             buffer);
 
-void tty_write(string_view fmt, ...)
-{
-    char    buffer[512];
-    va_list arg;
-    va_start(arg, fmt);
-    vsnprintf((string)&buffer, (size_t)-1, fmt, arg);
-    va_end(arg);
-
-    arch_tty_write((string_view)&buffer);
+    arch_tty_write(str(output));
 }
 
 // Note: This should only be called when information

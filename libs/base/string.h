@@ -2,14 +2,36 @@
 #define LIB_KERNEL_STRING_H
 
 #include <base/base-types.h>
+#include <base/cstring.h>
+#include <base/mem.h>
 
-int      strcmp(string_view str1, string_view str2);
-int      strncmp(string_view str1, string_view str2, size_t n);
-char    *strcpy(char *dest, string_view src);
-char    *strcat(char *a, char *b);
-uint64_t strlen(string_view s);
-char    *strrev(char *src);
+#define str(expression)                         \
+    _Generic((expression),                      \
+        char *: make_string_view,               \
+        const char *: make_string_view,         \
+        String *: make_string_view_from_string, \
+        default: make_string_view_from_array)(expression)
 
-bool isdigit(int c);
+#define str_literal(literal)                           \
+    (StringView)                                       \
+    {                                                  \
+        .length = sizeof(literal) - 1, .data = literal \
+    }
+
+typedef struct
+{
+    size_t length;
+    char  *data;
+} String;
+
+typedef struct
+{
+    const size_t      length;
+    const char *const data;
+} StringView;
+
+StringView make_string_view(const char *str);
+StringView make_string_view_from_string(const String *str);
+StringView make_string_view_from_array(const char arr[], size_t len);
 
 #endif  // LIB_KERNEL_STRING_H
